@@ -75,6 +75,9 @@ const struct animation_t* spriteinfo_find_transition_animation(const spriteinfo_
 /* get a programmatic animation, or NULL if none is defined with the given name */
 const struct proganim_t* spriteinfo_get_proganim(const spriteinfo_t* info, const char* name);
 
+/* gets a NULL-terminated array with the element(s) of a user-defined custom property, or NULL if no property with the given name exists */
+const char* const* spriteinfo_user_property(const spriteinfo_t* info, const char* name);
+
 /* the source file (image) of the sprite */
 const char* spriteinfo_source_file(const spriteinfo_t* info);
 

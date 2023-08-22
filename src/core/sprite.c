@@ -36,28 +36,8 @@
 #include "../util/iterator.h"
 #include "../physics/collisionmask.h"
 
-/* constants & utilities */
-#define MAX_ANIMATIONS 256 /* sprites can have at most this number of animations (numbered from 0 to MAX_ANIMATIONS-1) */
-#define is_valid_anim_id(id) ((id) >= 0 && (id) < MAX_ANIMATIONS) /* is id a valid animation ID? */
-#define is_transition_anim_id(id) ((id) >= MAX_ANIMATIONS) /* is id a transition animation ID? */
-
-static const int DEFAULT_ANIM = 0;
-static const char DEFAULT_SPRITE[] = "null";
-static const char OVERRIDE_PREFIX[] = "sprites/overrides/"; /* sprites defined in .spr files located in this folder take predecence over sprites defined elsewhere */
-static const int OVERRIDE_PREFIX_LENGTH = sizeof(OVERRIDE_PREFIX) - 1;
-static const int TRANSITION_ANY_ANIM = -1; /* special value representing a transition to/from any animation */
-
-/* transitions are animations that play between two other animations */
-typedef struct animtransition_t
-{
-    int anim_id; /* ID of the transition animation */
-    int from_id; /* ID of the previous animation */
-    int to_id; /* ID of the next animation */
-    bool is_valid; /* validity flag */
-} animtransition_t;
-
-static animtransition_t *transition_new(int anim_id, int from_id, int to_id); /* creates a transition */
-static animtransition_t *transition_delete(animtransition_t *transition); /* deletes transition */
+typedef struct animtransition_t animtransition_t;
+typedef struct userproperty_t userproperty_t;
 
 /* sprite info */
 /* spriteinfo_t represents only ONE sprite (metadata), with several animations */
@@ -85,7 +65,42 @@ struct spriteinfo_t {
     int transition_from_length; /* length of transition_from[] */
 
     dictionary_t* prog_anims; /* keyframe-based animations */
+    dictionary_t* user_properties; /* user-defined properties */
 };
+
+/* transitions are animations that play between two other animations */
+struct animtransition_t
+{
+    int anim_id; /* ID of the transition animation */
+    int from_id; /* ID of the previous animation */
+    int to_id; /* ID of the next animation */
+    bool is_valid; /* validity flag */
+};
+
+static animtransition_t *transition_new(int anim_id, int from_id, int to_id); /* creates a transition */
+static animtransition_t *transition_delete(animtransition_t *transition); /* deletes transition */
+
+/* user-defined properties */
+struct userproperty_t
+{
+    DARRAY(char*, data); /* NULL-terminated string array of length >= 1 */
+};
+
+static userproperty_t* userproperty_new(); /* create a user-defined property */
+static userproperty_t* userproperty_delete(userproperty_t* user_property); /* delete a user-defined property */
+static void userproperty_push(userproperty_t* user_property, const char* string); /* add a string to a user-defined property */
+static bool userproperty_is_valid_name(const char* name); /* validate the name of a user-defined property */
+
+/* constants & utilities */
+#define MAX_ANIMATIONS 256 /* sprites can have at most this number of animations (numbered from 0 to MAX_ANIMATIONS-1) */
+#define is_valid_anim_id(id) ((id) >= 0 && (id) < MAX_ANIMATIONS) /* is id a valid animation ID? */
+#define is_transition_anim_id(id) ((id) >= MAX_ANIMATIONS) /* is id a transition animation ID? */
+
+static const int DEFAULT_ANIM = 0;
+static const char DEFAULT_SPRITE[] = "null";
+static const char OVERRIDE_PREFIX[] = "sprites/overrides/"; /* sprites defined in .spr files located in this folder take predecence over sprites defined elsewhere */
+static const int OVERRIDE_PREFIX_LENGTH = sizeof(OVERRIDE_PREFIX) - 1;
+static const int TRANSITION_ANY_ANIM = -1; /* special value representing a transition to/from any animation */
 
 /* private functions */
 static void validate_sprite(spriteinfo_t *spr); /* validates the sprite */
@@ -99,8 +114,10 @@ static void load_sprite_images(spriteinfo_t *spr); /* loads the sprite by readin
 static int scanfile(const char* vpath, void* param); /* file system callback */
 static int traverse(const parsetree_statement_t *stmt, void *vpath);
 static int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spriteinfo);
+static int traverse_user_properties(const parsetree_statement_t *stmt, void *dict);
 static void inspect_transitions(const spriteinfo_t* sprite);
 static void destroy_proganim(void* element, void* context);
+static void destroy_userproperty(void* element, void* context);
 
 /* hash table that stores the metadata of the sprites */
 HASHTABLE_GENERATE_CODE(spriteinfo_t, spriteinfo_destroy);
@@ -309,6 +326,26 @@ const proganim_t* spriteinfo_get_proganim(const spriteinfo_t* info, const char* 
 }
 
 /*
+ * spriteinfo_user_property()
+ * Get a NULL-terminated array with the element(s) of a user-defined custom property,
+ * or NULL if no property with the given name exists
+ */
+const char* const* spriteinfo_user_property(const spriteinfo_t* info, const char* name)
+{
+    const userproperty_t* user_property = dictionary_get(info->user_properties, name);
+
+    /* no such user-defined custom property? */
+    if(user_property == NULL)
+        return NULL;
+
+    /* user-property->data is a NULL-terminated array of strings */
+    assertx(user_property->data[0] != NULL); /* ensure length(array) > 0 */
+
+    /* done! */
+    return (const char* const*)user_property->data;
+}
+
+/*
  * spriteinfo_source_file()
  * The source file (image) of the sprite
  */
@@ -429,6 +466,7 @@ spriteinfo_t *spriteinfo_new()
     sprite->transition_from_length = 0;
 
     sprite->prog_anims = dictionary_create(true, destroy_proganim, sprite);
+    sprite->user_properties = dictionary_create(true, destroy_userproperty, sprite);
 
     return sprite;
 }
@@ -441,7 +479,10 @@ spriteinfo_t *spriteinfo_delete(spriteinfo_t *sprite)
 {
     extern animation_t *animation_destroy(animation_t *anim);
 
-    /* delete prog_anims */
+    /* delete user-defined properties */
+    dictionary_destroy(sprite->user_properties);
+
+    /* delete programmatic animations */
     dictionary_destroy(sprite->prog_anims);
 
     /* delete transition_from[] */
@@ -736,6 +777,71 @@ void preprocess_transitions(spriteinfo_t *sprite)
 
 
 /*
+ * userproperty_new()
+ * Create a user-defined property
+ */
+userproperty_t* userproperty_new()
+{
+    userproperty_t* user_property = mallocx(sizeof *user_property);
+
+    darray_init(user_property->data);
+    darray_push(user_property->data, NULL);
+
+    return user_property;
+}
+
+
+/*
+ * userproperty_delete()
+ * Delete a user-defined property
+ */
+userproperty_t* userproperty_delete(userproperty_t* user_property)
+{
+    /* user_property->data is a NULL-terminated array */
+    for(int i = darray_length(user_property->data) - 2; i >= 0; i--)
+        free(user_property->data[i]);
+
+    darray_release(user_property->data);
+
+    free(user_property);
+    return NULL;
+}
+
+
+/*
+ * userproperty_push()
+ * Add a string to a user-defined property
+ */
+void userproperty_push(userproperty_t* user_property, const char* string)
+{
+    int last = darray_length(user_property->data) - 1;
+
+    assertx(user_property->data[last] == NULL);
+
+    user_property->data[last] = str_dup(string);
+    darray_push(user_property->data, NULL);
+}
+
+
+/*
+ * userproperty_is_valid_name()
+ * Validate the name of a user-defined property
+ */
+bool userproperty_is_valid_name(const char* name)
+{
+    if(!(isalpha(*name) || *name == '_'))
+        return false;
+
+    for(const char* p = name + 1; *p != '\0'; p++) {
+        if(!(isalnum(*p) || *p == '_'))
+            return false;
+    }
+
+    return true;
+}
+
+
+/*
  * validate_sprite()
  * Validate (and possibly fix) the sprite
  */
@@ -856,6 +962,21 @@ void destroy_proganim(void* element, void* context)
     spriteinfo_t* sprite = (spriteinfo_t*)context;
 
     proganim_destroy(prog_anim);
+
+    (void)sprite;
+}
+
+
+/*
+ * destroy_userproperty()
+ * Destroy a user-defined property (dictionary)
+ */
+void destroy_userproperty(void* element, void* context)
+{
+    userproperty_t* user_property = (userproperty_t*)element;
+    spriteinfo_t* sprite = (spriteinfo_t*)context;
+
+    userproperty_delete(user_property);
 
     (void)sprite;
 }
@@ -1078,9 +1199,51 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         /* add the keyframe-based animation to the dictionary */
         dictionary_put(s->prog_anims, name, prog_anim);
     }
+    else if(str_icmp(identifier, "custom_properties") == 0) {
+        p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_program(p1, "Expected a block of user-defined properties");
+
+        /* read the user-defined properties */
+        nanoparser_traverse_program_ex(nanoparser_get_program(p1), s->user_properties, traverse_user_properties);
+    }
     else
         nanoparser_crash(stmt, "Unknown identifier \"%s\"", identifier);
 
+    return 0;
+}
+
+
+/*
+ * traverse_user_properties()
+ * Read user-defined properties
+ */
+int traverse_user_properties(const parsetree_statement_t *stmt, void *dict)
+{
+    /* validate the name of the user-defined property */
+    const char* identifier = nanoparser_get_identifier(stmt);
+    if(!userproperty_is_valid_name(identifier))
+        nanoparser_crash(stmt, "Not a valid user-defined property name \"%s\"", identifier);
+
+    /* validate the content of the user-defined property */
+    const parsetree_parameter_t* param_list = nanoparser_get_parameter_list(stmt);
+    int number_of_parameters = nanoparser_get_number_of_parameters(param_list);
+    if(number_of_parameters == 0)
+        nanoparser_crash(stmt, "Unspecified user-defined property \"%s\"", identifier);
+
+    /* allocate a user-defined property */
+    dictionary_t* user_properties = (dictionary_t*)dict;
+    userproperty_t* user_property = userproperty_new();
+    dictionary_put(user_properties, identifier, user_property);
+
+    /* read the element(s) of the user-defined property */
+    for(int i = 1; i <= number_of_parameters; i++) {
+        const parsetree_parameter_t* param_i = nanoparser_get_nth_parameter(param_list, i);
+        const char* string = nanoparser_get_string(param_i);
+
+        userproperty_push(user_property, string);
+    }
+
+    /* done! */
     return 0;
 }
 

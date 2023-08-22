@@ -105,4 +105,7 @@ struct transform_t* animation_interpolated_transform(const animation_t* anim, do
 /* the interpolated opacity of a keyframe-based animation */
 float animation_interpolated_opacity(const animation_t* anim, double seconds);
 
+/* gets a NULL-terminated array with the element(s) of a user-defined custom property, or NULL if no property with the given name exists */
+const char* const* animation_user_property(const animation_t* anim, const char* name);
+
 #endif

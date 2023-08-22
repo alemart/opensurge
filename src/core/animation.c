@@ -346,7 +346,15 @@ float animation_interpolated_opacity(const animation_t* anim, double seconds)
     return proganim_interpolated_opacity(anim->prog_anim, seconds, anim->repeat);
 }
 
-
+/*
+ * animation_user_property()
+ * Get a NULL-terminated array with the element(s) of a user-defined custom property,
+ * or NULL if no property with the given name exists
+ */
+const char* const* animation_user_property(const animation_t* anim, const char* name)
+{
+    return spriteinfo_user_property(anim->sprite, name);
+}
 
 
 
