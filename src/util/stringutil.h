@@ -50,6 +50,6 @@ char* x64_to_str(uint64_t value, char* buf, size_t size); /* converts a 64-bit v
 uint64_t str_to_x64(const char* buf); /* converts a hex-string to a 64-bit value */
 
 /* Macros */
-#define atob(str)               ((str_icmp((str), "true") == 0) || (str_icmp((str), "yes") == 0))
+#define atob(str)           (str_icmp((str), "true") == 0)
 
 #endif
