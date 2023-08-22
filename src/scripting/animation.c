@@ -22,6 +22,7 @@
 #include <string.h>
 #include "scripting.h"
 #include "../util/util.h"
+#include "../util/stringutil.h"
 #include "../core/sprite.h"
 #include "../entities/actor.h"
 #include "../entities/player.h"
@@ -50,6 +51,7 @@ static surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const
 static surgescript_var_t* fun_getsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getexists(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_prop(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t ANIMID_ADDR = 0;
 static const surgescript_heapptr_t SPRITENAME_ADDR = 1;
 static const surgescript_heapptr_t HOTSPOT_ADDR = 2;
@@ -60,6 +62,7 @@ static const char* ONCHANGE = "onAnimationChange"; /* fun onAnimationChange(anim
 static void notify_change(const surgescript_object_t* object);
 static actor_t* get_animation_actor(const surgescript_object_t* object);
 static const animation_t* null_animation();
+static surgescript_var_t* convert_string_to_var(surgescript_var_t* var, const char* string);
 
 /*
  * scripting_register_animation()
@@ -91,6 +94,7 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "get_sync", fun_getsync, 0);
     surgescript_vm_bind(vm, "Animation", "set_sync", fun_setsync, 1);
     surgescript_vm_bind(vm, "Animation", "get_exists", fun_getexists, 0);
+    surgescript_vm_bind(vm, "Animation", "prop", fun_prop, 1);
 }
 
 /*
@@ -450,6 +454,42 @@ surgescript_var_t* fun_getexists(surgescript_object_t* object, const surgescript
     return surgescript_var_set_bool(surgescript_var_create(), animation != null_animation());
 }
 
+/* read a user-defined custom property given its name. Returns null if no such property is defined */
+surgescript_var_t* fun_prop(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const char* property_name = surgescript_var_fast_get_string(param[0]);
+    const animation_t* animation = scripting_animation_ptr(object);
+    const char* const* prop = animation_user_property(animation, property_name);
+    surgescript_var_t* ret = surgescript_var_create();
+
+    /* no such property exists */
+    if(prop == NULL)
+        return surgescript_var_set_null(ret);
+
+    /* does the property have multiple elements or just a single one? */
+    bool want_array = (prop[0] != NULL && prop[1] != NULL);
+    if(!want_array) {
+        /* the property has a single element */
+        return convert_string_to_var(ret, prop[0]);
+    }
+    else {
+        /* spawn an array */
+        surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+        surgescript_objecthandle_t array_handle = surgescript_objectmanager_spawn_array(manager);
+        surgescript_object_t* array = surgescript_objectmanager_get(manager, array_handle);
+
+        /* for each element of the user-defined custom property, call array.push(element) */
+        surgescript_var_t* tmp = ret;
+        for(const char* const* it = prop; *it != NULL; it++) {
+            convert_string_to_var(tmp, *it);
+            surgescript_object_call_function(array, "push", (const surgescript_var_t*[]){ tmp }, 1, NULL);
+        }
+
+        /* return the new array */
+        return surgescript_var_set_objecthandle(ret, array_handle);
+    }
+}
+
 
 /* --- misc --- */
 
@@ -486,4 +526,19 @@ void notify_change(const surgescript_object_t* object)
 const animation_t* null_animation()
 {
     return sprite_get_animation(NULL, 0);
+}
+
+/* convert a string to a SurgeScript variable. The type of the variable depends on its contents */
+surgescript_var_t* convert_string_to_var(surgescript_var_t* var, const char* string)
+{
+    if(string == NULL)
+        return surgescript_var_set_null(var);
+
+    if(str_is_numeric(string))
+        return surgescript_var_set_number(var, atof(string));
+
+    if(str_is_boolean(string))
+        return surgescript_var_set_bool(var, atob(string));
+
+    return surgescript_var_set_string(var, string);
 }
