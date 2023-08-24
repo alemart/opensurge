@@ -207,7 +207,7 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
         if(has_extension(nanoparser_get_string(p), required_extension))
             darray_push(q->entry, str_dup(nanoparser_get_string(p)));
         else
-            fatal_error("Quest loader: command %s expects a %s file at %s:%d", str_to_lower(id), required_extension, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            fatal_error("Quest loader: command %s expects a %s file at %s:%d", str_to_lower(id, NULL, 0), required_extension, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
     }
     else if(id[0] == '<' && id[strlen(id)-1] == '>') {
@@ -234,14 +234,14 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
         /* these fields are obsolete and were removed
            this code is kept for retro-compatibility */
         nanoparser_expect_string(p, "Quest loader: quest parameter is expected");
-        logfile_message("Quest loader: field %s is obsolete", str_to_lower(id));
+        logfile_message("Quest loader: field %s is obsolete", str_to_lower(id, NULL, 0));
 
     }
     else if(str_icmp(id, "hidden") == 0) {
 
         /* this field is obsolete and was removed
            this code is kept for retro-compatibility */
-        logfile_message("Quest loader: field %s is obsolete", str_to_lower(id));
+        logfile_message("Quest loader: field %s is obsolete", str_to_lower(id, NULL, 0));
 
     }
     else {

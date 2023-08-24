@@ -49,7 +49,7 @@ typedef enum pause_state_t pause_state_t;
 enum pause_state_t
 {
     STATE_APPEARING,    /* the player has just paused the game */
-    STATE_WAITING,   /* waiting for player input */
+    STATE_WAITING,      /* waiting for player input */
     STATE_DISAPPEARING  /* closing the pause menu */
 };
 

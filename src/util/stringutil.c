@@ -26,38 +26,52 @@
 
 /*
  * str_to_upper()
- * Upper-case convert
+ * Convert to uppercase
+ * If buffer is NULL, a statically allocated buffer is returned. Otherwise,
+ * buffer is returned.
  */
-const char *str_to_upper(const char *str)
+char *str_to_upper(const char *str, char *buffer, size_t buffer_size)
 {
     static char buf[1024];
     char *p;
     int i;
 
-    for(p=buf, i=0; *str && i<sizeof(buf)-1; str++,p++,i++)
+    if(buffer == NULL) {
+        buffer = buf;
+        buffer_size = sizeof buf;
+    }
+
+    for(p=buffer, i=0; *str && i<buffer_size-1; str++,p++,i++)
         *p = toupper(*str);
     *p = '\0';
 
-    return buf;
+    return buffer;
 }
 
 
 
 /*
  * str_to_lower()
- * Lower-case convert
+ * Convert to lowercase
+ * If buffer is NULL, a statically allocated buffer is returned. Otherwise,
+ * buffer is returned.
  */
-const char *str_to_lower(const char *str)
+char *str_to_lower(const char *str, char *buffer, size_t buffer_size)
 {
     static char buf[1024];
     char *p;
     int i = 0;
 
-    for(p=buf; *str && i<sizeof(buf)-1; str++,p++,i++)
+    if(buffer == NULL) {
+        buffer = buf;
+        buffer_size = sizeof buf;
+    }
+
+    for(p=buffer; *str && i<buffer_size-1; str++,p++,i++)
         *p = tolower(*str);
     *p = '\0';
 
-    return buf;
+    return buffer;
 }
 
 
@@ -236,25 +250,31 @@ char* str_trim(char* dest, const char* src, size_t dest_size)
  */
 char* str_dup(const char* str)
 {
-    char *p = mallocx((strlen(str)+1) * sizeof(char));
-    strcpy(p, str);
-    return p;
+    char *p = mallocx((strlen(str) + 1) * sizeof(char));
+    return strcpy(p, str);
 }
 
 /*
  * str_addslashes()
- * replaces " by \\", returning a static char*
+ * Replaces " by \\"
+ * If buffer is NULL, a statically allocated buffer is returned. Otherwise,
+ * buffer is returned.
  */
-const char* str_addslashes(const char *str)
+char* str_addslashes(const char *str, char *buffer, size_t buffer_size)
 {
     static char buf[1024];
     int i = 0;
     char *p;
 
-    for(p=buf; *str && i<sizeof(buf)-1; str++,p++,i++) {
+    if(buffer == NULL) {
+        buffer = buf;
+        buffer_size = sizeof buf;
+    }
+
+    for(p=buffer; *str && i<buffer_size-1; str++,p++,i++) {
         if(*str == '"') {
             *p = '\\';
-            if(++i<sizeof(buf)-1)
+            if(++i<buffer_size-1)
                 *(++p) = *str;
         }
         else
@@ -262,7 +282,7 @@ const char* str_addslashes(const char *str)
     }
     *p = '\0';
 
-    return buf;
+    return buffer;
 }
 
 /*
@@ -340,7 +360,8 @@ const char* str_basename(const char *path)
  */
 char* x64_to_str(uint64_t value, char* buf, size_t size)
 {
-    static char c[] = "0123456789abcdef", _buf[17] = "";
+    static const char c[] = "0123456789abcdef";
+    static char _buf[17] = "";
     char *p, *q, *r;
 
     /* use an internal buffer? */

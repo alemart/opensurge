@@ -25,8 +25,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-const char* str_to_upper(const char* str); /* returns a pointer to a static variable */
-const char* str_to_lower(const char* str); /* returns a pointer to a static variable */
+char* str_to_upper(const char* str, char* buffer, size_t buffer_size); /* convert to uppercase */
+char* str_to_lower(const char* str, char* buffer, size_t buffer_size); /* convert to lowercase */
 
 int str_icmp(const char* s1, const char* s2); /* case-insensitive compare function */
 int str_incmp(const char* s1, const char* s2, size_t n); /* case-insensitive compare up to n characters */
@@ -42,7 +42,7 @@ char* str_trim(char* dest, const char* src, size_t dest_size); /* trim */
 char* str_dup(const char* str); /* duplicates a string - strdup() isn't ANSI C */
 char* str_rstr(char* haystack, const char* needle); /* reverse strstr() */
 
-const char* str_addslashes(const char* str); /* replaces " by \\", returning a static char* */
+char* str_addslashes(const char* str, char* buffer, size_t buffer_size); /* replaces " by \\" */
 char* str_normalize_slashes(char* str); /* replaces '\\' by '/' in-place */
 const char* str_from_int(int integer, char* buffer, size_t buffer_size); /* converts integer to string; if no buffer is specified, returns a static char* */
 const char* str_basename(const char* path); /* the filename of the path */

@@ -614,12 +614,12 @@ int level_save(const char *filepath)
     al_fprintf(fp,
     "// header\n"
     "name \"%s\"\n",
-    str_addslashes(name));
+    str_addslashes(name, NULL, 0));
 
     /* author */
-    al_fprintf(fp, "author \"%s\"\n", str_addslashes(author));
+    al_fprintf(fp, "author \"%s\"\n", str_addslashes(author, NULL, 0));
     if(strcmp(license, "") != 0)
-        al_fprintf(fp, "license \"%s\"\n", str_addslashes(license));
+        al_fprintf(fp, "license \"%s\"\n", str_addslashes(license, NULL, 0));
 
     /* level attributes */
     al_fprintf(fp,
@@ -629,7 +629,7 @@ int level_save(const char *filepath)
     "theme \"%s\"\n"
     "bgtheme \"%s\"\n"
     "spawn_point %d %d\n",
-    str_addslashes(version),
+    str_addslashes(version, NULL, 0),
     GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP,
     act, theme, bgtheme,
     (int)spawn_point.x, (int)spawn_point.y);
@@ -648,7 +648,7 @@ int level_save(const char *filepath)
         al_fprintf(fp, "setup");
         while(iterator_has_next(setup_iterator)) {
             const char** object_name = iterator_next(setup_iterator);
-            al_fprintf(fp, " \"%s\"", str_addslashes(*object_name));
+            al_fprintf(fp, " \"%s\"", str_addslashes(*object_name, NULL, 0));
         }
         al_fprintf(fp, "\n");
     }
@@ -657,7 +657,7 @@ int level_save(const char *filepath)
     /* players */
     al_fprintf(fp, "players");
     for(int i = 0; i < team_size; i++)
-        al_fprintf(fp, " \"%s\"", str_addslashes(player_name(team[i])));
+        al_fprintf(fp, " \"%s\"", str_addslashes(player_name(team[i]), NULL, 0));
     al_fprintf(fp, "\n");
 
     /* read only? */
@@ -678,9 +678,15 @@ int level_save(const char *filepath)
         al_fprintf(fp, "\n// dialogs\n");
         for(int i = 0; i < dialogregion_size; i++) {
             char title[256], message[1024];
-            str_cpy(title, str_addslashes(dialogregion[i].title), sizeof(title));
-            str_cpy(message, str_addslashes(dialogregion[i].message), sizeof(message));
-            al_fprintf(fp, "dialogbox %d %d %d %d \"%s\" \"%s\"\n", dialogregion[i].rect_x, dialogregion[i].rect_y, dialogregion[i].rect_w, dialogregion[i].rect_h, title, message);
+            al_fprintf(fp,
+                "dialogbox %d %d %d %d \"%s\" \"%s\"\n",
+                dialogregion[i].rect_x,
+                dialogregion[i].rect_y,
+                dialogregion[i].rect_w,
+                dialogregion[i].rect_h,
+                str_addslashes(dialogregion[i].title, title, sizeof(title)),
+                str_addslashes(dialogregion[i].message, message, sizeof(message))
+            );
         }
     }
 
@@ -729,7 +735,7 @@ int level_save(const char *filepath)
         al_fprintf(fp, "\n// legacy objects\n");
         for(enemy_list_t* ite = object_list; ite != NULL; ite = ite->next) {
             if(ite->data->created_from_editor && ite->data->state != ES_DEAD)
-                al_fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(ite->data->name), (int)ite->data->actor->spawn_point.x, (int)ite->data->actor->spawn_point.y);
+                al_fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(ite->data->name, NULL, 0), (int)ite->data->actor->spawn_point.x, (int)ite->data->actor->spawn_point.y);
         }
     }
     object_list = entitymanager_release_retrieved_object_list(object_list);
@@ -1041,7 +1047,7 @@ bool level_save_ssobject(surgescript_object_t* object, void* param)
             v2d_t spawn_point = entity_info_spawnpoint(object);
             uint64_t entity_id = entity_info_id(object);
 
-            al_fprintf(fp, "entity \"%s\" %d %d \"%s\"\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y, x64_to_str(entity_id, NULL, 0));
+            al_fprintf(fp, "entity \"%s\" %d %d \"%s\"\n", str_addslashes(object_name, NULL, 0), (int)spawn_point.x, (int)spawn_point.y, x64_to_str(entity_id, NULL, 0));
         }
     }
 
@@ -3755,7 +3761,7 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
                 static char tmp[3][128];
                 snprintf(tmp[0], sizeof(tmp[0]), "EDITOR_BRICK_TYPE_%s", brick_util_typename(brick_type_preview(objid)));
                 snprintf(tmp[1], sizeof(tmp[1]), "EDITOR_BRICK_BEHAVIOR_%s", brick_util_behaviorname(brick_behavior_preview(objid)));
-                snprintf(tmp[2], sizeof(tmp[2]), "EDITOR_BRICK_FLIP_%s", str_to_upper(brick_util_flipstr(editor_flip)));
+                snprintf(tmp[2], sizeof(tmp[2]), "EDITOR_BRICK_FLIP_%s", str_to_upper(brick_util_flipstr(editor_flip), NULL, 0));
                 snprintf(buf, sizeof(buf),
                     "%4d %10s %12s    %3dx%-3d    z=%.2f    %6s", objid,
                     lang_getstring(tmp[0], tmp[0], sizeof(tmp[0])),
