@@ -79,7 +79,7 @@ static group_t *create_grouptree();
 #if defined(__ANDROID__)
 #define ENABLE_RESOLUTION 0
 #else
-#define ENABLE_RESOLUTION 0 /* deprecated? */
+#define ENABLE_RESOLUTION 1 /* deprecated? */
 #endif
 
 /* fullscreen */
@@ -87,6 +87,13 @@ static group_t *create_grouptree();
 #define ENABLE_FULLSCREEN 0
 #else
 #define ENABLE_FULLSCREEN 1
+#endif
+
+/* enable gamepad */
+#if defined(__ANDROID__)
+#define ENABLE_GAMEPAD 0
+#else
+#define ENABLE_GAMEPAD 0
 #endif
 
 /* website */
@@ -1256,7 +1263,11 @@ group_t *create_grouptree()
 
     /* section: game */
     game = group_game_create();
+#if ENABLE_GAMEPAD
     group_addchild(game, group_gamepad_create());
+#else
+    (void)group_gamepad_create();
+#endif
     group_addchild(game, group_stageselect_create());
     group_addchild(game, group_changelanguage_create());
     group_addchild(game, group_credits_create());
