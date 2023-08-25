@@ -61,7 +61,8 @@ static float scene_time;
 static bgtheme_t *bgtheme;
 static bool stageselect_enable_debug;
 static music_t* music;
-static const int OFFSET_X = 60;
+/*static const int OFFSET_X = 60;*/
+#define OFFSET_X (VIDEO_SCREEN_W / 2 - 153) /* adjust the position of the texts according to the size of the screen */
 
 /* private methods */
 static void save_preferences();
