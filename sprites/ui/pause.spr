@@ -1,17 +1,240 @@
 // -----------------------------------------------------------------------------
 // File: pause.spr
-// Description: sprite script for the legacy pause icon
+// Description: pause UI
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-// art by Colin Beard
-sprite "Pause"
+//
+// The Pause animation is divided into 3 phases:
+//
+// - idle (animation 0)
+// - appearing (animation 1)
+// - disappearing (animation 2)
+//
+// These phases are played in this sequence: appearing, idle and disappearing.
+// The pause menu first appears. Then, user will select an option during the
+// idle phase. Finally, when an option is chosen, the pause menu disappears.
+//
+// The options are: Continue, Restart and Exit (in this order). They can be
+// either highlighed or unhighlighted. Only one option will be highlighted at
+// any given time. You may change the position of the options (make a vertical
+// or horizontal layout) and the engine will attempt to accomodate your setup.
+//
+// In order to change the pause UI, create a new spritesheet (image), copy this
+// .spr file to sprites/overrides/ and make the desired modifications.
+//
+// In order to change the texts of the pause menu, modify the PAUSE_ strings
+// and save them in languages/extends/ (see languages/english.lng for details).
+//
+
+sprite "Pause - Overlay"
 {
-    source_file     "images/pause.png"
-    source_rect     0 0 23 20
-    frame_size      23 20
-    hot_spot        0 0
+    source_file     "images/ui/pause.png"
+    source_rect     0 0 128 240
+    frame_size      128 240
+    hot_spot        128 0
+
+    custom_properties
+    {
+        title_offset            -16 16      // offset relative to the hot_spot
+        continue_offset         0 96
+        restart_offset          0 128
+        exit_offset             0 160
+
+        position_in_screen      1.0 0.0     // top-right corner; relative coordinates in [0,1]
+    }
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // appearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "appearing"
+    }
+
+    // disappearing
+    animation 2
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "disappearing"
+    }
+
+    keyframes "appearing"
+    {
+        duration            0.15
+
+        keyframe 0%
+        {
+            translation     128 0
+        }
+
+        keyframe 100%
+        {
+            translation     0 0
+        }
+    }
+
+    keyframes "disappearing"
+    {
+        duration            0.15
+
+        keyframe 0%
+        {
+            translation     0 0
+        }
+
+        keyframe 100%
+        {
+            translation     128 0
+        }
+    }
+}
+
+sprite "Pause - Option"
+{
+    source_file     "images/ui/pause.png"
+    source_rect     0 240 128 32
+    frame_size      128 32
+    hot_spot        128 8
+
+    custom_properties
+    {
+        font_name           "GoodNeighbors"
+        font_align          "right"             // "left" | "center" | "right"
+        font_offset         -16 -7              // offset relative to the hot spot
+    }
+
+    // unhighlighted: typically an invisible (fully transparent) frame
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+        play        "hidden"
+    }
+
+    // highlighted
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // from unhighlighted to highlighted
+    transition 0 to 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "appearing"
+    }
+
+    // from highlighted to unhighlighted
+    transition 1 to 0
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "disappearing"
+    }
+
+    keyframes "appearing"
+    {
+        duration            0.15
+
+        keyframe 0%
+        {
+            translation     128 0
+        }
+
+        keyframe 100%
+        {
+            translation     0 0
+        }
+    }
+
+    keyframes "disappearing"
+    {
+        duration            0.15
+
+        keyframe 0%
+        {
+            translation     0 0
+        }
+
+        keyframe 100%
+        {
+            translation     128 0
+        }
+    }
+
+    keyframes "hidden"
+    {
+        duration            0.15
+
+        keyframe 0%
+        {
+            opacity         0%
+        }
+    }
+}
+
+sprite "Pause - Title"
+{
+    source_file     "images/ui/pause.png"
+    source_rect     0 0 16 16
+    frame_size      16 16
+    hot_spot        8 8
+
+    custom_properties
+    {
+        font_name           "GoodNeighborsLarge"
+        font_align          "right"             // "left" | "center" | "right"
+        font_offset         0 0                 // offset relative to the hot spot
+    }
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+        play        "hidden"
+    }
+
+    keyframes "hidden"
+    {
+        duration            1.0
+
+        keyframe 0%
+        {
+            opacity         0%
+        }
+    }
+}
+
+// the Drag Handle only appears in Mobile mode
+sprite "Pause - Drag Handle"
+{
+    source_file     "images/ui/pause.png"
+    source_rect     0 272 426 16
+    frame_size      426 16
+    hot_spot        213 16
+
+    // the spot that can be dragged
+    action_spot     213 0
 
     animation 0
     {

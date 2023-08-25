@@ -182,6 +182,8 @@ static const char* BLACKLIST[] = {
     PREFIX("images/backgrounds/waterworks-zone/"), /* 0.6.0 => 0.6.1 */
     PREFIX("images/bricks/waterworks-zone/"), /* 0.6.0 => 0.6.1 */
     PREFIX("images/backgrounds/waterworks-zone-indoors-"), /* 0.6.1 => 0.6.1 */
+    EXACT("fonts/pause_menu.fnt"), /* 0.6.1 => 0.6.1 */
+    EXACT("sprites/ui/pause_menu.spr"), /* 0.6.1 => 0.6.1 */
     EXACT("images/allegro.png"), /* 0.2.0 => 0.6.1 */
 
     /* NULL-terminated list */

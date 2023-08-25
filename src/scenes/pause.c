@@ -36,6 +36,7 @@
 #include "../core/logfile.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
+#include "../util/stringutil.h"
 #include "../entities/actor.h"
 #include "../entities/mobilegamepad.h"
 #include "../scenes/level.h"
@@ -48,8 +49,8 @@
 typedef enum pause_state_t pause_state_t;
 enum pause_state_t
 {
+    STATE_IDLE,         /* waiting for player input */
     STATE_APPEARING,    /* the player has just paused the game */
-    STATE_WAITING,      /* waiting for player input */
     STATE_DISAPPEARING  /* closing the pause menu */
 };
 
@@ -61,7 +62,7 @@ static void update_waiting();
 static void update_disappearing();
 static void (*update[])() = {
     [STATE_APPEARING] = update_appearing,
-    [STATE_WAITING] = update_waiting,
+    [STATE_IDLE] = update_waiting,
     [STATE_DISAPPEARING] = update_disappearing
 };
 
@@ -159,7 +160,8 @@ static const inputbutton_t BACK_BUTTON = IB_FIRE4;
 typedef enum pause_sprite_t pause_sprite_t;
 enum pause_sprite_t
 {
-    SPRITE_BACKGROUND,  /* sprite at the background */
+    SPRITE_BACKGROUND,  /* overlay */
+    SPRITE_TITLE,       /* title */
     SPRITE_CONTINUE,    /* continue game */
     SPRITE_RESTART,     /* restart level */
     SPRITE_EXIT,        /* exit game */
@@ -168,14 +170,26 @@ enum pause_sprite_t
 };
 
 static const char* SPRITE_NAME[] = {
-    [SPRITE_BACKGROUND] =   "Pause Menu",
-    [SPRITE_CONTINUE] =     "Pause Menu - Option - Continue",
-    [SPRITE_RESTART] =      "Pause Menu - Option - Restart",
-    [SPRITE_EXIT] =         "Pause Menu - Option - Exit"
+    [SPRITE_BACKGROUND] =   "Pause - Overlay",
+    [SPRITE_TITLE]          "Pause - Title",
+    [SPRITE_CONTINUE] =     "Pause - Option",
+    [SPRITE_RESTART] =      "Pause - Option",
+    [SPRITE_EXIT] =         "Pause - Option"
+};
+
+static const char* SPRITE_POSITION_PROPERTY = "position_in_screen";
+
+static const char* SPRITE_OFFSET_PROPERTY[] = {
+    [SPRITE_BACKGROUND] =   "",
+    [SPRITE_TITLE] =        "title_offset",
+    [SPRITE_CONTINUE] =     "continue_offset",
+    [SPRITE_RESTART] =      "restart_offset",
+    [SPRITE_EXIT] =         "exit_offset"
 };
 
 static const int ANIMATION_NUMBER[][3] = {
-    [SPRITE_BACKGROUND] =   { [STATE_APPEARING] = 1, [STATE_WAITING] = 2, [STATE_DISAPPEARING] = 3 },
+    [SPRITE_BACKGROUND] =   { [STATE_APPEARING] = 1, [STATE_IDLE] = 0, [STATE_DISAPPEARING] = 2 },
+    [SPRITE_TITLE] =        { [0] = 0 },
     [SPRITE_CONTINUE] =     { [HIGHLIGHTED] = 1, [UNHIGHLIGHTED] = 0 },
     [SPRITE_RESTART] =      { [HIGHLIGHTED] = 1, [UNHIGHLIGHTED] = 0 },
     [SPRITE_EXIT] =         { [HIGHLIGHTED] = 1, [UNHIGHLIGHTED] = 0 }
@@ -198,12 +212,17 @@ enum pause_text_t
     TEXT_COUNT          /* number of text elements */
 };
 
-static const char* FONT_NAME[] = {
-    [TEXT_TITLE] =      "Pause Menu - Title",
-    [TEXT_CONTINUE] =   "Pause Menu - Option",
-    [TEXT_RESTART] =    "Pause Menu - Option",
-    [TEXT_EXIT] =       "Pause Menu - Option"
+static const char* DEFAULT_FONT_NAME[] = {
+    [TEXT_TITLE] =      "GoodNeighborsLarge",
+    [TEXT_CONTINUE] =   "GoodNeighbors",
+    [TEXT_RESTART] =    "GoodNeighbors",
+    [TEXT_EXIT] =       "GoodNeighbors"
 };
+
+static const char* DEFAULT_FONT_ALIGN = "right";
+static const char* FONT_NAME_PROPERTY = "font_name";
+static const char* FONT_ALIGN_PROPERTY = "font_align";
+static const char* FONT_OFFSET_PROPERTY = "font_offset";
 
 static const char* FONT_TEXT[] = {
     [TEXT_TITLE] =      "$PAUSE_TITLE",
@@ -218,7 +237,7 @@ static const char* FONT_COLOR[] = {
 };
 
 static pause_sprite_t FONT_PARENT_SPRITE[] = { /* helps with positioning */
-    [TEXT_TITLE] =      SPRITE_BACKGROUND,
+    [TEXT_TITLE] =      SPRITE_TITLE,
     [TEXT_CONTINUE] =   SPRITE_CONTINUE,
     [TEXT_RESTART] =    SPRITE_RESTART,
     [TEXT_EXIT] =       SPRITE_EXIT
@@ -256,7 +275,7 @@ static sound_t* sound[SOUND_COUNT] = { NULL };
 #define DRAG_HANDLE_RADIUS              (v2d_magnitude(actor_action_offset(drag_handle)))
 #define DRAG_HANDLE_MINDIST             (VIDEO_SCREEN_H / 4) /* minimum distance required to open the overlay */
 #define DRAG_HANDLE_INITIAL_POSITION    (v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H))
-static const char* DRAG_HANDLE_SPRITE_NAME = "Pause Menu - Drag Handle";
+static const char* DRAG_HANDLE_SPRITE_NAME = "Pause - Drag Handle";
 static const int DRAG_HANDLE_ANIMATION_NUMBER = 0;
 static const float DRAG_HANDLE_FADE_TIME = 0.125f; /* in seconds */
 
@@ -301,6 +320,9 @@ static const float FADEOUT_TIME = 0.5f; /* in seconds */
 static bool was_mobilegamepad_visible = false;
 static image_t* snapshot = NULL;
 static input_t* input = NULL;
+static const char* read_property_as_string(pause_sprite_t sprite, const char* property_name, const char* default_value);
+static v2d_t read_property_as_v2d(pause_sprite_t sprite, const char* property_name);
+static fontalign_t string_to_fontalign(const char* align);
 
 
 
@@ -357,18 +379,35 @@ void pause_init(void *_)
     anim[SPRITE_RESTART] = ANIMATION(SPRITE_RESTART, UNHIGHLIGHTED);
     anim[SPRITE_EXIT] = ANIMATION(SPRITE_EXIT, UNHIGHLIGHTED);
 
+    /* find the position of the overlay in screen space */
+    v2d_t base_position = v2d_compmult(
+        read_property_as_v2d(SPRITE_BACKGROUND, SPRITE_POSITION_PROPERTY),
+        video_get_screen_size()
+    );
+
     /* initialize the actors */
     for(int i = 0; i < SPRITE_COUNT; i++) {
         actor[i] = actor_create();
-        actor[i]->position = v2d_new(0, 0);
+        actor[i]->position = v2d_add(base_position, read_property_as_v2d(SPRITE_BACKGROUND, SPRITE_OFFSET_PROPERTY[i]));
         actor_change_animation(actor[i], anim[i]);
     }
 
     /* initialize the fonts */
     for(int i = 0; i < TEXT_COUNT; i++) {
-        font[i] = font_create(FONT_NAME[i]);
-        font_set_text(font[i], "%s", FONT_TEXT[i]);
+        pause_sprite_t parent = FONT_PARENT_SPRITE[i];
+        font[i] = font_create(
+            read_property_as_string(parent, FONT_NAME_PROPERTY, DEFAULT_FONT_NAME[i])
+        );
+
         font_set_visible(font[i], false);
+        font_set_text(font[i], "%s", FONT_TEXT[i]);
+        font_set_align(font[i], string_to_fontalign(
+            read_property_as_string(parent, FONT_ALIGN_PROPERTY, DEFAULT_FONT_ALIGN)
+        ));
+        (void)guess_font_align;
+
+        v2d_t offset = read_property_as_v2d(parent, FONT_OFFSET_PROPERTY);
+        font_set_position(font[i], v2d_add(actor[parent]->position, offset));
     }
 
     /* initialize the sound effects */
@@ -387,12 +426,12 @@ void pause_init(void *_)
     /* initialize the state */
     state = INITIAL_STATE;
     option = INITIAL_OPTION;
-    /*orientation = DEFAULT_ORIENTATION;*/
+    orientation = DEFAULT_ORIENTATION;
 
     /* compute the orientation */
     orientation = guess_orientation(v2d_subtract(
-        actor_action_offset(actor[SPRITE_EXIT]),
-        actor_action_offset(actor[SPRITE_CONTINUE])
+        actor[SPRITE_EXIT]->position,
+        actor[SPRITE_CONTINUE]->position
     ));
 
     /* done! */
@@ -476,7 +515,7 @@ void pause_update()
     #define ANIMATE_SPRITE(s, a) actor_change_animation(actor[s], ANIMATION(s, a))
     #define ANIMATE_OPTION(s, o) do { \
         if(!actor_is_transition_animation_playing(actor[s])) \
-            ANIMATE_SPRITE((s), option == (o) && state == STATE_WAITING ? HIGHLIGHTED : UNHIGHLIGHTED); \
+            ANIMATE_SPRITE((s), option == (o) && state == STATE_IDLE ? HIGHLIGHTED : UNHIGHLIGHTED); \
     } while(0)
 
     ANIMATE_SPRITE(SPRITE_BACKGROUND, state);
@@ -484,15 +523,12 @@ void pause_update()
     ANIMATE_OPTION(SPRITE_RESTART, OPTION_RESTART);
     ANIMATE_OPTION(SPRITE_EXIT, OPTION_EXIT);
 
-    /* update the fonts */
-    for(int i = 0; i < TEXT_COUNT; i++) {
-        pause_sprite_t parent = FONT_PARENT_SPRITE[i];
-        v2d_t action_offset = actor_action_offset(actor[parent]);
-        font_set_position(font[i], v2d_add(actor[parent]->position, action_offset));
+    #undef ANIMATE_OPTION
+    #undef ANIMATE_SPRITE
 
-        font_set_align(font[i], guess_font_align(font[i], font_get_position(font[i])));
-        font_set_visible(font[i], state == STATE_WAITING);
-    }
+    /* update the fonts */
+    for(int i = 0; i < TEXT_COUNT; i++)
+        font_set_visible(font[i], state == STATE_IDLE);
 
     /* colorize the options */
     #define COLORIZE_TEXT(t, h)   font_set_text(font[t], "<color=%s>%s</color>", FONT_COLOR[h], FONT_TEXT[t])
@@ -501,6 +537,9 @@ void pause_update()
     COLORIZE_OPTION(TEXT_CONTINUE, OPTION_CONTINUE);
     COLORIZE_OPTION(TEXT_RESTART, OPTION_RESTART);
     COLORIZE_OPTION(TEXT_EXIT, OPTION_EXIT);
+
+    #undef COLORIZE_OPTION
+    #undef COLORIZE_TEXT
 }
 
 
@@ -546,7 +585,7 @@ void update_appearing()
         return;
 
     /* change the state */
-    state = STATE_WAITING;
+    state = STATE_IDLE;
 }
 
 /* update logic: waiting state */
@@ -704,7 +743,7 @@ void render_overlay()
     float dt = timer_get_delta();
 
     /* fade-in & fade-out */
-    if(state == STATE_WAITING)
+    if(state == STATE_IDLE)
         drag_handle->alpha = min(1.0f, drag_handle->alpha + dt / DRAG_HANDLE_FADE_TIME);
     else
         drag_handle->alpha = max(0.0f, drag_handle->alpha - dt / DRAG_HANDLE_FADE_TIME);
@@ -819,6 +858,48 @@ void finish_overlay()
 
 
 
+/* helpers */
+
+const char* read_property_as_string(pause_sprite_t sprite, const char* property_name, const char* default_value)
+{
+    const animation_t* anim = ANIMATION(sprite, 0);
+    const char* const* property = animation_user_property(anim, property_name);
+
+    if(property == NULL || property[0] == NULL)
+        return default_value;
+    else
+        return property[0];
+}
+
+v2d_t read_property_as_v2d(pause_sprite_t sprite, const char* property_name)
+{
+    const animation_t* anim = ANIMATION(sprite, 0);
+    const char* const* property = animation_user_property(anim, property_name);
+
+    if(property != NULL) {
+        float x = (property[0] != NULL) ? atof(property[0]) : 0.0f;
+        float y = (property[1] != NULL) ? atof(property[1]) : 0.0f;
+
+        return v2d_new(x, y);
+    }
+
+    return v2d_new(0.0f, 0.0f);
+}
+
+fontalign_t string_to_fontalign(const char* align)
+{
+    if(0 == str_icmp(align, "right"))
+        return FONTALIGN_RIGHT;
+    else if(0 == str_icmp(align, "center"))
+        return FONTALIGN_CENTER;
+    /*else if(0 == str_icmp(align, "left"))
+        return FONTALIGN_LEFT;*/
+    else
+        return FONTALIGN_LEFT;
+}
+
+
+
 /* legacy mode */
 
 /* legacy pause screen: update */
@@ -891,7 +972,7 @@ bool want_legacy_mode()
     }
 
     for(int i = 0; i < TEXT_COUNT; i++) {
-        if(!font_exists(FONT_NAME[i]))
+        if(!font_exists(DEFAULT_FONT_NAME[i]))
             return true;
     }
 
