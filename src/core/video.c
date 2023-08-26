@@ -325,11 +325,11 @@ void video_release()
     /* release the console */
     release_console();
 
-    /* destroy the default shader */
-    destroy_default_shader();
-
     /* destroy the backbuffer */
     destroy_backbuffer();
+
+    /* destroy the default shader */
+    destroy_default_shader();
 
     /* destroy the display */
     destroy_display();
@@ -802,6 +802,10 @@ void reconfigure_display()
             y = max(0, y - delta_height / 2);
             al_set_window_position(display, x, y);
 
+            /* restore the default shader */
+            if(!use_default_shader())
+                LOG("Can't set the default shader");
+
         }
         else
             LOG("Can't resize the display to %dx%d", new_display_width, new_display_height);
@@ -975,6 +979,10 @@ void reconfigure_backbuffer()
     /* create the new */
     if(!create_backbuffer())
         FATAL("Can't reconfigure the backbuffer");
+
+    /* reset shader */
+    if(!use_default_shader())
+        LOG("Can't set the default shader");
 }
 
 /* Compute the size of the screen / backbuffer according to the video mode */
@@ -1061,7 +1069,28 @@ void destroy_default_shader()
 /* use the default shader */
 bool use_default_shader()
 {
-    return (default_shader != NULL) && al_use_shader(default_shader);
+    if(default_shader == NULL)
+        return false;
+
+#if USE_ROUNDROBIN_BACKBUFFER
+    if(backbuffer[0] == NULL || backbuffer[1] == NULL)
+        return al_use_shader(default_shader);
+
+    /* According to the Allegro manual, al_use_shader() "uses the shader for
+       subsequent drawing operations on the current target bitmap".
+
+       https://liballeg.org/a5docs/trunk/shader.html */
+
+    al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
+    bool a = al_use_shader(default_shader);
+    al_set_target_bitmap(IMAGE2BITMAP(backbuffer[1 - backbuffer_index]));
+    bool b = al_use_shader(default_shader);
+    al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
+
+    return a && b;
+#else
+    return al_use_shader(default_shader);
+#endif
 }
 
 
