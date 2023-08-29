@@ -29,15 +29,16 @@
 #include "../util/util.h"
 
 typedef struct proganim_keyframe_t proganim_keyframe_t;
+typedef double (*proganim_easing_t)(double,const double*);
 
 
 /* programmatic animation */
 struct proganim_t {
     double duration; /* in seconds */
+    proganim_easing_t easing; /* easing function */
     proganim_keyframe_t* keyframe; /* array of keyframes */
     int keyframe_count; /* length of keyframe[] */
 };
-
 
 /* keyframe struct */
 struct proganim_keyframe_t {
@@ -55,6 +56,12 @@ struct proganim_keyframe_t {
 
 };
 
+/* easing functions */
+static double easing_linear(double t, const double* p);
+static double easing_in_quadratic(double t, const double* p);
+static double easing_out_quadratic(double t, const double* p);
+static double easing_inout_quadratic(double t, const double* p);
+
 /* constants */
 #define UNDEFINED_PERCENTAGE -1
 static const proganim_keyframe_t DEFAULT_KEYFRAME = {
@@ -67,6 +74,7 @@ static const proganim_keyframe_t DEFAULT_KEYFRAME = {
 
 static const proganim_t DEFAULT_PROGANIM = {
     .duration = 0.0,
+    .easing = easing_linear,
     .keyframe = NULL,
     .keyframe_count = 0
 };
@@ -78,6 +86,7 @@ static void find_keyframes_suitable_for_interpolation(const proganim_t* prog_ani
 static int compare_keyframes(const void* a, const void* b);
 static float normalized_percentage(float percentage, const proganim_keyframe_t* a, const proganim_keyframe_t* b);
 static int parse_percentage(const parsetree_parameter_t* param);
+static proganim_easing_t parse_easing_function(const parsetree_parameter_t* param);
 static int traverse_keyframe(const parsetree_statement_t *stmt, void *context);
 
 
@@ -130,6 +139,9 @@ transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double
     /* find the current percentage */
     double percentage = clip01(seconds / prog_anim->duration);
 
+    /* apply easing function */
+    percentage = prog_anim->easing(percentage, NULL);
+
     /* get two keyframes suitable for interpolation */
     const proganim_keyframe_t *keyframe_a, *keyframe_b;
     find_keyframes_suitable_for_interpolation(prog_anim, percentage, &keyframe_a, &keyframe_b);
@@ -169,6 +181,10 @@ float proganim_interpolated_opacity(const proganim_t* prog_anim, double seconds,
 
     /* find the current percentage */
     double percentage = clip01(seconds / prog_anim->duration);
+
+    /* apply easing function */
+    percentage = prog_anim->easing(percentage, NULL);
+    percentage = clip01(percentage); /* no opacity values outside [0,1] */
 
     /* get two keyframes suitable for interpolation */
     const proganim_keyframe_t *keyframe_a, *keyframe_b;
@@ -327,6 +343,11 @@ int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
         const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "duration receives a positive number");
         prog_anim->duration = atof(nanoparser_get_string(p1));
+    }
+    else if(str_icmp(identifier, "easing") == 0) {
+        const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "easing receives an easing function");
+        prog_anim->easing = parse_easing_function(p1);
     }
     else if(str_icmp(identifier, "keyframe") == 0) {
         const parsetree_parameter_t* block = NULL;
@@ -527,4 +548,66 @@ int parse_percentage(const parsetree_parameter_t* param)
 
     /* convert to integer */
     return atoi(buf);
+}
+
+
+/*
+ * parse_easing_function()
+ * Parse an easing function
+ */
+proganim_easing_t parse_easing_function(const parsetree_parameter_t* param)
+{
+    const parsetree_statement_t* stmt = nanoparser_get_statement(param);
+    const char* str = nanoparser_get_string(param);
+
+    /* compute a hash instead? */
+    if(str_icmp(str, "ease_in_out") == 0)
+        return easing_inout_quadratic;
+    else if(str_icmp(str, "ease_in") == 0)
+        return easing_in_quadratic;
+    else if(str_icmp(str, "ease_out") == 0)
+        return easing_out_quadratic;
+    else if(str_icmp(str, "linear") == 0)
+        return easing_linear;
+
+    /* error */
+    nanoparser_crash(stmt, "Invalid easing function \"%s\"", str);
+    return easing_linear;
+}
+
+
+
+
+/*
+ *
+ * easing functions
+ *
+ * these functions receive t in [0,1] as input (as well as an optional vector p of parameters)
+ * and return y = f(t, p) in [-m,1+w] for some small m, w >= 0 as output (currently m = w = 0)
+ *
+ */
+
+double easing_linear(double t, const double* p)
+{
+    return t;
+}
+
+double easing_in_quadratic(double t, const double* p)
+{
+    return t * t;
+}
+
+double easing_out_quadratic(double t, const double* p)
+{
+    double x = 1.0 - t;
+    return 1.0 - x * x;
+}
+
+double easing_inout_quadratic(double t, const double* p)
+{
+    if(t <= 0.5)
+        return 2.0 * t * t;
+
+    double x = 2.0 - 2.0 * t;
+    return 1.0 - 0.5 * x * x;
 }
