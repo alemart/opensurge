@@ -36,6 +36,7 @@ static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_setid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getid(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfps(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getduration(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfinished(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getrepeats(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -78,6 +79,7 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "set_id", fun_setid, 1);
     surgescript_vm_bind(vm, "Animation", "get_id", fun_getid, 0);
     surgescript_vm_bind(vm, "Animation", "get_fps", fun_getfps, 0);
+    surgescript_vm_bind(vm, "Animation", "get_duration", fun_getduration, 0);
     surgescript_vm_bind(vm, "Animation", "get_finished", fun_getfinished, 0);
     surgescript_vm_bind(vm, "Animation", "get_repeats", fun_getrepeats, 0);
     surgescript_vm_bind(vm, "Animation", "get_anchor", fun_getanchor, 0);
@@ -257,6 +259,13 @@ surgescript_var_t* fun_getfps(surgescript_object_t* object, const surgescript_va
 {
     const animation_t* animation = scripting_animation_ptr(object);
     return surgescript_var_set_number(surgescript_var_create(), animation_fps(animation));
+}
+
+/* the duration of the animation, in seconds */
+surgescript_var_t* fun_getduration(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const animation_t* animation = scripting_animation_ptr(object);
+    return surgescript_var_set_number(surgescript_var_create(), animation_duration(animation));
 }
 
 /* animation finished? */
