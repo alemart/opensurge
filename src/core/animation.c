@@ -258,7 +258,10 @@ double animation_duration(const animation_t* anim)
        as the duration of a non-repeating animation; we
        just repeat it. This is a more useful definition. */
 
-    return (double)anim->frame_count / (double)anim->fps;
+    double normal_duration = (double)anim->frame_count / (double)anim->fps;
+    double programmatic_duration = (anim->prog_anim != NULL) ? proganim_duration(anim->prog_anim) : 0.0;
+
+    return max(normal_duration, programmatic_duration);
 }
 
 /*
@@ -271,12 +274,8 @@ bool animation_is_over(const animation_t* anim, double seconds)
     if(anim->repeat)
         return false;
 
-    /* find the duration */
-    double normal_duration = (double)anim->frame_count / (double)anim->fps;
-    double programmatic_duration = (anim->prog_anim != NULL) ? proganim_duration(anim->prog_anim) : 0.0;
-
     /* test if the animation is over */
-    return seconds >= max(normal_duration, programmatic_duration);
+    return seconds >= animation_duration(anim);
 }
 
 /*
