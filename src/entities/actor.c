@@ -320,6 +320,23 @@ v2d_t actor_action_offset(const actor_t* act)
 }
 
 
+/*
+ * actor_interpolated_transform()
+ * The interpolated transform of a keyframe-based animation at the current time
+ * If no keyframe-based animation is playing, the identity transform is returned
+ */
+transform_t* actor_interpolated_transform(const actor_t* act, transform_t* out_transform)
+{
+    /* no keyframe-based animation is playing */
+    if(act->animation == NULL || !animation_has_keyframes(act->animation))
+        return transform_identity(out_transform);
+
+    /* interpolate and return */
+    return animation_interpolated_transform(act->animation, act->animation_timer, out_transform);
+}
+
+
+
 /* private stuff */
 
 /* this logic updates the animation of an actor */

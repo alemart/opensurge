@@ -31,6 +31,7 @@
 /* forward declarations */
 struct brick_t;
 struct brick_list_t;
+struct transform_t;
 
 /* actor structure */
 typedef struct actor_t {
@@ -76,7 +77,8 @@ bool actor_is_transition_animation_playing(const actor_t *act); /* true if a tra
 void actor_synchronize_animation(actor_t *act, bool sync); /* should I use a shared animation frame? */
 int actor_animation_frame(const actor_t* act);
 v2d_t actor_action_spot(const actor_t* act); /* action spot appropriately flipped */
-v2d_t actor_action_offset(const actor_t* act); /* action_spot - hot_spot */
+v2d_t actor_action_offset(const actor_t* act); /* action_offset = action_spot - hot_spot */
+struct transform_t* actor_interpolated_transform(const actor_t* act, struct transform_t* out_transform); /* interpolated transform of a keyframe-based animation */
 
 /* legacy */
 int actor_collision(const actor_t *a, const actor_t *b); /* tests bounding-box collision between a and b */
