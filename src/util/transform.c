@@ -267,14 +267,6 @@ void transform_decompose(const transform_t* t, v2d_t* translation, float* rotati
     v2d_t q1 = v2d_new(cos, sin);
     v2d_t q2 = v2d_new(-sin, cos);
 
-    /* if Q = [ q1 | q2 ] describes an improper rotation (how?) (det = -1), change the sign of the second column */
-    if(q1.x * q2.y < q2.x * q1.y) { /* if det Q < 0 */
-        q2.x = -q2.x;
-        q2.y = -q2.y;
-
-        /* now det Q is 1 */
-    }
-
     /* find a 2x2 matrix L such that M = L * Q. L should be diagonal (i.e., l1 = l2 = 0), but may not be */
     float l0 = a * q1.x + c * q2.x;
     float l1 = b * q1.x + d * q2.x;
