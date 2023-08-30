@@ -23,6 +23,8 @@
 #include "scripting.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../util/transform.h"
+#include "../util/numeric.h"
 #include "../core/sprite.h"
 #include "../entities/actor.h"
 #include "../entities/player.h"
@@ -52,6 +54,7 @@ static surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const
 static surgescript_var_t* fun_getsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getexists(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_findinterpolatedtransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_prop(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t ANIMID_ADDR = 0;
 static const surgescript_heapptr_t SPRITENAME_ADDR = 1;
@@ -59,6 +62,8 @@ static const surgescript_heapptr_t HOTSPOT_ADDR = 2;
 static const surgescript_heapptr_t ANCHOR_ADDR = 3;
 static const surgescript_heapptr_t ACTIONSPOT_ADDR = 4;
 static const surgescript_heapptr_t ACTIONOFFSET_ADDR = 5;
+static const surgescript_heapptr_t INTERPOLATEDTRANSFORM_ADDR = 6;
+static const surgescript_heapptr_t INTERPOLATEDTRANSFORMTEMPVECTOR_ADDR = 7;
 static const char* ONCHANGE = "onAnimationChange"; /* fun onAnimationChange(animation) will be called on the parent object */
 static void notify_change(const surgescript_object_t* object);
 static actor_t* get_animation_actor(const surgescript_object_t* object);
@@ -97,6 +102,7 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "set_sync", fun_setsync, 1);
     surgescript_vm_bind(vm, "Animation", "get_exists", fun_getexists, 0);
     surgescript_vm_bind(vm, "Animation", "prop", fun_prop, 1);
+    surgescript_vm_bind(vm, "Animation", "findInterpolatedTransform", fun_findinterpolatedtransform, 0);
 }
 
 /*
@@ -150,12 +156,16 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(ANCHOR_ADDR == surgescript_heap_malloc(heap));
     ssassert(ACTIONSPOT_ADDR == surgescript_heap_malloc(heap));
     ssassert(ACTIONOFFSET_ADDR == surgescript_heap_malloc(heap));
+    ssassert(INTERPOLATEDTRANSFORM_ADDR == surgescript_heap_malloc(heap));
+    ssassert(INTERPOLATEDTRANSFORMTEMPVECTOR_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_number(surgescript_heap_at(heap, ANIMID_ADDR), 0);
     surgescript_var_set_string(surgescript_heap_at(heap, SPRITENAME_ADDR), "");
     surgescript_var_set_null(surgescript_heap_at(heap, HOTSPOT_ADDR)); /* lazy evaluation */
     surgescript_var_set_null(surgescript_heap_at(heap, ANCHOR_ADDR)); /* lazy evaluation */
     surgescript_var_set_null(surgescript_heap_at(heap, ACTIONSPOT_ADDR)); /* lazy evaluation */
     surgescript_var_set_null(surgescript_heap_at(heap, ACTIONOFFSET_ADDR)); /* lazy evaluation */
+    surgescript_var_set_null(surgescript_heap_at(heap, INTERPOLATEDTRANSFORM_ADDR)); /* lazy evaluation */
+    surgescript_var_set_null(surgescript_heap_at(heap, INTERPOLATEDTRANSFORMTEMPVECTOR_ADDR)); /* lazy evaluation */
     surgescript_object_set_userdata(object, (void*)animation);
 
     /* sanity check */
@@ -498,6 +508,77 @@ surgescript_var_t* fun_prop(surgescript_object_t* object, const surgescript_var_
         return surgescript_var_set_objecthandle(ret, array_handle);
     }
 }
+
+/* the interpolated transform of the current keyframe-based animation at the current time, if it's defined.
+   If no keyframe-based animation is playing at the current time, an identity transform is returned */
+surgescript_var_t* fun_findinterpolatedtransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_objecthandle_t transform_handle;
+    surgescript_objecthandle_t v2_handle;
+
+    /* lazy evaluation */
+    surgescript_var_t* v2_var = surgescript_heap_at(heap, INTERPOLATEDTRANSFORMTEMPVECTOR_ADDR);
+    surgescript_var_t* transform_var = surgescript_heap_at(heap, INTERPOLATEDTRANSFORM_ADDR);
+    if(surgescript_var_is_null(transform_var)) {
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+
+        transform_handle = surgescript_objectmanager_spawn(manager, me, "Transform", NULL);
+        surgescript_var_set_objecthandle(transform_var, transform_handle);
+
+        v2_handle = surgescript_objectmanager_spawn(manager, me, "Vector2", NULL);
+        surgescript_var_set_objecthandle(v2_var, v2_handle);
+    }
+    else {
+        transform_handle = surgescript_var_get_objecthandle(transform_var);
+        v2_handle = surgescript_var_get_objecthandle(v2_var);
+    }
+
+    /* interpolate the transform. If no keyframe-based animation is played,
+       this will be the identity transform */
+    const animation_t* anim = scripting_animation_ptr(object);
+    const animation_t* null_anim = null_animation();
+    transform_t t;
+
+    if(anim != null_anim) {
+        const actor_t* actor = get_animation_actor(object);
+        actor_interpolated_transform(actor, &t);
+    }
+    else
+        transform_identity(&t);
+
+    /* decompose the interpolated transform */
+    v2d_t translation;
+    float rotation;
+    v2d_t scale;
+    v2d_t anchor_point = (anim != null_anim) ? animation_hot_spot(anim) : v2d_new(0.0f, 0.0f);
+
+    transform_decompose(&t, &translation, &rotation, &scale, anchor_point);
+
+    /* update the Transform object */
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, v2_handle);
+    surgescript_object_t* transform_object = surgescript_objectmanager_get(manager, transform_handle);
+    surgescript_var_t* x = surgescript_var_create();
+
+    scripting_vector2_update(v2, translation.x, translation.y);
+    surgescript_var_set_objecthandle(x, v2_handle);
+    surgescript_object_call_function(transform_object, "set_localPosition", (const surgescript_var_t*[]){ x }, 1, NULL);
+
+    float angle_in_degrees = -rotation * RAD2DEG; /* clockwise */
+    surgescript_var_set_number(x, angle_in_degrees);
+    surgescript_object_call_function(transform_object, "set_localAngle", (const surgescript_var_t*[]){ x }, 1, NULL);
+
+    scripting_vector2_update(v2, scale.x, scale.y);
+    surgescript_var_set_objecthandle(x, v2_handle);
+    surgescript_object_call_function(transform_object, "set_localScale", (const surgescript_var_t*[]){ x }, 1, NULL);
+
+    surgescript_var_destroy(x);
+
+    /* return the Transform object */
+    return surgescript_var_set_objecthandle(surgescript_var_create(), transform_handle);
+}
+
 
 
 /* --- misc --- */
