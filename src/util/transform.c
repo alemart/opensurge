@@ -21,6 +21,7 @@
 #include <allegro5/allegro.h>
 #include <math.h>
 #include "transform.h"
+#include "numeric.h"
 
 /*
  * transform_identity()
@@ -237,6 +238,71 @@ transform_t* transform_compose(transform_t* t, const transform_t* a)
     return t;
 
     #undef DOT
+}
+
+/*
+ * transform_decompose()
+ * Decomposition of a 2D transform, given an anchor point
+ * You may set the output parameters to NULL
+ */
+void transform_decompose(const transform_t* t, v2d_t* translation, float* rotation, v2d_t* scale, v2d_t anchor_point)
+{
+    /* extract the 2x2 rotation-scale block M */
+    float a = t->m[0];
+    float b = t->m[1];
+    float c = t->m[4];
+    float d = t->m[5];
+
+    /* find auxiliary values related to the scale factor */
+    float sx_squared = a*a + c*c;
+    float sy_squared = b*b + d*d;
+    float sx_times_sy = a*d - b*c;
+    float s2 = sx_squared + sy_squared;
+
+    /* find a rotation matrix Q assuming that the scale factor (sx,sy) is such that sy > 0 */
+    float cos_squared = (a*a + d*d) / s2;
+    float sin_squared = (b*b + c*c) / s2;
+    float cos = sqrtf(cos_squared) * copysignf(1.0f, a * sx_times_sy); /* sy > 0 => sign(cos) == sign(a) * sign(sx*sy) == sign(a*sx) */
+    float sin = sqrtf(sin_squared) * copysignf(1.0f, b); /* sy > 0 => sign(sin) == sign(b) */
+    v2d_t q1 = v2d_new(cos, sin);
+    v2d_t q2 = v2d_new(-sin, cos);
+
+    /* if Q = [ q1 | q2 ] describes an improper rotation (how?) (det = -1), change the sign of the second column */
+    if(q1.x * q2.y < q2.x * q1.y) { /* if det Q < 0 */
+        q2.x = -q2.x;
+        q2.y = -q2.y;
+
+        /* now det Q is 1 */
+    }
+
+    /* find a 2x2 matrix L such that M = L * Q. L should be diagonal (i.e., l1 = l2 = 0), but may not be */
+    float l0 = a * q1.x + c * q2.x;
+    float l1 = b * q1.x + d * q2.x;
+    float l2 = a * q1.y + c * q2.y;
+    float l3 = b * q1.y + d * q2.y;
+    /*printf("L=%f,%f,%f,%f\n",l0,l1,l2,l3);*/
+
+    /* set the scale */
+    if(scale != NULL) {
+        scale->x = l0;
+        scale->y = l3;
+    }
+    (void)l1;
+    (void)l2;
+
+    /* set the rotation */
+    if(rotation != NULL) {
+        float radians = acosf(cos) * copysignf(1.0f, sin);
+        *rotation = radians;
+    }
+
+    /* set the translation */
+    if(translation != NULL) {
+        float tx = t->m[12];
+        float ty = t->m[13];
+        translation->x = tx - l0 * (cos * -anchor_point.x - sin * -anchor_point.y);
+        translation->y = ty - l3 * (sin * -anchor_point.x + cos * -anchor_point.y);
+    }
 }
 
 /*

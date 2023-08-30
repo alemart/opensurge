@@ -43,6 +43,9 @@ transform_t* transform_scale(transform_t* t, v2d_t scale); /* scale */
 /* composition */
 transform_t* transform_compose(transform_t* t, const transform_t* a); /* T := A * T */
 
+/* decomposition */
+void transform_decompose(const transform_t* t, v2d_t* translation, float* rotation, v2d_t* scale, v2d_t anchor_point); /* give an anchor point as input */
+
 /* misc */
 struct ALLEGRO_TRANSFORM* transform_to_allegro(struct ALLEGRO_TRANSFORM* al_transform, const transform_t* t);
 
