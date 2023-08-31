@@ -92,38 +92,41 @@ void actor_render(actor_t *act, v2d_t camera_position)
         const image_t* img = actor_image(act);
         v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
         bool has_keyframes = animation_has_keyframes(act->animation);
-
-        /* update animation */
-        update_animation(act);
+        bool clip_out = false;
 
         /* clip out? */
         if(!has_keyframes) {
             if(nearly_zero(act->angle) && nearly_equal(act->scale.x, 1.0f) && nearly_equal(act->scale.y, 1.0f)) {
                 if(can_be_clipped_out(act, topleft))
-                    return;
+                    clip_out = true;
             }
         }
 
-        /* set transform */
-        ALLEGRO_TRANSFORM transform, prev_transform;
-        al_copy_transform(&prev_transform, al_get_current_transform());
-        actor_transform(&transform, act, topleft);
-        al_compose_transform(&transform, &prev_transform);
+        if(!clip_out) {
+            /* set transform */
+            ALLEGRO_TRANSFORM transform, prev_transform;
+            al_copy_transform(&prev_transform, al_get_current_transform());
+            actor_transform(&transform, act, topleft);
+            al_compose_transform(&transform, &prev_transform);
 
-        al_use_transform(&transform);
-        {
-            /* find alpha */
-            float alpha = act->alpha;
-            if(has_keyframes)
-                alpha *= animation_interpolated_opacity(act->animation, act->animation_timer);
+            al_use_transform(&transform);
+            {
+                /* find alpha */
+                float alpha = act->alpha;
+                if(has_keyframes)
+                    alpha *= animation_interpolated_opacity(act->animation, act->animation_timer);
 
-            /* render */
-            if(nearly_equal(alpha, 1.0f))
-                image_draw(img, 0, 0, act->mirror);
-            else
-                image_draw_trans(img, 0, 0, alpha, act->mirror);
+                /* render */
+                if(nearly_equal(alpha, 1.0f))
+                    image_draw(img, 0, 0, act->mirror);
+                else
+                    image_draw_trans(img, 0, 0, alpha, act->mirror);
+            }
+            al_use_transform(&prev_transform);
         }
-        al_use_transform(&prev_transform);
+
+        /* update animation timer (next frame) */
+        update_animation(act);
     }
 }
 
