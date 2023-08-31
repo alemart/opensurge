@@ -1104,15 +1104,17 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         s->default_action_spot.y = (float)atoi(nanoparser_get_string(p2));
     }
     else if(str_icmp(identifier, "animation") == 0) {
-        p1 = nanoparser_get_nth_parameter(param_list, 1);
-        p2 = nanoparser_get_nth_parameter(param_list, 2);
+        int n = nanoparser_get_number_of_parameters(param_list);
 
-        if(p1 && p2) {
+        if(n == 2) {
+            p1 = nanoparser_get_nth_parameter(param_list, 1);
+            p2 = nanoparser_get_nth_parameter(param_list, 2);
             nanoparser_expect_string(p1, "Must provide animation number");
             nanoparser_expect_program(p2, "Must provide animation attributes");
             anim_id = atoi(nanoparser_get_string(p1));
         }
-        else if(p1) {
+        else if(n == 1) {
+            p1 = nanoparser_get_nth_parameter(param_list, 1);
             nanoparser_expect_program(p1, "Must provide animation attributes");
             anim_id = 0;
             p2 = p1;

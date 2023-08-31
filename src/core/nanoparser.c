@@ -127,6 +127,13 @@ struct parsetree_parameter_t
     parsetree_parameter_t* next; /* next node (linked list) */
 };
 
+static const parsetree_parameter_t NULL_PARAMETER = {
+    .type = -1,
+    .string = "",
+    .statement = NULL,
+    .next = NULL
+};
+
 static int traverse_adapter(const parsetree_statement_t* statement, void* user_data);
 static parsetree_program_t* release_program(parsetree_program_t* program);
 static parsetree_statement_t* release_statement(parsetree_statement_t* statement);
@@ -431,6 +438,7 @@ int nanoparser_get_number_of_parameters(const parsetree_parameter_t* param_list)
  */
 const parsetree_parameter_t* nanoparser_get_nth_parameter(const parsetree_parameter_t* param_list, int n)
 {
+    const parsetree_parameter_t* first_node = param_list;
     nanoassert(n >= 1);
 
     for(int counter = 1; param_list != NULL; counter++, param_list = param_list->next) {
@@ -438,7 +446,19 @@ const parsetree_parameter_t* nanoparser_get_nth_parameter(const parsetree_parame
             return param_list;
     }
 
+#if 0
     return NULL;
+#else
+    /* give better error messages when getting missing parameters */
+    if(first_node != NULL) {
+        static parsetree_parameter_t tmp;
+        tmp = NULL_PARAMETER;
+        tmp.statement = first_node->statement;
+        return &tmp;
+    }
+
+    return NULL;
+#endif
 }
 
 /*
