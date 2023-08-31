@@ -12,7 +12,7 @@ sprite "Rate the Game - Dialog"
     frame_size      426 240
     hot_spot        0 0
 
-    animation
+    animation 0
     {
         repeat      TRUE
         fps         8
