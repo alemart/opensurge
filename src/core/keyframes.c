@@ -64,6 +64,7 @@ static double easing_inout_quadratic(double t, const double* p);
 
 /* constants */
 #define UNDEFINED_PERCENTAGE -1
+
 static const proganim_keyframe_t DEFAULT_KEYFRAME = {
     .percentage = UNDEFINED_PERCENTAGE,
     .translation = { 0.0f, 0.0f },
@@ -78,6 +79,8 @@ static const proganim_t DEFAULT_PROGANIM = {
     .keyframe = NULL,
     .keyframe_count = 0
 };
+
+static const double DURATION_EPSILON = 1e-5;
 
 
 /* helpers */
@@ -132,12 +135,15 @@ transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double
 
     /* we have at least 2 keyframes */
 
+    /* make sure we don't divide by zero */
+    double duration = max(prog_anim->duration, DURATION_EPSILON);
+
     /* is this a repeating animation? */
     if(repeat)
-        seconds = fmod(seconds, prog_anim->duration);
+        seconds = fmod(seconds, duration);
 
     /* find the current percentage */
-    double percentage = clip01(seconds / prog_anim->duration);
+    double percentage = clip01(seconds / duration);
 
     /* apply easing function */
     percentage = prog_anim->easing(percentage, NULL);
@@ -175,12 +181,15 @@ float proganim_interpolated_opacity(const proganim_t* prog_anim, double seconds,
 
     /* we have at least 2 keyframes */
 
+    /* make sure we don't divide by zero */
+    double duration = max(prog_anim->duration, DURATION_EPSILON);
+
     /* is this a repeating animation? */
     if(repeat)
-        seconds = fmod(seconds, prog_anim->duration);
+        seconds = fmod(seconds, duration);
 
     /* find the current percentage */
-    double percentage = clip01(seconds / prog_anim->duration);
+    double percentage = clip01(seconds / duration);
 
     /* apply easing function */
     percentage = prog_anim->easing(percentage, NULL);
