@@ -12,7 +12,7 @@
 // phase 1: appearing
 // phase 2: sustaining
 // phase 3: disappearing
-// phase 4: finishing up
+// phase 4: finishing
 //
 // These phases are played sequentially. The level name and zone number (act)
 // appear during phases 1, 2 and 3. After phase 4, the title card disappears.
@@ -34,11 +34,11 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
 {
     public readonly zindex = 1001.0;
     transform = Transform();
-    actor = Actor("Default Title Card");
-    levelName = spawn("Default Title Card - Level Name");
-    zoneNumber = spawn("Default Title Card - Zone Number");
-    timeBlocker = spawn("Default Title Card - Time Blocker");
-    playerBlocker = spawn("Default Title Card - Player Blocker");
+    actor = Actor(this.__name);
+    levelName = spawn(this.__name + " - Level Name");
+    zoneNumber = spawn(this.__name + " - Zone Number");
+    timeBlocker = spawn(this.__name + " - Time Blocker");
+    playerBlocker = spawn(this.__name + " - Player Blocker");
     layers = [];
 
     state "main"
@@ -77,11 +77,11 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         MobileGamepad.fadeIn();
         if(actor.animation.finished) {
             setAnim(4);
-            state = "finishing up";
+            state = "finishing";
         }
     }
 
-    state "finishing up"
+    state "finishing"
     {
         if(actor.animation.finished) {
 
@@ -100,7 +100,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         numberOfLayers = Number(actor.animation.prop("number_of_layers"));
         for(n = numberOfLayers; n >= 1; n--) {
             zoffset = 1 - (n-1) / numberOfLayers;
-            layer = spawn("Default Title Card - Layer")
+            layer = spawn(this.__name + " - Layer")
                     .setLayerNumber(n)
                     .setZIndex(zindex + zoffset);
 
@@ -141,14 +141,16 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
 object "Default Title Card - Layer" is "entity", "awake", "detached", "private"
 {
     public readonly layerNumber = 1;
+    transform = Transform();
+    offset = Vector2.zero;
     actor = null;
 
     fun setLayerNumber(n)
     {
-        assert(n >= 1);
+        assert(n >= 1 && actor === null);
 
         layerNumber = n;
-        actor = Actor("Default Title Card - Layer " + layerNumber);
+        actor = Actor(this.__name + " " + layerNumber);
 
         return this;
     }
@@ -159,6 +161,9 @@ object "Default Title Card - Layer" is "entity", "awake", "detached", "private"
 
         actor.anim = anim;
         actor.visible = actor.animation.exists;
+
+        transform.localPosition = layerPosition();
+        offset = transform.localPosition.plus(actor.actionOffset);
 
         return this;
     }
@@ -172,12 +177,27 @@ object "Default Title Card - Layer" is "entity", "awake", "detached", "private"
         return this;
     }
 
-    fun findPosition()
+
+
+    fun layerPosition()
     {
-        interpolatedTransform = actor.animation.findInterpolatedTransform();
-        return interpolatedTransform.localPosition.plus(actor.actionOffset);
+        pos = actor.animation.prop("layer_position");
+
+        // undefined position?
+        if(typeof pos !== "object")
+            return Vector2.zero;
+
+        // read position
+        xpos = Number(pos[0]);
+        ypos = Number(pos[1]);
+        return Vector2(xpos, ypos);
     }
 
+    fun apparentPosition()
+    {
+        animationTransform = actor.animation.findTransform();
+        return animationTransform.localPosition.plus(offset);
+    }
 }
 
 object "Default Title Card - Level Name" is "entity", "awake", "detached", "private"
@@ -189,7 +209,7 @@ object "Default Title Card - Level Name" is "entity", "awake", "detached", "priv
     state "main"
     {
         if(layer !== null)
-            transform.localPosition = layer.findPosition();
+            transform.localPosition = layer.apparentPosition();
     }
 
     fun setLayer(l)
@@ -213,13 +233,13 @@ object "Default Title Card - Level Name" is "entity", "awake", "detached", "priv
 object "Default Title Card - Zone Number" is "entity", "awake", "detached", "private"
 {
     transform = Transform();
-    actor = Actor("Default Title Card - Zone Number");
+    actor = Actor(this.__name);
     layer = null;
 
     state "main"
     {
         if(layer !== null)
-            transform.localPosition = layer.findPosition();
+            transform.localPosition = layer.apparentPosition();
     }
 
     fun setLayer(l)

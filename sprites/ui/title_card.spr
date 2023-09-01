@@ -238,6 +238,12 @@ sprite "Default Title Card - Layer 1"
     // be aligned to the action spot of this layer
     action_spot     0 0
 
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      464 64
+    }
+
     // warming up
     animation 0
     {
@@ -287,12 +293,6 @@ sprite "Default Title Card - Layer 1"
 
     keyframes "warming up"
     {
-        duration 0.125
-
-        keyframe 0%
-        {
-            translation 464 64
-        }
     }
 
     keyframes "appearing"
@@ -302,12 +302,12 @@ sprite "Default Title Card - Layer 1"
 
         keyframe 0%
         {
-            translation 464 64
+            translation 0 0
         }
 
         keyframe 100%
         {
-            translation 264 64
+            translation -200 0
         }
     }
 
@@ -317,7 +317,7 @@ sprite "Default Title Card - Layer 1"
 
         keyframe 0%
         {
-            translation 264 64
+            translation -200 0
         }
     }
 
@@ -328,23 +328,17 @@ sprite "Default Title Card - Layer 1"
 
         keyframe 0%
         {
-            translation 264 64
+            translation -200 0
         }
 
         keyframe 100%
         {
-            translation 464 64
+            translation 0 0
         }
     }
 
     keyframes "finishing"
     {
-        duration 0.03125
-
-        keyframe 0%
-        {
-            translation 464 64
-        }
     }
 }
 
@@ -365,6 +359,12 @@ sprite "Default Title Card - Layer 2"
     // be aligned to the action spot of this layer
     action_spot     32 16
 
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      432 112
+    }
+
     // warming up
     animation 0
     {
@@ -414,12 +414,6 @@ sprite "Default Title Card - Layer 2"
 
     keyframes "warming up"
     {
-        duration 0.125
-
-        keyframe 0%
-        {
-            translation 432 112
-        }
     }
 
     keyframes "appearing"
@@ -429,12 +423,12 @@ sprite "Default Title Card - Layer 2"
 
         keyframe 0%
         {
-            translation 432 112
+            translation 0 0
         }
 
         keyframe 100%
         {
-            translation 232 112
+            translation -200 0
         }
     }
 
@@ -444,7 +438,7 @@ sprite "Default Title Card - Layer 2"
 
         keyframe 0%
         {
-            translation 232 112
+            translation -200 0
         }
     }
 
@@ -455,23 +449,17 @@ sprite "Default Title Card - Layer 2"
 
         keyframe 0%
         {
-            translation 232 112
+            translation -200 0
         }
 
         keyframe 100%
         {
-            translation 432 112
+            translation 0 0
         }
     }
 
     keyframes "finishing"
     {
-        duration 0.03125
-
-        keyframe 0%
-        {
-            translation 432 112
-        }
     }
 }
 
@@ -486,7 +474,13 @@ sprite "Default Title Card - Layer 3"
     source_file     "images/ui/title_card.png"
     source_rect     688 0 192 192
     frame_size      48 192
-    hot_spot        48 0
+    hot_spot        24 0
+
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      -24 0
+    }
 
     // warming up
     animation 0
@@ -603,6 +597,12 @@ sprite "Default Title Card - Layer 4"
     frame_size      880 32
     hot_spot        0 32
 
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      0 0
+    }
+
     // warming up
     animation 0
     {
@@ -715,7 +715,13 @@ sprite "Default Title Card - Layer 5"
     source_file     "images/ui/title_card.png"
     source_rect     0 240 880 32
     frame_size      880 32
-    hot_spot        0 -240
+    hot_spot        0 0
+
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      0 240
+    }
 
     // warming up
     animation 0
@@ -829,6 +835,12 @@ sprite "Default Title Card - Layer 6"
     source_rect     0 0 426 240
     frame_size      426 240
     hot_spot        0 0
+
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      0 0
+    }
 
     // warming up
     animation 0
