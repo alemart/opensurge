@@ -178,13 +178,18 @@ static const char* BLACKLIST[] = {
 
     /* deleted files from previous builds */
     EXACT("preferences.dat"), /* 0.2.0 => 0.5.0 */
+    EXACT("images/allegro.png"), /* 0.2.0 => 0.6.1 */
     EXACT("scripts/core/motd.ss"), /* 0.5.0 => 0.6.1 */
     PREFIX("images/backgrounds/waterworks-zone/"), /* 0.6.0 => 0.6.1 */
     PREFIX("images/bricks/waterworks-zone/"), /* 0.6.0 => 0.6.1 */
     PREFIX("images/backgrounds/waterworks-zone-indoors-"), /* 0.6.1 => 0.6.1 */
     EXACT("fonts/pause_menu.fnt"), /* 0.6.1 => 0.6.1 */
     EXACT("sprites/ui/pause_menu.spr"), /* 0.6.1 => 0.6.1 */
-    EXACT("images/allegro.png"), /* 0.2.0 => 0.6.1 */
+    EXACT("images/ui/pause_menu.png"), /* 0.6.1 => 0.6.1 */
+    EXACT("images/ui/pause_menu_drag_handle.png"), /* 0.6.1 => 0.6.1 */
+    EXACT("images/ui/pause_menu_option.png"), /* 0.6.1 => 0.6.1 */
+    EXACT("fonts/default_title_card.fnt"), /* 0.6.0 => 0.6.1 */
+    EXACT("images/ui/title_card_zone_numbers.png"), /* 0.6.0 => 0.6.1 */
 
     /* NULL-terminated list */
     NULL

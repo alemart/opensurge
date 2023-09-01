@@ -35,22 +35,23 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     public readonly zindex = 1001.0;
     transform = Transform();
     actor = Actor("Default Title Card");
-    levelInfo = spawn("Default Title Card - Level Info").setTargetPosition(actor.animation.actionOffset);
+    levelName = spawn("Default Title Card - Level Name");
+    zoneNumber = spawn("Default Title Card - Zone Number");
     timeBlocker = spawn("Default Title Card - Time Blocker");
     playerBlocker = spawn("Default Title Card - Player Blocker");
+    layers = [];
 
     state "main"
     {
         MobileGamepad.fadeOut();
-        actor.anim = 0;
+        setAnim(0);
         state = "warming up";
     }
 
     state "warming up"
     {
         if(actor.animation.finished) {
-            actor.anim = 1;
-            levelInfo.appear(animationTime());
+            setAnim(1);
             state = "appearing";
         }
     }
@@ -58,7 +59,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     state "appearing"
     {
         if(actor.animation.finished) {
-            actor.anim = 2;
+            setAnim(2);
             state = "sustaining";
         }
     }
@@ -66,8 +67,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     state "sustaining"
     {
         if(actor.animation.finished) {
-            actor.anim = 3;
-            levelInfo.disappear(animationTime());
+            setAnim(3);
             state = "disappearing";
         }
     }
@@ -76,7 +76,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     {
         MobileGamepad.fadeIn();
         if(actor.animation.finished) {
-            actor.anim = 4;
+            setAnim(4);
             state = "finishing up";
         }
     }
@@ -91,120 +91,148 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         }
     }
 
-    // how long does it take for the current animation to complete?
-    fun animationTime()
-    {
-        // note: actor.animation.speedFactor is 1
-        return actor.animation.frameCount / actor.animation.fps;
-    }
-
     fun constructor()
     {
         transform.position = Vector2.zero;
         actor.zindex = zindex;
+
+        // create layers
+        numberOfLayers = Number(actor.animation.prop("number_of_layers"));
+        for(n = numberOfLayers; n >= 1; n--) {
+            zoffset = 1 - (n-1) / numberOfLayers;
+            layer = spawn("Default Title Card - Layer")
+                    .setLayerNumber(n)
+                    .setZIndex(zindex + zoffset);
+
+            layers.push(layer);
+        }
+
+        // attach the level name to a layer
+        titleLayerNumber = Number(actor.animation.prop("level_name_layer"));
+        titleLayer = getLayer(titleLayerNumber);
+        levelName.setLayer(titleLayer);
+
+        // set the font of the level name
+        titleLayerFont = String(actor.animation.prop("level_name_font"));
+        levelName.setFontName(titleLayerFont);
+
+        // attach the zone number to a layer
+        zoneLayerNumber = Number(actor.animation.prop("level_zone_layer"));
+        zoneLayer = getLayer(zoneLayerNumber);
+        zoneNumber.setLayer(zoneLayer);
+    }
+
+    fun setAnim(anim)
+    {
+        actor.anim = anim;
+        for(i = layers.length - 1; i >= 0; i--)
+            layers[i].setAnim(anim);
+    }
+
+    fun getLayer(n)
+    {
+        if(n >= 1 && n <= layers.length)
+            return layers[layers.length - n];
+
+        return null;
     }
 }
 
-// Level Info: Level Name & Zone Number
-object "Default Title Card - Level Info" is "entity", "awake", "detached", "private"
+object "Default Title Card - Layer" is "entity", "awake", "detached", "private"
 {
-    public readonly zindex = parent.zindex;
-    transform = Transform();
-    levelName = spawn("Default Title Card - Level Name");
-    zoneNumber = spawn("Default Title Card - Zone Number");
-    initialPosition = Vector2.zero;
-    targetPosition = Vector2.zero;
-    time = 0.0;
-    duration = 1.0;
+    public readonly layerNumber = 1;
+    actor = null;
 
-    state "main"
+    fun setLayerNumber(n)
     {
-        // initialize
-        transform.localPosition = initialPosition = Vector2(
-            Screen.width + levelName.size.x / 2,
-            targetPosition.y
-        );
+        assert(n >= 1);
 
-        state = "waiting";
-    }
+        layerNumber = n;
+        actor = Actor("Default Title Card - Layer " + layerNumber);
 
-    state "waiting"
-    {
-        // do nothing
-    }
-
-    state "appearing"
-    {
-        time += Time.delta;
-        t = time / duration;
-
-        x = Math.smoothstep(initialPosition.x, targetPosition.x, t);
-        y = Math.smoothstep(initialPosition.y, targetPosition.y, t);
-        transform.localPosition = Vector2(x, y);
-
-        if(time >= duration)
-            state = "waiting";
-    }
-
-    state "disappearing"
-    {
-        time += Time.delta;
-        t = time / duration;
-
-        x = Math.smoothstep(targetPosition.x, initialPosition.x, t);
-        y = Math.smoothstep(targetPosition.y, initialPosition.y, t);
-        transform.localPosition = Vector2(x, y);
-
-        if(time >= duration)
-            state = "waiting";
-    }
-
-    fun appear(seconds)
-    {
-        duration = Math.max(0.01, seconds);
-        time = 0.0;
-        state = "appearing";
-    }
-
-    fun disappear(seconds)
-    {
-        duration = Math.max(0.01, seconds);
-        time = 0.0;
-        state = "disappearing";
-    }
-
-    fun setTargetPosition(target)
-    {
-        targetPosition = target;
         return this;
     }
+
+    fun setAnim(anim)
+    {
+        assert(actor !== null);
+
+        actor.anim = anim;
+        actor.visible = actor.animation.exists;
+
+        return this;
+    }
+
+    fun setZIndex(zindex)
+    {
+        assert(actor !== null)
+
+        actor.zindex = zindex;
+
+        return this;
+    }
+
+    fun findPosition()
+    {
+        interpolatedTransform = actor.animation.findInterpolatedTransform();
+        return interpolatedTransform.localPosition.plus(actor.actionOffset);
+    }
+
 }
 
 object "Default Title Card - Level Name" is "entity", "awake", "detached", "private"
 {
-    label = Text("Default Title Card - Level Name");
+    transform = Transform();
+    label = null;
+    layer = null;
 
-    fun get_size()
+    state "main"
     {
-        return label.size;
+        if(layer !== null)
+            transform.localPosition = layer.findPosition();
     }
 
-    fun constructor()
+    fun setLayer(l)
     {
+        layer = l;
+        return this;
+    }
+
+    fun setFontName(fontName)
+    {
+        label = Text(fontName);
+
         label.text = Level.name;
         label.align = "center";
-        label.zindex = parent.zindex + 0.1;
+        label.zindex = parent.zindex + 1.1;
+
+        return this;
     }
 }
 
 object "Default Title Card - Zone Number" is "entity", "awake", "detached", "private"
 {
+    transform = Transform();
     actor = Actor("Default Title Card - Zone Number");
+    layer = null;
+
+    state "main"
+    {
+        if(layer !== null)
+            transform.localPosition = layer.findPosition();
+    }
+
+    fun setLayer(l)
+    {
+        layer = l;
+        return this;
+    }
 
     fun constructor()
     {
         actor.anim = Level.act;
-        actor.zindex = parent.zindex + 0.2;
+        actor.zindex = parent.zindex + 1.2;
+
         if(!actor.animation.exists)
             actor.visible = false;
     }
