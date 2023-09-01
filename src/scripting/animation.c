@@ -54,7 +54,7 @@ static surgescript_var_t* fun_setspeedfactor(surgescript_object_t* object, const
 static surgescript_var_t* fun_getsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setsync(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getexists(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_findinterpolatedtransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_findtransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_prop(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static const surgescript_heapptr_t ANIMID_ADDR = 0;
 static const surgescript_heapptr_t SPRITENAME_ADDR = 1;
@@ -62,8 +62,8 @@ static const surgescript_heapptr_t HOTSPOT_ADDR = 2;
 static const surgescript_heapptr_t ANCHOR_ADDR = 3;
 static const surgescript_heapptr_t ACTIONSPOT_ADDR = 4;
 static const surgescript_heapptr_t ACTIONOFFSET_ADDR = 5;
-static const surgescript_heapptr_t INTERPOLATEDTRANSFORM_ADDR = 6;
-static const surgescript_heapptr_t INTERPOLATEDTRANSFORMTEMPVECTOR_ADDR = 7;
+static const surgescript_heapptr_t ANIMTRANSFORM_ADDR = 6;
+static const surgescript_heapptr_t ANIMTRANSFORMTEMPVECTOR_ADDR = 7;
 static const char* ONCHANGE = "onAnimationChange"; /* fun onAnimationChange(animation) will be called on the parent object */
 static void notify_change(const surgescript_object_t* object);
 static actor_t* get_animation_actor(const surgescript_object_t* object);
@@ -102,7 +102,7 @@ void scripting_register_animation(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Animation", "set_sync", fun_setsync, 1);
     surgescript_vm_bind(vm, "Animation", "get_exists", fun_getexists, 0);
     surgescript_vm_bind(vm, "Animation", "prop", fun_prop, 1);
-    surgescript_vm_bind(vm, "Animation", "findInterpolatedTransform", fun_findinterpolatedtransform, 0);
+    surgescript_vm_bind(vm, "Animation", "findTransform", fun_findtransform, 0);
 }
 
 /*
@@ -156,16 +156,16 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(ANCHOR_ADDR == surgescript_heap_malloc(heap));
     ssassert(ACTIONSPOT_ADDR == surgescript_heap_malloc(heap));
     ssassert(ACTIONOFFSET_ADDR == surgescript_heap_malloc(heap));
-    ssassert(INTERPOLATEDTRANSFORM_ADDR == surgescript_heap_malloc(heap));
-    ssassert(INTERPOLATEDTRANSFORMTEMPVECTOR_ADDR == surgescript_heap_malloc(heap));
+    ssassert(ANIMTRANSFORM_ADDR == surgescript_heap_malloc(heap));
+    ssassert(ANIMTRANSFORMTEMPVECTOR_ADDR == surgescript_heap_malloc(heap));
     surgescript_var_set_number(surgescript_heap_at(heap, ANIMID_ADDR), 0);
     surgescript_var_set_string(surgescript_heap_at(heap, SPRITENAME_ADDR), "");
     surgescript_var_set_null(surgescript_heap_at(heap, HOTSPOT_ADDR)); /* lazy evaluation */
     surgescript_var_set_null(surgescript_heap_at(heap, ANCHOR_ADDR)); /* lazy evaluation */
     surgescript_var_set_null(surgescript_heap_at(heap, ACTIONSPOT_ADDR)); /* lazy evaluation */
     surgescript_var_set_null(surgescript_heap_at(heap, ACTIONOFFSET_ADDR)); /* lazy evaluation */
-    surgescript_var_set_null(surgescript_heap_at(heap, INTERPOLATEDTRANSFORM_ADDR)); /* lazy evaluation */
-    surgescript_var_set_null(surgescript_heap_at(heap, INTERPOLATEDTRANSFORMTEMPVECTOR_ADDR)); /* lazy evaluation */
+    surgescript_var_set_null(surgescript_heap_at(heap, ANIMTRANSFORM_ADDR)); /* lazy evaluation */
+    surgescript_var_set_null(surgescript_heap_at(heap, ANIMTRANSFORMTEMPVECTOR_ADDR)); /* lazy evaluation */
     surgescript_object_set_userdata(object, (void*)animation);
 
     /* sanity check */
@@ -511,7 +511,7 @@ surgescript_var_t* fun_prop(surgescript_object_t* object, const surgescript_var_
 
 /* the interpolated transform of the current keyframe-based animation at the current time, if it's defined.
    If no keyframe-based animation is playing at the current time, an identity transform is returned */
-surgescript_var_t* fun_findinterpolatedtransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+surgescript_var_t* fun_findtransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
@@ -519,8 +519,8 @@ surgescript_var_t* fun_findinterpolatedtransform(surgescript_object_t* object, c
     surgescript_objecthandle_t v2_handle;
 
     /* lazy evaluation */
-    surgescript_var_t* v2_var = surgescript_heap_at(heap, INTERPOLATEDTRANSFORMTEMPVECTOR_ADDR);
-    surgescript_var_t* transform_var = surgescript_heap_at(heap, INTERPOLATEDTRANSFORM_ADDR);
+    surgescript_var_t* v2_var = surgescript_heap_at(heap, ANIMTRANSFORMTEMPVECTOR_ADDR);
+    surgescript_var_t* transform_var = surgescript_heap_at(heap, ANIMTRANSFORM_ADDR);
     if(surgescript_var_is_null(transform_var)) {
         surgescript_objecthandle_t me = surgescript_object_handle(object);
 
