@@ -101,6 +101,7 @@ static const char DEFAULT_SPRITE[] = "null";
 static const char OVERRIDE_PREFIX[] = "sprites/overrides/"; /* sprites defined in .spr files located in this folder take predecence over sprites defined elsewhere */
 static const int OVERRIDE_PREFIX_LENGTH = sizeof(OVERRIDE_PREFIX) - 1;
 static const int TRANSITION_ANY_ANIM = -1; /* special value representing a transition to/from any animation */
+static const int MAX_FRAMES = 4096; /* maximum number of frames in a spritesheet */
 
 /* private functions */
 static void validate_sprite(spriteinfo_t *spr); /* validates the sprite */
@@ -900,10 +901,13 @@ void validate_sprite(spriteinfo_t *spr)
         logfile_message("Adjusting source_rect size to (%d,%d)", spr->rect_w, spr->rect_h);
     }
 
+    /* validate the number of frames in the spritesheet */
+    int number_of_frames_in_the_sheet = (spr->rect_w / spr->frame_w) * (spr->rect_h / spr->frame_h);
+    if(number_of_frames_in_the_sheet > MAX_FRAMES)
+        fatal_error("Sprite error: sprites cannot have more than %d frames. Is the frame_size (%d,%d) correct?", MAX_FRAMES, spr->frame_w, spr->frame_h);
+
     /* validate individual animations */
     extern void animation_validate(animation_t *anim, int number_of_frames_in_the_sheet);
-    int number_of_frames_in_the_sheet = (spr->rect_w / spr->frame_w) * (spr->rect_h / spr->frame_h);
-
     for(int i = 0; i < spr->animation_count; i++) {
         if(spr->animation_data[i] != NULL)
             animation_validate(spr->animation_data[i], number_of_frames_in_the_sheet);
@@ -911,7 +915,6 @@ void validate_sprite(spriteinfo_t *spr)
 
     /* validate individual keyframe-based animations */
     extern void proganim_validate(proganim_t* prog_anim);
-
     iterator_t* it = dictionary_keys(spr->prog_anims);
     while(iterator_has_next(it)) {
         const char* name = iterator_next(it);
