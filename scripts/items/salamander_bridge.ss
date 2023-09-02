@@ -17,7 +17,7 @@ using SurgeEngine.Vector2;
 object "Salamander Bridge" is "entity", "gimmick", "awake", "boss bridge"
 {
     public length = 6;
-    public recoverTime = 5.0;
+    public recoverTime = 3.5;
     elements = [];
     box = null;
     transform = Transform();
