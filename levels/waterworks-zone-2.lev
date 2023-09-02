@@ -15,7 +15,7 @@ theme "themes/waterworks-zone.brk"
 bgtheme "themes/waterworks-zone-indoors.bg"
 spawn_point 128 8960
 music "musics/waterworks.ogg"
-setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Title Card" "Default Cleared Animation" "Waterworks Zone"
+setup "Waterworks Zone" "Default Cleared Animation" "Default Title Card" "Default HUD" "Default Pause and Quit" "Default Camera" "Surge Gameplay"
 players "Surge"
 waterlevel 10000
 watercolor 144 99 255 128
@@ -1934,16 +1934,20 @@ brick 1 30240 9584
 brick 271 29760 9392
 brick 270 29920 9392
 brick 270 29856 9392
-brick 101 29824 9328
 brick 926 29808 9360
-brick 925 29808 9328
-brick 925 29872 9328
 brick 926 29872 9360
 brick 926 29744 9360
-brick 925 29744 9328
 brick 101 29696 9328
 brick 926 29680 9360
-brick 925 29680 9328
+brick 101 29824 9328
+brick 925 29680 9280
+brick 925 29744 9280
+brick 925 29808 9280
+brick 925 29872 9280
+brick 926 29680 9312
+brick 926 29744 9312
+brick 926 29808 9312
+brick 926 29872 9312
 brick 270 30192 9392
 brick 271 30112 9392
 brick 271 30048 9392
@@ -1951,11 +1955,14 @@ brick 101 29952 9328
 brick 101 29984 9328
 brick 101 30112 9328
 brick 926 29936 9360
-brick 925 29936 9328
-brick 925 30064 9328
-brick 925 30128 9328
 brick 926 30064 9360
 brick 926 30128 9360
+brick 925 29936 9280
+brick 925 30064 9280
+brick 925 30128 9280
+brick 926 29936 9312
+brick 926 30064 9312
+brick 926 30128 9312
 brick 11 28960 9456
 brick 11 29088 9456
 brick 1 28960 9584
@@ -1978,10 +1985,14 @@ brick 926 29616 9360
 brick 926 29552 9360
 brick 926 29488 9360
 brick 926 29424 9360
-brick 925 29424 9328
-brick 925 29488 9328
-brick 925 29552 9328
-brick 925 29616 9328
+brick 925 29424 9280
+brick 925 29488 9280
+brick 925 29552 9280
+brick 925 29616 9280
+brick 926 29424 9312
+brick 926 29488 9312
+brick 926 29552 9312
+brick 926 29616 9312
 brick 270 29344 9392
 brick 271 29376 9392
 brick 101 29312 9328
@@ -5660,5 +5671,6 @@ entity "Collectible" 17008 10672 "bf4b6fd7"
 entity "Collectible" 14968 10816 "a84ecc8"
 entity "Collectible" 15080 10816 "bc11d711"
 entity "Water Bubbles" 17776 10368 "1e0010ff"
+entity "Powerup Collectibles" 20816 9184 "34238daa"
 
 // EOF
