@@ -9,7 +9,7 @@
 sprite "GreenMarmot"
 {
     source_file     "images/enemies/waterworks_zone.png"
-    source_rect     400 392 240 40
+    source_rect     400 432 240 40
     frame_size      40 40
     hot_spot        20 40
 
