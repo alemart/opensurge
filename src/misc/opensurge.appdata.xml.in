@@ -5,14 +5,10 @@
   <developer_name>alemart</developer_name>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <summary>Unleash your creativity with Surge Engine, an open source game engine for retro games!</summary>
+  <summary>Make your dreams come true with Surge Engine, an open source game engine for retro games!</summary>
   <description>
-    <p>
-      Unleash your creativity with Surge Engine, an open source
-      game engine for retro games! It features Surge the Rabbit,
-      a free retro platformer with a charismatic character.
-      Players MOD it to create their own games.
-    </p>
+    <p>Make your dreams come true with Surge Engine, an open source game engine for retro games!</p>
+    <p>Get joyful with Surge the Rabbit, a fun retro platformer full of playfulness!</p>
   </description>
   <keywords>
     <keyword>games</keyword>
@@ -26,8 +22,13 @@
     <keyword>arcade</keyword>
     <keyword>fun</keyword>
     <keyword>cool</keyword>
+    <keyword>play</keyword>
+    <keyword>playful</keyword>
+    <keyword>joy</keyword>
+    <keyword>joyful</keyword>
     <keyword>game</keyword>
     <keyword>gaming</keyword>
+    <keyword>creativity</keyword>
     <keyword>create</keyword>
     <keyword>creator</keyword>
     <keyword>maker</keyword>

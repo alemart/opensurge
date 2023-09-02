@@ -6,7 +6,7 @@
 [![Discord server](https://img.shields.io/discord/493384707937927178?color=5662f6&logo=discord&logoColor=white)](https://discord.gg/w8JqM7m)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/alemart?label=Sponsor%20me&logo=github%20sponsors&style=social)](https://github.com/sponsors/alemart)
 
-Unleash your creativity with **Surge Engine**, an open source game engine for retro games! It features **Surge the Rabbit**, a free retro platformer with a charismatic character. Players MOD it to create their own games.
+Make your dreams come true with **Surge Engine**, an open source game engine for retro games! Get joyful with **Surge the Rabbit**, a fun retro platformer full of playfulness!
 
 [Download now](https://opensurge2d.org) | [Create your games](https://wiki.opensurge2d.org/Introduction_to_Modding) | [Learn scripting](https://docs.opensurge2d.org) | [Watch videos](https://youtube.com/alemart88)
 
