@@ -385,7 +385,7 @@ int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
         int percentage = UNDEFINED_PERCENTAGE;
         if(percentage_string != NULL)
             percentage = parse_percentage(percentage_string);
-#if 0
+#if 1
         /* create a new keyframe. Repeat the last one (if any) */
         if(prog_anim->keyframe_count == 0)
             proganim_add_keyframe(prog_anim, DEFAULT_KEYFRAME);
