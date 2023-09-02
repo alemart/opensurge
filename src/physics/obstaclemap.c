@@ -594,7 +594,7 @@ const obstacle_t* pick_best_obstacle(const obstacle_t *a, const obstacle_t *b, i
 /* pick the tallest ground between a and b. the sensor is assumed to collide with both. we assume x1 <= x2 and y1 <= y2 */
 const obstacle_t* pick_tallest_ground(const obstacle_t* a, const obstacle_t* b, int x1, int y1, int x2, int y2, grounddir_t ground_direction, int* out_gnd)
 {
-    int x, y, ha, hb;
+    int x = 0, y = 0;
 
     /* we analyze from the HEAD (x,y) of the sensor because the sensor is
        assumed to be large and because the tail may surpass the ground */
@@ -617,8 +617,8 @@ const obstacle_t* pick_tallest_ground(const obstacle_t* a, const obstacle_t* b, 
     }
 
     /* which obstacle is the tallest? */
-    ha = obstacle_ground_position(a, x, y, ground_direction);
-    hb = obstacle_ground_position(b, x, y, ground_direction);
+    int ha = obstacle_ground_position(a, x, y, ground_direction);
+    int hb = obstacle_ground_position(b, x, y, ground_direction);
     switch(ground_direction) {
         case GD_DOWN:   *out_gnd = min(ha, hb); break;
         case GD_UP:     *out_gnd = max(ha, hb); break;

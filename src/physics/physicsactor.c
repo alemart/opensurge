@@ -892,7 +892,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
 
     /* rotate and apply offset */
     point2d_t offset = sensor_local_head(sensor_d);
-    int rw, rh;
+    int rw = 0, rh = 0;
     switch(pa->movmode) {
         case MM_FLOOR:
             rw = w;
@@ -1852,7 +1852,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
         /* if the player is on the ground or has just left the ground, stick to it! */
         if(!pa->midair || !pa->was_midair || pa->unstable_angle_counter > 0) {
-            int gnd_pos_a, gnd_pos_b, gnd_pos;
+            int gnd_pos_a, gnd_pos_b, gnd_pos = 0;
             const obstacle_t *gnd_a, *gnd_b;
 
             /* get the ground sensors */

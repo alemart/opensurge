@@ -1122,8 +1122,10 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
             anim_id = 0;
             p2 = p1;
         }
-        else
+        else {
+            p1 = p2 = NULL;
             nanoparser_crash(stmt, "Undefined animation block");
+        }
 
         /* validate anim_id */
         if(!is_valid_anim_id(anim_id))
