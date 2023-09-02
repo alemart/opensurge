@@ -1170,7 +1170,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
         /* just to make sure that we don't get locked in this state
            maybe include a timer instead? */
-        if(!pa->midair && !pa->was_midair)
+        if(!pa->midair && !pa->was_midair && pa->ysp >= 0.0)
             pa->state = PAS_STOPPED;
     }
 
