@@ -285,8 +285,7 @@ object "Powerup Lucky Bonus" is "entity", "basic", "powerup"
 object "Powerup Transformation" is "entity", "basic", "powerup"
 {
     public character = "Surge"; // name of the character
-    public duration = -1; // duration of the transformation, in seconds (a negative value means forever)
-                          // suggested duration: 20 seconds
+    public duration = 20; // duration of the transformation, in seconds
 
     itemBox = spawn("Item Box").setAnimation(19);
     watcher = null;

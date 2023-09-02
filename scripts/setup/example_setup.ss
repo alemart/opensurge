@@ -133,20 +133,28 @@ object "Example Setup"
                 "onTrigger": EventList([
                     // run on trigger
                     FunctionEvent("Print").withArgument("3..."),
+                    FunctionEvent("Play Sound").withArgument("samples/choose.wav"),
 
                     // run after 1 second
                     DelayedEvent(
-                        FunctionEvent("Print").withArgument("2...")
+                        EventList([
+                            FunctionEvent("Print").withArgument("2..."),
+                            FunctionEvent("Play Sound").withArgument("samples/choose.wav")
+                        ])
                     ).willWait(1.0),
 
                     // run after 2 seconds
                     DelayedEvent(
-                        FunctionEvent("Print").withArgument("1...")
+                        EventList([
+                            FunctionEvent("Print").withArgument("1..."),
+                            FunctionEvent("Play Sound").withArgument("samples/choose.wav")
+                        ])
                     ).willWait(2.0),
 
                     // run after 3 seconds
                     DelayedEvent(
                         EventList([
+                            FunctionEvent("Play Sound").withArgument("samples/choose.wav"),
                             FunctionEvent("Print").withArgument("Double Lucky Bonus!"),
                             FunctionEvent("Print").withArgument("yaaaaay!"),
                             FunctionEvent("Give Lucky Bonus").withArgument(100)
