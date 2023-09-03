@@ -15,7 +15,7 @@ theme "themes/waterworks-zone.brk"
 bgtheme "themes/waterworks-zone-indoors.bg"
 spawn_point 128 8960
 music "musics/waterworks.ogg"
-setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Title Card" "Default Cleared Animation" "Waterworks Zone"
+setup "Waterworks Zone" "Default Cleared Animation" "Default Title Card" "Default HUD" "Default Pause and Quit" "Default Camera" "Surge Gameplay"
 players "Surge"
 waterlevel 10000
 watercolor 144 99 255 128
@@ -1615,14 +1615,22 @@ brick 101 7296 9760
 brick 5 7136 9808
 brick 251 7232 9680
 brick 250 7168 9680
+brick 268 7312 9824
 brick 24 7424 9888
 brick 20 7552 9888
 brick 101 7424 9760
 brick 101 7552 9760
+brick 268 7392 9824
+brick 268 7472 9824
+brick 268 7552 9824
+brick 268 7632 9824
 brick 20 7680 9888
 brick 22 7808 9888
 brick 101 7680 9760
 brick 101 7808 9760
+brick 269 7872 9824
+brick 268 7792 9824
+brick 268 7712 9824
 brick 1 7424 10016
 brick 1 7552 10016
 brick 1 7680 10016
@@ -4550,26 +4558,6 @@ entity "Layer Green" 7056 9696 "bf2a69f394e4330d"
 entity "Layer Green" 7056 9664 "9543aa18fcf6982b"
 entity "Layer Green" 7056 9632 "881af3b51c1a1fdb"
 entity "Layer Green" 7056 9600 "c6ecee2b4916bd24"
-entity "Spring Strongest" 7312 9856 "f5fa5a4ffa68a86c"
-entity "Spring Strongest" 7344 9856 "3b5f173f2ec3e23c"
-entity "Spring Strongest" 7376 9856 "de0ebb4049d16af8"
-entity "Spring Strongest" 7408 9856 "f7495f907c1d762d"
-entity "Spring Strongest" 7440 9856 "9065cc493a7f6781"
-entity "Spring Strongest" 7472 9856 "4c1e8494693e590e"
-entity "Spring Strongest" 7504 9856 "bef49b178923a63c"
-entity "Spring Strongest" 7536 9856 "a00272d846ffee70"
-entity "Spring Strongest" 7568 9856 "7e62a07caf1f8dac"
-entity "Spring Strongest" 7600 9856 "f5d12fdad37959b7"
-entity "Spring Strongest" 7632 9856 "93370620de3726c4"
-entity "Spring Strongest" 7664 9856 "84af16e905887989"
-entity "Spring Strongest" 7696 9856 "c2d7a76cecd82b3a"
-entity "Spring Strongest" 7728 9856 "ab52425a2db415ec"
-entity "Spring Strongest" 7760 9856 "8919d94c7bd986c7"
-entity "Spring Strongest" 7792 9856 "de627db5ed83640a"
-entity "Spring Strongest" 7824 9856 "43fc7d85ca842042"
-entity "Spring Strongest" 7856 9856 "776d957e15157882"
-entity "Spring Strongest" 7888 9856 "62afd591669732f3"
-entity "Spring Strongest" 7920 9856 "1c4fcd208764c056"
 entity "Tube Out" 7968 8784 "cb64e6a03462a176"
 entity "Tube In" 8000 8784 "54c7f0f5cbe4f9b4"
 entity "Layer Yellow" 7008 9056 "53c0ab4107b5fee2"
@@ -5682,5 +5670,25 @@ entity "Collectible" 14968 10816 "a84ecc8"
 entity "Collectible" 15080 10816 "bc11d711"
 entity "Water Bubbles" 17776 10368 "1e0010ff"
 entity "Powerup Collectibles" 20816 9184 "34238daa"
+entity "Spring Strongest Hidden" 7312 9856 "ea5c7647"
+entity "Spring Strongest Hidden" 7344 9856 "d28bbf6b"
+entity "Spring Strongest Hidden" 7376 9856 "d58612d5"
+entity "Spring Strongest Hidden" 7408 9856 "6a930bb0"
+entity "Spring Strongest Hidden" 7440 9856 "6abcc1a7"
+entity "Spring Strongest Hidden" 7472 9856 "94a531e4"
+entity "Spring Strongest Hidden" 7504 9856 "5ff28287"
+entity "Spring Strongest Hidden" 7536 9856 "fb392642"
+entity "Spring Strongest Hidden" 7568 9856 "d952848e"
+entity "Spring Strongest Hidden" 7600 9856 "d4dec207"
+entity "Spring Strongest Hidden" 7632 9856 "c6011e43"
+entity "Spring Strongest Hidden" 7664 9856 "197cecbf"
+entity "Spring Strongest Hidden" 7696 9856 "96aedaa6"
+entity "Spring Strongest Hidden" 7728 9856 "4e47ee93"
+entity "Spring Strongest Hidden" 7760 9856 "3beea58e"
+entity "Spring Strongest Hidden" 7792 9856 "280bdb45"
+entity "Spring Strongest Hidden" 7824 9856 "c6a3bdb3"
+entity "Spring Strongest Hidden" 7856 9856 "fe67f608"
+entity "Spring Strongest Hidden" 7888 9856 "1b6fbbe4"
+entity "Spring Strongest Hidden" 7920 9856 "3eed1d93"
 
 // EOF
