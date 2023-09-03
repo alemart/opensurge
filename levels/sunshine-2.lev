@@ -2332,11 +2332,11 @@ brick 18 5200 10256
 brick 1 5264 10256
 brick 1 5200 10384
 brick 145 5168 10304
-brick 29 5088 10208
 brick 1 5120 10336
-brick 1 5136 10256
-brick 22 5072 10224
 brick 1 5120 10368
+brick 1 5136 10256
+brick 29 5088 10208
+brick 16 5072 10224
 brick 255 5104 10320
 brick 50 5888 10368
 brick 1 5888 10240
@@ -2477,17 +2477,16 @@ brick 131 4736 10304
 brick 145 4592 10256
 brick 16 4864 10176
 brick 16 4992 10176
-brick 22 5040 10224
 brick 1 4992 10368
 brick 1 4864 10368
 brick 12 4864 10224
 brick 2 4864 10304
 brick 1 5008 10256
 brick 1 4992 10304
-brick 20 5008 10224
-brick 255 5088 10320
 brick 145 4848 10256
 brick 149 4928 10240
+brick 20 4944 10224
+brick 255 5088 10320
 brick 255 4304 10016
 brick 16 4112 10128
 brick 29 4208 10160
@@ -2988,8 +2987,6 @@ entity "Spring Standard Right" 5136 10304 "277a7f6bcf40aa52"
 entity "Bridge" 4608 9808 "395b93f322b2ff86"
 entity "Bridge" 4864 9808 "3327d33b404abbf9"
 entity "Collectible" 6320 10176 "e8b9ff0438a91591"
-entity "Collectible" 6304 10192 "479921346519b62b"
-entity "Collectible" 6336 10192 "c6e0283aa2756f87"
 entity "Collectible" 6320 10208 "a7797db9eeaa8498"
 entity "Spring Standard" 8032 10720 "f65a4ae0b3b8ae5a"
 entity "Spring Booster Right" 8336 10576 "1e2542509a330986"
@@ -3597,26 +3594,16 @@ entity "Tube In" 14384 9904 "f2cf2d9813ab4546"
 entity "Tube In" 15248 10704 "b8379459a56d824c"
 entity "Powerup Invincibility" 13632 9536 "4ef005040677aea1"
 entity "Powerup 1up" 11312 10112 "b0e6f22540f3ed66"
-entity "Collectible" 6304 10160 "d76a7a761de3e845"
-entity "Collectible" 6336 10160 "786718ecc9809ed5"
 entity "Collectible" 6320 10144 "73f2b30276be8aa8"
-entity "Collectible" 15520 10192 "3bc5d97d6b0d52d5"
-entity "Collectible" 15552 10192 "c002515e42b55d30"
 entity "Collectible" 15536 10176 "1f483bb80fd57b8a"
 entity "Powerup 1up" 7616 9840 "dbfbd6c4dbd1d390"
 entity "Spring Stronger Up Left" 17664 10272 "e81d7fa586e97f89"
 entity "Spring Stronger Up Right" 17408 10112 "996a669ef64bafaf"
 entity "Spring Stronger Up Left" 17664 9936 "425c92554ad93330"
 entity "Spring Stronger Right" 17408 9760 "ff46f7b4eaca4d56"
-entity "Collectible" 15520 10224 "aff523a8fd51af16"
 entity "Collectible" 15536 10240 "7362a63edeb209c8"
-entity "Collectible" 15552 10224 "49ccaa7b71021fdb"
-entity "Collectible" 15520 10256 "caf28547c897690f"
 entity "Collectible" 15536 10272 "a35d75647c7e41d"
-entity "Collectible" 15552 10256 "f29d6df47f18cc95"
-entity "Collectible" 6304 10224 "2581ef2c5f9fa681"
 entity "Collectible" 6320 10240 "407884242701198c"
-entity "Collectible" 6336 10224 "a1d6e0b47d46f8bf"
 entity "Spikes" 6448 10976 "2ab627e40af8b0ad"
 entity "Wolfey" 4464 10256 "237c4fcf43fdccb6"
 entity "Collectible" 2624 9840 "d5ff1ffb0f7e7276"
