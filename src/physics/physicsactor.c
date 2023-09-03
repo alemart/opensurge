@@ -1185,7 +1185,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
         const double threshold = 60.0;
         input_reset(pa->input);
 
-        pa->gsp = clip(pa->gsp, -0.75 * pa->capspeed, 0.75 * pa->capspeed);
+        pa->gsp = clip(pa->gsp, -0.625 * pa->capspeed, 0.625 * pa->capspeed);
         if(pa->state == PAS_ROLLING) {
             notify_observers(pa, PAE_BRAKE);
             pa->state = PAS_BRAKING;
