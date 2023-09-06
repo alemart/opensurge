@@ -2165,7 +2165,7 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
 
     /* A, B: ignore clouds when moving upwards */
     if(pa->ysp < 0.0) {
-        if(-pa->ysp > fabs(pa->xsp)) {
+        if(pa->ysp < -fabs(pa->xsp) || pa->state != PAS_JUMPING) {
             *at_A = (*at_A != NULL && obstacle_is_solid(*at_A)) ? *at_A : NULL;
             *at_B = (*at_B != NULL && obstacle_is_solid(*at_B)) ? *at_B : NULL;
         }
