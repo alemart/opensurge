@@ -80,6 +80,7 @@ static bool require_angle_to_be_zero(physicsactorstate_t state, movmode_t movmod
 static inline float delta_angle(float alpha, float beta);
 static void hotspot_magic(player_t* player);
 static void animate_invincibility_stars(player_t* player);
+static void run_dying_logic(player_t* player);
 static int fix_angle(int degrees, int threshold);
 static int is_head_underwater(const player_t* player);
 static void set_default_multipliers(physicsactor_t* pa, const character_t* character);
@@ -200,7 +201,6 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
     physicsactor_t *pa = player->pa;
     float padding = 16.0f, eps = 1e-5;
     float dt = timer_get_delta();
-    v2d_t position;
 
     /* if the player movement is enabled... */
     if(!player->disable_movement) {
@@ -209,7 +209,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         physics_adapter(player, obstaclemap);
 
         /* read new position */
-        position = player_position(player);
+        v2d_t position = player_position(player);
 
         /* enter / leave water */
         /* FIXME scripting flag */
@@ -251,7 +251,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 
         /* the player is blinking */
         if(player->blinking) {
-            player->blink_timer += timer_get_delta();
+            player->blink_timer += dt;
 
             if(player->blink_timer >= player->blink_visibility_timer + 0.06f) {
                 player->blink_visibility_timer = player->blink_timer;
@@ -303,24 +303,24 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 
             /* lock horizontally */
             if(position.x > cam_bottomright.x - padding + eps) {
-                player_set_xpos(player, cam_bottomright.x - padding);
                 player_set_speed(player, player_speed(player) * 0.5f);
+                player_set_xpos(player, cam_bottomright.x - padding);
+                position = player_position(player); /* update position */
             }
             else if(position.x < cam_topleft.x + padding - eps) {
-                player_set_xpos(player, cam_topleft.x + padding);
                 player_set_speed(player, player_speed(player) * 0.5f);
+                player_set_xpos(player, cam_topleft.x + padding);
+                position = player_position(player);
             }
 
             /* lock on top; won't prevent pits */
             if(!player_is_dying(player)) {
                 if(position.y < cam_topleft.y + padding - eps) {
-                    player_set_ypos(player, cam_topleft.y + padding);
                     player_set_ysp(player, player_ysp(player) * 0.5f);
+                    player_set_ypos(player, cam_topleft.y + padding);
+                    position = player_position(player);
                 }
             }
-
-            /* update position */
-            position = player_position(player);
         }
 
         /* modes of gameplay */
@@ -350,24 +350,31 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 
         }
     }
-    /* else if player is frozen, blinking and invisible ...? */
+#if 0
+    else {
+        /* if the player is frozen...? */
+    }
+#endif
 
     /* can't leave the world */
+    v2d_t position = player_position(player);
+
     if(position.x < padding - eps) {
-        player_set_xpos(player, padding);
         player_set_speed(player, player_speed(player) * 0.5f);
+        player_set_xpos(player, padding);
+        position = player_position(player); /* update position */
     }
     else if(position.x > level_size().x - padding + eps) {
-        player_set_xpos(player, level_size().x - padding);
         player_set_speed(player, player_speed(player) * 0.5f);
+        player_set_xpos(player, level_size().x - padding);
+        position = player_position(player);
     }
 
     if(position.y < padding - eps) {
-        player_set_ypos(player, padding);
         player_set_ysp(player, player_ysp(player) * 0.5f);
+        player_set_ypos(player, padding);
+        position = player_position(player);
     }
-
-    position = player_position(player); /* update position */
 
     /* invincibility stars */
     if(player->invincible)
@@ -378,58 +385,10 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         update_shield(player);
 
     /* restart the level if dead */
-#if 0
-    if(!player->disable_movement && player_is_dying(player)) {
-#else
-    if(player_is_dying(player)) {
-#endif
-        bool can_resurrect = player->immortal;
-        const float FADEOUT_TIME = 1.0f;
-
-        if(!can_resurrect) {
-            /* fade out the music */
-            const float MUSIC_FADEOUT_TIME = 0.5f;
-            float new_volume = 1.0f - min(player->dead_timer, MUSIC_FADEOUT_TIME) / MUSIC_FADEOUT_TIME;
-            float current_volume = music_get_volume();
-            if(new_volume < current_volume)
-                music_set_volume(new_volume);
-
-            /* hide the mobile gamepad */
-            mobilegamepad_fadeout();
-        }
-
-        /* decide what to do next */
-        if(player->dead_timer >= PLAYER_DEAD_RESTART_TIME) {
-
-            if(can_resurrect) {
-                /* resurrect */
-                player->dead_timer = 0.0f;
-                physicsactor_resurrect(player->pa);
-                /*position = player_position(player);*/ /* update position */
-                return;
-            }
-            else if(player_get_lives() <= 1) {
-                /* game over */
-                level_quit_with_gameover();
-            }
-            /*else if(fadefx_is_over()) { // skips a frame */
-            else if(player->dead_timer + dt >= PLAYER_DEAD_RESTART_TIME + FADEOUT_TIME) {
-                /* restart the level */
-                player_set_lives(player_get_lives() - 1);
-                level_restart();
-            }
-            else {
-                /* fade out */
-                color_t black = color_rgb(0, 0, 0);
-                fadefx_out(black, FADEOUT_TIME);
-            }
-
-        }
-
-        /* update the dead timer */
-        player->dead_timer += dt;
-    }
+    if(player_is_dying(player))
+        run_dying_logic(player);
 }
+
 
 /*
  * player_early_update()
@@ -505,7 +464,7 @@ int player_bounce_ex(player_t *player, const actor_t *hazard, int is_heavy_objec
     int hh = image_height(actor_image(hazard));
     int ph = image_height(actor_image(player->actor));
     float hazard_centre = (hazard->position.y - hazard->hot_spot.y) + hh * 0.5f;
-    float player_centre = (player->actor->position.y - player->actor->hot_spot.y) + ph * 0.5f;
+    float player_centre = (player_position(player).y - player->actor->hot_spot.y) + ph * 0.5f;
     return player_bounce(player, player_centre - hazard_centre, is_heavy_object);
 }
 
@@ -550,7 +509,7 @@ void player_hit_ex(player_t *player, const actor_t *hazard)
     int hw = image_width(actor_image(hazard));
     int pw = image_width(actor_image(player->actor));
     float hazard_centre = (hazard->position.x - hazard->hot_spot.x) + hw * 0.5f;
-    float player_centre = (player->actor->position.x - player->actor->hot_spot.x) + pw * 0.5f;
+    float player_centre = (player_position(player).x - player->actor->hot_spot.x) + pw * 0.5f;
     player_hit(player, player_centre - hazard_centre);
 }
 
@@ -1898,6 +1857,55 @@ void animate_invincibility_stars(player_t* player)
         player->star[i]->position = v2d_add(center, v2d_rotate(v2d_new(distance, 0.0f), angle));
         actor_change_animation_speed_factor(player->star[i], 1.0f + i * 0.25f);
     }
+}
+
+/* restart the level, display the game over scene or resurrect the player */
+void run_dying_logic(player_t* player)
+{
+    const float FADEOUT_TIME = 1.0f, MUSIC_FADEOUT_TIME = 0.5f;
+    bool can_resurrect = player->immortal;
+    float dt = timer_get_delta();
+
+    if(!can_resurrect) {
+        /* fade out the music */
+        float new_volume = 1.0f - min(player->dead_timer, MUSIC_FADEOUT_TIME) / MUSIC_FADEOUT_TIME;
+        float current_volume = music_get_volume();
+        if(new_volume < current_volume)
+            music_set_volume(new_volume);
+
+        /* hide the mobile gamepad */
+        mobilegamepad_fadeout();
+    }
+
+    /* decide what to do next */
+    if(player->dead_timer >= PLAYER_DEAD_RESTART_TIME) {
+
+        if(can_resurrect) {
+            /* resurrect */
+            player->dead_timer = 0.0f;
+            physicsactor_resurrect(player->pa);
+            return;
+        }
+        else if(player_get_lives() <= 1) {
+            /* game over */
+            level_quit_with_gameover();
+        }
+        /*else if(fadefx_is_over()) { // skips a frame */
+        else if(player->dead_timer + dt >= PLAYER_DEAD_RESTART_TIME + FADEOUT_TIME) {
+            /* restart the level */
+            player_set_lives(player_get_lives() - 1);
+            level_restart();
+        }
+        else {
+            /* fade out */
+            color_t black = color_rgb(0, 0, 0);
+            fadefx_out(black, FADEOUT_TIME);
+        }
+
+    }
+
+    /* update the dead timer */
+    player->dead_timer += dt;
 }
 
 /* given two angles in [0, 2pi], return their difference */
