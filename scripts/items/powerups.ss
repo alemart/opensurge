@@ -462,7 +462,7 @@ object "Item Box" is "entity", "private"
             return false;
 
         // player.attacking won't cut it (it's true when invincible)
-        return player.jumping || player.rolling || player.charging || player.aggressive;
+        return player.jumping || player.rolling || player.charging;
     }
 
     // --- MODIFIERS ---
