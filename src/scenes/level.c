@@ -199,7 +199,8 @@ static font_t *dlgbox_title, *dlgbox_message;
 static void level_load(const char *filepath);
 static void level_unload();
 static int level_save(const char *filepath);
-static bool level_interpret_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void *data);
+static bool level_interpret_header_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void *data);
+static bool level_interpret_body_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void *data);
 static bool level_save_ssobject(surgescript_object_t* object, void* param);
 
 /* internal methods */
@@ -475,7 +476,7 @@ void level_load(const char *filepath)
     strcpy(version, "");
     strcpy(license, "");
     strcpy(grouptheme, "");
-    spawn_point = v2d_new(0,0);
+    spawn_point = v2d_new(0, 0);
     dialogregion_size = 0;
     act = 0;
     requires[0] = GAME_VERSION_SUP;
@@ -498,18 +499,18 @@ void level_load(const char *filepath)
     surgescript_object_t* level_manager = scripting_util_surgeengine_component(surgescript_vm(), "LevelManager");
     surgescript_object_call_function(level_manager, "onLevelLoad", NULL, 0, NULL);
 
-    /* reading the level file */
-    if(!levparser_parse(filepath, NULL, level_interpret_line))
+    /* read the header of the level file */
+    if(!levparser_parse(filepath, NULL, level_interpret_header_line))
         fatal_error("Can\'t open level file \"%s\".", filepath);
 
     /* load the music */
     music_stop(); /* stop any music that's playing */
     music = *musicfile ? music_load(musicfile) : NULL;
 
-    /* recompute the level size */
-    update_level_size();
+    /* load the brickset */
+    brickset_load(theme);
 
-    /* background */
+    /* load the background */
     backgroundtheme = background_load(bgtheme);
 
     /* players */
@@ -518,6 +519,13 @@ void level_load(const char *filepath)
     level_change_player(team[0]);
     camera_set_position(player_position(player));
     surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "Player"), "__spawnPlayers", NULL, 0, NULL);
+
+    /* read the body of the level file;
+       load bricks & entities */
+    levparser_parse(filepath, NULL, level_interpret_body_line);
+
+    /* recompute the level size */
+    update_level_size();
 
     /* spawn setup objects */
     spawn_setup_objects();
@@ -750,37 +758,12 @@ int level_save(const char *filepath)
 }
 
 /*
- * level_interpret_line()
- * Interprets a line of the .lev file
+ * level_interpret_header_line()
+ * Interprets a line of the header of the .lev file
  */
-bool level_interpret_line(const char* filepath, int fileline, const char* identifier, int param_count, const char** param, void* data)
+bool level_interpret_header_line(const char* filepath, int fileline, const char* identifier, int param_count, const char** param, void* data)
 {
-    /* interpreting the command */
-    if(strcmp(identifier, "theme") == 0) {
-        if(!brickset_loaded()) {
-            if(param_count == 1) {
-                str_cpy(theme, param[0], sizeof(theme));
-                brickset_load(theme);
-            }
-            else
-                logfile_message("Level loader - command 'theme' expects one parameter: brickset filepath. Did you forget to double quote the brickset filepath?");
-        }
-        else
-            logfile_message("Level loader - duplicate command 'theme' on line %d. Ignoring...", fileline);
-    }
-    else if(strcmp(identifier, "bgtheme") == 0) {
-        if(param_count == 1)
-            str_cpy(bgtheme, param[0], sizeof(bgtheme));
-        else
-            logfile_message("Level loader - command 'bgtheme' expects one parameter: background filepath. Did you forget to double quote the background filepath?");
-    }
-    else if(strcmp(identifier, "music") == 0) {
-        if(param_count == 1)
-            str_cpy(musicfile, param[0], sizeof(musicfile));
-        else
-            logfile_message("Level loader - command 'music' expects one parameter: music filepath. Did you forget to double quote the music filepath?");
-    }
-    else if(strcmp(identifier, "name") == 0) {
+    if(strcmp(identifier, "name") == 0) {
         if(param_count == 1)
             str_cpy(name, param[0], sizeof(name));
         else
@@ -806,10 +789,11 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
     }
     else if(strcmp(identifier, "requires") == 0) {
         if(param_count == 1) {
-            int i;
             requires[0] = requires[1] = requires[2] = 0;
             sscanf(param[0], "%d.%d.%d", &requires[0], &requires[1], &requires[2]);
-            for(i=0; i<3; i++) requires[i] = clip(requires[i], 0, 99);
+            for(int i = 0; i < 3; i++)
+                requires[i] = clip(requires[i], 0, 99);
+
             if(game_version_compare(requires[0], requires[1], requires[2]) < 0) {
                 fatal_error(
                     "This level requires version %d.%d.%d or greater of the game engine.\nYours is %s\nPlease check out for new versions at %s",
@@ -825,6 +809,40 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
             act = clip(atoi(param[0]), 0, 65535);
         else
             logfile_message("Level loader - command 'act' expects one parameter: act number");
+    }
+    else if(strcmp(identifier, "readonly") == 0) {
+        if(!readonly) {
+            if(param_count == 0)
+                readonly = TRUE;
+            else
+                logfile_message("Level loader - command 'readonly' expects no parameters");
+        }
+        else
+            logfile_message("Level loader - duplicate command 'readonly' on line %d. Ignoring...", fileline);
+    }
+    else if(strcmp(identifier, "theme") == 0) {
+        if(param_count == 1)
+            str_cpy(theme, param[0], sizeof(theme));
+        else
+            logfile_message("Level loader - command 'theme' expects one parameter: brickset filepath. Did you forget to double quote the brickset filepath?");
+    }
+    else if(strcmp(identifier, "bgtheme") == 0) {
+        if(param_count == 1)
+            str_cpy(bgtheme, param[0], sizeof(bgtheme));
+        else
+            logfile_message("Level loader - command 'bgtheme' expects one parameter: background filepath. Did you forget to double quote the background filepath?");
+    }
+    else if(strcmp(identifier, "grouptheme") == 0) { /* deprecated */
+        if(param_count == 1)
+            str_cpy(grouptheme, param[0], sizeof(grouptheme));
+        else
+            logfile_message("Level loader - command 'grouptheme' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?");
+    }
+    else if(strcmp(identifier, "music") == 0) {
+        if(param_count == 1)
+            str_cpy(musicfile, param[0], sizeof(musicfile));
+        else
+            logfile_message("Level loader - command 'music' expects one parameter: music filepath. Did you forget to double quote the music filepath?");
     }
     else if(strcmp(identifier, "waterlevel") == 0) {
         if(param_count == 1)
@@ -861,16 +879,6 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
         else
             logfile_message("Level loader - command 'spawn_point' expects two parameters: xpos, ypos");
     }
-    else if(strcmp(identifier, "readonly") == 0) {
-        if(!readonly) {
-            if(param_count == 0)
-                readonly = TRUE;
-            else
-                logfile_message("Level loader - command 'readonly' expects no parameters");
-        }
-        else
-            logfile_message("Level loader - duplicate command 'readonly' on line %d. Ignoring...", fileline);
-    }
     else if(strcmp(identifier, "players") == 0) {
         if(team_size == 0) {
             if(param_count > 0) {
@@ -893,9 +901,68 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
                 logfile_message("Level loader - command 'players' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]");
         }
         else
-            logfile_message("Level loader - duplicate command 'players' on line %d. Ignoring... (note: 'players' accepts one or more parameters)", fileline);
+            logfile_message("Level loader - duplicate command 'players' on line %d. Ignoring...", fileline);
     }
-    else if(strcmp(identifier, "brick") == 0) {
+    else if(
+        strcmp(identifier, "setup") == 0 ||
+        strcmp(identifier, "startup") == 0 /* retro-compatibility */
+    ) {
+        if(is_setup_object_list_empty()) {
+            if(param_count > 0) {
+                for(int i = param_count - 1; i >= 0; i--)
+                    add_to_setup_object_list(param[i]);
+            }
+            else
+                logfile_message("Level loader - command '%s' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]", identifier);
+        }
+        else
+            logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring...", identifier, fileline);
+    }
+    else if(
+        /* skip the body */
+        strcmp(identifier, "brick") == 0 ||
+        strcmp(identifier, "entity") == 0 ||
+
+        /* deprecated */
+        strcmp(identifier, "object") == 0 ||
+        strcmp(identifier, "enemy") == 0 ||
+        strcmp(identifier, "item") == 0
+    ) {
+        /* skip */
+        ;
+    }
+    else if(strcmp(identifier, "dialogbox") == 0) { /* deprecated */
+        if(param_count == 6) {
+            if(dialogregion_size < DIALOGREGION_MAX) {
+                dialogregion_t *d = &(dialogregion[dialogregion_size++]);
+                d->disabled = FALSE;
+                d->rect_x = atoi(param[0]);
+                d->rect_y = atoi(param[1]);
+                d->rect_w = atoi(param[2]);
+                d->rect_h = atoi(param[3]);
+                str_cpy(d->title, param[4], sizeof(d->title));
+                str_cpy(d->message, param[5], sizeof(d->message));
+            }
+            else
+                logfile_message("Level loader - command 'dialogbox' has reached %d repetitions.", dialogregion_size);
+        }
+        else
+            logfile_message("Level loader - command 'dialogbox' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?");
+    }
+    else
+        logfile_message("Level loader - unknown command '%s' in '%s' near line %d", identifier, filepath, fileline);
+
+    /* continue reading */
+    return true;
+}
+
+/*
+ * level_interpret_body_line()
+ * Interprets a line of the body of the .lev file
+ */
+bool level_interpret_body_line(const char* filepath, int fileline, const char* identifier, int param_count, const char** param, void* data)
+{
+    if(strcmp(identifier, "brick") == 0) {
         if(param_count == 3 || param_count == 4 || param_count == 5) {
             if(*theme != 0) {
                 bricklayer_t layer = BRL_DEFAULT;
@@ -943,38 +1010,6 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
             logfile_message("Level loader - command 'entity' expects three or four parameters: name, xpos, ypos [, id]");
     }
     else if(
-        strcmp(identifier, "setup") == 0 ||
-        strcmp(identifier, "startup") == 0 /* retro-compatibility */
-    ) {
-        if(is_setup_object_list_empty()) {
-            if(param_count > 0) {
-                for(int i = param_count - 1; i >= 0; i--)
-                    add_to_setup_object_list(param[i]);
-            }
-            else
-                logfile_message("Level loader - command '%s' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]", identifier);
-        }
-        else
-            logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring... (note: the command accepts one or more parameters)", identifier, fileline);
-    }
-    else if(strcmp(identifier, "item") == 0) {
-        if(param_count == 3) {
-            int type = atoi(param[0]);
-            int x = atoi(param[1]);
-            int y = atoi(param[2]);
-            surgescript_object_t* object = NULL;
-            const char* object_name = item2surgescript(type); /* legacy item ported to SurgeScript? */
-            if(object_name != NULL && (object = level_create_object(object_name, v2d_new(x, y))) != NULL) {
-                /* force this flag, so the port gets persisted */
-                entity_info_set_persistent(object, true);
-            }
-            else
-                level_create_legacy_item(type, v2d_new(x, y)); /* no; create legacy item */
-        }
-        else
-            logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
-    }
-    else if(
         strcmp(identifier, "object") == 0 ||
         strcmp(identifier, "enemy") == 0 /* retro-compatibility */
     ) {
@@ -999,32 +1034,23 @@ bool level_interpret_line(const char* filepath, int fileline, const char* identi
         else
             logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
     }
-    else if(strcmp(identifier, "grouptheme") == 0) {
-        if(param_count == 1)
-            str_cpy(grouptheme, param[0], sizeof(grouptheme));
-        else
-            logfile_message("Level loader - command 'grouptheme' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?");
-    }
-    else if(strcmp(identifier, "dialogbox") == 0) {
-        if(param_count == 6) {
-            if(dialogregion_size < DIALOGREGION_MAX) {
-                dialogregion_t *d = &(dialogregion[dialogregion_size++]);
-                d->disabled = FALSE;
-                d->rect_x = atoi(param[0]);
-                d->rect_y = atoi(param[1]);
-                d->rect_w = atoi(param[2]);
-                d->rect_h = atoi(param[3]);
-                str_cpy(d->title, param[4], sizeof(d->title));
-                str_cpy(d->message, param[5], sizeof(d->message));
+    else if(strcmp(identifier, "item") == 0) { /* deprecated */
+        if(param_count == 3) {
+            int type = atoi(param[0]);
+            int x = atoi(param[1]);
+            int y = atoi(param[2]);
+            surgescript_object_t* object = NULL;
+            const char* object_name = item2surgescript(type); /* legacy item ported to SurgeScript? */
+            if(object_name != NULL && (object = level_create_object(object_name, v2d_new(x, y))) != NULL) {
+                /* force this flag, so the port gets persisted */
+                entity_info_set_persistent(object, true);
             }
             else
-                logfile_message("Level loader - command 'dialogbox' has reached %d repetitions.", dialogregion_size);
+                level_create_legacy_item(type, v2d_new(x, y)); /* no; create legacy item */
         }
         else
-            logfile_message("Level loader - command 'dialogbox' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?");
+            logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
     }
-    else
-        logfile_message("Level loader - unknown command '%s'\nin '%s' near line %d", identifier, filepath, fileline);
 
     /* continue reading */
     return true;
