@@ -2165,7 +2165,7 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
 
     /* A, B: ignore clouds when moving upwards */
     if(pa->ysp < 0.0) {
-        if(pa->ysp < -fabs(pa->xsp) || pa->state != PAS_JUMPING) {
+        if(pa->ysp < -fabs(pa->xsp) || (pa->was_midair && pa->state != PAS_JUMPING)) {
             *at_A = (*at_A != NULL && obstacle_is_solid(*at_A)) ? *at_A : NULL;
             *at_B = (*at_B != NULL && obstacle_is_solid(*at_B)) ? *at_B : NULL;
         }
@@ -2220,8 +2220,10 @@ void update_movmode(physicsactor_t* pa)
     /* angles 0x20, 0x60, 0xA0, 0xE0
        do not change the movmode */
     if(pa->angle < 0x20 || pa->angle > 0xE0) {
+#if 0
         if(pa->movmode == MM_CEILING)
             pa->gsp = -pa->gsp;
+#endif
         pa->movmode = MM_FLOOR;
     }
     else if(pa->angle > 0x20 && pa->angle < 0x60)
