@@ -178,6 +178,7 @@ static void spawn_companions(surgescript_object_t* object, const player_t* playe
 static void destroy_companions(surgescript_object_t* object);
 static bool destroy_companion(surgescript_var_t* var, surgescript_heapptr_t ptr, void* ctx);
 static void init_animation(surgescript_object_t* animation, const char* sprite_name);
+static bool is_removed_companion(const surgescript_objectmanager_t* manager, surgescript_objecthandle_t handle);
 #define FIXANG(rad) ((rad) >= 0.0 ? (rad) * RAD2DEG : 360.0 + (rad) * RAD2DEG)
 
 
@@ -1783,7 +1784,12 @@ void spawn_companions(surgescript_object_t* object, const player_t* player)
             }
 
             /* spawn the companion */
-            if(surgescript_object_child(object, companion_name) == null_handle) {
+            surgescript_objecthandle_t child_handle = surgescript_object_child(object, companion_name);
+            if(
+                /* don't accept repeated companions */
+                child_handle == null_handle || /* no such companion? */
+                is_removed_companion(manager, child_handle) /* this may be the case when using player.transformInto() */
+            ) {
                 surgescript_objecthandle_t this_handle = surgescript_object_handle(object);
                 surgescript_objecthandle_t companion = surgescript_objectmanager_spawn(manager, this_handle, companion_name, NULL);
                 surgescript_var_t* companion_var = surgescript_heap_at(heap, addr);
@@ -1846,4 +1852,15 @@ void init_animation(surgescript_object_t* animation, const char* sprite_name)
     surgescript_object_call_function(animation, "__init", args, 1, NULL);
 
     surgescript_var_destroy(arg);
+}
+
+/* test if an object is inexistent or killed */
+bool is_removed_companion(const surgescript_objectmanager_t* manager, surgescript_objecthandle_t handle)
+{
+    if(surgescript_objectmanager_exists(manager, handle)) {
+        const surgescript_object_t* companion = surgescript_objectmanager_get(manager, handle);
+        return surgescript_object_is_killed(companion);
+    }
+
+    return false;
 }
