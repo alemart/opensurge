@@ -24,6 +24,7 @@
 #include "scripting.h"
 #include "../core/video.h"
 #include "../core/input.h"
+#include "../util/djb2.h"
 
 /* private */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -37,13 +38,12 @@ static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const 
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getscrollup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getscrolldown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static uint64_t hash(const char *str);
 static const surgescript_heapptr_t POSITION_ADDR = 0;
 
 /* button hashes */
-#define BUTTON_LEFT         UINT64_C(0x17C9A03B0)         /* hash("left") */
-#define BUTTON_RIGHT        UINT64_C(0x3110494163)        /* hash("right") */
-#define BUTTON_MIDDLE       UINT64_C(0x6530DC5EBD4)       /* hash("middle") */
+static const uint64_t BUTTON_LEFT = DJB2("left");
+static const uint64_t BUTTON_RIGHT = DJB2("right");
+static const uint64_t BUTTON_MIDDLE = DJB2("middle");
 
 /*
  * scripting_register_mouse()
@@ -133,7 +133,7 @@ surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescrip
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
-    switch(hash(button)) {
+    switch(djb2(button)) {
         case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE1));
         case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE2));
         case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE3));
@@ -148,7 +148,7 @@ surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgesc
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
-    switch(hash(button)) {
+    switch(djb2(button)) {
         case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE1));
         case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE2));
         case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE3));
@@ -163,7 +163,7 @@ surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surges
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
-    switch(hash(button)) {
+    switch(djb2(button)) {
         case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE1));
         case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE2));
         case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE3));
@@ -183,19 +183,4 @@ surgescript_var_t* fun_getscrolldown(surgescript_object_t* object, const surgesc
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_DOWN));
-}
-
-
-
-/* -- private -- */
-
-/* djb2 hash function */
-uint64_t hash(const char *str)
-{
-    int c; uint64_t hash = 5381;
-
-    while((c = *((unsigned char*)(str++))))
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-    return hash;
 }

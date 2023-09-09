@@ -448,6 +448,7 @@ SET(GAME_HEADERS
   src/util/csv.h
   src/util/darray.h
   src/util/dictionary.h
+  src/util/djb2.h
   src/util/fasthash.h
   src/util/hashtable.h
   src/util/iterator.h
