@@ -378,7 +378,9 @@ object "Powerup Transformation - Player Watcher"
     {
         duration = Math.max(0, d);
         endTime = Time.time + duration; // this may be greater than or less than the previous endTime !!!
-                                        // e.g., get multiple powerups with different durations
+                                        // e.g., get multiple powerups with different durations.
+                                        // we want this behavior because each powerup may transform the
+                                        // player into a different character.
         return this;
     }
 
