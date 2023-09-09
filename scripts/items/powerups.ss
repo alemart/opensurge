@@ -286,8 +286,8 @@ object "Powerup Transformation" is "entity", "basic", "powerup"
 {
     public character = "Surge"; // name of the character
     public duration = 20; // duration of the transformation, in seconds
-
     itemBox = spawn("Item Box").setAnimation(19);
+    manager = Level.child("Powerup Transformation - Manager") || Level.spawn("Powerup Transformation - Manager");
     watcher = null;
 
     state "main"
@@ -296,21 +296,32 @@ object "Powerup Transformation" is "entity", "basic", "powerup"
 
     fun onItemBoxCrushed(player)
     {
-        originalCharacter = player.name;
+        originalName = manager.originalNameOf(player);
 
+        // transform the player
         if(!player.transformInto(character)) {
-            Console.print("Can't transform \"" + originalCharacter + "\" into \"" + character + "\"");
+            Console.print("Can't transform \"" + player.name + "\" into \"" + character + "\"");
             return;
         }
 
         Level.spawnEntity("Explosion", player.collider.center);
 
-        if(duration >= 0) {
+        // get the transformation watcher linked to this player
+        watcher = manager.watcherOf(player);
+        if(watcher === null) {
+            // new transformation
             watcher = Level.spawn("Powerup Transformation - Player Watcher")
-                     .setPlayer(player)
-                     .setCharacter(originalCharacter)
-                     .setDuration(duration);
+                           .setManager(manager);
         }
+        else {
+            // override existing transformation
+            ;
+        }
+
+        // setup the watcher
+        watcher.setPlayer(player)
+               .setCharacter(originalName)
+               .setDuration(duration >= 0 ? duration : Math.infinity);
     }
 }
 
@@ -318,31 +329,43 @@ object "Powerup Transformation" is "entity", "basic", "powerup"
 object "Powerup Transformation - Player Watcher"
 {
     player = null;
-    duration = 0;
+    manager = null;
+    endTime = 0;
     character = "";
     sfx = Sound("samples/destroy.wav");
 
     state "main"
     {
-        if(player === null)
-            Application.crash(this.__name + ": unset player");
+        assert(player !== null);
+        assert(manager !== null);
 
+        manager.setWatcherOf(player, this);
         state = "watch";
     }
 
     state "watch"
     {
-        if(timeout(duration))
+        if(Time.time >= endTime)
             state = "detransform";
     }
 
     state "detransform"
     {
+        assert(player !== null);
+        assert(manager !== null);
+
         player.transformInto(character);
         Level.spawnEntity("Explosion", player.collider.center);
         sfx.play();
 
+        manager.setWatcherOf(player, null);
         destroy();
+    }
+
+    fun setManager(m)
+    {
+        manager = m;
+        return this;
     }
 
     fun setPlayer(p)
@@ -354,6 +377,8 @@ object "Powerup Transformation - Player Watcher"
     fun setDuration(d)
     {
         duration = Math.max(0, d);
+        endTime = Time.time + duration; // this may be greater than or less than the previous endTime !!!
+                                        // e.g., get multiple powerups with different durations
         return this;
     }
 
@@ -361,6 +386,44 @@ object "Powerup Transformation - Player Watcher"
     {
         character = String(s);
         return this;
+    }
+}
+
+// Helper object
+object "Powerup Transformation - Manager"
+{
+    originalName = {};
+    watcher = {};
+
+    fun originalNameOf(player)
+    {
+        if(originalName.has(player.id))
+            return originalName[player.id];
+
+        originalName[player.id] = player.name;
+        return player.name;
+    }
+
+    fun watcherOf(player)
+    {
+        if(watcher.has(player.id))
+            return watcher[player.id];
+
+        return null;
+    }
+
+    fun setWatcherOf(player, obj)
+    {
+        watcher[player.id] = obj;
+    }
+
+    fun constructor()
+    {
+        // store the original names of all players when the level is loaded
+        for(i = 0; i < Player.count; i++) {
+            player = Player[i];
+            originalName[player.id] = player.name;
+        }
     }
 }
 
