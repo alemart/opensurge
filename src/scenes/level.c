@@ -199,8 +199,8 @@ static font_t *dlgbox_title, *dlgbox_message;
 static void level_load(const char *filepath);
 static void level_unload();
 static int level_save(const char *filepath);
-static bool level_interpret_header_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void *data);
-static bool level_interpret_body_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void *data);
+static bool level_interpret_header_line(const char *filepath, int fileline, levparser_command_t command, const char *command_name, int param_count, const char** param, void *data);
+static bool level_interpret_body_line(const char *filepath, int fileline, levparser_command_t command, const char *command_name, int param_count, const char** param, void *data);
 static bool level_save_ssobject(surgescript_object_t* object, void* param);
 
 /* internal methods */
@@ -761,33 +761,46 @@ int level_save(const char *filepath)
  * level_interpret_header_line()
  * Interprets a line of the header of the .lev file
  */
-bool level_interpret_header_line(const char* filepath, int fileline, const char* identifier, int param_count, const char** param, void* data)
+bool level_interpret_header_line(const char* filepath, int fileline, levparser_command_t command, const char* command_name, int param_count, const char** param, void* data)
 {
-    if(strcmp(identifier, "name") == 0) {
+    switch(command) {
+    case LEVCOMMAND_NAME: {
         if(param_count == 1)
             str_cpy(name, param[0], sizeof(name));
         else
-            logfile_message("Level loader - command 'name' expects one parameter: level name. Did you forget to double quote the level name?");
+            logfile_message("Level loader - command '%s' expects one parameter: level name. Did you forget to double quote the level name?", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "author") == 0) {
+
+    case LEVCOMMAND_AUTHOR: {
         if(param_count == 1)
             str_cpy(author, param[0], sizeof(name));
         else
-            logfile_message("Level loader - command 'author' expects one parameter: author name. Did you forget to double quote the author name?");
+            logfile_message("Level loader - command '%s' expects one parameter: author name. Did you forget to double quote the author name?", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "version") == 0) {
+
+    case LEVCOMMAND_VERSION: {
         if(param_count == 1)
             str_cpy(version, param[0], sizeof(name));
         else
-            logfile_message("Level loader - command 'version' expects one parameter: level version");
+            logfile_message("Level loader - command '%s' expects one parameter: level version", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "license") == 0) {
+
+    case LEVCOMMAND_LICENSE: {
         if(param_count == 1)
             str_cpy(license, param[0], sizeof(license));
         else
-            logfile_message("Level loader - command 'license' expects one parameter: license name. Did you forget to double quote the license parameter?");
+            logfile_message("Level loader - command '%s' expects one parameter: license name. Did you forget to double quote the license parameter?", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "requires") == 0) {
+
+    case LEVCOMMAND_REQUIRES: {
         if(param_count == 1) {
             requires[0] = requires[1] = requires[2] = 0;
             sscanf(param[0], "%d.%d.%d", &requires[0], &requires[1], &requires[2]);
@@ -796,61 +809,81 @@ bool level_interpret_header_line(const char* filepath, int fileline, const char*
 
             if(game_version_compare(requires[0], requires[1], requires[2]) < 0) {
                 fatal_error(
-                    "This level requires version %d.%d.%d or greater of the game engine.\nYours is %s\nPlease check out for new versions at %s",
+                    "This level requires version %d.%d.%d or greater of the game engine. Yours is %s. Please check out for new versions at %s",
                     requires[0], requires[1], requires[2], GAME_VERSION_STRING, GAME_WEBSITE
                 );
             }
         }
         else
-            logfile_message("Level loader - command 'requires' expects one parameter: minimum required engine version");
+            logfile_message("Level loader - command '%s' expects one parameter: minimum required engine version", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "act") == 0) {
+
+    case LEVCOMMAND_ACT: {
         if(param_count == 1)
             act = clip(atoi(param[0]), 0, 65535);
         else
-            logfile_message("Level loader - command 'act' expects one parameter: act number");
+            logfile_message("Level loader - command '%s' expects one parameter: act number", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "readonly") == 0) {
-        if(!readonly) {
-            if(param_count == 0)
-                readonly = TRUE;
-            else
-                logfile_message("Level loader - command 'readonly' expects no parameters");
-        }
+
+    case LEVCOMMAND_READONLY: {
+        if(param_count == 0)
+            readonly = TRUE;
         else
-            logfile_message("Level loader - duplicate command 'readonly' on line %d. Ignoring...", fileline);
+            logfile_message("Level loader - command '%s' expects no parameters", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "theme") == 0) {
+
+    case LEVCOMMAND_THEME: {
         if(param_count == 1)
             str_cpy(theme, param[0], sizeof(theme));
         else
-            logfile_message("Level loader - command 'theme' expects one parameter: brickset filepath. Did you forget to double quote the brickset filepath?");
+            logfile_message("Level loader - command '%s' expects one parameter: brickset filepath. Did you forget to double quote the brickset filepath?", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "bgtheme") == 0) {
+
+    case LEVCOMMAND_BGTHEME: {
         if(param_count == 1)
             str_cpy(bgtheme, param[0], sizeof(bgtheme));
         else
-            logfile_message("Level loader - command 'bgtheme' expects one parameter: background filepath. Did you forget to double quote the background filepath?");
+            logfile_message("Level loader - command '%s' expects one parameter: background filepath. Did you forget to double quote the background filepath?", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "grouptheme") == 0) { /* deprecated */
+
+    case LEVCOMMAND_GROUPTHEME: /* deprecated */ {
         if(param_count == 1)
             str_cpy(grouptheme, param[0], sizeof(grouptheme));
         else
-            logfile_message("Level loader - command 'grouptheme' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?");
+            logfile_message("Level loader - command '%s' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "music") == 0) {
+
+    case LEVCOMMAND_MUSIC: {
         if(param_count == 1)
             str_cpy(musicfile, param[0], sizeof(musicfile));
         else
-            logfile_message("Level loader - command 'music' expects one parameter: music filepath. Did you forget to double quote the music filepath?");
+            logfile_message("Level loader - command '%s' expects one parameter: music filepath. Did you forget to double quote the music filepath?", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "waterlevel") == 0) {
+
+    case LEVCOMMAND_WATERLEVEL: {
         if(param_count == 1)
             waterlevel = atoi(param[0]);
         else
-            logfile_message("Level loader - command 'waterlevel' expects one parameter: y coordinate");
+            logfile_message("Level loader - command '%s' expects one parameter: y coordinate", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "watercolor") == 0) {
+
+    case LEVCOMMAND_WATERCOLOR: {
         if(param_count == 3) {
             watercolor = color_rgba(
                 clip(atoi(param[0]), 0, 255),
@@ -868,25 +901,31 @@ bool level_interpret_header_line(const char* filepath, int fileline, const char*
             );
         }
         else
-            logfile_message("Level loader - command 'watercolor' expects parameters: red, green, blue [, alpha]");
+            logfile_message("Level loader - command '%s' expects parameters: red, green, blue [, alpha]", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "spawn_point") == 0) {
+
+    case LEVCOMMAND_SPAWNPOINT: {
         if(param_count == 2) {
             int x = atoi(param[0]);
             int y = atoi(param[1]);
             spawn_point = v2d_new(x, y);
         }
         else
-            logfile_message("Level loader - command 'spawn_point' expects two parameters: xpos, ypos");
+            logfile_message("Level loader - command '%s' expects two parameters: xpos, ypos", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "players") == 0) {
+
+    case LEVCOMMAND_PLAYERS: {
         if(team_size == 0) {
             if(param_count > 0) {
                 for(int i = 0; i < param_count; i++) {
                     if(team_size < TEAM_MAX) {
                         for(int j = 0; j < team_size; j++) {
                             if(strcmp(player_name(team[j]), param[i]) == 0)
-                                fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filepath, fileline);
+                                fatal_error("Level loader - duplicate player entry '%s' in '%s' near line %d", param[i], filepath, fileline);
                         }
 
                         logfile_message("Loading player '%s'...", param[i]);
@@ -898,40 +937,30 @@ bool level_interpret_header_line(const char* filepath, int fileline, const char*
                 }
             }
             else
-                logfile_message("Level loader - command 'players' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]");
+                logfile_message("Level loader - command '%s' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]", command_name);
         }
         else
-            logfile_message("Level loader - duplicate command 'players' on line %d. Ignoring...", fileline);
+            logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring...", command_name, fileline);
+
+        break;
     }
-    else if(
-        strcmp(identifier, "setup") == 0 ||
-        strcmp(identifier, "startup") == 0 /* retro-compatibility */
-    ) {
+
+    case LEVCOMMAND_SETUP: {
         if(is_setup_object_list_empty()) {
             if(param_count > 0) {
                 for(int i = param_count - 1; i >= 0; i--)
                     add_to_setup_object_list(param[i]);
             }
             else
-                logfile_message("Level loader - command '%s' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]", identifier);
+                logfile_message("Level loader - command '%s' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]", command_name);
         }
         else
-            logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring...", identifier, fileline);
-    }
-    else if(
-        /* skip the body */
-        strcmp(identifier, "brick") == 0 ||
-        strcmp(identifier, "entity") == 0 ||
+            logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring...", command_name, fileline);
 
-        /* deprecated */
-        strcmp(identifier, "object") == 0 ||
-        strcmp(identifier, "enemy") == 0 ||
-        strcmp(identifier, "item") == 0
-    ) {
-        /* skip */
-        ;
+        break;
     }
-    else if(strcmp(identifier, "dialogbox") == 0) { /* deprecated */
+
+    case LEVCOMMAND_DIALOGBOX: {
         if(param_count == 6) {
             if(dialogregion_size < DIALOGREGION_MAX) {
                 dialogregion_t *d = &(dialogregion[dialogregion_size++]);
@@ -944,13 +973,25 @@ bool level_interpret_header_line(const char* filepath, int fileline, const char*
                 str_cpy(d->message, param[5], sizeof(d->message));
             }
             else
-                logfile_message("Level loader - command 'dialogbox' has reached %d repetitions.", dialogregion_size);
+                logfile_message("Level loader - command '%s' has reached %d repetitions.", command_name, dialogregion_size);
         }
         else
-            logfile_message("Level loader - command 'dialogbox' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?");
+            logfile_message("Level loader - command '%s' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?", command_name);
+
+        break;
     }
-    else
-        logfile_message("Level loader - unknown command '%s' in '%s' near line %d", identifier, filepath, fileline);
+
+    case LEVCOMMAND_BRICK:
+    case LEVCOMMAND_ENTITY:
+    case LEVCOMMAND_LEGACYOBJECT:
+    case LEVCOMMAND_LEGACYITEM:
+        /* skip the body of the file */
+        break;
+
+    default:
+        logfile_message("Level loader - unknown command '%s' in '%s' near line %d", command_name, filepath, fileline);
+        break;
+    }
 
     /* continue reading */
     return true;
@@ -960,11 +1001,12 @@ bool level_interpret_header_line(const char* filepath, int fileline, const char*
  * level_interpret_body_line()
  * Interprets a line of the body of the .lev file
  */
-bool level_interpret_body_line(const char* filepath, int fileline, const char* identifier, int param_count, const char** param, void* data)
+bool level_interpret_body_line(const char* filepath, int fileline, levparser_command_t command, const char* command_name, int param_count, const char** param, void* data)
 {
-    if(strcmp(identifier, "brick") == 0) {
-        if(param_count == 3 || param_count == 4 || param_count == 5) {
-            if(*theme != 0) {
+    switch(command) {
+    case LEVCOMMAND_BRICK: {
+        if(param_count >= 3 && param_count <= 5) {
+            if(*theme != '\0') {
                 bricklayer_t layer = BRL_DEFAULT;
                 brickflip_t flip = BRF_NOFLIP;
                 int id = atoi(param[0]);
@@ -987,9 +1029,12 @@ bool level_interpret_body_line(const char* filepath, int fileline, const char* i
                 logfile_message("Level loader - warning: cannot create a new brick if the theme is not defined");
         }
         else
-            logfile_message("Level loader - command 'brick' expects three, four or five parameters: id, xpos, ypos [, layer_name [, flip_flags]]");
+            logfile_message("Level loader - command '%s' expects three, four or five parameters: id, xpos, ypos [, layer_name [, flip_flags]]", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "entity") == 0) {
+
+    case LEVCOMMAND_ENTITY: {
         if(param_count == 3 || param_count == 4) {
             const char* name = param[0];
             int x = atoi(param[1]);
@@ -1007,12 +1052,12 @@ bool level_interpret_body_line(const char* filepath, int fileline, const char* i
             }
         }
         else
-            logfile_message("Level loader - command 'entity' expects three or four parameters: name, xpos, ypos [, id]");
+            logfile_message("Level loader - command '%s' expects three or four parameters: name, xpos, ypos [, id]", command_name);
+
+        break;
     }
-    else if(
-        strcmp(identifier, "object") == 0 ||
-        strcmp(identifier, "enemy") == 0 /* retro-compatibility */
-    ) {
+
+    case LEVCOMMAND_LEGACYOBJECT: {
         if(param_count == 3) {
             const char* name = param[0];
             int x = atoi(param[1]);
@@ -1032,9 +1077,12 @@ bool level_interpret_body_line(const char* filepath, int fileline, const char* i
             }
         }
         else
-            logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
+            logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", command_name);
+
+        break;
     }
-    else if(strcmp(identifier, "item") == 0) { /* deprecated */
+
+    case LEVCOMMAND_LEGACYITEM: {
         if(param_count == 3) {
             int type = atoi(param[0]);
             int x = atoi(param[1]);
@@ -1049,7 +1097,14 @@ bool level_interpret_body_line(const char* filepath, int fileline, const char* i
                 level_create_legacy_item(type, v2d_new(x, y)); /* no; create legacy item */
         }
         else
-            logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
+            logfile_message("Level loader - command '%s' expects three parameters: type, xpos, ypos", command_name);
+
+        break;
+    }
+
+    default:
+        /* skip the header */
+        break;
     }
 
     /* continue reading */

@@ -23,8 +23,39 @@
 
 #include <stdbool.h>
 
-typedef bool (*levparser_callback_t)(const char *filepath, int fileline, const char *identifier, int param_count, const char **param, void* data);
+typedef enum levparser_command_t levparser_command_t;
+typedef bool (*levparser_callback_t)(const char *filepath, int fileline, levparser_command_t command, const char *command_name, int param_count, const char **param, void* data);
 
 bool levparser_parse(const char* path_to_lev_file, void* data, levparser_callback_t callback);
+
+enum levparser_command_t
+{
+    LEVCOMMAND_NAME,
+    LEVCOMMAND_AUTHOR,
+    LEVCOMMAND_VERSION,
+    LEVCOMMAND_LICENSE,
+    LEVCOMMAND_REQUIRES,
+    LEVCOMMAND_ACT,
+    LEVCOMMAND_READONLY,
+    LEVCOMMAND_THEME,
+    LEVCOMMAND_BGTHEME,
+    LEVCOMMAND_MUSIC,
+    LEVCOMMAND_WATERLEVEL,
+    LEVCOMMAND_WATERCOLOR,
+    LEVCOMMAND_SPAWNPOINT,
+    LEVCOMMAND_PLAYERS,
+    LEVCOMMAND_SETUP,
+    LEVCOMMAND_BRICK,
+    LEVCOMMAND_ENTITY,
+
+    /* deprecated: */
+    LEVCOMMAND_LEGACYOBJECT,
+    LEVCOMMAND_LEGACYITEM,
+    LEVCOMMAND_GROUPTHEME,
+    LEVCOMMAND_DIALOGBOX,
+
+    /* end of list */
+    LEVCOMMAND_UNKNOWN = -1,
+};
 
 #endif

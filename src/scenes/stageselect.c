@@ -63,7 +63,7 @@ typedef struct {
 
 static stagedata_t* stagedata_load(const char *filename, bool is_quest);
 static void stagedata_unload(stagedata_t *s);
-static bool interpret_level_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void* data);
+static bool interpret_level_line(const char *filepath, int fileline, levparser_command_t command, const char *command_name, int param_count, const char** param, void* data);
 
 
 
@@ -462,20 +462,30 @@ void stagedata_unload(stagedata_t *s)
 }
 
 /* read a line of the .lev file */
-bool interpret_level_line(const char *filepath, int fileline, const char *identifier, int param_count, const char** param, void* data)
+bool interpret_level_line(const char *filepath, int fileline, levparser_command_t command, const char *command_name, int param_count, const char** param, void* data)
 {
-    stagedata_t* s = (stagedata_t*)data;
+    stagedata_t* stage = (stagedata_t*)data;
 
-    if(param_count == 0)
-        return true;
+    switch(command) {
+        case LEVCOMMAND_NAME:
+            if(param_count >= 1)
+                str_cpy(stage->name, param[0], sizeof(stage->name));
+            break;
 
-    if(strcmp(identifier, "name") == 0)
-        str_cpy(s->name, param[0], sizeof(s->name));
-    else if(strcmp(identifier, "act") == 0)
-        s->act = atoi(param[0]);
-    else if(strcmp(identifier, "brick") == 0 || strcmp(identifier, "entity") == 0) /* optimization */
-        return false; /* stop the enumeration */
+        case LEVCOMMAND_ACT:
+            if(param_count >= 1)
+                stage->act = atoi(param[0]);
+            break;
 
+        case LEVCOMMAND_BRICK:
+        case LEVCOMMAND_ENTITY:
+            return false; /* stop the enumeration after reading the header */
+
+        default:
+            break;
+    }
+
+    /* continue the enumeration */
     return true;
 }
 
