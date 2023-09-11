@@ -253,8 +253,11 @@ level;levels/sunshine-3.lev;CC-BY 3.0;Alexandre Martins;;
 level;levels/waterworks-1.lev;CC-BY 3.0;Alexandre Martins;;
 level;levels/waterworks-2.lev;CC-BY 3.0;Alexandre Martins;;
 level;levels/waterworks-3.lev;CC-BY 3.0;Alexandre Martins;;
-level;levels/demo-1.lev;CC-BY 3.0;Alexandre Martins;;
-level;levels/demo-2.lev;CC-BY 3.0;Alexandre Martins;;
+level;levels/demo-1.lev;CC-BY 4.0;Alexandre Martins;;
+level;levels/demo-2.lev;CC-BY 4.0;Alexandre Martins;;
+level;levels/waterworks-zone-1.lev;CC-BY 4.0;Alexandre Martins;;
+level;levels/waterworks-zone-2.lev;CC-BY 4.0;Alexandre Martins;;
+level;levels/waterworks-zone-3.lev;CC-BY 4.0;Alexandre Martins;;
 translation;languages/bosnian.lng;MIT;SecularSteve;github.com/SecularSteve;
 translation;languages/dutch.lng;MIT;SecularSteve;github.com/SecularSteve;
 translation;languages/serbian.lng;MIT;SecularSteve;github.com/SecularSteve;Includes contributions by Aleska
