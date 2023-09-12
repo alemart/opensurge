@@ -56,6 +56,7 @@ static bgtheme_t *bgtheme;
 static music_t *music;
 static scene_t *next_scene;
 static int text_height;
+static bool was_immersive;
 
 #define ASSETS_CATEGORIES 6
 #define ASSETS_TEXT_MAXLEN 65536
@@ -115,6 +116,10 @@ void credits_init(void *foo)
 
     /* fade-in */
     fadefx_in(color_rgb(0,0,0), 1.0);
+
+    /* immersive mode */
+    was_immersive = video_is_immersive();
+    video_set_immersive(false);
 }
 
 
@@ -124,6 +129,8 @@ void credits_init(void *foo)
  */
 void credits_release()
 {
+    video_set_immersive(was_immersive);
+
     font_destroy(title);
     font_destroy(text);
     font_destroy(back);

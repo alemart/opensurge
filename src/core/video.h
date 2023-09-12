@@ -77,6 +77,10 @@ videoquality_t video_get_quality();
 void video_set_fullscreen(bool fullscreen);
 bool video_is_fullscreen();
 
+/* immersive mode */
+void video_set_immersive(bool immersive);
+bool video_is_immersive();
+
 /* frames per second */
 void video_set_fps_visible(bool visible);
 bool video_is_fps_visible();

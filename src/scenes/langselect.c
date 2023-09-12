@@ -70,6 +70,7 @@ static bool fresh_install;
 static bool came_from_options;
 static v2d_t sliding_camera;
 static int column_width;
+static bool was_immersive;
 
 /* private functions */
 static void save_preferences(const char *filepath);
@@ -129,6 +130,9 @@ void langselect_init(void *param)
     option = option_of(lang_get("LANG_NAME"));
 
     fadefx_in(color_rgb(0,0,0), 1.0f);
+
+    was_immersive = video_is_immersive();
+    video_set_immersive(false);
 }
 
 
@@ -138,6 +142,8 @@ void langselect_init(void *param)
  */
 void langselect_release()
 {
+    video_set_immersive(was_immersive);
+
     unload_lang_list();
     bgtheme = background_unload(bgtheme);
 

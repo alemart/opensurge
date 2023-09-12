@@ -61,6 +61,7 @@ static float scene_time;
 static bgtheme_t *bgtheme;
 static bool stageselect_enable_debug;
 static music_t* music;
+static bool was_immersive;
 /*static const int OFFSET_X = 60;*/
 #define OFFSET_X (VIDEO_SCREEN_W / 2 - 153) /* adjust the position of the texts according to the size of the screen */
 
@@ -152,6 +153,9 @@ void options_init(void *foo)
 
     root = create_grouptree();
     grouptree_init_all(root);
+
+    was_immersive = video_is_immersive();
+    video_set_immersive(false);
 }
 
 
@@ -161,6 +165,8 @@ void options_init(void *foo)
  */
 void options_release()
 {
+    video_set_immersive(was_immersive);
+
     grouptree_release_all(root);
     grouptree_destroy_all(root);
 

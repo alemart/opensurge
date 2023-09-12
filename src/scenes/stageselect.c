@@ -88,6 +88,7 @@ static bool enable_debug; /* debug mode? must start out as false. */
 static bool can_play_music; /* can play music? */
 static music_t* music = NULL; /* background music */
 static const stagedata_t* selected_stage; /* the level or quest we're going to load (NULL if none) */
+static bool was_immersive = false; /* immersive mode */
 
 
 
@@ -143,6 +144,9 @@ void stageselect_init(void *should_enable_debug)
 
     bgtheme = background_load(STAGE_BGFILE);
     fadefx_in(color_rgb(0,0,0), 1.0);
+
+    was_immersive = video_is_immersive();
+    video_set_immersive(false);
 }
 
 
@@ -152,6 +156,8 @@ void stageselect_init(void *should_enable_debug)
  */
 void stageselect_release()
 {
+    video_set_immersive(was_immersive);
+
     selected_stage = NULL;
     bgtheme = background_unload(bgtheme);
     unload_stage_list();

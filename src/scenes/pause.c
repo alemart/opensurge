@@ -171,7 +171,7 @@ enum pause_sprite_t
 
 static const char* SPRITE_NAME[] = {
     [SPRITE_BACKGROUND] =   "Pause - Overlay",
-    [SPRITE_TITLE]          "Pause - Title",
+    [SPRITE_TITLE] =        "Pause - Title",
     [SPRITE_CONTINUE] =     "Pause - Option",
     [SPRITE_RESTART] =      "Pause - Option",
     [SPRITE_EXIT] =         "Pause - Option"
@@ -414,6 +414,9 @@ void pause_init(void *_)
     for(int i = 0; i < SOUND_COUNT; i++)
         sound[i] = sound_load(SOUND_PATH[i]);
 
+    /* disable the immersive mode */
+    video_set_immersive(false);
+
     /* initialize the mobile overlay */
     overlay_state = OVERLAY_CLOSING;
     mouse_input = input_create_mouse();
@@ -491,6 +494,9 @@ void pause_release()
     /* destroy the input object and the snapshot */
     input_destroy(input);
     image_destroy(snapshot);
+
+    /* restore the immersive mode */
+    video_set_immersive(true); /* use immersive mode during gameplay */
 }
 
 

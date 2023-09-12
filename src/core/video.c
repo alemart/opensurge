@@ -98,6 +98,9 @@ static struct {
     /* fullscreen mode? */
     bool is_fullscreen;
 
+    /* immersive mode? */
+    bool is_immersive;
+
     /* should we display the FPS counter? */
     bool is_fps_visible;
 
@@ -106,6 +109,7 @@ static struct {
     .mode = VIDEOMODE_DEFAULT,
     .quality = VIDEOQUALITY_MEDIUM,
     .is_fullscreen = false,
+    .is_immersive = false,
     .is_fps_visible = false,
 };
 
@@ -310,6 +314,9 @@ void video_init()
     if(!use_default_shader())
         FATAL("Failed to use the default shader");
 
+    /* initialize in immersive mode */
+    video_set_immersive(true);
+
     /* initialize the console */
     init_console();
 }
@@ -465,6 +472,34 @@ void video_set_fullscreen(bool fullscreen)
 bool video_is_fullscreen()
 {
     return settings.is_fullscreen;
+}
+
+/*
+ * video_set_immersive()
+ * Enable/disable immersive mode
+ */
+void video_set_immersive(bool immersive)
+{
+    LOG("%s immersive mode", immersive ? "Enabling" : "Disabling");
+    settings.is_immersive = immersive;
+
+#if defined(__ANDROID__)
+    /* Android-only */
+    al_set_display_flag(display, ALLEGRO_FRAMELESS, immersive);
+
+    /* restore the default shader */
+    if(!use_default_shader())
+        LOG("Can't set the default shader");
+#endif
+}
+
+/*
+ * video_is_immersive()
+ * Are we in immersive mode?
+ */
+bool video_is_immersive()
+{
+    return settings.is_immersive;
 }
 
 /*
