@@ -182,6 +182,7 @@ static float dead_player_timeout;
 static actor_t *camera_focus; /* camera */
 static int must_render_brick_masks;
 static int must_display_gizmos;
+static bool was_immersive;
 
 /* scripting controlled variables */
 static int level_cleared; /* display the level cleared animation */
@@ -1175,6 +1176,10 @@ void level_init(void *path_to_lev_file)
     cached_level_ssobject = NULL;
     cached_entity_manager = NULL;
 
+    /* immersive mode */
+    was_immersive = video_is_immersive();
+    video_set_immersive(true); /* enable immersive mode during gameplay */
+
     /* create the brick manager */
     brick_manager = brickmanager_create();
 
@@ -1218,6 +1223,9 @@ void level_init(void *path_to_lev_file)
 void level_release()
 {
     logfile_message("level_release()");
+
+    /* immersive mode */
+    video_set_immersive(was_immersive);
 
     /* save prefs */
     extern prefs_t* prefs;
@@ -1279,6 +1287,7 @@ void level_update()
     v2d_t cam = level_editmode() ? editor_camera : camera_get_position();
     (void)dt;
 
+    /* legacy: release entities */
     entitymanager_remove_dead_bricks();
     entitymanager_remove_dead_items();
     entitymanager_remove_dead_objects();

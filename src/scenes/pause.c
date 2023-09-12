@@ -365,6 +365,9 @@ void pause_init(void *_)
     was_mobilegamepad_visible = mobilegamepad_is_visible();
     mobilegamepad_fadein();
 
+    /* disable the immersive mode */
+    video_set_immersive(false);
+
     /* should we use the legacy mode? */
     legacy_mode = want_legacy_mode();
     if(legacy_mode) {
@@ -413,9 +416,6 @@ void pause_init(void *_)
     /* initialize the sound effects */
     for(int i = 0; i < SOUND_COUNT; i++)
         sound[i] = sound_load(SOUND_PATH[i]);
-
-    /* disable the immersive mode */
-    video_set_immersive(false);
 
     /* initialize the mobile overlay */
     overlay_state = OVERLAY_CLOSING;
@@ -487,6 +487,9 @@ void pause_release()
 
     #endif
 
+    /* restore the immersive mode */
+    video_set_immersive(true); /* use immersive mode during gameplay */
+
     /* resume music & scripting */
     scripting_resume_vm();
     music_resume();
@@ -494,9 +497,6 @@ void pause_release()
     /* destroy the input object and the snapshot */
     input_destroy(input);
     image_destroy(snapshot);
-
-    /* restore the immersive mode */
-    video_set_immersive(true); /* use immersive mode during gameplay */
 }
 
 

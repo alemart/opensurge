@@ -480,17 +480,25 @@ bool video_is_fullscreen()
  */
 void video_set_immersive(bool immersive)
 {
-    LOG("%s immersive mode", immersive ? "Enabling" : "Disabling");
-    settings.is_immersive = immersive;
+    bool changed_mode = (settings.is_immersive != immersive);
+
+    /* log */
+    if(changed_mode)
+        LOG("%s immersive mode", immersive ? "Enabling" : "Disabling");
 
 #if defined(__ANDROID__)
     /* Android-only */
     al_set_display_flag(display, ALLEGRO_FRAMELESS, immersive);
 
     /* restore the default shader */
-    if(!use_default_shader())
-        LOG("Can't set the default shader");
+    if(changed_mode) {
+        if(!use_default_shader())
+            LOG("Can't set the default shader");
+    }
 #endif
+
+    /* update the internal flag */
+    settings.is_immersive = immersive;
 }
 
 /*
