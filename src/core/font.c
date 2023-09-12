@@ -1190,13 +1190,10 @@ void preprocess_wordwrap(fonttext_t* out, const fontdrv_t* drv, int max_width)
     int line_width = 0;
     darray_clear(out->line_width);
 
-    for(char* p = out->buffer, *q, *w; ; ) {
+    for(char* p = out->buffer, *q, *w ;;) {
         /* we must scan one line at a time */
-        if(NULL != (q = strchr(p, '\n'))) {
+        if(NULL != (q = strchr(p, '\n')))
             *q = '\0';
-            line_width = drv->line_width(drv, p);
-            darray_push(out->line_width, line_width);
-        }
 
         /* now p is a single line of text */
         while(NULL != (w = find_wordwrap(drv, p, max_width))) {
@@ -1211,14 +1208,15 @@ void preprocess_wordwrap(fonttext_t* out, const fontdrv_t* drv, int max_width)
             p = w + 1;
         }
 
-        /* this was the last line; no more line breaks nor wordwraps */
-        if(q == NULL) {
-            line_width = drv->line_width(drv, p);
-            darray_push(out->line_width, line_width);
-            break;
-        }
+        /* compute the width of the remaining text of the current line */
+        line_width = drv->line_width(drv, p);
+        darray_push(out->line_width, line_width);
 
-        /* put the newline back */
+        /* this was the last line; no more line breaks nor wordwraps */
+        if(q == NULL)
+            break;
+
+        /* put the newline back and continue */
         *q = '\n';
         p = q + 1;
     }

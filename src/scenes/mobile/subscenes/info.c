@@ -87,7 +87,7 @@ void init(mobile_subscene_t* subscene_ptr)
     font_set_align(font, FONTALIGN_CENTER);
     font_set_text(font,
 
-        #define SEPARATOR    "     "
+        #define SEPARATOR    "    "
         #define NOWRAP_SPACE "<color=" BACKGROUND_COLOR ">_</color>"
 
         "%s\n"
@@ -109,8 +109,8 @@ void init(mobile_subscene_t* subscene_ptr)
         "You should have received a copy of the GNU General Public License "
         "along with this program.  If not, see < http://www.gnu.org/licenses/ >.\n"
         "\n"
-        "Engine"        NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
         "Build"         NOWRAP_SPACE "date:"    NOWRAP_SPACE "%s" SEPARATOR
+        "Engine"        NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
         "SurgeScript"   NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
         "Allegro"       NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
 #if defined(__ANDROID__)
@@ -125,11 +125,11 @@ void init(mobile_subscene_t* subscene_ptr)
         GAME_TITLE,
         GAME_COPYRIGHT,
 
-        GAME_VERSION_STRING,
         GAME_BUILD_DATE,
-
+        GAME_VERSION_STRING,
         surgescript_version_string(),
         allegro_version_string(),
+
 #if defined(__ANDROID__)
         al_android_get_os_version(),
 #elif defined(ALLEGRO_PLATFORM_STR)
