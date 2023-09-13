@@ -880,7 +880,8 @@ void compute_display_transform(ALLEGRO_TRANSFORM* transform)
         offset = v2d_new((display_width - scale.y * backbuffer_width) * 0.5f, 0.0f);
 
     /* compute the transform */
-    al_build_transform(transform, offset.x, offset.y, min(scale.x, scale.y), min(scale.x, scale.y), 0.0f);
+    float s = min(scale.x, scale.y);
+    al_build_transform(transform, offset.x, offset.y, s, s, 0.0f);
 }
 
 /* sets the icon of the display to a built-in icon */
@@ -928,12 +929,20 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
         case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
             al_acknowledge_drawing_halt(event->display.source);
             destroy_backbuffer(); /* the backbuffer has the ALLEGRO_NO_PRESERVE_TEXTURE flag enabled */
+            destroy_default_shader();
             break;
 
         case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
             al_acknowledge_drawing_resume(event->display.source);
+
             if(!create_backbuffer())
                 FATAL("Can't create backbuffer after al_acknowledge_drawing_resume()");
+
+            if(!create_default_shader())
+                LOG("*** ERROR *** Failed to recreate the default shader");
+            else if(!use_default_shader())
+                LOG("Can't set the default shader");
+
             break;
     }
 
@@ -1237,8 +1246,22 @@ void update_fps()
 /* render the FPS counter */
 void render_fps()
 {
+#if !defined(__ANDROID__)
     int font_scale = FONT_SCALE();
     int display_width = al_get_display_width(display);
+    int xpos = display_width;
+#else
+    int font_scale = 2;
+    int display_width = al_get_display_width(display);
+    int display_height = al_get_display_height(display);
+    int backbuffer_width = image_width(backbuffer[0]);
+    int backbuffer_height = image_height(backbuffer[0]);
+    float scale = (float)display_height / (float)backbuffer_height;
+
+    int xpos = (display_width + scale * backbuffer_width) * 0.5f;
+    if(xpos > display_width)
+        xpos = display_width;
+#endif
 
     ALLEGRO_STATE state;
     al_store_state(&state, ALLEGRO_STATE_TRANSFORM);
@@ -1246,7 +1269,7 @@ void render_fps()
     ALLEGRO_TRANSFORM transform;
     al_identity_transform(&transform);
     al_scale_transform(&transform, font_scale, font_scale);
-    al_translate_transform(&transform, display_width, 0.0f);
+    al_translate_transform(&transform, xpos, 0.0f);
 
     al_use_transform(&transform);
         DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps);
