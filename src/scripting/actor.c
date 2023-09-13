@@ -268,6 +268,14 @@ surgescript_var_t* fun_getistranslucent(surgescript_object_t* object, const surg
     actor_t* actor = scripting_actor_ptr(object);
     bool is_translucent = (actor->alpha < 1.0f); /* doesn't take individual pixels into account */
 
+    if(!is_translucent) {
+        const surgescript_object_t* animation = get_animation(object);
+        const animation_t* anim = scripting_animation_ptr(animation);
+
+        if(animation_has_keyframes(anim)) /* FIXME should be has_keyframes_with_changed_opacity or similar */
+            is_translucent = true;
+    }
+
     return surgescript_var_set_bool(surgescript_var_create(), is_translucent);
 }
 
