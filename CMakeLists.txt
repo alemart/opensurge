@@ -278,13 +278,13 @@ ENDIF()
 
 # adding sources
 SET(GAME_SRCS
-  src/core/nanoparser.c
   src/core/animation.c
   src/core/asset.c
   src/core/audio.c
   src/core/color.c
   src/core/commandline.c
   src/core/engine.c
+  src/core/fadefx.c
   src/core/font.c
   src/core/image.c
   src/core/import.c
@@ -293,18 +293,18 @@ SET(GAME_SRCS
   src/core/keyframes.c
   src/core/lang.c
   src/core/logfile.c
-  src/core/web.c
+  src/core/nanoparser.c
   src/core/prefs.c
   src/core/quest.c
   src/core/resourcemanager.c
   src/core/scene.c
   src/core/screenshot.c
-  src/core/fadefx.c
   src/core/shader.c
   src/core/sprite.c
   src/core/storyboard.c
   src/core/timer.c
   src/core/video.c
+  src/core/web.c
 
   src/util/csv.c
   src/util/dictionary.c
@@ -418,13 +418,13 @@ SET(GAME_SRCS
 
 # adding headers
 SET(GAME_HEADERS
-  src/core/nanoparser.h
   src/core/animation.h
   src/core/asset.h
   src/core/audio.h
   src/core/color.h
   src/core/commandline.h
   src/core/engine.h
+  src/core/fadefx.h
   src/core/font.h
   src/core/global.h
   src/core/image.h
@@ -434,18 +434,18 @@ SET(GAME_HEADERS
   src/core/keyframes.h
   src/core/lang.h
   src/core/logfile.h
-  src/core/web.h
+  src/core/nanoparser.h
   src/core/prefs.h
   src/core/quest.h
   src/core/resourcemanager.h
   src/core/scene.h
   src/core/screenshot.h
-  src/core/fadefx.h
   src/core/shader.h
   src/core/sprite.h
   src/core/storyboard.h
   src/core/timer.h
   src/core/video.h
+  src/core/web.h
 
   src/util/csv.h
   src/util/darray.h
