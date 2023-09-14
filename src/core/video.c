@@ -689,6 +689,8 @@ bool create_display()
 {
     ALLEGRO_STATE state;
 
+    LOG("Creating the display...");
+
     /* check for duplicates */
     if(display != NULL)
         FATAL("Duplicate display");
@@ -749,6 +751,8 @@ bool create_display()
 /* Destroy the display */
 void destroy_display()
 {
+    LOG("Destroying the display...");
+
     if(display == NULL)
         FATAL("Display released twice");
 
@@ -1050,6 +1054,8 @@ bool use_default_shader()
 /* Initialize the console */
 void init_console()
 {
+    LOG("Initializing the console...");
+
     /* initialize the entries */
     for(int i = 0; i < CONSOLE_MAX_ENTRIES; i++) {
         console.entry[i].message[0] = '\0';
@@ -1066,6 +1072,8 @@ void init_console()
 /* Release the console */
 void release_console()
 {
+    LOG("Releasing the console...");
+
     /* release the font of the console */
     al_destroy_font(console.font);
 }

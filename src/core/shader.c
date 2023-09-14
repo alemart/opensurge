@@ -112,6 +112,8 @@ static dictionary_t* registry = NULL;
  */
 void shader_init()
 {
+    LOG("Initializing...");
+
     /* initialize the registry of shaders */
     registry = dictionary_create(false, destroy_shader_callback, NULL);
 
@@ -125,6 +127,8 @@ void shader_init()
  */
 void shader_release()
 {
+    LOG("Releasing...");
+
     /* use Allegro's default shader */
     al_use_shader(NULL);
 
