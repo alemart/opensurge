@@ -849,6 +849,8 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
 /* handle a video event from Allegro */
 void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
 {
+    static bool was_immersive = false;
+
     switch(event->type) {
 
         case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -872,6 +874,7 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
             al_acknowledge_drawing_halt(event->display.source);
             destroy_backbuffer(); /* the backbuffer has the ALLEGRO_NO_PRESERVE_TEXTURE flag enabled */
             shader_discard_all();
+            was_immersive = video_is_immersive();
             break;
 
         case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
@@ -884,6 +887,7 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
             if(!use_default_shader())
                 LOG("Can't set the default shader");
 
+            video_set_immersive(was_immersive);
             break;
     }
 
