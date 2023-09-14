@@ -35,5 +35,6 @@ dictionary_t* dictionary_destroy(dictionary_t* dict);
 void* dictionary_get(const dictionary_t* dict, const char* key);
 void dictionary_put(dictionary_t* dict, const char* key, void* element);
 struct iterator_t* dictionary_keys(const dictionary_t* dict);
+struct iterator_t* dictionary_values(const dictionary_t* dict);
 
 #endif

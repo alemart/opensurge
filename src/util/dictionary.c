@@ -59,7 +59,8 @@ struct dictiterator_state_t
 
 static iterator_state_t* dictiterator_copy_ctor(void* ctor_data);
 static void dictiterator_dtor(iterator_state_t* state);
-static void* dictiterator_next(iterator_state_t* state);
+static void* dictiterator_next_key(iterator_state_t* state);
+static void* dictiterator_next_value(iterator_state_t* state);
 static bool dictiterator_has_next(iterator_state_t* state);
 
 
@@ -170,7 +171,21 @@ iterator_t* dictionary_keys(const dictionary_t* dict)
         .current_index = 0
     };
 
-    return iterator_create(&state, dictiterator_copy_ctor, dictiterator_dtor, dictiterator_next, dictiterator_has_next);
+    return iterator_create(&state, dictiterator_copy_ctor, dictiterator_dtor, dictiterator_next_key, dictiterator_has_next);
+}
+
+/*
+ * dictionary_values()
+ * Returns an iterator to the values of the dictionary
+ */
+iterator_t* dictionary_values(const dictionary_t* dict)
+{
+    dictiterator_state_t state = {
+        .dict = dict,
+        .current_index = 0
+    };
+
+    return iterator_create(&state, dictiterator_copy_ctor, dictiterator_dtor, dictiterator_next_value, dictiterator_has_next);
 }
 
 
@@ -234,7 +249,7 @@ void dictiterator_dtor(iterator_state_t* state)
 }
 
 /* DictionaryIterator: return the next element and advance the iteration pointer */
-void* dictiterator_next(iterator_state_t* state)
+void* dictiterator_next_key(iterator_state_t* state)
 {
     dictiterator_state_t* s = (dictiterator_state_t*)state;
     const dictionary_t* dict = s->dict;
@@ -242,6 +257,20 @@ void* dictiterator_next(iterator_state_t* state)
     if(s->current_index < darray_length(dict->entry)) {
         const dictentry_t* entry = &dict->entry[s->current_index++];
         return entry->key;
+    }
+
+    return NULL;
+}
+
+/* DictionaryIterator: return the next element and advance the iteration pointer */
+void* dictiterator_next_value(iterator_state_t* state)
+{
+    dictiterator_state_t* s = (dictiterator_state_t*)state;
+    const dictionary_t* dict = s->dict;
+
+    if(s->current_index < darray_length(dict->entry)) {
+        const dictentry_t* entry = &dict->entry[s->current_index++];
+        return entry->value;
     }
 
     return NULL;
