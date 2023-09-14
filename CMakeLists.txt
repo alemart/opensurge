@@ -300,6 +300,7 @@ SET(GAME_SRCS
   src/core/scene.c
   src/core/screenshot.c
   src/core/fadefx.c
+  src/core/shader.c
   src/core/sprite.c
   src/core/storyboard.c
   src/core/timer.c
@@ -440,6 +441,7 @@ SET(GAME_HEADERS
   src/core/scene.h
   src/core/screenshot.h
   src/core/fadefx.h
+  src/core/shader.h
   src/core/sprite.h
   src/core/storyboard.h
   src/core/timer.h

@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include "video.h"
 #include "image.h"
+#include "shader.h"
 #include "engine.h"
 #include "timer.h"
 #include "logfile.h"
@@ -191,68 +192,6 @@ static const char* VIDEOQUALITY_NAME[] = {
 #define FATAL(...)  fatal_error("Video - " __VA_ARGS__)
 
 static void render_texts();
-
-
-/* Default shader */
-static ALLEGRO_SHADER* default_shader = NULL;
-
-static const char vs_glsl[] = ""
-    "#define a_position " ALLEGRO_SHADER_VAR_POS "\n"
-    "#define a_color " ALLEGRO_SHADER_VAR_COLOR "\n"
-    "#define a_texcoord " ALLEGRO_SHADER_VAR_TEXCOORD "\n"
-    "#define projview " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX "\n"
-    "#define use_texmatrix " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX "\n"
-    "#define texmatrix " ALLEGRO_SHADER_VAR_TEX_MATRIX "\n"
-
-    "attribute vec4 a_position;\n"
-    "attribute vec4 a_color;\n"
-    "attribute vec2 a_texcoord;\n"
-
-    "varying vec4 v_color;\n"
-    "varying vec2 v_texcoord;\n"
-
-    "uniform mat4 projview;\n"
-    "uniform mat4 texmatrix;\n"
-    "uniform bool use_texmatrix;\n"
-
-    "void main()\n"
-    "{\n"
-    "   mat4 m = use_texmatrix ? texmatrix : mat4(1.0);\n"
-    "   vec4 uv = m * vec4(a_texcoord, 0.0, 1.0);\n"
-
-    "   v_texcoord = uv.xy;\n"
-    "   v_color = a_color;\n"
-
-    "   gl_Position = projview * a_position;\n"
-    "}\n"
-"";
-
-static const char fs_glsl[] = ""
-    "#ifdef GL_ES\n"
-    "precision lowp float;\n"
-    "#endif\n"
-
-    "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n"
-    "#define tex " ALLEGRO_SHADER_VAR_TEX "\n"
-
-    "uniform sampler2D tex;\n"
-    "uniform bool use_tex;\n"
-    "varying vec4 v_color;\n" /* tint */
-    "varying vec2 v_texcoord;\n"
-
-    "const vec3 MASK_COLOR = vec3(1.0, 0.0, 1.0);\n" /* magenta */
-
-    "void main()\n"
-    "{\n"
-    "   vec4 p = use_tex ? texture2D(tex, v_texcoord) : vec4(1.0);\n"
-    "   p *= float(p.rgb != MASK_COLOR);\n" /* set all components to zero; we use a premultiplied alpha workflow */
-
-    "   gl_FragColor = v_color * p;\n"
-    "}\n"
-"";
-
-static bool create_default_shader();
-static void destroy_default_shader();
 static bool use_default_shader();
 
 
@@ -308,17 +247,16 @@ void video_init()
     if(!create_backbuffer())
         FATAL("Failed to create the backbuffer");
 
-    /* create and use the default shader */
-    if(!create_default_shader())
-        FATAL("Failed to create the default shader");
+    /* initialize the shader system */
+    shader_init();
     if(!use_default_shader())
         FATAL("Failed to use the default shader");
 
-    /* initialize in immersive mode */
-    video_set_immersive(true);
-
     /* initialize the console */
     init_console();
+
+    /* initialize in immersive mode */
+    video_set_immersive(true);
 }
 
 /*
@@ -332,11 +270,11 @@ void video_release()
     /* release the console */
     release_console();
 
+    /* release the shader system */
+    shader_release();
+
     /* destroy the backbuffer */
     destroy_backbuffer();
-
-    /* destroy the default shader */
-    destroy_default_shader();
 
     /* destroy the display */
     destroy_display();
@@ -929,7 +867,7 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
         case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
             al_acknowledge_drawing_halt(event->display.source);
             destroy_backbuffer(); /* the backbuffer has the ALLEGRO_NO_PRESERVE_TEXTURE flag enabled */
-            destroy_default_shader();
+            shader_discard_all();
             break;
 
         case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
@@ -938,9 +876,8 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
             if(!create_backbuffer())
                 FATAL("Can't create backbuffer after al_acknowledge_drawing_resume()");
 
-            if(!create_default_shader())
-                LOG("*** ERROR *** Failed to recreate the default shader");
-            else if(!use_default_shader())
+            shader_recreate_all();
+            if(!use_default_shader())
                 LOG("Can't set the default shader");
 
             break;
@@ -1078,55 +1015,12 @@ void compute_screen_size(videomode_t mode, int* screen_width, int* screen_height
  *
  */
 
-/* create the default shader */
-bool create_default_shader()
-{
-    default_shader = al_create_shader(ALLEGRO_SHADER_GLSL);
-    if(default_shader == NULL) {
-        LOG("Can't create GLSL shader.");
-    }
-    else if(!al_attach_shader_source(default_shader, ALLEGRO_VERTEX_SHADER, vs_glsl)) {
-        LOG("Can't compile the vertex shader. %s", al_get_shader_log(default_shader));
-        al_destroy_shader(default_shader);
-        default_shader = NULL;
-    }
-    else if(!al_attach_shader_source(default_shader, ALLEGRO_PIXEL_SHADER, fs_glsl)) {
-        LOG("Can't compile the fragment shader. %s", al_get_shader_log(default_shader));
-        al_destroy_shader(default_shader);
-        default_shader = NULL;
-    }
-    else if(!al_build_shader(default_shader)) {
-        LOG("Can't build the shader. %s", al_get_shader_log(default_shader));
-        al_destroy_shader(default_shader);
-        default_shader = NULL;
-    }
-
-    /* returns true on success */
-    return default_shader != NULL;
-}
-
-/* destroy the default shader */
-void destroy_default_shader()
-{
-    /* use the Allegro's shader */
-    al_use_shader(NULL);
-
-    /* destroy the default shader */
-    if(default_shader != NULL) {
-        al_destroy_shader(default_shader);
-        default_shader = NULL;
-    }
-}
-
 /* use the default shader */
 bool use_default_shader()
 {
-    if(default_shader == NULL)
-        return false;
-
 #if USE_ROUNDROBIN_BACKBUFFER
     if(backbuffer[0] == NULL || backbuffer[1] == NULL)
-        return al_use_shader(default_shader);
+        return shader_use(NULL);
 
     /* According to the Allegro manual, al_use_shader() "uses the shader for
        subsequent drawing operations on the current target bitmap".
@@ -1134,16 +1028,17 @@ bool use_default_shader()
        https://liballeg.org/a5docs/trunk/shader.html */
 
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
-    bool a = al_use_shader(default_shader);
+    bool a = shader_use(NULL);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[1 - backbuffer_index]));
-    bool b = al_use_shader(default_shader);
+    bool b = shader_use(NULL);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
 
     return a && b;
 #else
-    return al_use_shader(default_shader);
+    return shader_use(NULL);
 #endif
 }
+
 
 
 /*
