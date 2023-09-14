@@ -491,8 +491,9 @@ void renderqueue_init(bool want_depth_buffer)
     if(use_depth_buffer) {
         LOG("will perform alpha testing");
 
-        internal_shader = shader_get("alpha test");
-        if(internal_shader == NULL)
+        if(shader_exists("alpha test"))
+            internal_shader = shader_get("alpha test");
+        else
             internal_shader = shader_create("alpha test", fs_glsl_with_alpha_testing);
     }
     else {

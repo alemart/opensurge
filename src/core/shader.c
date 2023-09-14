@@ -179,6 +179,14 @@ void shader_recreate_all()
 
 
 
+/*
+ * shader_exists()
+ * Checks if a managed shader exists
+ */
+bool shader_exists(const char* name)
+{
+    return (registry != NULL) && dictionary_get(registry, name) != NULL;
+}
 
 /*
  * shader_get()

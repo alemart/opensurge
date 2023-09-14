@@ -28,6 +28,7 @@ void shader_release();
 void shader_discard_all();
 void shader_recreate_all();
 
+bool shader_exists(const char* name);
 shader_t* shader_get(const char* name);
 shader_t* shader_create(const char* name, const char* fs_glsl);
 shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs_glsl);
