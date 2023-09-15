@@ -109,10 +109,10 @@ void init(mobile_subscene_t* subscene_ptr)
         "You should have received a copy of the GNU General Public License "
         "along with this program.  If not, see < http://www.gnu.org/licenses/ >.\n"
         "\n"
-        "Build"         NOWRAP_SPACE "date:"    NOWRAP_SPACE "%s" SEPARATOR
         "Engine"        NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
         "SurgeScript"   NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
         "Allegro"       NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
+        "Build"         NOWRAP_SPACE "date:"    NOWRAP_SPACE "%s" SEPARATOR
 #if defined(__ANDROID__)
         "Platform:"     NOWRAP_SPACE "Android"  NOWRAP_SPACE "%s" SEPARATOR
 #else
@@ -125,10 +125,11 @@ void init(mobile_subscene_t* subscene_ptr)
         GAME_TITLE,
         GAME_COPYRIGHT,
 
-        GAME_BUILD_DATE,
         GAME_VERSION_STRING,
         surgescript_version_string(),
         allegro_version_string(),
+
+        GAME_BUILD_DATE,
 
 #if defined(__ANDROID__)
         al_android_get_os_version(),
