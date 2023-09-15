@@ -1098,11 +1098,18 @@ int cmp_zbuf_fun(const void* i, const void* j)
     if(la != lb)
         return la - lb;
 
-    /* sort by texture first, for optimal batching */
-    texturehandle_t ta = a->cached.texture;
-    texturehandle_t tb = b->cached.texture;
-    if(ta != tb)
-        return (ta > tb) - (ta < tb); /* compare unsigned integers */
+    /* read z-index */
+    float za = a->cached.zindex;
+    float zb = b->cached.zindex;
+    int dz = (za > zb) - (za < zb);
+
+    /* sort by texture, for optimal batching */
+    if(!la || dz == 0) {
+        texturehandle_t ta = a->cached.texture;
+        texturehandle_t tb = b->cached.texture;
+        if(ta != tb)
+            return (ta > tb) - (ta < tb); /* compare unsigned integers */
+    }
 
     /* if the entries share the same texture, sort
        front-to-back, so that the depth testing can
@@ -1110,9 +1117,6 @@ int cmp_zbuf_fun(const void* i, const void* j)
 
        if both entries are translucent, then sort
        back-to-front. We'll render them separately. */
-    float za = a->cached.zindex;
-    float zb = b->cached.zindex;
-    int dz = (za > zb) - (za < zb);
 
     if(dz == 0)
         return a->zorder - b->zorder; /* keep relative z-order */
@@ -1220,7 +1224,7 @@ int ypos_background(renderable_t r) { return 0; } /* preserve relative indexes *
 int ypos_foreground(renderable_t r) { return 0; } /* preserve relative indexes */
 int ypos_water(renderable_t r) { return 0; } /* not needed */
 
-bool is_translucent_player(renderable_t r) { return false; }
+bool is_translucent_player(renderable_t r) { return true; /* invincibility stars, shields, maybe even the sprite itself... */ }
 bool is_translucent_item(renderable_t r) { return false; }
 bool is_translucent_object(renderable_t r) { return false; }
 bool is_translucent_brick(renderable_t r) { return false; }
