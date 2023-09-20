@@ -45,7 +45,7 @@ surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescrip
     return surgescript_var_set_string(surgescript_var_create(), GAME_VERSION_STRING);
 }
 
-/* checks whether or not the engine has been launched in mobile mode */
+/* checks whether or not the engine has been **SUCCESSFULLY** launched in mobile mode */
 surgescript_var_t* fun_getmobile(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_bool(surgescript_var_create(), mobilegamepad_is_available());

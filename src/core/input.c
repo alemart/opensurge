@@ -827,7 +827,8 @@ void inputuserdefined_update(input_t* in)
     }
 }
 
-/* remap joystick buttons according to the underlying platform */
+/* remap joystick buttons according to the underlying platform.
+   We want to maintain consistency across platforms */
 void remap_joystick_buttons(int joy_id)
 {
     /* Allegro's numbers for XINPUT button input
@@ -847,14 +848,10 @@ void remap_joystick_buttons(int joy_id)
     const int XINPUT_DPAD_D = 12;
     const int XINPUT_DPAD_U = 13;
 
-    /* store the original state of the buttons */
-    uint32_t buttons = joy[joy_id].button;
-
 #if defined(__ANDROID__)
     /*
 
     Remap Allegro's JS_* button constants to Allegro's buttons of the Windows XInput driver.
-    We want to maintain consistency across platforms.
 
     The following JS_* constants are defined in the source code of Allegro 5.2.8 at:
     android/gradle_project/allegro/src/main/java/org/liballeg/android/AllegroActivity.java
@@ -868,7 +865,7 @@ void remap_joystick_buttons(int joy_id)
     const int JS_R1 = 5;
     const int JS_DPAD_L = 6;
     const int JS_DPAD_R = 7;
-    const int JS_DPAD_U = 9;
+    const int JS_DPAD_U = 8;
     const int JS_DPAD_D = 9;
     const int JS_MENU = 10;
 
@@ -886,18 +883,22 @@ void remap_joystick_buttons(int joy_id)
         [JS_MENU] = -1 /* unused */
     };
 
-    /* remap buttons */
     const int n = sizeof(remap) / sizeof(int);
+
+    /* clear any unknown buttons just to be sure */
+    const uint32_t mask = (1u << n) - 1u;
+    joy[joy_id].button &= mask;
+
+    /* store the state of the buttons */
+    uint32_t buttons = joy[joy_id].button;
+
+    /* remap buttons */
     for(int js = 0; js < n; js++) {
         if((buttons & (1 << js)) != 0) {
             joy[joy_id].button &= ~(1 << js);
             joy[joy_id].button |= (remap[js] >= 0) ? (1 << remap[js]) : 0;
         }
     }
-
-    /* clear all other buttons just to be safe */
-    const int mask = (1 << n) - 1;
-    joy[joy_id].button &= mask;
 
     /* Allegro 5.2.8 will not remap the following keys to joystick input.
        We'll do it here. */
@@ -906,7 +907,7 @@ void remap_joystick_buttons(int joy_id)
     if(a5_key[ALLEGRO_KEY_SELECT])
         joy[joy_id].button |= 1 << XINPUT_BACK;
 #if 1
-    if(a5_key[ALLEGRO_KEY_BUTTON_L2]) /* which joy_id generated this? 0? */
+    if(a5_key[ALLEGRO_KEY_BUTTON_L2]) /* which joy_id generated this? */
         joy[joy_id].button |= 1 << XINPUT_LT;
     if(a5_key[ALLEGRO_KEY_BUTTON_R2])
         joy[joy_id].button |= 1 << XINPUT_RT;
@@ -929,7 +930,6 @@ void remap_joystick_buttons(int joy_id)
     (void)XINPUT_DPAD_L;
     (void)XINPUT_DPAD_D;
     (void)XINPUT_DPAD_U;
-    (void)buttons;
     (void)joy_id;
 
 #endif
