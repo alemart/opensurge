@@ -870,7 +870,7 @@ void remap_joystick_buttons(int joy_id)
     const int JS_MENU = 10;
 
     const int remap[] = {
-        [JS_A] = XINPUT_A,
+        [JS_A] = XINPUT_A, /* BUTTON_A := primary action button */
         [JS_B] = XINPUT_B,
         [JS_X] = XINPUT_X,
         [JS_Y] = XINPUT_Y,
@@ -912,6 +912,23 @@ void remap_joystick_buttons(int joy_id)
     if(a5_key[ALLEGRO_KEY_BUTTON_R2])
         joy[joy_id].button |= 1 << XINPUT_RT;
 #endif
+
+    /* back button */
+    if(a5_key[ALLEGRO_KEY_BACK])
+        joy[joy_id].button |= 1 << XINPUT_BACK;
+
+    /* D-Pad Center (Android TV) */
+    static float dwell_time = 0.0f;
+    if(a5_key[ALLEGRO_KEY_DPAD_CENTER]) {
+        joy[joy_id].button |= 1 << XINPUT_A; /* primary action button */
+
+        /* check if holding the button */
+        dwell_time += timer_get_delta();
+        if(dwell_time >= 3.0f)
+            joy[joy_id].button |= 1 << XINPUT_START;
+    }
+    else
+        dwell_time = 0.0f;
 
 #else
 
