@@ -117,6 +117,7 @@ static void input_register(input_t *in);
 static void input_unregister(input_t *in);
 static void input_clear(input_t *in);
 static void log_joysticks();
+static void log_joystick(ALLEGRO_JOYSTICK* joystick);
 static void handle_hotkey(int keycode);
 
 /* Allegro 5 events */
@@ -912,6 +913,10 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data)
                 for(int j = 0; j < num_joysticks; j++) {
                     ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
                     video_showmessage("%s", al_get_joystick_name(joystick));
+
+                    /* log */
+                    logfile_message("Found new joystick (%d)", j);
+                    log_joystick(joystick);
                 }
 
                 /* activate input */
@@ -1038,22 +1043,28 @@ void log_joysticks()
     logfile_message("Found %d joystick%s", num_joysticks, num_joysticks == 1 ? "" : "s");
     for(int j = 0; j < num_joysticks; j++) {
         ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
-
-        logfile_message("- Joystick %d (\"%s\"):", j, al_get_joystick_name(joystick));
-        logfile_message("-- %d sticks, %d buttons", al_get_joystick_num_sticks(joystick), al_get_joystick_num_buttons(joystick));
-
-        for(int s = 0; s < al_get_joystick_num_sticks(joystick); s++) {
-            static const char* joy_flag[4] = { "", "digital", "analog", "" };
-
-            logfile_message("-- stick %d (\"%s\")", s, al_get_joystick_stick_name(joystick, s));
-            logfile_message("--- flags: 0x%X %s", al_get_joystick_stick_flags(joystick, s), joy_flag[al_get_joystick_stick_flags(joystick, s) & 0x3]);
-            logfile_message("--- number of axes: %d", al_get_joystick_num_axes(joystick, s));
-
-            for(int a = 0; a < al_get_joystick_num_axes(joystick, s); a++)
-                logfile_message("---- axis %d (\"%s\")", a, al_get_joystick_axis_name(joystick, s, a));
-        }
-
-        for(int b = 0; b < al_get_joystick_num_buttons(joystick); b++)
-            logfile_message("-- button %d (\"%s\")", b, al_get_joystick_button_name(joystick, b));
+        logfile_message("[Joystick %d]", j);
+        log_joystick(joystick);
     }
+}
+
+/* log joystick info */
+void log_joystick(ALLEGRO_JOYSTICK* joystick)
+{
+    const char* joy_flag[4] = { "", "digital", "analog", "" };
+
+    logfile_message("- Joystick \"%s\"", al_get_joystick_name(joystick));
+    logfile_message("-- %d sticks, %d buttons", al_get_joystick_num_sticks(joystick), al_get_joystick_num_buttons(joystick));
+
+    for(int s = 0; s < al_get_joystick_num_sticks(joystick); s++) {
+        logfile_message("-- stick %d (\"%s\")", s, al_get_joystick_stick_name(joystick, s));
+        logfile_message("--- flags: 0x%X %s", al_get_joystick_stick_flags(joystick, s), joy_flag[al_get_joystick_stick_flags(joystick, s) & 0x3]);
+        logfile_message("--- number of axes: %d", al_get_joystick_num_axes(joystick, s));
+
+        for(int a = 0; a < al_get_joystick_num_axes(joystick, s); a++)
+            logfile_message("---- axis %d (\"%s\")", a, al_get_joystick_axis_name(joystick, s, a));
+    }
+
+    for(int b = 0; b < al_get_joystick_num_buttons(joystick); b++)
+        logfile_message("-- button %d (\"%s\")", b, al_get_joystick_button_name(joystick, b));
 }
