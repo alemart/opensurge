@@ -92,7 +92,7 @@ static struct {
 static struct {
     float axis[REQUIRED_AXES]; /* -1.0 <= axis[i] <= 1.0 */
     uint32_t button; /* bit vector */
-} joy[MAX_JOYS];
+} joy[MAX_JOYS], *wanted_joy[MAX_JOYS];
 
 static bool ignore_joystick = false;
 
@@ -193,6 +193,9 @@ void input_init()
         a5_key[i] = false;
 
     /* initialize joystick input */
+    for(int j = 0; j < MAX_JOYS; j++)
+        wanted_joy[j] = NULL;
+
     ignore_joystick = !input_is_joystick_available();
     log_joysticks();
 
@@ -212,11 +215,11 @@ void input_update()
     for(int j = 0; j < num_joys; j++) {
         ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
         int num_sticks = al_get_joystick_num_sticks(joystick);
-        int num_buttons = min(al_get_joystick_num_buttons(joystick), MAX_JOYSTICK_BUTTONS);
+        int num_buttons = al_get_joystick_num_buttons(joystick);
 
-        /* ignore devices such as accelerometers */
-        if(num_buttons < REQUIRED_BUTTONS)
-            continue;
+        /* cap the number of buttons */
+        if(num_buttons > MAX_JOYSTICK_BUTTONS)
+            num_buttons = MAX_JOYSTICK_BUTTONS;
 
         /* read the current state */
         ALLEGRO_JOYSTICK_STATE state;
@@ -301,6 +304,24 @@ void input_update()
         joy[j].axis[AXIS_X] = clip(joy[j].axis[AXIS_X], -1.0f, 1.0f);
         joy[j].axis[AXIS_Y] = clip(joy[j].axis[AXIS_Y], -1.0f, 1.0f);
         #endif
+    }
+
+    /* remap joystick IDs. The first joystick (if any) must be a valid one!
+       This is especially important on Android, which may report the first
+       joystick as an accelerometer. */
+    for(int j = 0; j < MAX_JOYS; j++)
+        wanted_joy[j] = NULL;
+
+    for(int j = 0, counter = 0; j < num_joys; j++) {
+        ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
+        int num_buttons = al_get_joystick_num_buttons(joystick);
+
+        /* filter out undesirable devices such as accelerometers */
+        if(num_buttons < REQUIRED_BUTTONS)
+            continue;
+
+        /* remap joystick */
+        wanted_joy[counter++] = &joy[j];
     }
 
     /* update the input objects */
@@ -638,10 +659,11 @@ bool input_is_joystick_ignored()
 
 /*
  * input_number_of_joysticks()
- * number of plugged joysticks
+ * Number of connected joysticks
  */
 int input_number_of_joysticks()
 {
+    /* Note: this includes devices such as accelerometers */
     return al_get_num_joysticks();
 }
 
@@ -772,17 +794,16 @@ void inputuserdefined_update(input_t* in)
     }
 
     if(im->joystick.enabled && input_is_joystick_enabled()) {
-        int num_joysticks = min(input_number_of_joysticks(), MAX_JOYS);
-
-        if(im->joystick.id < num_joysticks) {
-            in->state[IB_UP] = in->state[IB_UP] || (joy[im->joystick.id].axis[AXIS_Y] <= -analog2digital_threshold[AXIS_Y]);
-            in->state[IB_DOWN] = in->state[IB_DOWN] || (joy[im->joystick.id].axis[AXIS_Y] >= analog2digital_threshold[AXIS_Y]);
-            in->state[IB_LEFT] = in->state[IB_LEFT] || (joy[im->joystick.id].axis[AXIS_X] <= -analog2digital_threshold[AXIS_X]);
-            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (joy[im->joystick.id].axis[AXIS_X] >= analog2digital_threshold[AXIS_X]);
+        int joy_id = im->joystick.id;
+        if(joy_id < MAX_JOYS && wanted_joy[joy_id] != NULL) {
+            in->state[IB_UP] = in->state[IB_UP] || (wanted_joy[joy_id]->axis[AXIS_Y] <= -analog2digital_threshold[AXIS_Y]);
+            in->state[IB_DOWN] = in->state[IB_DOWN] || (wanted_joy[joy_id]->axis[AXIS_Y] >= analog2digital_threshold[AXIS_Y]);
+            in->state[IB_LEFT] = in->state[IB_LEFT] || (wanted_joy[joy_id]->axis[AXIS_X] <= -analog2digital_threshold[AXIS_X]);
+            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (wanted_joy[joy_id]->axis[AXIS_X] >= analog2digital_threshold[AXIS_X]);
 
             for(inputbutton_t button = 0; button < IB_MAX; button++) {
                 uint32_t button_mask = im->joystick.button_mask[(int)button];
-                in->state[button] = in->state[button] || ((joy[im->joystick.id].button & button_mask) != 0);
+                in->state[button] = in->state[button] || ((wanted_joy[joy_id]->button & button_mask) != 0);
             }
         }
     }
