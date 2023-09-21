@@ -2059,10 +2059,16 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
         }
         else if(pa->state == PAS_ROLLING) {
             /* unroll when landing on the ground */
-            if(pa->midair_timer >= 0.2 && !input_button_down(pa->input, IB_DOWN)) {
-                pa->state = WALKING_OR_RUNNING(pa);
-                if(!nearly_zero(pa->gsp))
-                    pa->facing_right = (pa->gsp > 0.0);
+            if(pa->midair_timer >= 0.2) {
+                /* ...unless the player wants to (and can) keep rolling */
+                bool wanna_roll = input_button_down(pa->input, IB_DOWN);
+                bool can_roll = fabs(pa->gsp) >= pa->rollthreshold;
+
+                if(!(wanna_roll && can_roll)) {
+                    pa->state = WALKING_OR_RUNNING(pa);
+                    if(!nearly_zero(pa->gsp))
+                        pa->facing_right = (pa->gsp > 0.0);
+                }
             }
         }
         else {
