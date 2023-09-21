@@ -2145,6 +2145,7 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         sensor_set_enabled(n, wanna_middle && (pa->gsp >= -pa->movethreshold)); /* gsp >= 0.0 */
     }
     else {
+#if 0
         double abs_xsp = fabs(pa->xsp), abs_ysp = fabs(pa->ysp);
         sensor_set_enabled(a, pa->ysp >= -abs_xsp); /* ysp >= 0.0 */
         sensor_set_enabled(b, pa->ysp >= -abs_xsp); /* ysp >= 0.0 */
@@ -2152,6 +2153,14 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         sensor_set_enabled(d, pa->ysp < abs_xsp);   /* ysp < 0.0 */
         sensor_set_enabled(m, pa->xsp < abs_ysp);   /* xsp < 0.0 */
         sensor_set_enabled(n, pa->xsp > -abs_ysp);  /* xsp > 0.0 */
+#else
+        sensor_set_enabled(a, true);
+        sensor_set_enabled(b, true);
+        sensor_set_enabled(c, true);
+        sensor_set_enabled(d, true);
+        sensor_set_enabled(m, true);
+        sensor_set_enabled(n, true);
+#endif
     }
 
     /* read sensors */
