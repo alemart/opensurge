@@ -15,7 +15,7 @@ theme "themes/sunshine.brk"
 bgtheme "themes/template.bg"
 spawn_point 176 9792
 music "musics/template.ogg"
-setup "Demo Setup" "Default Cleared Animation" "Default Title Card" "Default HUD" "Default Pause and Quit" "Default Camera" "Surge Gameplay"
+setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Title Card" "Default Cleared Animation" "Demo Setup"
 players "Surge"
 
 // bricks

@@ -949,7 +949,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     case LEVCOMMAND_SETUP: {
         if(is_setup_object_list_empty()) {
             if(param_count > 0) {
-                for(int i = param_count - 1; i >= 0; i--)
+                for(int i = 0; i < param_count; i++)
                     add_to_setup_object_list(param[i]);
             }
             else
@@ -2607,7 +2607,6 @@ bool is_setup_object_list_empty()
 }
 
 /* adds a new object to the setup object list */
-/* (actually it inserts the new object in the first position of the linked list) */
 void add_to_setup_object_list(const char *object_name)
 {
     surgescript_object_t* level = level_ssobject();
