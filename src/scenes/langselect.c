@@ -205,7 +205,7 @@ void langselect_update()
             sound_play(SFX_CONFIRM);
             quit = true;
         }
-        if(input_button_pressed(input, IB_FIRE4)) {
+        if(input_button_pressed(input, IB_FIRE4) || input_button_pressed(input, IB_FIRE2)) {
             sound_play(SFX_BACK);
             quit = true;
         }

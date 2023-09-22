@@ -12,8 +12,8 @@ object "Switch Controller"
 {
     public enabled = true; // enable character switching?
     deny = Sound("samples/deny.wav");
-    leftShoulder = "fire7";
-    rightShoulder = "fire8";
+    leftShoulder = "fire5";
+    rightShoulder = "fire6";
     secondaryActionButton = "fire2";
 
     state "main"

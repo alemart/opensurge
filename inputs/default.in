@@ -74,15 +74,15 @@ We use the following conventions for the button names in the default mapping:
     down:   directional control
     left:   directional control
 
-    fire1:  action button (jump)
-    fire2:  secondary action button
+    fire1:  primary action button (jump | menus: confirm)
+    fire2:  secondary action button (menus: back)
     fire3:  start, confirm, pause
     fire4:  back, cancel, quit
 
-    fire5:  tertiary action button
-    fire6:  quaternary action button
-    fire7:  left shoulder button
-    fire8:  right shoulder button
+    fire5:  left shoulder button
+    fire6:  right shoulder button
+    fire7:  reserved for future use
+    fire8:  reserved for future use
 
 */
 
@@ -106,10 +106,10 @@ inputmap "default"
         fire3           KEY_ENTER
         fire4           KEY_ESC
 
-        fire5           KEY_NONE
-        fire6           KEY_NONE
-        fire7           KEY_LSHIFT
-        fire8           KEY_RSHIFT
+        fire5           KEY_LSHIFT
+        fire6           KEY_RSHIFT
+        fire7           KEY_NONE
+        fire8           KEY_NONE
     }
 
     // default mapping for XInput controllers in Allegro
@@ -120,14 +120,14 @@ inputmap "default"
         down            BUTTON_13
         left            BUTTON_12
 
-        fire1           BUTTON_1 | BUTTON_2 | BUTTON_3 | BUTTON_4
-        fire2           BUTTON_NONE
+        fire1           BUTTON_1 | BUTTON_3 | BUTTON_4
+        fire2           BUTTON_2
         fire3           BUTTON_10
         fire4           BUTTON_9
 
-        fire5           BUTTON_NONE
-        fire6           BUTTON_NONE
-        fire7           BUTTON_6
-        fire8           BUTTON_5
+        fire5           BUTTON_6
+        fire6           BUTTON_5
+        fire7           BUTTON_NONE
+        fire8           BUTTON_NONE
     }
 }
