@@ -16,7 +16,7 @@ LANG_ID                     "pl_PL"                   // language code & country
 LANG_NAME                   "Polski"                  // language name
 LANG_AUTHOR                 "suve"                    // translation author
 LANG_LASTUPDATE             "2022-08-30"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.5.2"                   // required engine version
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -190,10 +190,10 @@ INPUT_KEYB_FIRE1            "SPACJA"
 INPUT_KEYB_FIRE2            "LEWY CTRL"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESCAPE"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
+FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
+FIXME INPUT_KEYB_FIRE7            "<available>"
+FIXME INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "D-PAD"
@@ -202,11 +202,11 @@ INPUT_JOY_RIGHT             "przycisk W PRAWO"
 INPUT_JOY_UP                "przycisk W GÓRĘ"
 INPUT_JOY_DOWN              "przycisk W DÓŁ"
 INPUT_JOY_FIRE1             "SKOK"
-INPUT_JOY_FIRE2             "PRZEŁĄCZ"
+FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
 INPUT_JOY_FIRE3             "PAUZA"
 INPUT_JOY_FIRE4             "WSTECZ"
-INPUT_JOY_FIRE5             "<dostępny>"
-INPUT_JOY_FIRE6             "<dostępny>"
+FIXME INPUT_JOY_FIRE5             "L1"
+FIXME INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<dostępny>"
 INPUT_JOY_FIRE8             "<dostępny>"
 

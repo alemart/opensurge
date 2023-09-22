@@ -16,7 +16,7 @@ LANG_ID                  "fr_FR"                          // language code & cou
 LANG_NAME                "Français"                       // language name
 LANG_AUTHOR              "Stilic"                       // translation author
 LANG_LASTUPDATE          "2022-08-03"                     // date format: yyyy-mm-dd
-LANG_COMPATIBILITY       "0.6.0"                          // required engine version
+LANG_COMPATIBILITY       "0.6.1"                          // required engine version
 
 
 
@@ -189,10 +189,10 @@ INPUT_KEYB_FIRE1         "ESPACE"
 INPUT_KEYB_FIRE2         "CONTRÔLE DROIT"
 INPUT_KEYB_FIRE3         "ENTRÉE"
 INPUT_KEYB_FIRE4         "ESC"
-INPUT_KEYB_FIRE5         "W"
-INPUT_KEYB_FIRE6         "A"
-INPUT_KEYB_FIRE7         "S"
-INPUT_KEYB_FIRE8         "D"
+FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
+FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
+FIXME INPUT_KEYB_FIRE7            "<available>"
+FIXME INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL    "les DIRECTIONS"
@@ -201,11 +201,11 @@ INPUT_JOY_RIGHT          "la TOUCHE DROITE"
 INPUT_JOY_UP             "la TOUCHE HAUT"
 INPUT_JOY_DOWN           "la TOUCHE BAS"
 INPUT_JOY_FIRE1             "SAUT"
-INPUT_JOY_FIRE2             "SWITCH"
+FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
 INPUT_JOY_FIRE3             "PAUSE"
 INPUT_JOY_FIRE4             "RETOUR"
-INPUT_JOY_FIRE5             "<disponible>"
-INPUT_JOY_FIRE6             "<disponible>"
+FIXME INPUT_JOY_FIRE5             "L1"
+FIXME INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<disponible>"
 INPUT_JOY_FIRE8             "<disponible>"
 

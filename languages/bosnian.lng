@@ -16,7 +16,7 @@ LANG_ID                     "bs_BA"                   // language code & country
 LANG_NAME                   "Bosanski"                // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
 LANG_LASTUPDATE             "2022-08-26"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -190,10 +190,10 @@ INPUT_KEYB_FIRE1            "RAZMAKNICA"
 INPUT_KEYB_FIRE2            "LIJEVI CTRL"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
+FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
+FIXME INPUT_KEYB_FIRE7            "<available>"
+FIXME INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "DUGMADI"
@@ -202,11 +202,11 @@ INPUT_JOY_RIGHT             "DESNO DUGME"
 INPUT_JOY_UP                "GORNJE DUGME"
 INPUT_JOY_DOWN              "DONJE DUGME"
 INPUT_JOY_FIRE1             "SKOČI"
-INPUT_JOY_FIRE2             "ŠALTAJ"
+FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
 INPUT_JOY_FIRE3             "PAUZIRAJ"
 INPUT_JOY_FIRE4             "NATRAG"
-INPUT_JOY_FIRE5             "<dostupan>"
-INPUT_JOY_FIRE6             "<dostupan>"
+FIXME INPUT_JOY_FIRE5             "L1"
+FIXME INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<dostupan>"
 INPUT_JOY_FIRE8             "<dostupan>"
 

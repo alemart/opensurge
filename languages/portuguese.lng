@@ -15,8 +15,8 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2022-08-03"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_LASTUPDATE             "2023-09-22"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -190,10 +190,10 @@ INPUT_KEYB_FIRE1            "ESPAÇO"
 INPUT_KEYB_FIRE2            "o CTRL esquerdo"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+INPUT_KEYB_FIRE5            "o SHIFT esquerdo"
+INPUT_KEYB_FIRE6            "o SHIFT direito"
+INPUT_KEYB_FIRE7            "<disponível>"
+INPUT_KEYB_FIRE8            "<disponível>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "o DIRECIONAL"
@@ -202,11 +202,11 @@ INPUT_JOY_RIGHT             "DIREITA"
 INPUT_JOY_UP                "CIMA"
 INPUT_JOY_DOWN              "BAIXO"
 INPUT_JOY_FIRE1             "PULO"
-INPUT_JOY_FIRE2             "TROCAR"
+INPUT_JOY_FIRE2             "a AÇÃO SECUNDÁRIA"
 INPUT_JOY_FIRE3             "PAUSE"
 INPUT_JOY_FIRE4             "VOLTAR"
-INPUT_JOY_FIRE5             "<disponível>"
-INPUT_JOY_FIRE6             "<disponível>"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<disponível>"
 INPUT_JOY_FIRE8             "<disponível>"
 

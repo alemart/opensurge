@@ -16,7 +16,7 @@ LANG_ID                     "it_IT"                   // language code & country
 LANG_NAME                   "Italiano"                // language name
 LANG_AUTHOR                 "Nicolò Patanè"           // translation author
 LANG_LASTUPDATE             "2021-05-23"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -190,10 +190,10 @@ INPUT_KEYB_FIRE1            "SPAZIO"
 INPUT_KEYB_FIRE2            "CTRL SINISTRO"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
+FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
+FIXME INPUT_KEYB_FIRE7            "<available>"
+FIXME INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "i DIREZIONALI"
@@ -202,11 +202,11 @@ INPUT_JOY_RIGHT             "il BOTTONE DESTRO"
 INPUT_JOY_UP                "il BOTTONE SU"
 INPUT_JOY_DOWN              "il BOTTONE GIÙ"
 INPUT_JOY_FIRE1             "SALTO"
-INPUT_JOY_FIRE2             "SWITCH"
+FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
 INPUT_JOY_FIRE3             "PAUSA"
 INPUT_JOY_FIRE4             "INDIETRO"
-INPUT_JOY_FIRE5             "<available>"
-INPUT_JOY_FIRE6             "<available>"
+FIXME INPUT_JOY_FIRE5             "L1"
+FIXME INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<available>"
 INPUT_JOY_FIRE8             "<available>"
 

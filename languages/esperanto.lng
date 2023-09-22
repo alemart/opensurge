@@ -16,7 +16,7 @@ LANG_ID                     "eo"                   // language code & country ac
 LANG_NAME                   "Esperanto"                 // language name
 LANG_AUTHOR                 "Jorge Maldonado Ventura"       // translation author
 LANG_LASTUPDATE             "2021-11-16"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -192,10 +192,10 @@ INPUT_KEYB_FIRE2            "MALDEKSTRA STIRKLAVO"
 INPUT_KEYB_FIRE2__EO        "MALDEKSTRAN STIRKLAVON"
 INPUT_KEYB_FIRE3            "ENIGA KLAVO"
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
+FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
+FIXME INPUT_KEYB_FIRE7            "<available>"
+FIXME INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "la STIRSTANGO"
@@ -205,12 +205,12 @@ INPUT_JOY_RIGHT             "the DEKSTRA BUTONO"
 INPUT_JOY_UP                "the SUPRA BUTONO"
 INPUT_JOY_DOWN              "the MALSUPRA BUTONO"
 INPUT_JOY_FIRE1             "SALTI"
-INPUT_JOY_FIRE2             "ŜANĜI"
+FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
 INPUT_JOY_FIRE2__EO         "ŜANĜI"
 INPUT_JOY_FIRE3             "PAŬZI"
 INPUT_JOY_FIRE4             "REEN"
-INPUT_JOY_FIRE5             "<disponebla>"
-INPUT_JOY_FIRE6             "<disponebla>"
+FIXME INPUT_JOY_FIRE5             "L1"
+FIXME INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<disponebla>"
 INPUT_JOY_FIRE8             "<disponebla>"
 

@@ -17,7 +17,7 @@ LANG_ID                     "ru_RU"                   // language code & country
 LANG_NAME                   "Русский"                 // language name
 LANG_AUTHOR                 "Halatnikov"              // translation author
 LANG_LASTUPDATE             "2022-08-04"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -194,10 +194,10 @@ INPUT_KEYB_FIRE1            "ПРОБЕЛ"
 INPUT_KEYB_FIRE2            "ЛЕВЫЙ CTRL"
 INPUT_KEYB_FIRE3            "ENTER"  //v2: i don't think anyone actually calls this key ВВОД, so i untranslated it
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
+FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
+FIXME INPUT_KEYB_FIRE7            "<available>"
+FIXME INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "КНОПКИ НАПРАВЛЕНИЙ"
@@ -206,11 +206,11 @@ INPUT_JOY_RIGHT             "ВПРАВО"
 INPUT_JOY_UP                "ВВЕРХ"
 INPUT_JOY_DOWN              "ВНИЗ"
 INPUT_JOY_FIRE1             "ПРЫЖОК"
-INPUT_JOY_FIRE2             "СМЕНИТЬ"  //v5
+FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
 INPUT_JOY_FIRE3             "ПАУЗА"
 INPUT_JOY_FIRE4             "НАЗАД"
-INPUT_JOY_FIRE5             "<доступно>"
-INPUT_JOY_FIRE6             "<доступно>"
+FIXME INPUT_JOY_FIRE5             "L1"
+FIXME INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<доступно>"
 INPUT_JOY_FIRE8             "<доступно>"
 

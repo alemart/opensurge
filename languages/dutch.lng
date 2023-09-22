@@ -16,7 +16,7 @@ LANG_ID                     "nl_NL"                   // language code & country
 LANG_NAME                   "Nederlands"              // language name
 LANG_AUTHOR                 "SecularSteve"	          // translation author
 LANG_LASTUPDATE             "2022-08-26"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -189,10 +189,10 @@ INPUT_KEYB_FIRE1            "SPATIEBALK"
 INPUT_KEYB_FIRE2            "LINKER CTRL"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
+FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
+FIXME INPUT_KEYB_FIRE7            "<available>"
+FIXME INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "de RICHTLIJNEN"
@@ -201,11 +201,11 @@ INPUT_JOY_RIGHT             "de RECHTE-KNOP"
 INPUT_JOY_UP                "de BOVEN-KNOP"
 INPUT_JOY_DOWN              "de BENEDEN-KNOP"
 INPUT_JOY_FIRE1             "SPRINGEN"
-INPUT_JOY_FIRE2             "SCHAKELEN"
+FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
 INPUT_JOY_FIRE3             "PAUZEREN"
 INPUT_JOY_FIRE4             "TERUG"
-INPUT_JOY_FIRE5             "<beschikbaar>"
-INPUT_JOY_FIRE6             "<beschikbaar>"
+FIXME INPUT_JOY_FIRE5             "L1"
+FIXME INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<beschikbaar>"
 INPUT_JOY_FIRE8             "<beschikbaar>"
 

@@ -16,7 +16,7 @@ LANG_ID                     "es_ES"                   // language code & country
 LANG_NAME                   "Español"                 // language name
 LANG_AUTHOR                 "Álvaro Bazán"            // translation author
 LANG_LASTUPDATE             "2023-07-01"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -189,10 +189,10 @@ INPUT_KEYB_FIRE1            "ESPACIO"
 INPUT_KEYB_FIRE2            "CTRL IZQUIERDO"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
+FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
+FIXME INPUT_KEYB_FIRE7            "<available>"
+FIXME INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "las DIRECCIONES"
@@ -201,11 +201,11 @@ INPUT_JOY_RIGHT             "el BOTÓN DERECHO"
 INPUT_JOY_UP                "el BOTÓN ARRIBA"
 INPUT_JOY_DOWN              "el BOTÓN ABAJO"
 INPUT_JOY_FIRE1             "SALTO"
-INPUT_JOY_FIRE2             "CAMBIAR"
+FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
 INPUT_JOY_FIRE3             "PAUSA"
 INPUT_JOY_FIRE4             "VOLVER"
-INPUT_JOY_FIRE5             "<available>"
-INPUT_JOY_FIRE6             "<available>"
+FIXME INPUT_JOY_FIRE5             "L1"
+FIXME INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<available>"
 INPUT_JOY_FIRE8             "<available>"
 
