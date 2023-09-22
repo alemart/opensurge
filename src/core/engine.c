@@ -96,6 +96,7 @@ static event_listener_list_t* event_listener_table[EVENT_LISTENER_TABLE_SIZE];
 static void init_event_listener_table();
 static void release_event_listener_table();
 static void add_to_event_listener_table(event_listener_t event_listener);
+static bool remove_from_event_listener_table(event_listener_t event_listener);
 static void call_event_listeners(const ALLEGRO_EVENT* event);
 
 static ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
@@ -229,6 +230,19 @@ void engine_quit()
 void engine_add_event_listener(ALLEGRO_EVENT_TYPE event_type, void* data, void (*callback)(const ALLEGRO_EVENT*,void*))
 {
     add_to_event_listener_table((event_listener_t) {
+        .event_type = event_type,
+        .data = data,
+        .callback = callback
+    });
+}
+
+/*
+ * engine_remove_event_listener()
+ * Remove an event listener previously added with engine_add_event_listener()
+ */
+bool engine_remove_event_listener(ALLEGRO_EVENT_TYPE event_type, void* data, void (*callback)(const ALLEGRO_EVENT*,void*))
+{
+    return remove_from_event_listener_table((event_listener_t) {
         .event_type = event_type,
         .data = data,
         .callback = callback
@@ -593,6 +607,51 @@ void add_to_event_listener_table(event_listener_t event_listener)
     node->event_listener = event_listener;
     node->next = event_listener_table[index];
     event_listener_table[index] = node;
+
+    /* note: repeated elements are not handled */
+}
+
+/*
+ * remove_from_event_listener_table()
+ * Remove an entry from the table of event listeners
+ */
+bool remove_from_event_listener_table(event_listener_t event_listener)
+{
+    int index = event_listener.event_type % EVENT_LISTENER_TABLE_SIZE;
+    event_listener_list_t *node, *next;
+
+    #define is_the_same_event_listener(e1, e2) \
+        (((e1).event_type == (e2).event_type) && ((e1).callback == (e2).callback) && ((e1).data == (e2).data))
+
+    node = event_listener_table[index];
+    if(node == NULL) {
+        /* empty list */
+        return false; /* not found */
+    }
+    else if(is_the_same_event_listener(node->event_listener, event_listener)) {
+        /* first node */
+        next = node->next;
+        free(node);
+        event_listener_table[index] = next;
+        return true;
+    }
+    else {
+        /* not the first node */
+        while(node->next != NULL) {
+            if(is_the_same_event_listener(node->next->event_listener, event_listener)) {
+                next = node->next->next;
+                free(node->next);
+                node->next = next;
+                return true;
+            }
+
+            node = node->next;
+        }
+
+        return false; /* not found */
+    }
+
+    #undef is_the_same_event_listener
 }
 
 /*
