@@ -919,7 +919,7 @@ void remap_joystick_buttons(int joy_id)
 
     /* D-Pad Center (Android TV) */
     static float dwell_time = 0.0f;
-    if(a5_key[ALLEGRO_KEY_DPAD_CENTER]) {
+    if(a5_key[ALLEGRO_KEY_DPAD_CENTER] || a5_key[ALLEGRO_KEY_PAD_ENTER]) {
         joy[joy_id].button |= 1 << XINPUT_A; /* primary action button */
 
         /* check if holding the button */
@@ -929,6 +929,14 @@ void remap_joystick_buttons(int joy_id)
     }
     else
         dwell_time = 0.0f;
+
+    /*
+
+    See also: recommended game actions for gamepad buttons
+    https://developer.android.com/develop/ui/views/touch-and-input/game-controllers/controller-input#button
+    https://developer.android.com/training/tv/start/controllers#tv-ui-events
+
+    */
 
 #else
 
