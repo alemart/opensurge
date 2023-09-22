@@ -130,7 +130,8 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const struct
 void physicsactor_kill(physicsactor_t *pa);
 void physicsactor_hit(physicsactor_t *pa, double direction);
 bool physicsactor_bounce(physicsactor_t *pa, double direction);
-void physicsactor_spring(physicsactor_t *pa);
+void physicsactor_restore_state(physicsactor_t* pa);
+void physicsactor_springify(physicsactor_t *pa);
 void physicsactor_roll(physicsactor_t *pa);
 void physicsactor_drown(physicsactor_t *pa);
 void physicsactor_breathe(physicsactor_t *pa);

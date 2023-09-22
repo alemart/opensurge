@@ -731,7 +731,22 @@ bool physicsactor_bounce(physicsactor_t *pa, double direction)
     return true;
 }
 
-void physicsactor_spring(physicsactor_t *pa)
+void physicsactor_restore_state(physicsactor_t* pa)
+{
+    if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
+        return;
+
+    /* the player will be restored to a state vulnerable to attack
+       (unless invincible, blinking, etc.) */
+    if(fabs(pa->gsp) >= pa->topspeed)
+        pa->state = PAS_RUNNING;
+    else if(pa->midair || !nearly_zero(pa->gsp))
+        pa->state = PAS_WALKING;
+    else if(pa->state != PAS_WAITING && pa->state != PAS_PUSHING && pa->state != PAS_LEDGE && pa->state != PAS_LOOKINGUP && pa->state != PAS_DUCKING && pa->state != PAS_WINNING)
+        pa->state = PAS_STOPPED;
+}
+
+void physicsactor_springify(physicsactor_t *pa)
 {
     if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
         return;

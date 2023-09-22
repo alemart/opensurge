@@ -561,6 +561,15 @@ void player_disable_roll(player_t *player)
 }
 
 /*
+ * player_restore_state()
+ * Restore the player to a vulnerable state
+ */
+void player_restore_state(player_t *player)
+{
+    physicsactor_restore_state(player->pa);
+}
+
+/*
  * player_springify()
  * Springify player
  */

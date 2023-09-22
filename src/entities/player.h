@@ -116,6 +116,7 @@ int player_bounce(player_t *player, float direction, int is_heavy_object);
 int player_bounce_ex(player_t *player, const struct actor_t *hazard, int is_heavy_object);
 void player_detach_from_ground(player_t *player);
 void player_kill(player_t *player);
+void player_restore_state(player_t *player);
 void player_springify(player_t *player);
 void player_roll(player_t *player);
 void player_enable_roll(player_t *player);
