@@ -145,6 +145,7 @@ static surgescript_var_t* fun_bounceback(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_ouch(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_kill(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_breathe(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_restore(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_springify(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_roll(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -281,6 +282,7 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "getHit", fun_ouch, 1);
     surgescript_vm_bind(vm, "Player", "kill", fun_kill, 0);
     surgescript_vm_bind(vm, "Player", "breathe", fun_breathe, 0);
+    surgescript_vm_bind(vm, "Player", "restore", fun_restore, 0);
     surgescript_vm_bind(vm, "Player", "springify", fun_springify, 0);
     surgescript_vm_bind(vm, "Player", "roll", fun_roll, 0);
     surgescript_vm_bind(vm, "Player", "focus", fun_focus, 0);
@@ -1437,6 +1439,15 @@ surgescript_var_t* fun_breathe(surgescript_object_t* object, const surgescript_v
     player_t* player = get_player(object);
     if(player != NULL)
         player_breathe(player);
+    return NULL;
+}
+
+/* restore to a vulnerable state */
+surgescript_var_t* fun_restore(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL)
+        player_restore_state(player);
     return NULL;
 }
 
