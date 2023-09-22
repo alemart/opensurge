@@ -75,7 +75,7 @@ We use the following conventions for the button names in the default mapping:
     left:   directional control
 
     fire1:  primary action button (jump | menus: confirm)
-    fire2:  secondary action button (menus: back)
+    fire2:  secondary action button (menus: cancel)
     fire3:  start, confirm, pause
     fire4:  back, cancel, quit
 
