@@ -561,12 +561,12 @@ void player_disable_roll(player_t *player)
 }
 
 /*
- * player_spring()
- * Springfy player
+ * player_springify()
+ * Springify player
  */
-void player_spring(player_t *player)
+void player_springify(player_t *player)
 {
-    physicsactor_spring(player->pa);
+    physicsactor_springify(player->pa);
 }
 
 /*

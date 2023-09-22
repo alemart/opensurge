@@ -1445,7 +1445,7 @@ surgescript_var_t* fun_springify(surgescript_object_t* object, const surgescript
 {
     player_t* player = get_player(object);
     if(player != NULL)
-        player_spring(player);
+        player_springify(player);
     return NULL;
 }
 

@@ -5485,7 +5485,7 @@ void playeraction_render(objectmachine_t *obj, v2d_t camera_position)
 /* private strategies */
 void springfy(player_t *player)
 {
-    player_spring(player);
+    player_springify(player);
 }
 
 void roll(player_t *player)

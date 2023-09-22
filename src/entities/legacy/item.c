@@ -3674,7 +3674,7 @@ void activate_spring(spring_t *spring, player_t *player)
 
     if(!nearly_zero(spring->strength.y)) {
         player_detach_from_ground(player);
-        player_spring(player);
+        player_springify(player);
     }
 
     if(!nearly_zero(spring->strength.x)) {
@@ -3684,7 +3684,7 @@ void activate_spring(spring_t *spring, player_t *player)
             player->actor->mirror |= IF_HFLIP;
     }
     else
-        player_spring(player);
+        player_springify(player);
 
     if(spring->bang_timer > SPRING_BANG_TIMER) {
         sound_play(SFX_SPRING);
