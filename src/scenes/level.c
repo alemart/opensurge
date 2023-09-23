@@ -256,6 +256,9 @@ static void entity_info_set_persistent(const surgescript_object_t* object, bool 
 /* debug mode */
 #define debug_mode_want_to_activate() (!mobilegamepad_is_available() && editorcmd_is_triggered(editor_cmd, "enter-debug-mode"))
 
+/* events */
+static void handle_switchout_event(const ALLEGRO_EVENT* event, void* data);
+
 
 
 /* ------------------------
@@ -1176,10 +1179,6 @@ void level_init(void *path_to_lev_file)
     cached_level_ssobject = NULL;
     cached_entity_manager = NULL;
 
-    /* immersive mode */
-    was_immersive = video_is_immersive();
-    video_set_immersive(true); /* enable immersive mode during gameplay */
-
     /* create the brick manager */
     brick_manager = brickmanager_create();
 
@@ -1210,6 +1209,13 @@ void level_init(void *path_to_lev_file)
     /* editor */
     editor_init();
 
+    /* event listeners */
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_SWITCH_OUT, NULL, handle_switchout_event);
+
+    /* immersive mode */
+    was_immersive = video_is_immersive();
+    video_set_immersive(true); /* enable immersive mode during gameplay */
+
     /* done! */
     logfile_message("level_init() ok");
 }
@@ -1224,12 +1230,16 @@ void level_release()
 {
     logfile_message("level_release()");
 
-    /* immersive mode */
-    video_set_immersive(was_immersive);
-
     /* save prefs */
     extern prefs_t* prefs;
     prefs_save(prefs);
+
+    /* immersive mode */
+    video_set_immersive(was_immersive);
+
+    /* event listeners */
+    if(!engine_remove_event_listener(ALLEGRO_EVENT_DISPLAY_SWITCH_OUT, NULL, handle_switchout_event))
+        logfile_message("Can't remove event listener: switch out");
 
     /* release the editor */
     editor_release();
@@ -3023,6 +3033,44 @@ bool entity_info_is_persistent(const surgescript_object_t* object)
 void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent)
 {
     entitymanager_set_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object), is_persistent);
+}
+
+
+
+/*
+ * Event listeners
+ */
+
+/* a switch out event takes place when the window is no longer active */
+void handle_switchout_event(const ALLEGRO_EVENT* event, void* data)
+{
+#if defined(__ANDROID__)
+    const scene_t* level_scene = storyboard_get_scene(SCENE_LEVEL);
+    const scene_t* current_scene = scenestack_top();
+
+    if(current_scene == level_scene) {
+        /*
+
+        Pause the game when the app goes out of focus.
+
+        We should implement an event system in the scripting layer in order to
+        accomplish this. Not all levels / scenes admit pausing; we should pause
+        only on the ones that do.
+
+        The solution below is not meant to be permanent.
+
+        FIXME
+
+        */
+        if(is_setup_object("Default Pause and Quit")) {
+            if(!level_is_in_debug_mode())
+                level_pause();
+        }
+    }
+#endif
+
+    (void)event;
+    (void)data;
 }
 
 
