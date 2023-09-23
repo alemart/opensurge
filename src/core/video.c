@@ -18,6 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define ALLEGRO_UNSTABLE /* al_x_set_initial_icon(), al_clear_keyboard_state() */
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_memfile.h>
+
+#ifdef ALLEGRO_UNIX
+#include <allegro5/allegro_x.h>
+#endif
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -38,16 +49,6 @@
 #include "../util/stringutil.h"
 #include "../entities/mobilegamepad.h"
 
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_memfile.h>
-
-#ifdef ALLEGRO_UNIX
-#define ALLEGRO_UNSTABLE
-#include <allegro5/allegro_x.h>
-#endif
 
 
 /* Display (window) */
@@ -868,6 +869,7 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
             break;
 
         case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
+            al_clear_keyboard_state(event->display.source);
             break;
 
         case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
