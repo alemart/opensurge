@@ -74,6 +74,9 @@ bool mobilegamepad_is_available();
 bool mobilegamepad_is_visible();
 void mobilegamepad_get_state(mobilegamepad_state_t* state);
 
+int mobilegamepad_opacity();
+void mobilegamepad_set_opacity(int value);
+
 void mobilegamepad_fadein();
 void mobilegamepad_fadeout();
 

@@ -420,8 +420,16 @@ void init_accessories(const commandline_t* cmd)
     fadefx_init();
     audio_preload(); /* preload audio samples */
     charactersystem_init();
-    mobilegamepad_init(commandline_getint(cmd->mobile, FALSE) ? MOBILEGAMEPAD_DEFAULT_FLAGS : MOBILEGAMEPAD_DISABLED);
     objects_init(); /* legacy scripting */
+
+    /* mobile gamepad */
+    bool mobile_mode = (bool)commandline_getint(cmd->mobile, FALSE);
+    mobilegamepad_init(mobile_mode ? MOBILEGAMEPAD_DEFAULT_FLAGS : MOBILEGAMEPAD_DISABLED);
+    if(prefs_has_item(prefs, ".gamepad_opacity")) {
+        int opacity = prefs_get_int(prefs, ".gamepad_opacity");
+        if(opacity > 0) /* don't make it invisible */
+            mobilegamepad_set_opacity(opacity);
+    }
 
     /* launch the SurgeScript Virtual Machine */
     scripting_launch_vm();

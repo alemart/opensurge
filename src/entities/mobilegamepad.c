@@ -194,6 +194,9 @@ static bool is_visible = true;
 /* alpha value used for fading in and fading out the mobile gamepad */
 static float alpha = 1.0f;
 
+/* user-defined opacity value: an integer between 0 and 100, inclusive */
+static int user_opacity = 100;
+
 /* the distance from the center of the sprites, in pixels, to which controls respond to input */
 static float interactive_radius[] = {
     [DPAD] = 0.0f,
@@ -290,6 +293,7 @@ void mobilegamepad_init(int _flags)
 
     /* make it visible */
     is_visible = true;
+    user_opacity = 100;
     alpha = 0.0f; /* make it fade in nicely when initializing */
 
     /* success! */
@@ -452,6 +456,24 @@ void mobilegamepad_get_state(mobilegamepad_state_t* state)
 }
 
 /*
+ * mobilegamepad_opacity()
+ * Get the current opacity, a value in [0,100]
+ */
+int mobilegamepad_opacity()
+{
+    return user_opacity;
+}
+
+/*
+ * mobilegamepad_set_opacity()
+ * Set a new opacity value in [0,100]
+ */
+void mobilegamepad_set_opacity(int value)
+{
+    user_opacity = clip(value, 0, 100);
+}
+
+/*
  * mobilegamepad_fadein()
  * Makes the mobile gamepad visible
  */
@@ -536,10 +558,11 @@ void update_actors()
     animate_actors();
 
     /* update the attributes of the actors */
+    float alpha_multiplier = (float)user_opacity * 0.01f;
     for(int i = 0; i < NUM_CONTROLS; i++) {
         actor[i]->position = v2d_compmult(RELATIVE_POSITION[i], window_size);
         actor[i]->scale = v2d_new(scale, scale);
-        actor[i]->alpha = alpha;
+        actor[i]->alpha = alpha * alpha_multiplier;
     }
 
     /* update the interactive radii of the controls based on the scale of the actors */

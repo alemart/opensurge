@@ -163,13 +163,23 @@ static void change_quality(settings_entry_t* e);
 static void init_resolution(settings_entry_t* e);
 static void change_resolution(settings_entry_t* e);
 
-#define vt_fullscreen (settings_entryvt_t){ change_fullscreen, nop, nop, init_fullscreen, nop, nop, !IS_MOBILE ? visible : invisible }
+#define vt_fullscreen (settings_entryvt_t){ change_fullscreen, nop, highlight_fullscreen, init_fullscreen, nop, nop, !IS_MOBILE ? visible : invisible }
 static void init_fullscreen(settings_entry_t* e);
 static void change_fullscreen(settings_entry_t* e);
+static void highlight_fullscreen(settings_entry_t* e);
 
 #define vt_showfps (settings_entryvt_t){ change_showfps, nop, nop, init_showfps, nop, nop, visible }
 static void init_showfps(settings_entry_t* e);
 static void change_showfps(settings_entry_t* e);
+
+
+
+#define vt_controls (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, want_gamepadopacity }
+
+#define vt_gamepadopacity (settings_entryvt_t){ change_gamepadopacity, nop, nop, init_gamepadopacity, nop, nop, want_gamepadopacity }
+static void init_gamepadopacity(settings_entry_t* e);
+static void change_gamepadopacity(settings_entry_t* e);
+static bool want_gamepadopacity(settings_entry_t* e);
 
 
 
@@ -230,6 +240,10 @@ static const struct
     { TYPE_SETTING, "$OPTIONS_RESOLUTION", (const char*[]){ _X(1), _X(2), _X(3), _X(4), NULL }, 1, vt_resolution, 0 },
     { TYPE_SETTING, "$OPTIONS_FULLSCREEN", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_fullscreen, 0 },
     { TYPE_SETTING, "$OPTIONS_FPS", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_showfps, 0 },
+
+    /* Controls */
+    { TYPE_SUBTITLE, "$OPTIONS_CONTROLS", (const char*[]){ NULL }, 0, vt_controls, 8 },
+    { TYPE_SETTING, "$OPTIONS_GAMEPADOPACITY", (const char*[]){ "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%", NULL }, 10, vt_gamepadopacity, 8 },
 
     /* Game */
     { TYPE_SUBTITLE, "$OPTIONS_GAME", (const char*[]){ NULL }, 0, vt_game, 8 },
@@ -507,7 +521,7 @@ void handle_controls()
         }
     }
 
-    /* change the value of the highlighted setting by pressing left, right or fire1 */
+    /* change the value of the highlighted setting */
     if(input_button_pressed(input, IB_LEFT)) {
         int i = index_of_highlighted_setting;
         int n = setting[i]->number_of_possible_values;
@@ -528,7 +542,7 @@ void handle_controls()
         }
     }
 
-    if(input_button_pressed(input, IB_FIRE1)) {
+    if(input_button_pressed(input, IB_FIRE1) || input_button_pressed(input, IB_FIRE3)) {
         int i = index_of_highlighted_setting;
         int n = setting[i]->number_of_possible_values;
         if(n > 1) {
@@ -615,6 +629,8 @@ void save_preferences()
     prefs_set_bool(prefs, ".showfps", video_is_fps_visible());
 
     prefs_set_string(prefs, ".langpath", filepath_of_lang(lang_getid()));
+
+    prefs_set_int(prefs, ".gamepad_opacity", mobilegamepad_opacity());
 }
 
 /* returns a static char[] */
@@ -808,6 +824,10 @@ void change_quality(settings_entry_t* e)
 
     int i = e->index_of_current_value;
     video_set_quality(new_quality[i]);
+
+    /* coming soon */
+    if(new_quality[i] == VIDEOQUALITY_HIGH)
+        sound_play(SFX_DENY);
 }
 
 void init_quality(settings_entry_t* e)
@@ -840,6 +860,15 @@ void init_fullscreen(settings_entry_t* e)
     e->index_of_current_value = index;
 }
 
+void highlight_fullscreen(settings_entry_t* e)
+{
+    /* note: user may press F11 at any time,
+       not just when highlighting the setting.
+       tiny detail? */
+    int index = video_is_fullscreen() ? 1 : 0;
+    e->index_of_current_value = index;
+}
+
 
 
 /*
@@ -857,6 +886,30 @@ void init_showfps(settings_entry_t* e)
     int index = video_is_fps_visible() ? 1 : 0;
     e->index_of_current_value = index;
 }
+
+
+
+/*
+ * Change opacity of the gamepad
+ */
+
+void init_gamepadopacity(settings_entry_t* e)
+{
+    int opacity = mobilegamepad_opacity();
+    e->index_of_current_value = clip(opacity, 0, 100) / 10;
+}
+
+void change_gamepadopacity(settings_entry_t* e)
+{
+    int opacity = e->index_of_current_value * 10;
+    mobilegamepad_set_opacity(opacity);
+}
+
+bool want_gamepadopacity(settings_entry_t* e)
+{
+    return mobilegamepad_is_available();
+}
+
 
 
 /*
@@ -921,8 +974,7 @@ void highlight_stageselect(settings_entry_t* e)
 {
     int* counter = e->data;
 
-    if(*counter > 0)
-        *counter = 0;
+    *counter = 0;
 }
 
 void update_stageselect(settings_entry_t* e)
@@ -940,9 +992,7 @@ void update_stageselect(settings_entry_t* e)
 
     if(input_button_pressed(input, IB_RIGHT)) {
         if(++(*counter) == 3) {
-            *counter = -1;
             sound_play(SFX_SECRET);
-
             enable_developermode = true;
             rebuild_entries();
         }

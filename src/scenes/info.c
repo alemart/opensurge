@@ -36,11 +36,15 @@
 #include "../util/util.h"
 #include "../util/v2d.h"
 #include "../entities/sfx.h"
+#include "../entities/mobilegamepad.h"
 
 #define FONT_NAME           "BoxyBold"
 #define BACKGROUND_COLOR    "303030" /* rgb hex */
 #define FADE_COLOR          "000000"
 #define FADE_TIME           0.5f
+
+static int prev_opacity = 0;
+static const int GAMEPAD_OPACITY = 20;
 
 static bool go_back = false;
 static font_t* font = NULL;
@@ -68,6 +72,10 @@ void info_init(void* data)
     font_set_position(font, v2d_new(VIDEO_SCREEN_W / 2, 4));
     set_info_text(font);
 
+    /* mobile gamepad */
+    prev_opacity = mobilegamepad_opacity();
+    mobilegamepad_set_opacity(min(prev_opacity, GAMEPAD_OPACITY));
+
     /* fade in */
     fadefx_in(color_hex(FADE_COLOR), FADE_TIME);
 }
@@ -78,6 +86,7 @@ void info_init(void* data)
  */
 void info_release()
 {
+    mobilegamepad_set_opacity(prev_opacity);
     font_destroy(font);
     input_destroy(input);
 }
