@@ -1,0 +1,141 @@
+// -----------------------------------------------------------------------------
+// File: flag_icons.spr
+// Description: sprite script for a set of flag icons
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+//
+// The artwork is the freely available, MIT-licensed, GoSquared's Flag Icon Set
+// available at https://github.com/gosquared/flags
+//
+
+sprite "Flag Icon"
+{
+    source_file     "images/ui/flag_icons.png"
+    source_rect     0 32 256 272
+    frame_size      16 16
+    hot_spot        8 8
+
+    custom_properties
+    {
+        // associate each LANG_ID with an animation number
+        // LANG_IDs are defined in the .lng files
+        en_US       1
+        pt_BR       2
+        es_ES       3
+        fr_FR       4
+        de_DE       5
+        nl_NL       6
+        it_IT       7
+        pl_PL       8
+        bs_BA       9
+        ru_RU       10
+        sr_RS       11
+        eo          31
+    }
+
+    // unknown
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // en_US
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        242
+    }
+
+    // pt_BR
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        34
+    }
+
+    // es_ES
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        72
+    }
+
+    // fr_FR
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        80
+    }
+
+    // de_DE
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        60
+    }
+
+    // nl_NL
+    animation 6
+    {
+        repeat      TRUE
+        fps         8
+        data        173
+    }
+
+    // it_IT
+    animation 7
+    {
+        repeat      TRUE
+        fps         8
+        data        113
+    }
+
+    // pl_PL
+    animation 8
+    {
+        repeat      TRUE
+        fps         8
+        data        188
+    }
+
+    // bs_BA
+    animation 9
+    {
+        repeat      TRUE
+        fps         8
+        data        19
+    }
+
+    // ru_RU
+    animation 10
+    {
+        repeat      TRUE
+        fps         8
+        data        199
+    }
+
+    // sr_RS
+    animation 11
+    {
+        repeat      TRUE
+        fps         8
+        data        198
+    }
+
+    // eo
+    animation 31
+    {
+        repeat      TRUE
+        fps         8
+        data        241
+    }
+}

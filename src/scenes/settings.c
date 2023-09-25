@@ -27,6 +27,7 @@
 #include "settings.h"
 #include "../core/global.h"
 #include "../core/asset.h"
+#include "../core/animation.h"
 #include "../core/audio.h"
 #include "../core/video.h"
 #include "../core/scene.h"
@@ -39,6 +40,7 @@
 #include "../core/lang.h"
 #include "../core/web.h"
 #include "../util/v2d.h"
+#include "../util/point2d.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../util/numeric.h"
@@ -91,6 +93,7 @@ struct settings_entry_t
 /* constants */
 const char* OPTIONS_MUSICFILE = "musics/options.ogg"; /* public */
 static const char* BGFILE = "themes/scenes/options.bg";
+static const char* FLAG_ICON_SPRITE_NAME = "Flag Icon";
 static const char* FONT_NAME[] = {
     [TYPE_TITLE] = "MenuTitle",
     [TYPE_SUBTITLE] = "MenuBold",
@@ -106,17 +109,20 @@ static float FONT_RELATIVE_XPOS[] = {
     [TYPE_SUBTITLE] = 0.05f,
     [TYPE_SETTING] = 0.05f
 };
+static const char* FONT_COLOR_HIGHLIGHT = "$COLOR_HIGHLIGHT";
+static const char* FONT_COLOR_DEFAULT = "ffffff";
 static const float FADE_TIME = 0.5f;
 static const char* FADE_COLOR = "000000";
 
-#define TIMES   "\xc3\x97" /* utf-8 encoding for hex code point 00D7 (multiplication sign) */
-#define _X(k)   #k TIMES
-
+/* helpers */
 #if defined(__ANDROID__)
 enum { IS_MOBILE = 1 };
 #else
 enum { IS_MOBILE = 0 };
 #endif
+
+#define MULTIPLICATION_SIGN     "\xc3\x97" /* utf-8 encoding for hex code point D7 */
+#define _X(k)                   #k MULTIPLICATION_SIGN
 
 /* languages */
 #define MAX_LANGUAGES 63
@@ -136,9 +142,8 @@ static v2d_t camera;
 static input_t* input = NULL;
 static bgtheme_t* background = NULL;
 static music_t* music = NULL;
+static actor_t* flag_icon = NULL;
 static bool was_immersive = false;
-static char* highlight_color = "$COLOR_HIGHLIGHT";
-static char* default_color = "ffffff";
 static bool fade_in = false, fade_out = false;
 static scene_t* next_scene = NULL;
 static void* next_scene_arg = NULL;
@@ -280,6 +285,7 @@ static int index_of_highlighted_setting = 0;
 #define index_of_back (number_of_settings - 1) /* assumes that BACK is the last entry */
 
 /* misc */
+static void update_flag_icon(const settings_entry_t* e);
 static void update_music();
 static void handle_controls();
 static bool handle_fading();
@@ -308,6 +314,7 @@ void settings_init(void* data)
     background = background_load(BGFILE);
     input = input_create_user(NULL);
     music = music_load(OPTIONS_MUSICFILE);
+    flag_icon = actor_create();
 
     /* setup entries */
     index_of_highlighted_setting = 0;
@@ -333,6 +340,7 @@ void settings_release()
     unload_lang_list();
 
     /* release objects */
+    actor_destroy(flag_icon);
     music_unref(music);
     input_destroy(input);
     background_unload(background);
@@ -363,7 +371,10 @@ void settings_update()
 void settings_render()
 {
     background_render_bg(background, camera);
+
     render_entries(camera);
+    actor_render(flag_icon, camera);
+
     background_render_fg(background, camera);
 }
 
@@ -448,13 +459,13 @@ void update_entries()
     for(int i = 0; i < number_of_entries; i++) {
         /* check if the entry is highlighted */
         bool is_highlighted = &entry[i] == setting[index_of_highlighted_setting];
-        const char* color = is_highlighted ? highlight_color : default_color;
+        const char* color = is_highlighted ? FONT_COLOR_HIGHLIGHT : FONT_COLOR_DEFAULT;
 
-        /* display key */
+        /* display the key */
         const char* key = entry[i].key_name;
         font_set_text(entry[i].key, "<color=%s>%s</color>", color, key);
 
-        /* display current value */
+        /* display the current value */
         if(entry[i].number_of_possible_values > 0) {
             int j = entry[i].index_of_current_value % entry[i].number_of_possible_values;
             const char* value = entry[i].possible_values[j];
@@ -923,19 +934,64 @@ void init_language(settings_entry_t* e)
     for(int i = 0; languages.id_list[i] != NULL; i++) {
         if(0 == strcmp(languages.id_list[i], current_lang_id)) {
             e->index_of_current_value = i;
-            return;
+            break;
         }
     }
+
+    /* update the flag */
+    update_flag_icon(e);
 }
 
 void change_language(settings_entry_t* e)
 {
     int i = e->index_of_current_value;
 
+    /* validate */
     if(i > MAX_LANGUAGES || languages.path_list[i] == NULL)
         return;
 
+    /* load the language */
     lang_loadfile(languages.path_list[i]);
+
+    /* update the flag */
+    update_flag_icon(e);
+}
+
+void update_flag_icon(const settings_entry_t* e)
+{
+    const int UNKNOWN_FLAG = 0;
+    point2d_t flag_offset = point2d_new(-12, 1);
+    int lang_index = e->index_of_current_value;
+
+    if(sprite_animation_exists(FLAG_ICON_SPRITE_NAME, UNKNOWN_FLAG)) {
+        const animation_t* anim = sprite_get_animation(FLAG_ICON_SPRITE_NAME, UNKNOWN_FLAG);
+        const char* lang_id = languages.id_list[lang_index];
+        char const* const* anim_id_property = animation_user_property(anim, lang_id);
+
+        if(anim_id_property != NULL) {
+            int anim_id = atoi(*anim_id_property);
+            if(sprite_animation_exists(FLAG_ICON_SPRITE_NAME, anim_id))
+                anim = sprite_get_animation(FLAG_ICON_SPRITE_NAME, anim_id);
+        }
+
+        const image_t* img = animation_image(anim, 0);
+        int flag_width = image_width(img);
+        flag_offset.x = -flag_width / 2 - 4;
+
+        actor_change_animation(flag_icon, anim);
+        flag_icon->visible = true;
+    }
+    else {
+        flag_icon->visible = false;
+    }
+
+    font_t* f = e->value;
+    font_set_text(f, "%s", languages.name_list[e->index_of_current_value]);
+    v2d_t font_size = font_get_textsize(f);
+
+    float flag_xpos = font_get_position(f).x - font_size.x + flag_offset.x;
+    float flag_ypos = e->ypos + font_size.y * 0.5f + flag_offset.y;
+    flag_icon->position = v2d_new(flag_xpos, flag_ypos);
 }
 
 
