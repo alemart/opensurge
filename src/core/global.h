@@ -29,6 +29,7 @@
 #define GAME_VERSION_WIP        1
 #define GAME_VERSION_FIX        0
 #define GAME_WEBSITE            "opensurge2d.org"
+#define GAME_URL                "http://" GAME_WEBSITE
 #define GAME_YEAR               "2008-2023"
 
 /* Build date */
@@ -58,7 +59,7 @@
 /* Copyright text */
 #define GAME_COPYRIGHT "" \
     "Copyright (C) " GAME_YEAR " Alexandre Martins\n" \
-    "http://" GAME_WEBSITE
+    GAME_URL
 
 /* Header text */
 #define GAME_HEADER "" \
