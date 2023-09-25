@@ -66,5 +66,6 @@ FILE* fopen_utf8(const char* filepath, const char* mode); /* fopen() with UTF-8 
 const char* allegro_version_string(); /* version of the Allegro library */
 const char* surgescript_version_string(); /* version of the SurgeScript runtime */
 const char* physfs_version_string(); /* version of the PhysFS library */
+const char* opensurge_game_name(); /* the sanitized name of the game / MOD that is being run in the engine */
 
 #endif

@@ -48,8 +48,6 @@ static const mobile_subscene_t super = { .init = init, .release = release, .upda
 #define BACKGROUND_COLOR "303030" /* RGB hex code */
 static const char FONT_NAME[] = "BoxyBold";
 
-static const char* opensurge_game_name();
-
 
 
 /*
@@ -90,7 +88,7 @@ void init(mobile_subscene_t* subscene_ptr)
         #define SEPARATOR    "    "
         #define NOWRAP_SPACE "<color=" BACKGROUND_COLOR ">_</color>"
 
-        "%s\n"
+        "%.48s\n"
         "(see credits) is created with\n"
         "\n"
         "%s\n"
@@ -185,27 +183,4 @@ void render(mobile_subscene_t* subscene_ptr, v2d_t subscene_offset)
     v2d_t center = v2d_multiply(video_get_screen_size(), 0.5f);
     v2d_t camera = v2d_subtract(center, subscene_offset);
     font_render(subscene->font, camera);
-}
-
-
-
-/* --- private --- */
-
-/* the sanitized name of the game / MOD that is being run in the engine */
-const char* opensurge_game_name()
-{
-    /* don't use a large buffer because wordwrap is enabled */
-    static char buffer[48];
-
-    /* FIXME: is the title of the window always equal to the name of the game? */
-    str_cpy(buffer, video_get_window_title(), sizeof(buffer));
-
-    /* get rid of newlines */
-    for(char* p = buffer; *p; p++) {
-        if(*p == '\n' || *p == '\r')
-            *p = ' ';
-    }
-
-    /* done! */
-    return buffer;
 }

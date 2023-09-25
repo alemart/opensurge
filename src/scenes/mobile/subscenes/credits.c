@@ -57,7 +57,6 @@ static const float SCROLL_SPEED = 30.0f;
 
 #define MOD_CREDITS_FILE "credits.txt"
 static const char* mod_credits();
-static const char* opensurge_game_name();
 
 static float SMOOTH_SCROLL_COEFFICIENT = 0.97f;
 static void on_touch_start(v2d_t touch_start, void* subscene_ptr);
@@ -242,8 +241,8 @@ const char* mod_credits()
     const char* game_name = opensurge_game_name();
     bool show_warning = (0 != strcmp(game_name, "Surge the Rabbit"));
     snprintf(buffer, sizeof(buffer),
-        "%s\n"
-        "Created by %s authors\n\n"
+        "%.48s\n"
+        "Created by %.48s authors\n\n"
         "%s"
         "___________________________________________________\n\n",
         game_name,
@@ -279,25 +278,6 @@ const char* mod_credits()
         /* text <within tags> won't show up either, so... I should add a
            <verbatim> mode to the font module, so that text shows up unprocessed */
 
-    }
-
-    /* done! */
-    return buffer;
-}
-
-/* the sanitized name of the game / MOD that is being run in the engine */
-const char* opensurge_game_name()
-{
-    /* don't use a large buffer because wordwrap is enabled */
-    static char buffer[48];
-
-    /* FIXME: is the title of the window always equal to the name of the game? */
-    str_cpy(buffer, video_get_window_title(), sizeof(buffer));
-
-    /* get rid of newlines */
-    for(char* p = buffer; *p; p++) {
-        if(*p == '\n' || *p == '\r')
-            *p = ' ';
     }
 
     /* done! */

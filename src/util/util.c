@@ -28,9 +28,11 @@
 #include <surgescript.h>
 #include <physfs.h>
 #include "util.h"
+#include "stringutil.h"
 #include "v2d.h"
 #include "../core/global.h"
 #include "../core/timer.h"
+#include "../core/video.h"
 #include "../core/logfile.h"
 #include "../core/resourcemanager.h"
 
@@ -269,6 +271,28 @@ const char* physfs_version_string()
 
     return str;
 }
+
+/*
+ * opensurge_game_name()
+ * The sanitized name of the game / MOD that is being run in the engine
+ */
+const char* opensurge_game_name()
+{
+    static char buffer[48];
+
+    /* FIXME: is the title of the window always equal to the name of the game? */
+    str_cpy(buffer, video_get_window_title(), sizeof(buffer));
+
+    /* get rid of newlines */
+    for(char* p = buffer; *p; p++) {
+        if(*p == '\n' || *p == '\r')
+            *p = ' ';
+    }
+
+    /* done! */
+    return buffer;
+}
+
 
 /*
  * merge_sort()
