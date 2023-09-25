@@ -19,7 +19,7 @@ font "MenuText"
 {
     truetype
     {
-        source_file             "fonts/Roboto-Medium.ttf"
+        source_file             "fonts/Roboto-Bold.ttf"
         size                    15
         shadow
         antialias

@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * options.h - options screen
+ * info.h - engine information
  * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -18,16 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _OPTIONS_H
-#define _OPTIONS_H
+#ifndef _INFO_H
+#define _INFO_H
 
-/* public functions */
-void options_init(void*);
-void options_release();
-void options_update();
-void options_render();
-
-/* public data */
-extern const char* OPTIONS_MUSICFILE; /* path to a music file */
+void info_init(void*);
+void info_release();
+void info_update();
+void info_render();
 
 #endif

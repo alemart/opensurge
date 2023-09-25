@@ -331,13 +331,14 @@ SET(GAME_SRCS
   src/scenes/editorhelp.c
   src/scenes/editorpal.c
   src/scenes/gameover.c
+  src/scenes/info.c
   src/scenes/intro.c
   src/scenes/langselect.c
   src/scenes/level.c
-  src/scenes/options.c
   src/scenes/pause.c
   src/scenes/quest.c
   src/scenes/stageselect.c
+  src/scenes/settings.c
 
   src/scripting/util/iterators.c
   src/scripting/scripting.c
@@ -478,12 +479,13 @@ SET(GAME_HEADERS
   src/scenes/editorpal.h
   src/scenes/credits.h
   src/scenes/gameover.h
+  src/scenes/info.h
   src/scenes/intro.h
   src/scenes/langselect.h
   src/scenes/level.h
-  src/scenes/options.h
   src/scenes/pause.h
   src/scenes/quest.h
+  src/scenes/settings.h
   src/scenes/stageselect.h
 
   src/scripting/util/iterators.h

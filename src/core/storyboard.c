@@ -29,7 +29,8 @@
 #include "../scenes/confirmbox.h"
 #include "../scenes/langselect.h"
 #include "../scenes/credits.h"
-#include "../scenes/options.h"
+#include "../scenes/info.h"
+#include "../scenes/settings.h"
 #include "../scenes/stageselect.h"
 #include "../scenes/editorhelp.h"
 #include "../scenes/editorpal.h"
@@ -61,7 +62,8 @@ void storyboard_init()
     storyboard[SCENE_CONFIRMBOX] = scene_create(confirmbox_init, confirmbox_update, confirmbox_render, confirmbox_release);
     storyboard[SCENE_LANGSELECT] = scene_create(langselect_init, langselect_update, langselect_render, langselect_release);
     storyboard[SCENE_CREDITS] = scene_create(credits_init, credits_update, credits_render, credits_release);
-    storyboard[SCENE_OPTIONS] = scene_create(options_init, options_update, options_render, options_release);
+    storyboard[SCENE_INFO] = scene_create(info_init, info_update, info_render, info_release);
+    storyboard[SCENE_OPTIONS] = scene_create(settings_init, settings_update, settings_render, settings_release);
     storyboard[SCENE_STAGESELECT] = scene_create(stageselect_init, stageselect_update, stageselect_render, stageselect_release);
     storyboard[SCENE_EDITORHELP] = scene_create(editorhelp_init, editorhelp_update, editorhelp_render, editorhelp_release);
     storyboard[SCENE_EDITORPAL] = scene_create(editorpal_init, editorpal_update, editorpal_render, editorpal_release);

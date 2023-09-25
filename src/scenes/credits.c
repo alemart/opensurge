@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include "credits.h"
-#include "options.h"
+#include "settings.h"
 #include "../core/fadefx.h"
 #include "../core/color.h"
 #include "../core/video.h"

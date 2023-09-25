@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * storyboard.h - storyboard (stores the scenes of the game)
+ * settings.h - settings screen
  * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -18,31 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _STORYBOARD_H
-#define _STORYBOARD_H
+#ifndef _SETTINGS_H
+#define _SETTINGS_H
 
-/* available scenes */
-typedef enum scenetype_t {
-    SCENE_INTRO,
-    SCENE_LEVEL,
-    SCENE_PAUSE,
-    SCENE_GAMEOVER,
-    SCENE_QUEST,
-    SCENE_CONFIRMBOX,
-    SCENE_LANGSELECT,
-    SCENE_CREDITS,
-    SCENE_INFO,
-    SCENE_OPTIONS,
-    SCENE_STAGESELECT,
-    SCENE_EDITORHELP,
-    SCENE_EDITORPAL,
-    SCENE_MOBILEMENU,
-    SCENE_MOBILEPOPUP
-} scenetype_t;
+void settings_init(void*);
+void settings_release();
+void settings_update();
+void settings_render();
 
-/* Storyboard */
-void storyboard_init();
-void storyboard_release();
-struct scene_t* storyboard_get_scene(scenetype_t type);
+extern const char* OPTIONS_MUSICFILE; /* path to a music file */
 
 #endif

@@ -22,7 +22,7 @@
 #include <string.h>
 #include <math.h>
 #include "langselect.h"
-#include "options.h"
+#include "settings.h"
 #include "../core/global.h"
 #include "../core/scene.h"
 #include "../core/asset.h"

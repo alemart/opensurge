@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include "stageselect.h"
 #include "util/levparser.h"
-#include "options.h"
+#include "settings.h"
 #include "level.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"

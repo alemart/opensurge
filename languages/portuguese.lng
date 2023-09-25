@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-09-22"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-09-25"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -64,30 +64,29 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 // Options
 OPTIONS_TITLE               "<color=$COLOR_TITLE>CONFIGURAÇÕES</color>"
-OPTIONS_YES                 "SIM"
-OPTIONS_NO                  "NÃO"
-OPTIONS_GRAPHICS            "GRÁFICOS"
+OPTIONS_YES                 "Sim"
+OPTIONS_NO                  "Não"
+OPTIONS_GRAPHICS            "Gráficos"
 OPTIONS_FULLSCREEN          "Tela cheia"
 OPTIONS_RESOLUTION          "Tamanho"
-OPTIONS_RESOLUTION_OPT1     "1×"
-OPTIONS_RESOLUTION_OPT2     "2×"
-OPTIONS_RESOLUTION_OPT3     "3×"
-OPTIONS_RESOLUTION_OPT4     "4×"
 OPTIONS_QUALITY             "Qualidade"
-OPTIONS_QUALITY_LOW         "BAIXA"
-OPTIONS_QUALITY_MEDIUM      "MÉDIA"
-OPTIONS_QUALITY_HIGH        "ALTA"
-OPTIONS_SMOOTHGFX           "Gráficos suaves"
-OPTIONS_SMOOTHGFX_ERROR     "[só em 32 bpp]"
+OPTIONS_QUALITY_LOW         "Baixa"
+OPTIONS_QUALITY_MEDIUM      "Média"
+OPTIONS_QUALITY_HIGH        "Alta"
 OPTIONS_FPS                 "Mostrar FPS"
-OPTIONS_GAME                "JOGO"
+OPTIONS_GAME                "Jogo"
 OPTIONS_GAMEPAD             "Usar joystick"
-OPTIONS_LANGUAGE            "Trocar idioma"
+OPTIONS_LANGUAGE            "Idioma"
 OPTIONS_STAGESELECT         "Seleção de fases"
+OPTIONS_DEVELOPERMODE       "Modo do desenvolvedor"
 OPTIONS_CREDITS             "Créditos do Open Surge"
 OPTIONS_WEBSITE             "Visite Open Surge na web"
 OPTIONS_DONATE              "Doar para o Open Surge"
-OPTIONS_BACK                "VOLTAR"
+OPTIONS_BACK                "Voltar"
+OPTIONS_EXTRA               "Extra"
+OPTIONS_INFO                "Informações da engine"
+OPTIONS_SHARE               "Compartilhar a engine"
+OPTIONS_DOWNLOAD            "Baixar a engine para PC & mobile"
 
 // Stage Select
 STAGESELECT_TITLE           "<color=$COLOR_TITLE>SELEÇÃO DE FASES</color>"

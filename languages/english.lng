@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-09-22"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-09-25"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -71,30 +71,29 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 // Options
 OPTIONS_TITLE               "<color=$COLOR_TITLE>OPTIONS</color>"
-OPTIONS_YES                 "YES"
-OPTIONS_NO                  "NO"
-OPTIONS_GRAPHICS            "GRAPHICS"
+OPTIONS_YES                 "Yes"
+OPTIONS_NO                  "No"
+OPTIONS_GRAPHICS            "Graphics"
 OPTIONS_FULLSCREEN          "Fullscreen"
 OPTIONS_RESOLUTION          "Screen size"
-OPTIONS_RESOLUTION_OPT1     "1×"
-OPTIONS_RESOLUTION_OPT2     "2×"
-OPTIONS_RESOLUTION_OPT3     "3×"
-OPTIONS_RESOLUTION_OPT4     "4×"
 OPTIONS_QUALITY             "Quality"
-OPTIONS_QUALITY_LOW         "LOW"
-OPTIONS_QUALITY_MEDIUM      "MEDIUM"
-OPTIONS_QUALITY_HIGH        "HIGH"
-OPTIONS_SMOOTHGFX           "Smooth graphics"
-OPTIONS_SMOOTHGFX_ERROR     "[32 bpp only]"
+OPTIONS_QUALITY_LOW         "Low"
+OPTIONS_QUALITY_MEDIUM      "Medium"
+OPTIONS_QUALITY_HIGH        "High"
 OPTIONS_FPS                 "Display FPS"
-OPTIONS_GAME                "GAME"
+OPTIONS_GAME                "Game"
 OPTIONS_GAMEPAD             "Use gamepad"
-OPTIONS_LANGUAGE            "Change language"
+OPTIONS_LANGUAGE            "Language"
 OPTIONS_STAGESELECT         "Stage select"
+OPTIONS_DEVELOPERMODE       "Developer mode"
 OPTIONS_CREDITS             "Open Surge Credits"
 OPTIONS_WEBSITE             "Visit Open Surge on the web"
 OPTIONS_DONATE              "Donate to Open Surge"
-OPTIONS_BACK                "BACK"
+OPTIONS_BACK                "Back"
+OPTIONS_EXTRA               "Extra"
+OPTIONS_INFO                "Engine information"
+OPTIONS_SHARE               "Share the engine"
+OPTIONS_DOWNLOAD            "Get the engine for PC & mobile"
 
 // Stage Select
 STAGESELECT_TITLE           "<color=$COLOR_TITLE>STAGE SELECT</color>"
