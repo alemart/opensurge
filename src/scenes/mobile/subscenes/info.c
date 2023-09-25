@@ -47,6 +47,7 @@ static const mobile_subscene_t super = { .init = init, .release = release, .upda
 
 #define BACKGROUND_COLOR "303030" /* RGB hex code */
 static const char FONT_NAME[] = "BoxyBold";
+static void set_info_text(font_t* font);
 
 
 
@@ -76,70 +77,13 @@ mobile_subscene_t* mobile_subscene_info()
 void init(mobile_subscene_t* subscene_ptr)
 {
     mobile_subscene_info_t* subscene = (mobile_subscene_info_t*)subscene_ptr;
-    char path[2][1024];
 
     /* create font */
     font_t* font = font_create(FONT_NAME);
     font_set_position(font, v2d_new(VIDEO_SCREEN_W / 2, 4));
     font_set_width(font, VIDEO_SCREEN_W - 8);
     font_set_align(font, FONTALIGN_CENTER);
-    font_set_text(font,
-
-        #define SEPARATOR    "    "
-        #define NOWRAP_SPACE "<color=" BACKGROUND_COLOR ">_</color>"
-
-        "%.48s\n"
-        "(see credits) is created with\n"
-        "\n"
-        "%s\n"
-        "%s\n"
-        "\n"
-        "This program is free software; you can redistribute it and/or modify "
-        "it under the terms of the GNU General Public License as published by "
-        "the Free Software Foundation; either version 3 of the License, or "
-        "(at your option) any later version.\n"
-        "\n"
-        "This program is distributed in the hope that it will be useful, "
-        "but WITHOUT ANY WARRANTY; without even the implied warranty of "
-        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
-        "GNU General Public License for more details.\n"
-        "\n"
-        "You should have received a copy of the GNU General Public License "
-        "along with this program.  If not, see < http://www.gnu.org/licenses/ >.\n"
-        "\n"
-        "Engine"        NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
-        "SurgeScript"   NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
-        "Allegro"       NOWRAP_SPACE "version:" NOWRAP_SPACE "%s" SEPARATOR
-        "Build"         NOWRAP_SPACE "date:"    NOWRAP_SPACE "%s" SEPARATOR
-#if defined(__ANDROID__)
-        "Platform:"     NOWRAP_SPACE "Android"  NOWRAP_SPACE "%s" SEPARATOR
-#else
-        "Platform:"     NOWRAP_SPACE "%s" SEPARATOR
-#endif
-        "Data"          NOWRAP_SPACE "directories: %s %s",
-
-        opensurge_game_name(),
-
-        GAME_TITLE,
-        GAME_COPYRIGHT,
-
-        GAME_VERSION_STRING,
-        surgescript_version_string(),
-        allegro_version_string(),
-
-        GAME_BUILD_DATE,
-
-#if defined(__ANDROID__)
-        al_android_get_os_version(),
-#elif defined(ALLEGRO_PLATFORM_STR)
-        ALLEGRO_PLATFORM_STR,
-#else
-        "Undefined",
-#endif
-
-        asset_shared_datadir(path[0], sizeof(path[0])),
-        asset_user_datadir(path[1], sizeof(path[1]))
-    );
+    set_info_text(font);
     subscene->font = font;
 }
 
@@ -183,4 +127,84 @@ void render(mobile_subscene_t* subscene_ptr, v2d_t subscene_offset)
     v2d_t center = v2d_multiply(video_get_screen_size(), 0.5f);
     v2d_t camera = v2d_subtract(center, subscene_offset);
     font_render(subscene->font, camera);
+}
+
+
+
+/*
+ * private
+ */
+
+void set_info_text(font_t* font)
+{
+    char path[2][1024];
+    bool multiple_datadirs;
+
+    asset_shared_datadir(path[0], sizeof(path[0]));
+    asset_user_datadir(path[1], sizeof(path[1]));
+    multiple_datadirs = (0 != strcmp(path[0], path[1]));
+
+    #define SEPARATOR       "    "
+    #define NOWRAP_SPACE    "<color=" BACKGROUND_COLOR ">_</color>"
+    #define HIGHLIGHT_COLOR "ffee11"
+
+    font_set_text(font,
+
+        "%.48s\n"
+        "is created with an open source game engine:\n"
+        "\n"
+        "%s\n"
+        "%s\n"
+        "\n"
+        "This program is free software; you can redistribute it and/or modify "
+        "it under the terms of the GNU General Public License as published by "
+        "the Free Software Foundation; either version 3 of the License, or "
+        "(at your option) any later version.\n"
+        "\n"
+        "This program is distributed in the hope that it will be useful, "
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of "
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
+        "GNU General Public License for more details.\n"
+        "\n"
+        "You should have received a copy of the GNU General Public License "
+        "along with this program.  If not, see < http://www.gnu.org/licenses/ >.\n"
+        "\n"
+        "<color=" HIGHLIGHT_COLOR ">Engine"             NOWRAP_SPACE "version:</color>" NOWRAP_SPACE "%s" SEPARATOR
+        "<color=" HIGHLIGHT_COLOR ">SurgeScript"        NOWRAP_SPACE "version:</color>" NOWRAP_SPACE "%s" SEPARATOR
+        "<color=" HIGHLIGHT_COLOR ">Allegro"            NOWRAP_SPACE "version:</color>" NOWRAP_SPACE "%s" SEPARATOR
+        "<color=" HIGHLIGHT_COLOR ">Build"              NOWRAP_SPACE "date:</color>"    NOWRAP_SPACE "%s" SEPARATOR
+#if defined(__ANDROID__)
+        "<color=" HIGHLIGHT_COLOR ">Platform:</color>"  NOWRAP_SPACE "Android"  NOWRAP_SPACE "%s" SEPARATOR
+#else
+        "<color=" HIGHLIGHT_COLOR ">Platform:</color>"  NOWRAP_SPACE "%s" SEPARATOR
+#endif
+        "<color=" HIGHLIGHT_COLOR ">Data"               NOWRAP_SPACE "%s:</color> %s\n%s",
+
+        opensurge_game_name(),
+
+        GAME_TITLE,
+        GAME_COPYRIGHT,
+
+        GAME_VERSION_STRING,
+        surgescript_version_string(),
+        allegro_version_string(),
+
+        GAME_BUILD_DATE,
+
+#if defined(__ANDROID__)
+        al_android_get_os_version(),
+#elif defined(ALLEGRO_PLATFORM_STR)
+        ALLEGRO_PLATFORM_STR,
+#else
+        "Undefined",
+#endif
+
+        multiple_datadirs ? "directories" : "directory",
+        path[0],
+        multiple_datadirs ? path[1] : ""
+    );
+
+    #undef HIGHLIGHT_COLOR
+    #undef NOWRAP_SPACE
+    #undef SEPARATOR
 }
