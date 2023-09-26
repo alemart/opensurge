@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-09-25"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-09-26"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -72,6 +72,7 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 // Options
 OPTIONS_TITLE               "<color=$COLOR_TITLE>OPTIONS</color>"
 OPTIONS_GRAPHICS            "Graphics"
+OPTIONS_AUDIO               "Audio"
 OPTIONS_CONTROLS            "Controls"
 OPTIONS_GAME                "Game"
 OPTIONS_EXTRA               "Extra"
@@ -85,6 +86,8 @@ OPTIONS_QUALITY_LOW         "Low"
 OPTIONS_QUALITY_MEDIUM      "Medium"
 OPTIONS_QUALITY_HIGH        "High"
 OPTIONS_FPS                 "Display FPS"
+OPTIONS_VOLUME              "Volume"
+OPTIONS_MUTE                "Muted"
 OPTIONS_GAMEPADOPACITY      "Opacity"
 OPTIONS_GAMEPAD             "Use gamepad"
 OPTIONS_LANGUAGE            "Language"

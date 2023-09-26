@@ -399,6 +399,12 @@ void load_managers_preferences(const commandline_t* cmd)
         false
     ));
 
+    int master_volume = (
+        prefs_has_item(prefs, ".master_volume") ?
+        prefs_get_int(prefs, ".master_volume") :
+        100
+    );
+
     const char* lang_path = commandline_getstring(cmd->language_filepath,
         prefs_has_item(prefs, ".langpath") ?
         prefs_get_string(prefs, ".langpath") :
@@ -427,11 +433,15 @@ void load_managers_preferences(const commandline_t* cmd)
             quality = VIDEOQUALITY_DEFAULT;
     }
 
+    master_volume = clip(master_volume, 0, 100);
+
     /* apply preferences */
     video_set_resolution(resolution);
     video_set_quality(quality);
     video_set_fullscreen(fullscreen);
     video_set_fps_visible(show_fps);
+
+    audio_set_master_volume(0.01f * (float)master_volume);
 
     if(*lang_path != '\0')
         lang_loadfile(lang_path);
@@ -766,6 +776,12 @@ void a5_handle_hotkey(const ALLEGRO_EVENT* event, void* data)
         case ALLEGRO_KEY_F10:
             if(!renderqueue_toggle_stats_report())
                 video_showmessage("Can't toggle stats report");
+            break;
+
+        /* unmute / mute */
+        case ALLEGRO_KEY_F7:
+            audio_set_muted(!audio_is_muted());
+            video_showmessage("%s", audio_is_muted() ? "Muted" : "Unmuted");
             break;
     }
 

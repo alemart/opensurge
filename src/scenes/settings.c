@@ -179,12 +179,25 @@ static void change_showfps(settings_entry_t* e);
 
 
 
-#define vt_controls (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, want_gamepadopacity }
+#define vt_audio (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
 
-#define vt_gamepadopacity (settings_entryvt_t){ change_gamepadopacity, nop, nop, init_gamepadopacity, nop, nop, want_gamepadopacity }
+#define vt_volume (settings_entryvt_t){ change_volume, nop, nop, init_volume, nop, nop, visible }
+static void init_volume(settings_entry_t* e);
+static void change_volume(settings_entry_t* e);
+
+#define vt_mute (settings_entryvt_t){ change_mute, nop, nop, init_mute, nop, update_mute, visible }
+static void init_mute(settings_entry_t* e);
+static void change_mute(settings_entry_t* e);
+static void update_mute(settings_entry_t* e);
+
+
+
+#define vt_controls (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, display_gamepadopacity }
+
+#define vt_gamepadopacity (settings_entryvt_t){ change_gamepadopacity, nop, nop, init_gamepadopacity, nop, nop, display_gamepadopacity }
 static void init_gamepadopacity(settings_entry_t* e);
 static void change_gamepadopacity(settings_entry_t* e);
-static bool want_gamepadopacity(settings_entry_t* e);
+static bool display_gamepadopacity(settings_entry_t* e);
 
 
 
@@ -245,6 +258,11 @@ static const struct
     { TYPE_SETTING, "$OPTIONS_RESOLUTION", (const char*[]){ _X(1), _X(2), _X(3), _X(4), NULL }, 1, vt_resolution, 0 },
     { TYPE_SETTING, "$OPTIONS_FULLSCREEN", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_fullscreen, 0 },
     { TYPE_SETTING, "$OPTIONS_FPS", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_showfps, 0 },
+
+    /* Audio */
+    { TYPE_SUBTITLE, "$OPTIONS_AUDIO", (const char*[]){ NULL }, 0, vt_audio, 8 },
+    { TYPE_SETTING, "$OPTIONS_VOLUME", (const char*[]){ "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%", NULL }, 10, vt_volume, 8 },
+    { TYPE_SETTING, "$OPTIONS_MUTE", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_mute, 0 },
 
     /* Controls */
     { TYPE_SUBTITLE, "$OPTIONS_CONTROLS", (const char*[]){ NULL }, 0, vt_controls, 8 },
@@ -639,6 +657,8 @@ void save_preferences()
     prefs_set_bool(prefs, ".fullscreen", video_is_fullscreen());
     prefs_set_bool(prefs, ".showfps", video_is_fps_visible());
 
+    prefs_set_int(prefs, ".master_volume", (int)(audio_get_master_volume() * 100.0f));
+
     prefs_set_string(prefs, ".langpath", filepath_of_lang(lang_getid()));
 
     prefs_set_int(prefs, ".gamepad_opacity", mobilegamepad_opacity());
@@ -901,6 +921,52 @@ void init_showfps(settings_entry_t* e)
 
 
 /*
+ * Change volume
+ */
+
+void init_volume(settings_entry_t* e)
+{
+    int volume = (int)(audio_get_master_volume() * 100.0f);
+    int index = (volume / 10) + (volume % 10 != 0); /* ceil(volume / 10) */
+    e->index_of_current_value = index;
+}
+
+void change_volume(settings_entry_t* e)
+{
+    int volume = e->index_of_current_value * 10;
+    audio_set_master_volume((float)volume * 0.01f);
+
+    if(volume != 0)
+        audio_set_muted(false);
+}
+
+
+/*
+ * Unmute / mute
+ */
+
+void init_mute(settings_entry_t* e)
+{
+    bool is_muted = audio_is_muted();
+    e->index_of_current_value = is_muted ? 1 : 0;
+}
+
+void change_mute(settings_entry_t* e)
+{
+    bool want_muted = (e->index_of_current_value != 0);
+    audio_set_muted(want_muted);
+}
+
+void update_mute(settings_entry_t* e)
+{
+    /* the audio may be muted externally */
+    bool is_muted = audio_is_muted();
+    e->index_of_current_value = is_muted ? 1 : 0;
+}
+
+
+
+/*
  * Change opacity of the gamepad
  */
 
@@ -916,7 +982,7 @@ void change_gamepadopacity(settings_entry_t* e)
     mobilegamepad_set_opacity(opacity);
 }
 
-bool want_gamepadopacity(settings_entry_t* e)
+bool display_gamepadopacity(settings_entry_t* e)
 {
     return mobilegamepad_is_available();
 }

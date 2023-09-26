@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-09-25"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-09-26"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -68,6 +68,7 @@ OPTIONS_GRAPHICS            "Gráficos"
 OPTIONS_CONTROLS            "Controles"
 OPTIONS_GAME                "Jogo"
 OPTIONS_EXTRA               "Extra"
+OPTIONS_AUDIO               "Áudio"
 OPTIONS_BACK                "Voltar"
 OPTIONS_YES                 "Sim"
 OPTIONS_NO                  "Não"
@@ -78,6 +79,8 @@ OPTIONS_QUALITY_LOW         "Baixa"
 OPTIONS_QUALITY_MEDIUM      "Média"
 OPTIONS_QUALITY_HIGH        "Alta"
 OPTIONS_FPS                 "Mostrar FPS"
+OPTIONS_VOLUME              "Volume"
+OPTIONS_MUTE                "Mudo"
 OPTIONS_GAMEPADOPACITY      "Opacidade"
 OPTIONS_GAMEPAD             "Usar joystick"
 OPTIONS_LANGUAGE            "Idioma"
