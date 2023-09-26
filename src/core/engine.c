@@ -110,6 +110,7 @@ static void clean_garbage();
 static void render_overlay();
 static void init_basic_stuff(const commandline_t* cmd);
 static void init_managers(const commandline_t* cmd);
+static void load_managers_preferences(const commandline_t* cmd);
 static void init_accessories(const commandline_t* cmd);
 static void push_initial_scene(const commandline_t* cmd);
 static void release_accessories();
@@ -355,34 +356,82 @@ void init_basic_stuff(const commandline_t* cmd)
 void init_managers(const commandline_t* cmd)
 {
     timer_init();
-
     video_init();
-    video_set_resolution(
-        commandline_getint(cmd->video_resolution, video_best_fit_resolution())
-    );
-    video_set_quality(
-        commandline_getint(cmd->video_quality, prefs_has_item(prefs, ".videoquality") ?
-            prefs_get_int(prefs, ".videoquality") :
-            VIDEOQUALITY_DEFAULT
-        )
-    );
-    video_set_fullscreen(
-        commandline_getint(cmd->fullscreen, prefs_has_item(prefs, ".fullscreen") ?
-            prefs_get_bool(prefs, ".fullscreen") :
-            false
-        )
-    );
-    video_set_fps_visible(
-        !commandline_getint(cmd->hide_fps, FALSE) &&
-        commandline_getint(cmd->show_fps, prefs_has_item(prefs, ".showfps") ?
-            prefs_get_bool(prefs, ".showfps") :
-            false
-        )
-    );
-
     audio_init();
     input_init();
     resourcemanager_init();
+    lang_init();
+
+    load_managers_preferences(cmd);
+}
+
+/*
+ * load_managers_preferences()
+ * Load user preferences (managers only)
+ */
+void load_managers_preferences(const commandline_t* cmd)
+{
+    /* read from prefs */
+    videoresolution_t resolution = (videoresolution_t)commandline_getint(cmd->video_resolution,
+        prefs_has_item(prefs, ".resolution") ?
+        prefs_get_int(prefs, ".resolution") :
+        video_best_fit_resolution()
+    );
+
+    videoquality_t quality = (videoquality_t)commandline_getint(cmd->video_quality,
+        prefs_has_item(prefs, ".videoquality") ?
+        prefs_get_int(prefs, ".videoquality") :
+        VIDEOQUALITY_DEFAULT
+    );
+
+    bool fullscreen = (bool)commandline_getint(cmd->fullscreen,
+        prefs_has_item(prefs, ".fullscreen") ?
+        prefs_get_bool(prefs, ".fullscreen") :
+        false
+    );
+
+    bool show_fps = (bool)(!commandline_getint(cmd->hide_fps, FALSE) && commandline_getint(cmd->show_fps,
+        prefs_has_item(prefs, ".showfps") ?
+        prefs_get_bool(prefs, ".showfps") :
+        false
+    ));
+
+    const char* lang_path = commandline_getstring(cmd->language_filepath,
+        prefs_has_item(prefs, ".langpath") ?
+        prefs_get_string(prefs, ".langpath") :
+        ""
+    );
+
+    /* validate preferences */
+    switch(resolution) {
+        case VIDEORESOLUTION_1X:
+        case VIDEORESOLUTION_2X:
+        case VIDEORESOLUTION_3X:
+        case VIDEORESOLUTION_4X:
+            break;
+
+        default:
+            resolution = VIDEORESOLUTION_1X;
+    }
+
+    switch(quality) {
+        case VIDEOQUALITY_LOW:
+        case VIDEOQUALITY_MEDIUM:
+        case VIDEOQUALITY_HIGH:
+            break;
+
+        default:
+            quality = VIDEOQUALITY_DEFAULT;
+    }
+
+    /* apply preferences */
+    video_set_resolution(resolution);
+    video_set_quality(quality);
+    video_set_fullscreen(fullscreen);
+    video_set_fps_visible(show_fps);
+
+    if(*lang_path != '\0')
+        lang_loadfile(lang_path);
 }
 
 
@@ -395,15 +444,7 @@ void init_accessories(const commandline_t* cmd)
     /* we'll load SurgeScript in a different thread */
     ALLEGRO_THREAD* surgescript_thread = surgescriptloaderthread_create(cmd->user_argc, cmd->user_argv);
 
-    /* load translations, fonts and display a loading screen */
-    const char* custom_lang = commandline_getstring(cmd->language_filepath,
-        prefs_has_item(prefs, ".langpath") ? prefs_get_string(prefs, ".langpath") : NULL
-    );
-
-    lang_init();
-    if(custom_lang && *custom_lang)
-        lang_loadfile(custom_lang);
-
+    /* load fonts and display a loading screen */
     font_init();
     video_display_loading_screen();
 
