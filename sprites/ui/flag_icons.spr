@@ -136,13 +136,13 @@ sprite "Flag Icon"
     {
         repeat      TRUE
         fps         8
-        data        241
+        data        260
     }
 }
 
 /*
 
-Frame numbers <=> Country Codes (ISO 3166-1)
+Frame number <=> Country Code (ISO 3166-1) or Flag Name
 
 0   _unknown
 1   _abkhazia
@@ -404,5 +404,6 @@ Frame numbers <=> Country Codes (ISO 3166-1)
 257 ZA
 258 ZM
 259 ZW
+260 Esperanto Flag (not in the original icon set)
 
 */
