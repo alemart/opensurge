@@ -168,10 +168,10 @@ static void change_quality(settings_entry_t* e);
 static void init_resolution(settings_entry_t* e);
 static void change_resolution(settings_entry_t* e);
 
-#define vt_fullscreen (settings_entryvt_t){ change_fullscreen, nop, highlight_fullscreen, init_fullscreen, nop, nop, !IS_MOBILE ? visible : invisible }
+#define vt_fullscreen (settings_entryvt_t){ change_fullscreen, nop, nop, init_fullscreen, nop, update_fullscreen, !IS_MOBILE ? visible : invisible }
 static void init_fullscreen(settings_entry_t* e);
 static void change_fullscreen(settings_entry_t* e);
-static void highlight_fullscreen(settings_entry_t* e);
+static void update_fullscreen(settings_entry_t* e);
 
 #define vt_showfps (settings_entryvt_t){ change_showfps, nop, nop, init_showfps, nop, nop, visible }
 static void init_showfps(settings_entry_t* e);
@@ -581,9 +581,9 @@ void handle_controls()
         sound_play(SFX_BACK);
     }
 
-    /* update the highlighted setting */
-    int h = index_of_highlighted_setting;
-    setting[h]->vt->on_update(setting[h]);
+    /* update all settings */
+    for(int i = 0; i < number_of_settings; i++)
+        setting[i]->vt->on_update(setting[i]);
 }
 
 bool handle_fading()
@@ -871,7 +871,7 @@ void init_fullscreen(settings_entry_t* e)
     e->index_of_current_value = index;
 }
 
-void highlight_fullscreen(settings_entry_t* e)
+void update_fullscreen(settings_entry_t* e)
 {
     /* note: user may press F11 at any time,
        not just when highlighting the setting.
@@ -1035,9 +1035,13 @@ void highlight_stageselect(settings_entry_t* e)
 
 void update_stageselect(settings_entry_t* e)
 {
-    /* Developer mode trick */
     int* counter = e->data;
 
+    /* Skip if not highlighted */
+    if(e != setting[index_of_highlighted_setting])
+        return;
+
+    /* Developer mode trick */
     if(enable_developermode)
         return;
 
