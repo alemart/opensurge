@@ -26,7 +26,6 @@
 #include "timer.h"
 #include "inputmap.h"
 #include "../entities/mobilegamepad.h"
-#include "../entities/renderqueue.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
@@ -119,7 +118,6 @@ static void input_clear(input_t *in);
 static void remap_joystick_buttons(int joy_id);
 static void log_joysticks();
 static void log_joystick(ALLEGRO_JOYSTICK* joystick);
-static void handle_hotkey(int keycode);
 
 /* Allegro 5 events */
 static void a5_handle_keyboard_event(const ALLEGRO_EVENT* event, void* data);
@@ -967,7 +965,6 @@ void a5_handle_keyboard_event(const ALLEGRO_EVENT* event, void* data)
 
         case ALLEGRO_EVENT_KEY_DOWN:
             a5_key[event->keyboard.keycode] = true;
-            handle_hotkey(event->keyboard.keycode);
             break;
 
         case ALLEGRO_EVENT_KEY_UP:
@@ -1147,23 +1144,6 @@ void a5_handle_touch_event(const ALLEGRO_EVENT* event, void* data)
             emulated_mouse.tracked_touch_id = event->touch.id;
         else if(event->type == ALLEGRO_EVENT_TOUCH_END || event->type == ALLEGRO_EVENT_TOUCH_CANCEL)
             emulated_mouse.tracked_touch_id = -1;
-    }
-}
-
-/* handle hotkeys */
-void handle_hotkey(int keycode)
-{
-    switch(keycode) {
-        /* toggle fullscreen */
-        case ALLEGRO_KEY_F11:
-            video_set_fullscreen(!video_is_fullscreen());
-            break;
-
-        /* toggle render queue stats report */
-        case ALLEGRO_KEY_F10:
-            if(!renderqueue_toggle_stats_report())
-                video_showmessage("Can't toggle stats report");
-            break;
     }
 }
 

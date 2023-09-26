@@ -50,6 +50,7 @@
 #include "../entities/actor.h"
 #include "../entities/player.h"
 #include "../entities/character.h"
+#include "../entities/renderqueue.h"
 #include "../entities/mobilegamepad.h"
 #include "../scripting/scripting.h"
 #include "../scripting/loaderthread.h"
@@ -102,6 +103,7 @@ static void call_event_listeners(const ALLEGRO_EVENT* event);
 static ALLEGRO_EVENT_QUEUE* a5_event_queue = NULL;
 static void a5_handle_timer_event(const ALLEGRO_EVENT* event, void* data);
 static void a5_handle_haltresume_event(const ALLEGRO_EVENT* event, void* data);
+static void a5_handle_hotkey(const ALLEGRO_EVENT* event, void* data);
 
 
 
@@ -181,6 +183,7 @@ void engine_mainloop()
     /* setup event listeners */
     engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, &is_active, a5_handle_haltresume_event);
     engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, &is_active, a5_handle_haltresume_event);
+    engine_add_event_listener(ALLEGRO_EVENT_KEY_DOWN, NULL, a5_handle_hotkey);
 
     /* configure the timer */
     if(NULL == (a5_timer = al_create_timer(1.0 / TARGET_FPS)))
@@ -742,6 +745,31 @@ void a5_handle_haltresume_event(const ALLEGRO_EVENT* event, void* data)
             *is_active = true;
             break;
     }
+}
+
+/*
+ * a5_handle_hotkey_event()
+ * Handles hotkeys
+ */
+void a5_handle_hotkey(const ALLEGRO_EVENT* event, void* data)
+{
+    if(event->type != ALLEGRO_EVENT_KEY_DOWN)
+        return;
+
+    switch(event->keyboard.keycode) {
+        /* toggle fullscreen */
+        case ALLEGRO_KEY_F11:
+            video_set_fullscreen(!video_is_fullscreen());
+            break;
+
+        /* toggle render queue stats report */
+        case ALLEGRO_KEY_F10:
+            if(!renderqueue_toggle_stats_report())
+                video_showmessage("Can't toggle stats report");
+            break;
+    }
+
+    (void)data;
 }
 
 /*
