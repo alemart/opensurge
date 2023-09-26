@@ -1189,6 +1189,7 @@ brick 132 12288 10048
 brick 133 12288 10016
 brick 134 12256 9968
 brick 145 12400 10096
+brick 145 12464 10128
 brick 28 12192 9664
 brick 34 12192 9792
 brick 225 12208 9712
@@ -3179,7 +3180,6 @@ entity "Springfling" 5808 9728 "1f704667916d5ad4"
 entity "Springfling" 5648 9680 "8dd691a5c481b561"
 entity "Wolfey" 5440 9664 "8592def4055fce4b"
 entity "Springfling" 11184 9808 "cd0f1097166b25d1"
-entity "Wolfey" 12496 10144 "bc3e45d78980a7da"
 entity "Mosquito" 13776 10160 "5946bb6d6560b082"
 entity "Jumping Fish" 4608 9872 "84ff3d799655fa9"
 entity "Jumping Fish" 4704 10336 "5c35bfa217c0f868"
