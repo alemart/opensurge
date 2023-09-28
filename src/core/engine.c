@@ -779,7 +779,7 @@ void a5_handle_hotkey(const ALLEGRO_EVENT* event, void* data)
             break;
 
         /* unmute / mute */
-        case ALLEGRO_KEY_F7:
+        case ALLEGRO_KEY_F8:
             audio_set_muted(!audio_is_muted());
             video_showmessage("%s", audio_is_muted() ? "Muted" : "Unmuted");
             break;
