@@ -33,7 +33,7 @@ shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs
 shader_t* shader_get(const char* name);
 bool shader_exists(const char* name);
 
-bool shader_use(const shader_t* shader);
+bool shader_set_active(const shader_t* shader);
 
 void shader_set_float(shader_t* shader, const char* var_name, float value);
 void shader_set_int(shader_t* shader, const char* var_name, int value);

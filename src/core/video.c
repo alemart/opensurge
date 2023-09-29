@@ -1030,7 +1030,7 @@ bool use_default_shader()
 {
 #if USE_ROUNDROBIN_BACKBUFFER
     if(backbuffer[0] == NULL || backbuffer[1] == NULL)
-        return shader_use(NULL);
+        return shader_set_active(NULL);
 
     /* According to the Allegro manual, al_use_shader() "uses the shader for
        subsequent drawing operations on the current target bitmap".
@@ -1038,14 +1038,14 @@ bool use_default_shader()
        https://liballeg.org/a5docs/trunk/shader.html */
 
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
-    bool a = shader_use(NULL);
+    bool a = shader_set_active(NULL);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[1 - backbuffer_index]));
-    bool b = shader_use(NULL);
+    bool b = shader_set_active(NULL);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
 
     return a && b;
 #else
-    return shader_use(NULL);
+    return shader_set_active(NULL);
 #endif
 }
 

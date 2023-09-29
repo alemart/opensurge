@@ -278,11 +278,11 @@ shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs
 }
 
 /*
- * shader_use()
+ * shader_set_active()
  * Use the shader for the next drawing operations on the current target image
  * Pass NULL to use the default shader. Returns true on success
  */
-bool shader_use(const shader_t* shader)
+bool shader_set_active(const shader_t* shader)
 {
     bool success;
 
