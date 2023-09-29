@@ -513,8 +513,8 @@ void push_initial_scene(const commandline_t* cmd)
     }
     else {
         scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)(INTRO_QUEST));
-        if(!prefs_has_item(prefs, ".langpath"))
-            scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);
+        /*if(!prefs_has_item(prefs, ".langpath"))
+            scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);*/
         scenestack_push(storyboard_get_scene(SCENE_INTRO), NULL);
     }
 }
