@@ -24,6 +24,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_memfile.h>
+#include <allegro5/allegro_opengl.h>
 
 #ifdef ALLEGRO_UNIX
 #include <allegro5/allegro_x.h>
@@ -698,10 +699,10 @@ bool create_display()
 
     /* create a new display */
     al_store_state(&state, ALLEGRO_STATE_NEW_DISPLAY_PARAMETERS);
-    al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE | ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE);
-#if defined(__ANDROID__)
-    al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_ES_PROFILE);
-#endif
+    al_set_new_display_flags(
+        ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE |
+        ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE
+    );
 
     al_set_new_display_option(
         ALLEGRO_SUPPORTED_ORIENTATIONS,
@@ -730,6 +731,10 @@ bool create_display()
     al_restore_state(&state);
     if(display == NULL)
         return false;
+
+    /* the display was created. Log OpenGL version & variant */
+    const char* opengl_variant = (al_get_opengl_variant() == ALLEGRO_OPENGL_ES) ? "OpenGL ES" : "OpenGL";
+    LOG("We're using %s version 0x%08x", opengl_variant, al_get_opengl_version());
 
     /* configure the display */
     al_set_window_title(display, window_title);
