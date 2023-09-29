@@ -132,6 +132,7 @@ static void discard_shader(shader_t* shader);
 static void recreate_shader(shader_t* shader);
 static const char DEFAULT_SHADER_NAME[] = "default";
 static shader_t* default_shader = NULL;
+static const shader_t* active_shader = NULL;
 static dictionary_t* registry = NULL;
 
 
@@ -143,12 +144,18 @@ static dictionary_t* registry = NULL;
 void shader_init()
 {
     LOG("Initializing...");
+    default_shader = NULL;
+    active_shader = NULL;
 
     /* initialize the registry of shaders */
     registry = dictionary_create(false, destroy_shader_callback, NULL);
 
     /* create the default shader */
     default_shader = shader_create_ex(DEFAULT_SHADER_NAME, default_fs_glsl, default_vs_glsl);
+
+    /* use the default shader */
+    shader_set_active(default_shader);
+    assertx(active_shader == default_shader);
 }
 
 /*
@@ -167,6 +174,9 @@ void shader_release()
 
     /* reset the default_shader pointer (already released) */
     default_shader = NULL;
+
+    /* reset the active_shader pointer */
+    active_shader = NULL;
 }
 
 /*
@@ -219,7 +229,7 @@ void shader_recreate_all()
  */
 bool shader_exists(const char* name)
 {
-    return (registry != NULL) && dictionary_get(registry, name) != NULL;
+    return (registry != NULL) && (dictionary_get(registry, name) != NULL);
 }
 
 /*
@@ -309,8 +319,32 @@ bool shader_set_active(const shader_t* shader)
         iterator_destroy(it);
     }
 
+    /* update active shader */
+    if(success)
+        active_shader = shader;
+
     /* done! */
     return success;
+}
+
+/*
+ * shader_get_active()
+ * Get the shader currently used for subsequent drawing operations
+ */
+const shader_t* shader_get_active()
+{
+    assertx(active_shader != NULL);
+    return active_shader;
+}
+
+/*
+ * shader_get_default()
+ * Get the default shader
+ */
+const shader_t* shader_get_default()
+{
+    assertx(default_shader != NULL);
+    return default_shader;
 }
 
 /*

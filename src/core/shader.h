@@ -34,6 +34,8 @@ shader_t* shader_get(const char* name);
 bool shader_exists(const char* name);
 
 bool shader_set_active(const shader_t* shader);
+const shader_t* shader_get_active();
+const shader_t* shader_get_default();
 
 void shader_set_float(shader_t* shader, const char* var_name, float value);
 void shader_set_int(shader_t* shader, const char* var_name, int value);
