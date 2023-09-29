@@ -28,10 +28,15 @@ void shader_release();
 void shader_discard_all();
 void shader_recreate_all();
 
-bool shader_exists(const char* name);
-shader_t* shader_get(const char* name);
 shader_t* shader_create(const char* name, const char* fs_glsl);
 shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs_glsl);
+shader_t* shader_get(const char* name);
+bool shader_exists(const char* name);
+
 bool shader_use(const shader_t* shader);
+
+void shader_set_float(shader_t* shader, const char* var_name, float value);
+void shader_set_int(shader_t* shader, const char* var_name, int value);
+void shader_set_bool(shader_t* shader, const char* var_name, bool value);
 
 #endif

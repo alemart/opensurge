@@ -24,6 +24,7 @@
 #include "../util/iterator.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../util/numeric.h"
 #include "../core/logfile.h"
 
 /* shader struct */
@@ -32,7 +33,36 @@ struct shader_t
     ALLEGRO_SHADER* shader; /* the first field */
     char* fs;
     char* vs;
+    dictionary_t* uniforms;
 };
+
+/* uniform variables */
+typedef struct shader_uniform_t shader_uniform_t;
+typedef enum shader_uniformtype_t shader_uniformtype_t;
+#define UNIFORM_NAME_MAXLEN 63
+
+enum shader_uniformtype_t
+{
+    TYPE_FLOAT,
+    TYPE_INT,
+    TYPE_BOOL
+};
+
+struct shader_uniform_t
+{
+    shader_uniformtype_t type;
+    char name[1 + UNIFORM_NAME_MAXLEN];
+    union {
+        float f;
+        int i;
+        bool b;
+    } value;
+};
+
+static shader_uniform_t* create_uniform(shader_uniformtype_t type, const char* var_name);
+static void destroy_uniform(shader_uniform_t* uniform);
+static void set_uniform(const shader_uniform_t* uniform);
+static void uniform_dtor(void *uniform, void* ctx) { destroy_uniform((shader_uniform_t*)uniform); (void)ctx; }
 
 /* default vertex shader */
 static const char default_vs_glsl[] = ""
@@ -236,6 +266,9 @@ shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs
     shader->vs = str_dup(vs_glsl);
     shader->fs = str_dup(fs_glsl);
 
+    /* create the dictionary of uniforms */
+    shader->uniforms = dictionary_create(true, uniform_dtor, NULL);
+
     /* register the shader */
     assertx(registry != NULL);
     dictionary_put(registry, name, shader);
@@ -251,17 +284,96 @@ shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs
  */
 bool shader_use(const shader_t* shader)
 {
+    bool success;
+
     /* According to the Allegro manual, al_use_shader() "uses the shader for
        subsequent drawing operations on the current target bitmap".
 
        https://liballeg.org/a5docs/trunk/shader.html */
 
+    /* use the shader */
     if(shader != NULL)
-        return al_use_shader(shader->shader);
+        success = al_use_shader(shader->shader);
     else if(default_shader != NULL)
-        return al_use_shader(default_shader->shader);
+        success = al_use_shader(default_shader->shader);
     else
-        return false;
+        success = false;
+
+    /* set uniform variables */
+    if(success && shader != NULL) {
+        iterator_t* it = dictionary_values(shader->uniforms);
+        while(iterator_has_next(it)) {
+            const shader_uniform_t* uniform = iterator_next(it);
+            set_uniform(uniform);
+        }
+        iterator_destroy(it);
+    }
+
+    /* done! */
+    return success;
+}
+
+/*
+ * shader_set_float()
+ * Set the value of a floating-point uniform variable
+ */
+void shader_set_float(shader_t* shader, const char* var_name, float value)
+{
+    shader_uniform_t* stored_uniform = dictionary_get(shader->uniforms, var_name);
+
+    if(stored_uniform == NULL) {
+        /* add new uniform */
+        stored_uniform = create_uniform(TYPE_FLOAT, var_name);
+        stored_uniform->value.f = value;
+        dictionary_put(shader->uniforms, var_name, stored_uniform);
+    }
+    else {
+        /* update uniform */
+        assertx(stored_uniform->type == TYPE_FLOAT, "Can't change uniform type");
+        stored_uniform->value.f = value;
+    }
+}
+
+/*
+ * shader_set_int()
+ * Set the value of an integer uniform variable
+ */
+void shader_set_int(shader_t* shader, const char* var_name, int value)
+{
+    shader_uniform_t* stored_uniform = dictionary_get(shader->uniforms, var_name);
+
+    if(stored_uniform == NULL) {
+        /* add new uniform */
+        stored_uniform = create_uniform(TYPE_INT, var_name);
+        stored_uniform->value.i = value;
+        dictionary_put(shader->uniforms, var_name, stored_uniform);
+    }
+    else {
+        /* update uniform */
+        assertx(stored_uniform->type == TYPE_INT, "Can't change uniform type");
+        stored_uniform->value.i = value;
+    }
+}
+
+/*
+ * shader_set_bool()
+ * Set the value of a boolean uniform variable
+ */
+void shader_set_bool(shader_t* shader, const char* var_name, bool value)
+{
+    shader_uniform_t* stored_uniform = dictionary_get(shader->uniforms, var_name);
+
+    if(stored_uniform == NULL) {
+        /* add new uniform */
+        stored_uniform = create_uniform(TYPE_BOOL, var_name);
+        stored_uniform->value.b = value;
+        dictionary_put(shader->uniforms, var_name, stored_uniform);
+    }
+    else {
+        /* update uniform */
+        assertx(stored_uniform->type == TYPE_BOOL, "Can't change uniform type");
+        stored_uniform->value.b = value;
+    }
 }
 
 
@@ -317,6 +429,9 @@ void destroy_shader_callback(void* shader, void* context)
 /* destroy a shader instance */
 void destroy_shader(shader_t* shader)
 {
+    /* release the dictionary of uniforms */
+    dictionary_destroy(shader->uniforms);
+
     /* release the source code */
     free(shader->fs);
     free(shader->vs);
@@ -346,5 +461,50 @@ void recreate_shader(shader_t* shader)
     if(shader->shader == NULL) {
         LOG("Can't recreate shader!");
         FATAL("%s", error);
+    }
+}
+
+/* create a uniform sturct */
+shader_uniform_t* create_uniform(shader_uniformtype_t type, const char* var_name)
+{
+    /* validate */
+    if(*var_name == '\0')
+        FATAL("Empty name");
+    else if(strlen(var_name) > UNIFORM_NAME_MAXLEN)
+        FATAL("Name is too long: %s", var_name);
+
+    /* create uniform */
+    shader_uniform_t* uniform = mallocx(sizeof *uniform);
+    memset(uniform, 0, sizeof *uniform);
+
+    /* initialize */
+    uniform->type = type;
+    str_cpy(uniform->name, var_name, sizeof uniform->name);
+
+    /* done! */
+    return uniform;
+}
+
+/* destroy a uniform sturct */
+void destroy_uniform(shader_uniform_t* uniform)
+{
+    free(uniform);
+}
+
+/* set value of uniform variable (current shader) */
+void set_uniform(const shader_uniform_t* uniform)
+{
+    switch(uniform->type) {
+        case TYPE_FLOAT:
+            al_set_shader_float(uniform->name, uniform->value.f);
+            break;
+
+        case TYPE_INT:
+            al_set_shader_int(uniform->name, uniform->value.i);
+            break;
+
+        case TYPE_BOOL:
+            al_set_shader_bool(uniform->name, uniform->value.b);
+            break;
     }
 }
