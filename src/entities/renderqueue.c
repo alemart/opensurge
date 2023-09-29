@@ -576,7 +576,7 @@ void renderqueue_end()
     if(internal_shader != NULL)
         shader_set_active(internal_shader);
     else
-        shader_set_active(NULL); /* use the default shader; this line is here for clarity */
+        shader_set_active(shader_get_default()); /* use the default shader */
 
 #if USE_DEFERRED_DRAWING
 
@@ -716,7 +716,7 @@ void renderqueue_end()
 
     /* go back to the default shader */
     if(internal_shader != NULL)
-        shader_set_active(NULL);
+        shader_set_active(shader_get_default());
 
     /* clean up */
     buffer_size = 0;

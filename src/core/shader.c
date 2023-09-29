@@ -289,28 +289,21 @@ shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs
 
 /*
  * shader_set_active()
- * Use the shader for the next drawing operations on the current target image
- * Pass NULL to use the default shader. Returns true on success
+ * Use the shader for the subsequent drawing operations on the current target image
+ * Returns true on success
  */
 bool shader_set_active(const shader_t* shader)
 {
-    bool success;
-
     /* According to the Allegro manual, al_use_shader() "uses the shader for
        subsequent drawing operations on the current target bitmap".
 
        https://liballeg.org/a5docs/trunk/shader.html */
 
     /* use the shader */
-    if(shader != NULL)
-        success = al_use_shader(shader->shader);
-    else if(default_shader != NULL)
-        success = al_use_shader(default_shader->shader);
-    else
-        success = false;
+    bool success = al_use_shader(shader->shader);
 
     /* set uniform variables */
-    if(success && shader != NULL) {
+    if(success) {
         iterator_t* it = dictionary_values(shader->uniforms);
         while(iterator_has_next(it)) {
             const shader_uniform_t* uniform = iterator_next(it);

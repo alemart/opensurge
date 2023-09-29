@@ -1028,9 +1028,11 @@ void compute_screen_size(videomode_t mode, int* screen_width, int* screen_height
 /* use the default shader */
 bool use_default_shader()
 {
+    const shader_t* default_shader = shader_get_default();
+
 #if USE_ROUNDROBIN_BACKBUFFER
     if(backbuffer[0] == NULL || backbuffer[1] == NULL)
-        return shader_set_active(NULL);
+        return shader_set_active(default_shader);
 
     /* According to the Allegro manual, al_use_shader() "uses the shader for
        subsequent drawing operations on the current target bitmap".
@@ -1038,14 +1040,14 @@ bool use_default_shader()
        https://liballeg.org/a5docs/trunk/shader.html */
 
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
-    bool a = shader_set_active(NULL);
+    bool a = shader_set_active(default_shader);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[1 - backbuffer_index]));
-    bool b = shader_set_active(NULL);
+    bool b = shader_set_active(default_shader);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
 
     return a && b;
 #else
-    return shader_set_active(NULL);
+    return shader_set_active(default_shader);
 #endif
 }
 
