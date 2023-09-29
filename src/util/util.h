@@ -51,7 +51,7 @@
 #define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* legacy macro; a[4],b[4] = (x,y,x+w,y+h) */
 #define mallocx(bytes)          __mallocx((bytes), __FILE__, __LINE__)
 #define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__, __LINE__)
-#define assertx(expr)           do { if(!(expr)) fatal_error("In %s:%d: %s", __FILE__, __LINE__, ": assertion `" STRINGIFY(expr) "` failed."); } while(0)
+#define assertx(expr, ...)      do { if(!(expr)) fatal_error("In %s:%d: assertion `%s` failed. %s", __FILE__, __LINE__, STRINGIFY(expr), #__VA_ARGS__); } while(0)
 
 /* Memory management */
 void* __mallocx(size_t bytes, const char* location, int line);
