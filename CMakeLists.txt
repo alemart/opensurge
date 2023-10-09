@@ -405,6 +405,7 @@ SET(GAME_SRCS
   src/entities/mobilegamepad.c
   src/entities/player.c
   src/entities/renderqueue.c
+  src/entities/waterfx.c
 
   src/third_party/fast_draw.c
   src/third_party/ignorecase.c
@@ -518,6 +519,7 @@ SET(GAME_HEADERS
   src/entities/player.h
   src/entities/renderqueue.h
   src/entities/sfx.h
+  src/entities/waterfx.h
 
   src/third_party/fast_draw.h
   src/third_party/ignorecase.h

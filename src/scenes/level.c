@@ -61,6 +61,7 @@
 #include "../entities/brickmanager.h"
 #include "../entities/player.h"
 #include "../entities/camera.h"
+#include "../entities/waterfx.h"
 #include "../entities/background.h"
 #include "../entities/renderqueue.h"
 #include "../entities/sfx.h"
@@ -116,11 +117,13 @@ static bool is_setup_object(const char* object_name);
 #define MAX_POWERUPS            10
 #define DLGBOX_MAXTIME          10000
 #define TEAM_MAX                16
-#define DEFAULT_WATERLEVEL      LARGE_INT
-#define DEFAULT_WATERCOLOR()    color_rgba(0,64,255,128)
 #define DEFAULT_GRAVITY         787.5f
 #define PATH_MAXLEN             1024
 #define LINE_MAXLEN             1024
+
+/* water */
+#define DEFAULT_WATERLEVEL()    waterfx_default_ypos()
+#define DEFAULT_WATERCOLOR()    waterfx_default_color()
 
 /* level attributes */
 static char file[PATH_MAXLEN];
@@ -136,8 +139,6 @@ static int act;
 static int requires[3]; /* this level requires engine version x.y.z */
 static int readonly; /* we can't activate the level editor */
 static v2d_t spawn_point;
-static int waterlevel; /* y coordinate */
-static color_t watercolor;
 
 /* player data */
 static player_t *team[TEAM_MAX]; /* players */
@@ -487,8 +488,6 @@ void level_load(const char *filepath)
     requires[1] = GAME_VERSION_SUB;
     requires[2] = GAME_VERSION_WIP;
     readonly = FALSE;
-    waterlevel = DEFAULT_WATERLEVEL;
-    watercolor = DEFAULT_WATERCOLOR();
 
     /* clear pointers */
     backgroundtheme = NULL;
@@ -498,6 +497,9 @@ void level_load(const char *filepath)
     team_size = 0;
     for(int i = 0; i < TEAM_MAX; i++)
         team[i] = NULL;
+
+    /* initialize the water effect */
+    waterfx_init();
 
     /* scripting: preparing a new Level... */
     surgescript_object_t* level_manager = scripting_util_surgeengine_component(surgescript_vm(), "LevelManager");
@@ -563,6 +565,7 @@ void level_unload()
 
     /* misc */
     camera_unlock();
+    waterfx_release();
 
     /* music */
     logfile_message("Stopping the music...");
@@ -677,11 +680,11 @@ int level_save(const char *filepath)
         al_fprintf(fp, "readonly\n");
 
     /* water */
-    if(waterlevel != DEFAULT_WATERLEVEL)
-        al_fprintf(fp, "waterlevel %d\n", waterlevel);
-    if(!color_equals(watercolor, DEFAULT_WATERCOLOR())) {
+    if(level_waterlevel() != DEFAULT_WATERLEVEL())
+        al_fprintf(fp, "waterlevel %d\n", level_waterlevel());
+    if(!color_equals(level_watercolor(), DEFAULT_WATERCOLOR())) {
         uint8_t r, g, b, a;
-        color_unmap(watercolor, &r, &g, &b, &a);
+        color_unmap(level_watercolor(), &r, &g, &b, &a);
         al_fprintf(fp, "watercolor %d %d %d %d\n", r, g, b, a);
     }
 
@@ -879,8 +882,10 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_WATERLEVEL: {
-        if(param_count == 1)
-            waterlevel = atoi(param[0]);
+        if(param_count == 1) {
+            int waterlevel = atoi(param[0]);
+            level_set_waterlevel(waterlevel);
+        }
         else
             logfile_message("Level loader - command '%s' expects one parameter: y coordinate", command_name);
 
@@ -889,20 +894,20 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
 
     case LEVCOMMAND_WATERCOLOR: {
         if(param_count == 3) {
-            watercolor = color_rgba(
+            level_set_watercolor(color_rgba(
                 clip(atoi(param[0]), 0, 255),
                 clip(atoi(param[1]), 0, 255),
                 clip(atoi(param[2]), 0, 255),
                 128
-            );
+            ));
         }
         else if(param_count == 4) {
-            watercolor = color_rgba(
+            level_set_watercolor(color_rgba(
                 clip(atoi(param[0]), 0, 255),
                 clip(atoi(param[1]), 0, 255),
                 clip(atoi(param[2]), 0, 255),
                 clip(atoi(param[3]), 0, 255)
-            );
+            ));
         }
         else
             logfile_message("Level loader - command '%s' expects parameters: red, green, blue [, alpha]", command_name);
@@ -2140,7 +2145,7 @@ void level_restart()
  */
 int level_waterlevel()
 {
-    return waterlevel;
+    return waterfx_ypos();
 }
 
 /*
@@ -2149,7 +2154,7 @@ int level_waterlevel()
  */
 void level_set_waterlevel(int ycoord)
 {
-    waterlevel = ycoord;
+    waterfx_set_ypos(ycoord);
 }
 
 /*
@@ -2158,7 +2163,7 @@ void level_set_waterlevel(int ycoord)
  */
 color_t level_watercolor()
 {
-    return watercolor;
+    return waterfx_color();
 }
 
 /*
@@ -2167,7 +2172,7 @@ color_t level_watercolor()
  */
 void level_set_watercolor(color_t color)
 {
-    watercolor = color;
+    waterfx_set_color(color);
 }
 
 /*
@@ -2663,8 +2668,8 @@ bool is_setup_object(const char* object_name)
 void save_level_state(levelstate_t* state)
 {
     state->spawn_point = spawn_point;
-    state->waterlevel = waterlevel;
-    state->watercolor = watercolor;
+    state->waterlevel = level_waterlevel();
+    state->watercolor = level_watercolor();
     str_cpy(
         state->bgtheme,
         (backgroundtheme != NULL) ? background_filepath(backgroundtheme) : bgtheme,
@@ -2678,8 +2683,8 @@ void restore_level_state(const levelstate_t* state)
 {
     if(state->is_valid) {
         spawn_point = state->spawn_point;
-        waterlevel = state->waterlevel;
-        watercolor = state->watercolor;
+        level_set_waterlevel(state->waterlevel);
+        level_set_watercolor(state->watercolor);
         level_change_background(state->bgtheme);
     }
 }
@@ -3396,7 +3401,7 @@ void editor_update()
     /* change waterlevel */
     if(editorcmd_is_triggered(editor_cmd, "change-waterlevel")) {
         v2d_t nsp = editor_grid_snap(editor_cursor);
-        editor_action_t eda = editor_action_waterlevel_new(TRUE, nsp.y, waterlevel);
+        editor_action_t eda = editor_action_waterlevel_new(TRUE, nsp.y, level_waterlevel());
         eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
@@ -3634,7 +3639,7 @@ void editor_render()
     editor_grid_render();
 
     /* draw editor water line */
-    editor_waterline_render((int)(waterlevel - topleft.y), color_rgb(255, 255, 255));
+    editor_waterline_render((int)(level_waterlevel() - topleft.y), color_rgb(255, 255, 255));
 
     /* top bar */
     image_rectfill(0, 0, VIDEO_SCREEN_W, 32, EDITOR_UI_COLOR_TRANS(160));
