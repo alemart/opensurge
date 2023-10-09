@@ -905,9 +905,9 @@ void remap_joystick_buttons(int joy_id)
     if(a5_key[ALLEGRO_KEY_SELECT])
         joy[joy_id].button |= 1 << XINPUT_BACK;
 #if 1
-    if(a5_key[ALLEGRO_KEY_BUTTON_L2]) /* which joy_id generated this? */
+    if(a5_key[ALLEGRO_KEY_THUMBL]) /* which joy_id generated this? */
         joy[joy_id].button |= 1 << XINPUT_LT;
-    if(a5_key[ALLEGRO_KEY_BUTTON_R2])
+    if(a5_key[ALLEGRO_KEY_THUMBR])
         joy[joy_id].button |= 1 << XINPUT_RT;
 #endif
 

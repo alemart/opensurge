@@ -701,7 +701,8 @@ bool create_display()
     al_store_state(&state, ALLEGRO_STATE_NEW_DISPLAY_PARAMETERS);
     al_set_new_display_flags(
         ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE |
-        ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE
+        ALLEGRO_OPENGL | ALLEGRO_OPENGL_3_0 |
+        ALLEGRO_PROGRAMMABLE_PIPELINE
     );
 
     al_set_new_display_option(
