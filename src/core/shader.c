@@ -26,6 +26,7 @@
 #include "../util/stringutil.h"
 #include "../util/numeric.h"
 #include "../core/logfile.h"
+#include "../core/image.h"
 
 /* shader struct */
 struct shader_t
@@ -34,6 +35,7 @@ struct shader_t
     char* fs;
     char* vs;
     dictionary_t* uniforms;
+    int next_texture_unit;
 };
 
 /* uniform variables */
@@ -45,7 +47,24 @@ enum shader_uniformtype_t
 {
     TYPE_FLOAT,
     TYPE_INT,
-    TYPE_BOOL
+    TYPE_BOOL,
+
+    TYPE_SAMPLER_0, /* TYPE_SAMPLER_k := TYPE_SAMPLER_0 + k */
+    TYPE_SAMPLER_1,
+    TYPE_SAMPLER_2,
+    TYPE_SAMPLER_3,
+    TYPE_SAMPLER_4,
+    TYPE_SAMPLER_5,
+    TYPE_SAMPLER_6,
+    TYPE_SAMPLER_7,
+    TYPE_SAMPLER_8,
+    TYPE_SAMPLER_9,
+    TYPE_SAMPLER_10,
+    TYPE_SAMPLER_11,
+    TYPE_SAMPLER_12,
+    TYPE_SAMPLER_13,
+    TYPE_SAMPLER_14,
+    TYPE_SAMPLER_15
 };
 
 struct shader_uniform_t
@@ -56,12 +75,13 @@ struct shader_uniform_t
         float f;
         int i;
         bool b;
+        const image_t* tex;
     } value;
 };
 
 static shader_uniform_t* create_uniform(shader_uniformtype_t type, const char* var_name);
 static void destroy_uniform(shader_uniform_t* uniform);
-static void set_uniform(const shader_uniform_t* uniform);
+static bool set_uniform(const shader_uniform_t* uniform);
 static void uniform_dtor(void *uniform, void* ctx) { destroy_uniform((shader_uniform_t*)uniform); (void)ctx; }
 
 /* default vertex shader */
@@ -271,6 +291,9 @@ shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs
     shader_t* shader = mallocx(sizeof *shader);
     char error[256] = "";
 
+    /* log */
+    LOG("Creating shader \"%s\"...", name);
+
     /* create GLSL shader */
     shader->shader = create_glsl_shader(fs_glsl, vs_glsl, error, sizeof error);
     if(shader->shader == NULL) {
@@ -284,6 +307,9 @@ shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs
 
     /* create the dictionary of uniforms */
     shader->uniforms = dictionary_create(true, uniform_dtor, NULL);
+
+    /* set the next texture unit */
+    shader->next_texture_unit = 1; /* unit 0 is used by Allegro */
 
     /* register the shader */
     assertx(registry != NULL);
@@ -409,6 +435,31 @@ void shader_set_bool(shader_t* shader, const char* var_name, bool value)
     }
 }
 
+/*
+ * shader_set_sampler()
+ * Set a texture sampler
+ */
+void shader_set_sampler(shader_t* shader, const char* var_name, const image_t* image)
+{
+    shader_uniform_t* stored_uniform = dictionary_get(shader->uniforms, var_name);
+
+    /* set the texture unit */
+    int unit = (stored_uniform == NULL) ? shader->next_texture_unit++ : (int)stored_uniform->type - TYPE_SAMPLER_0;
+    assertx(unit >= 0 && unit <= 15);
+
+    if(stored_uniform == NULL) {
+        /* add new uniform */
+        stored_uniform = create_uniform(TYPE_SAMPLER_0 + unit, var_name);
+        stored_uniform->value.tex = image;
+        dictionary_put(shader->uniforms, var_name, stored_uniform);
+    }
+    else {
+        /* update uniform */
+        assertx(stored_uniform->type >= TYPE_SAMPLER_0 && stored_uniform->type <= TYPE_SAMPLER_15, "Can't change uniform type");
+        stored_uniform->value.tex = image;
+    }
+}
+
 
 
 
@@ -525,19 +576,36 @@ void destroy_uniform(shader_uniform_t* uniform)
 }
 
 /* set value of uniform variable (current shader) */
-void set_uniform(const shader_uniform_t* uniform)
+bool set_uniform(const shader_uniform_t* uniform)
 {
     switch(uniform->type) {
         case TYPE_FLOAT:
-            al_set_shader_float(uniform->name, uniform->value.f);
-            break;
+            return al_set_shader_float(uniform->name, uniform->value.f);
 
         case TYPE_INT:
-            al_set_shader_int(uniform->name, uniform->value.i);
-            break;
+            return al_set_shader_int(uniform->name, uniform->value.i);
 
         case TYPE_BOOL:
-            al_set_shader_bool(uniform->name, uniform->value.b);
-            break;
+            return al_set_shader_bool(uniform->name, uniform->value.b);
+
+        case TYPE_SAMPLER_0:
+        case TYPE_SAMPLER_1:
+        case TYPE_SAMPLER_2:
+        case TYPE_SAMPLER_3:
+        case TYPE_SAMPLER_4:
+        case TYPE_SAMPLER_5:
+        case TYPE_SAMPLER_6:
+        case TYPE_SAMPLER_7:
+        case TYPE_SAMPLER_8:
+        case TYPE_SAMPLER_9:
+        case TYPE_SAMPLER_10:
+        case TYPE_SAMPLER_11:
+        case TYPE_SAMPLER_12:
+        case TYPE_SAMPLER_13:
+        case TYPE_SAMPLER_14:
+        case TYPE_SAMPLER_15:
+            return al_set_shader_sampler(uniform->name, IMAGE2BITMAP(uniform->value.tex), (int)uniform->type - TYPE_SAMPLER_0);
     }
+
+    return false;
 }

@@ -22,6 +22,7 @@
 #define _SHADER_H
 
 typedef struct shader_t shader_t;
+struct image_t;
 
 void shader_init();
 void shader_release();
@@ -40,6 +41,7 @@ const shader_t* shader_get_default();
 void shader_set_float(shader_t* shader, const char* var_name, float value);
 void shader_set_int(shader_t* shader, const char* var_name, int value);
 void shader_set_bool(shader_t* shader, const char* var_name, bool value);
+void shader_set_sampler(shader_t* shader, const char* var_name, const struct image_t* image);
 
 #if !defined(__ANDROID__)
 #define SHADER_GLSL_PREFIX "#version 330 core\n"
