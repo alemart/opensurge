@@ -342,6 +342,8 @@ static const renderable_vtable_t VTABLE[] = {
 
 /* alpha testing shader */
 static const char fs_glsl_with_alpha_testing[] = ""
+    SHADER_GLSL_PREFIX
+
     "#ifdef GL_ES\n"
     "precision lowp float;\n"
     "#endif\n"
@@ -351,26 +353,28 @@ static const char fs_glsl_with_alpha_testing[] = ""
 
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"
-    "varying vec4 v_color;\n" /* tint */
-    "varying vec2 v_texcoord;\n"
+
+    "in vec4 v_color;\n" /* tint */
+    "in vec2 v_texcoord;\n"
+    "out vec4 color;\n" /* fragment color */
 
     "const vec3 MASK_COLOR = vec3(1.0, 0.0, 1.0);\n" /* magenta */
 
     "void main()\n"
     "{\n"
-    "   vec4 p = use_tex ? texture2D(tex, v_texcoord) : vec4(1.0);\n"
+    "   vec4 p = use_tex ? texture(tex, v_texcoord) : vec4(1.0);\n"
     "   p *= float(p.rgb != MASK_COLOR);\n" /* we set alpha = 0 too */
 
         /* alpha test: discard the fragment (and don't write to the depth buffer) if alpha is zero */
     "   if(p.a == 0.0)\n"
     "       discard;\n"
 
-    "   gl_FragColor = v_color * p;\n"
+    "   color = v_color * p;\n"
 
 #if 0
         /* inspect the depth map */
     "   float depth = gl_FragCoord.z * 0.5 + 0.5;" /* map [-1,1] to [0,1] */
-    "   gl_FragColor = vec4(vec3(1.0 - depth), 1.0);\n"
+    "   color = vec4(vec3(1.0 - depth), 1.0);\n"
 #endif
 
     "}\n"

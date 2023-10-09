@@ -41,4 +41,10 @@ void shader_set_float(shader_t* shader, const char* var_name, float value);
 void shader_set_int(shader_t* shader, const char* var_name, int value);
 void shader_set_bool(shader_t* shader, const char* var_name, bool value);
 
+#if !defined(__ANDROID__)
+#define SHADER_GLSL_PREFIX "#version 330 core\n"
+#else
+#define SHADER_GLSL_PREFIX "#version 300 es\n"
+#endif
+
 #endif

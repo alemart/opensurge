@@ -66,6 +66,8 @@ static void uniform_dtor(void *uniform, void* ctx) { destroy_uniform((shader_uni
 
 /* default vertex shader */
 static const char default_vs_glsl[] = ""
+    SHADER_GLSL_PREFIX
+
     "#define a_position " ALLEGRO_SHADER_VAR_POS "\n"
     "#define a_color " ALLEGRO_SHADER_VAR_COLOR "\n"
     "#define a_texcoord " ALLEGRO_SHADER_VAR_TEXCOORD "\n"
@@ -73,12 +75,12 @@ static const char default_vs_glsl[] = ""
     "#define use_texmatrix " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX "\n"
     "#define texmatrix " ALLEGRO_SHADER_VAR_TEX_MATRIX "\n"
 
-    "attribute vec4 a_position;\n"
-    "attribute vec4 a_color;\n"
-    "attribute vec2 a_texcoord;\n"
+    "in vec4 a_position;\n"
+    "in vec4 a_color;\n"
+    "in vec2 a_texcoord;\n"
 
-    "varying vec4 v_color;\n"
-    "varying vec2 v_texcoord;\n"
+    "out vec4 v_color;\n"
+    "out vec2 v_texcoord;\n"
 
     "uniform mat4 projview;\n"
     "uniform mat4 texmatrix;\n"
@@ -98,6 +100,8 @@ static const char default_vs_glsl[] = ""
 
 /* default fragment shader */
 static const char default_fs_glsl[] = ""
+    SHADER_GLSL_PREFIX
+
     "#ifdef GL_ES\n"
     "precision lowp float;\n"
     "#endif\n"
@@ -107,17 +111,19 @@ static const char default_fs_glsl[] = ""
 
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"
-    "varying vec4 v_color;\n" /* tint */
-    "varying vec2 v_texcoord;\n"
+
+    "in vec4 v_color;\n" /* tint */
+    "in vec2 v_texcoord;\n"
+    "out vec4 color;\n" /* fragment color */
 
     "const vec3 MASK_COLOR = vec3(1.0, 0.0, 1.0);\n" /* magenta */
 
     "void main()\n"
     "{\n"
-    "   vec4 p = use_tex ? texture2D(tex, v_texcoord) : vec4(1.0);\n"
+    "   vec4 p = use_tex ? texture(tex, v_texcoord) : vec4(1.0);\n"
     "   p *= float(p.rgb != MASK_COLOR);\n" /* set all components to zero; we use a premultiplied alpha workflow */
 
-    "   gl_FragColor = v_color * p;\n"
+    "   color = v_color * p;\n"
     "}\n"
 "";
 

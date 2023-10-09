@@ -701,9 +701,26 @@ bool create_display()
     al_store_state(&state, ALLEGRO_STATE_NEW_DISPLAY_PARAMETERS);
     al_set_new_display_flags(
         ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE |
-        ALLEGRO_OPENGL | ALLEGRO_OPENGL_3_0 |
-        ALLEGRO_PROGRAMMABLE_PIPELINE
+        ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE
     );
+
+#if defined(__ANDROID__)
+    /* require OpenGL ES 3.0+ on mobile */
+    al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_ES_PROFILE);
+    al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 3, ALLEGRO_REQUIRE);
+    al_set_new_display_option(ALLEGRO_OPENGL_MINOR_VERSION, 0, ALLEGRO_REQUIRE);
+#elif 0
+    /* request OpenGL 3.3+ on Desktop */
+    /* does not work properly, why? */
+    al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_3_0);
+    al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_CORE_PROFILE);
+    al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 3, ALLEGRO_SUGGEST);
+    al_set_new_display_option(ALLEGRO_OPENGL_MINOR_VERSION, 3, ALLEGRO_SUGGEST);
+#else
+    /* create an OpenGL context with "default" settings. Will likely work.
+       (we should require 3.3+ instead, or ES 3.0+) */
+    ;
+#endif
 
     al_set_new_display_option(
         ALLEGRO_SUPPORTED_ORIENTATIONS,
@@ -715,9 +732,9 @@ bool create_display()
     al_set_new_display_option(ALLEGRO_SUPPORT_NPOT_BITMAP, 1, ALLEGRO_SUGGEST);
     al_set_new_display_option(ALLEGRO_CAN_DRAW_INTO_BITMAP, 1, ALLEGRO_REQUIRE);
     /*al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_SUGGEST);*/
-    #if defined(ALLEGRO_VERSION_INT) && defined(AL_ID) && ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
+#if defined(ALLEGRO_VERSION_INT) && defined(AL_ID) && ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
     al_set_new_display_option(ALLEGRO_DEFAULT_SHADER_PLATFORM, ALLEGRO_SHADER_GLSL_MINIMAL, ALLEGRO_REQUIRE); /* faster shader with no alpha testing */
-    #endif
+#endif
 
 #if defined(ALLEGRO_UNIX) && !defined(ALLEGRO_RASPBERRYPI)
     set_display_icon(NULL);
