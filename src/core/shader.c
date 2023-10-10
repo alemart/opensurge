@@ -49,6 +49,10 @@ enum shader_uniformtype_t
     TYPE_INT,
     TYPE_BOOL,
 
+    TYPE_FLOAT2, /* TYPE_FLOAT_(k+1) = TYPE_FLOAT_k + 1 */
+    TYPE_FLOAT3,
+    TYPE_FLOAT4,
+
     TYPE_SAMPLER_0, /* TYPE_SAMPLER_k := TYPE_SAMPLER_0 + k */
     TYPE_SAMPLER_1,
     TYPE_SAMPLER_2,
@@ -75,6 +79,9 @@ struct shader_uniform_t
         float f;
         int i;
         bool b;
+
+        float fvec[4];
+
         const image_t* tex;
     } value;
 };
@@ -436,6 +443,28 @@ void shader_set_bool(shader_t* shader, const char* var_name, bool value)
 }
 
 /*
+ * shader_set_float_vector()
+ * Set the value of a floating-point vector of n components
+ */
+void shader_set_float_vector(shader_t* shader, const char* var_name, int n, float* value)
+{
+    assertx(n >= 2 && n <= 4);
+    shader_uniform_t* stored_uniform = dictionary_get(shader->uniforms, var_name);
+
+    if(stored_uniform == NULL) {
+        /* add new uniform */
+        stored_uniform = create_uniform(TYPE_FLOAT2 + (n-2), var_name);
+        memcpy(stored_uniform->value.fvec, value, n * sizeof(*value));
+        dictionary_put(shader->uniforms, var_name, stored_uniform);
+    }
+    else {
+        /* update uniform */
+        assertx(stored_uniform->type == TYPE_FLOAT2 + (n-2), "Can't change uniform type");
+        memcpy(stored_uniform->value.fvec, value, n * sizeof(*value));
+    }
+}
+
+/*
  * shader_set_sampler()
  * Set a texture sampler
  */
@@ -587,6 +616,15 @@ bool set_uniform(const shader_uniform_t* uniform)
 
         case TYPE_BOOL:
             return al_set_shader_bool(uniform->name, uniform->value.b);
+
+        case TYPE_FLOAT2:
+            return al_set_shader_float_vector(uniform->name, 2, uniform->value.fvec, 1);
+
+        case TYPE_FLOAT3:
+            return al_set_shader_float_vector(uniform->name, 3, uniform->value.fvec, 1);
+
+        case TYPE_FLOAT4:
+            return al_set_shader_float_vector(uniform->name, 4, uniform->value.fvec, 1);
 
         case TYPE_SAMPLER_0:
         case TYPE_SAMPLER_1:

@@ -41,6 +41,7 @@ const shader_t* shader_get_default();
 void shader_set_float(shader_t* shader, const char* var_name, float value);
 void shader_set_int(shader_t* shader, const char* var_name, int value);
 void shader_set_bool(shader_t* shader, const char* var_name, bool value);
+void shader_set_float_vector(shader_t* shader, const char* var_name, int n, float* value);
 void shader_set_sampler(shader_t* shader, const char* var_name, const struct image_t* image);
 
 #if !defined(__ANDROID__)
