@@ -38,34 +38,15 @@ static const char watershader_glsl[] = ""
     "uniform highp float scroll_y;\n"
     "uniform vec4 watercolor;\n"
 
-#if 0
-    "const int wave[48] = int[48](\n"
-    "   0,0,0,0,0,0,0,0,\n"
-    "   0,0,0,0,0,0,0,0,\n"
-    "   1,1,1,1,1,1,1,1,\n"
-    "   2,2,2,2,2,2,2,2,\n"
-    "   2,2,2,2,2,2,2,2,\n"
-    "   1,1,1,1,1,1,1,1 \n"
-    ");\n"
-#elif 0
-    "const int wave[60] = int[60](\n"
+    /* golden ratio */
+    "const int wave[64] = int[64](\n"
     "   0,0,0,0,0,0,0,0,0,0,\n"
     "   0,0,0,0,0,0,0,0,0,0,\n"
-    "   1,1,1,1,1,1,1,1,1,1,\n"
-    "   2,2,2,2,2,2,2,2,2,2,\n"
-    "   2,2,2,2,2,2,2,2,2,2,\n"
-    "   1,1,1,1,1,1,1,1,1,1 \n"
-    ");\n"
-#else
-    "const int wave[72] = int[72](\n"
-    "   0,0,0,0,0,0,0,0,0,0,0,0,\n"
-    "   0,0,0,0,0,0,0,0,0,0,0,0,\n"
     "   1,1,1,1,1,1,1,1,1,1,1,1,\n"
-    "   2,2,2,2,2,2,2,2,2,2,2,2,\n"
-    "   2,2,2,2,2,2,2,2,2,2,2,2,\n"
-    "   1,1,1,1,1,1,1,1,1,1,1,1 \n"
+    "   2,2,2,2,2,2,2,2,2,2,\n"
+    "   2,2,2,2,2,2,2,2,2,2,\n"
+    "   1,1,1,1,1,1,1,1,1,1,1,1\n"
     ");\n"
-#endif
 
     "void main()\n"
     "{\n"
@@ -77,9 +58,9 @@ static const char watershader_glsl[] = ""
 
     "   mediump float screen_height = float(textureSize(tex, 0).y);\n"
     "   mediump float screen_y = (1.0 - texcoord.y) * screen_height;\n"
-    "   highp int wanted_y = int(screen_y + scroll_y);\n" /* from screen space to world space */
-    "   int w = abs(wanted_y) % wave.length();\n"
-    "   int k = wave[w];\n"
+    "   highp float world_y = screen_y + scroll_y;\n" /* from screen space to world space */
+    "   highp int wanted_y = int(abs(world_y));\n"
+    "   int k = wave[wanted_y & 63];\n"
     "   vec4 wanted_pixel = pixel[k];\n"
 
     "   vec3 blended_pixel = mix(wanted_pixel.rgb, watercolor.rgb, watercolor.a);\n"
@@ -192,8 +173,9 @@ void waterfx_render_bg(v2d_t camera_position)
 
     /* render */
     if(video_get_quality() > VIDEOQUALITY_LOW) {
+        float camera_y = 0.0f; /* no camera */
         color_t transparent = color_rgba(0, 0, 0, 0);
-        render_default_effect(y, 0.0f, 18.0f, 2.0f * internal_timer, transparent);
+        render_default_effect(y, camera_y, 18.0f, 2.0f * internal_timer, transparent);
     }
 }
 
@@ -299,7 +281,7 @@ void render_default_effect(int y, float camera_y, float offset, float timer, col
     image_set_drawing_target(target);
 
     /* scrolling */
-    const float speed = 32.0f; /* px/s */
+    const float speed = 40.0f; /* px/s */
     float world_scroll_y = speed * timer + offset;
     float scroll_y = world_scroll_y + camera_y;
     shader_set_float(watershader, "scroll_y", scroll_y);
