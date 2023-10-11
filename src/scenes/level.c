@@ -1436,6 +1436,9 @@ void level_update()
     /* update background */
     background_update(backgroundtheme);
 
+    /* update water */
+    waterfx_update();
+
     /* legacy camera code (runs before scripts) */
     if(!level_is_in_debug_mode()) {
         if(level_cleared)

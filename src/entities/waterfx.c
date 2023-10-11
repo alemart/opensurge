@@ -23,6 +23,7 @@
 #include "../core/image.h"
 #include "../core/video.h"
 #include "../core/shader.h"
+#include "../core/timer.h"
 #include "../entities/player.h"
 #include "../scenes/level.h"
 #include "../util/util.h"
@@ -91,6 +92,7 @@ static const char watershader_glsl[] = ""
 #define DEFAULT_WATERCOLOR()    color_rgba(0, 64, 255, 128)
 static int waterlevel = DEFAULT_WATERLEVEL;
 static color_t watercolor;
+static float internal_timer;
 static shader_t* watershader;
 static image_t* backbuffer;
 static void render_simple_effect(int y, color_t color);
@@ -105,6 +107,7 @@ static float* color_to_vec4(color_t color, float* vec4);
  */
 void waterfx_init()
 {
+    internal_timer = 0.0f;
     waterlevel = DEFAULT_WATERLEVEL;
     watercolor = DEFAULT_WATERCOLOR();
     watershader = shader_create("waterfx", watershader_glsl);
@@ -118,6 +121,16 @@ void waterfx_init()
 void waterfx_release()
 {
     image_destroy(backbuffer);
+}
+
+/*
+ * waterfx_update()
+ * Update the water effect
+ */
+void waterfx_update()
+{
+    float dt = timer_get_delta();
+    internal_timer += dt;
 }
 
 /*
@@ -141,7 +154,7 @@ void waterfx_render_fg(v2d_t camera_position)
     /* if the active player is too fast,
        maybe a simple effect will look better? */
     const player_t* player = level_player();
-    if(player != NULL && !player_is_frozen(player)) {
+    if(player != NULL && !player_is_dying(player) && !player_is_frozen(player)) {
         static bool disabled_effect = false;
         float abs_ysp = fabsf(player_ysp(player));
 
@@ -154,7 +167,7 @@ void waterfx_render_fg(v2d_t camera_position)
 
     /* render */
     if(video_get_quality() > VIDEOQUALITY_LOW)
-        render_default_effect(y, topleft.y, 0.0f, level_time(), watercolor);
+        render_default_effect(y, topleft.y, 0.0f, internal_timer, watercolor);
     else
         render_simple_effect(y, watercolor);
 }
@@ -180,7 +193,7 @@ void waterfx_render_bg(v2d_t camera_position)
     /* render */
     if(video_get_quality() > VIDEOQUALITY_LOW) {
         color_t transparent = color_rgba(0, 0, 0, 0);
-        render_default_effect(y, 0.0f, 18.0f, 2.0f * level_time(), transparent);
+        render_default_effect(y, 0.0f, 18.0f, 2.0f * internal_timer, transparent);
     }
 }
 

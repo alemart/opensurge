@@ -26,6 +26,7 @@
 
 void waterfx_init();
 void waterfx_release();
+void waterfx_update();
 void waterfx_render_fg(v2d_t camera_position);
 void waterfx_render_bg(v2d_t camera_position);
 
