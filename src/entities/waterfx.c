@@ -77,7 +77,7 @@ static float internal_timer;
 static shader_t* watershader;
 static image_t* backbuffer;
 static void render_simple_effect(int y, color_t color);
-static void render_default_effect(int y, float camera_y, float offset, float timer, color_t color);
+static void render_default_effect(int y, float camera_y, float offset, float timer, float speed, color_t color);
 static float* color_to_vec4(color_t color, float* vec4);
 
 
@@ -148,7 +148,7 @@ void waterfx_render_fg(v2d_t camera_position)
 
     /* render */
     if(video_get_quality() > VIDEOQUALITY_LOW)
-        render_default_effect(y, topleft.y, 0.0f, internal_timer, watercolor);
+        render_default_effect(y, topleft.y, 0.0f, internal_timer, 32.0f, watercolor);
     else
         render_simple_effect(y, watercolor);
 }
@@ -175,7 +175,7 @@ void waterfx_render_bg(v2d_t camera_position)
     if(video_get_quality() > VIDEOQUALITY_LOW) {
         float camera_y = 0.0f; /* no camera */
         color_t transparent = color_rgba(0, 0, 0, 0);
-        render_default_effect(y, camera_y, 18.0f, 2.0f * internal_timer, transparent);
+        render_default_effect(y, camera_y, 16.0f, internal_timer, 64.0f, transparent);
     }
 }
 
@@ -269,7 +269,7 @@ void render_simple_effect(int y, color_t color)
 }
 
 /* render the default water effect */
-void render_default_effect(int y, float camera_y, float offset, float timer, color_t color)
+void render_default_effect(int y, float camera_y, float offset, float timer, float speed, color_t color)
 {
     /* copy the backbuffer */
     image_t* target = image_drawing_target();
@@ -281,7 +281,6 @@ void render_default_effect(int y, float camera_y, float offset, float timer, col
     image_set_drawing_target(target);
 
     /* scrolling */
-    const float speed = 40.0f; /* px/s */
     float world_scroll_y = speed * timer + offset;
     float scroll_y = world_scroll_y + camera_y;
     shader_set_float(watershader, "scroll_y", scroll_y);
