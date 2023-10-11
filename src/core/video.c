@@ -78,6 +78,18 @@ static void reconfigure_backbuffer();
 static void compute_screen_size(videomode_t mode, int* screen_width, int* screen_height);
 
 
+/* OpenGL-specific */
+ALLEGRO_DEFINE_PROC_TYPE(void, fun_glinvalidateframebuffer_t, (GLenum, GLsizei, const GLenum*));
+ALLEGRO_DEFINE_PROC_TYPE(void, fun_glclear_t, (GLbitfield));
+ALLEGRO_DEFINE_PROC_TYPE(void, fun_glclearcolor_t, (GLfloat, GLfloat, GLfloat, GLfloat));
+ALLEGRO_DEFINE_PROC_TYPE(void, fun_glcleardepth_t, (GLdouble));
+static fun_glinvalidateframebuffer_t _glInvalidateFramebuffer = NULL;
+static fun_glclear_t _glClear = NULL;
+static fun_glclearcolor_t _glClearColor = NULL;
+static fun_glcleardepth_t _glClearDepth = NULL;
+static void import_opengl_symbols();
+
+
 /* FPS counter */
 static int fps = 0;
 static int fps_counter = 0;
@@ -249,6 +261,9 @@ void video_init()
     if(!create_backbuffer())
         FATAL("Failed to create the backbuffer");
 
+    /* import OpenGL symbols */
+    import_opengl_symbols();
+
     /* initialize the shader system */
     shader_init();
     if(!use_default_shader())
@@ -298,8 +313,12 @@ void video_render(void (*render_overlay)())
 
     /* hint the graphics driver that we no longer need the depth buffer
        just before switching the target bitmap */
-    /*glInvalidateFramebuffer();*/
-    al_clear_depth_buffer(1);
+    if(_glInvalidateFramebuffer != NULL) {
+        static const GLenum attachments[1] = { GL_DEPTH_ATTACHMENT };
+        _glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, attachments);
+    }
+    else
+        al_clear_depth_buffer(1);
 
     /* copy our backbuffer to the display backbuffer */
     al_set_target_bitmap(al_get_backbuffer(display));
@@ -328,12 +347,20 @@ void video_render(void (*render_overlay)())
     /* flip display */
     al_flip_display();
 
-#if USE_ROUNDROBIN_BACKBUFFER
-    /* clearing just after flipping may provide a slight performance increase
-       in some drivers (?). Allegro should call glClear() behind the scenes */
-    al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
-    al_clear_depth_buffer(1);
+    /* OpenGL: clear values */
+    if(_glClearColor != NULL)
+        _glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    if(_glClearDepth != NULL)
+        _glClearDepth(1.0);
 
+    /* clearing just after flipping may provide a slight performance increase
+       in some drivers */
+    if(_glClear != NULL)
+        _glClear(GL_COLOR_BUFFER_BIT);
+    else
+        al_clear_to_color(al_map_rgba_f(0.0f, 0.0f, 0.0f, 0.0f));
+
+#if USE_ROUNDROBIN_BACKBUFFER
     /* use a round-robin scheme for a (possible) performance improvement,
        in an attempt to avoid pipeline stalling */
     backbuffer_index = 1 - backbuffer_index;
@@ -344,8 +371,22 @@ void video_render(void (*render_overlay)())
 
     /* it's a good idea to call glClear() just after glBindFramebuffer() in
        some tiled architectures (mobile) */
-    al_clear_to_color(al_map_rgba_f(0, 0, 0, 0));
-    al_clear_depth_buffer(1);
+    if(_glClear != NULL) {
+        /* clear color & depth buffers in a single call */
+        _glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+    else {
+        /* Allegro should call glClear() behind the scenes */
+        al_clear_to_color(al_map_rgba_f(0.0f, 0.0f, 0.0f, 0.0f));
+        al_clear_depth_buffer(1);
+    }
+
+    /*
+
+    See also:
+    https://community.arm.com/arm-community-blogs/b/graphics-gaming-and-vr-blog/posts/mali-performance-2-how-to-correctly-handle-framebuffers
+
+    */
 }
 
 /*
@@ -664,7 +705,7 @@ image_t* video_take_snapshot()
 
 /*
  * video_use_default_shader()
- * Use the default shader
+ * Use the default shader. THIS IS NOT MEANT TO BE USED IN A LOOP.
  * Returns true on success
  */
 bool video_use_default_shader()
@@ -1061,6 +1102,8 @@ bool use_default_shader()
 
        https://liballeg.org/a5docs/trunk/shader.html */
 
+    /* *** THIS IS SLOW ***
+       not meant to be used in a loop! */
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[backbuffer_index]));
     bool a = shader_set_active(default_shader);
     al_set_target_bitmap(IMAGE2BITMAP(backbuffer[1 - backbuffer_index]));
@@ -1229,6 +1272,35 @@ void render_texts()
     al_hold_bitmap_drawing(false);
 }
 
+/* import OpenGL symbols */
+void import_opengl_symbols()
+{
+#if 1
+    /* glClear & friends */
+    _glClear = (fun_glclear_t)al_get_opengl_proc_address("glClear");
+    _glClearColor = (fun_glclearcolor_t)al_get_opengl_proc_address("glClearColor");
+    _glClearDepth = (fun_glcleardepth_t)al_get_opengl_proc_address("glClearDepth");
+
+    /* glInvalidateFramebuffer: OpenGL 4.3+ and OpenGL ES 3.0+ */
+    _glInvalidateFramebuffer = (fun_glinvalidateframebuffer_t)al_get_opengl_proc_address("glInvalidateFramebuffer");
+#else
+    _glClear = NULL;
+    _glClearColor = NULL;
+    _glClearDepth = NULL;
+    _glInvalidateFramebuffer = NULL;
+#endif
+
+    /* log */
+    #define LOG_GL(symbol) LOG("Found gl" #symbol ": %s", (_gl ## symbol != NULL) ? "yes" : "no")
+
+    LOG("Importing OpenGL symbols");
+    LOG_GL(Clear);
+    LOG_GL(ClearColor);
+    LOG_GL(ClearDepth);
+    LOG_GL(InvalidateFramebuffer);
+
+    #undef LOG_GL
+}
 
 
 /*
