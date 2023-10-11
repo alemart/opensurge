@@ -343,21 +343,12 @@ static const renderable_vtable_t VTABLE[] = {
 
 /* alpha testing shader */
 static const char fs_glsl_with_alpha_testing[] = ""
-    SHADER_GLSL_PREFIX
+    FRAGMENT_SHADER_GLSL_PREFIX
 
-    "#ifdef GL_ES\n"
     "precision lowp float;\n"
-    "#endif\n"
-
-    "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n"
-    "#define tex " ALLEGRO_SHADER_VAR_TEX "\n"
 
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"
-
-    "in vec4 v_color;\n" /* tint */
-    "in vec2 v_texcoord;\n"
-    "out vec4 color;\n" /* fragment color */
 
     "const vec3 MASK_COLOR = vec3(1.0, 0.0, 1.0);\n" /* magenta */
 
@@ -1432,6 +1423,7 @@ void render_ssobject_debug(renderable_t r, v2d_t camera_position)
 void render_background(renderable_t r, v2d_t camera_position)
 {
     background_render_bg(r.theme, camera_position);
+    waterfx_render_bg(camera_position);
 }
 
 void render_foreground(renderable_t r, v2d_t camera_position)
@@ -1441,5 +1433,5 @@ void render_foreground(renderable_t r, v2d_t camera_position)
 
 void render_water(renderable_t r, v2d_t camera_position)
 {
-    waterfx_render(camera_position);
+    waterfx_render_fg(camera_position);
 }

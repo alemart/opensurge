@@ -18,17 +18,84 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
 #include "waterfx.h"
 #include "../core/image.h"
 #include "../core/video.h"
+#include "../core/shader.h"
+#include "../entities/player.h"
+#include "../scenes/level.h"
 #include "../util/util.h"
+
+/* shader */
+static const char watershader_glsl[] = ""
+    FRAGMENT_SHADER_GLSL_PREFIX
+
+    "precision mediump float;\n"
+
+    "uniform sampler2D tex;\n"
+    "uniform float scroll_y;\n"
+    "uniform vec4 watercolor;\n"
+
+#if 0
+    "const int wave[48] = int[48](\n"
+    "   0,0,0,0,0,0,0,0,\n"
+    "   0,0,0,0,0,0,0,0,\n"
+    "   1,1,1,1,1,1,1,1,\n"
+    "   2,2,2,2,2,2,2,2,\n"
+    "   2,2,2,2,2,2,2,2,\n"
+    "   1,1,1,1,1,1,1,1 \n"
+    ");\n"
+#elif 0
+    "const int wave[60] = int[60](\n"
+    "   0,0,0,0,0,0,0,0,0,0,\n"
+    "   0,0,0,0,0,0,0,0,0,0,\n"
+    "   1,1,1,1,1,1,1,1,1,1,\n"
+    "   2,2,2,2,2,2,2,2,2,2,\n"
+    "   2,2,2,2,2,2,2,2,2,2,\n"
+    "   1,1,1,1,1,1,1,1,1,1 \n"
+    ");\n"
+#else
+    "const int wave[72] = int[72](\n"
+    "   0,0,0,0,0,0,0,0,0,0,0,0,\n"
+    "   0,0,0,0,0,0,0,0,0,0,0,0,\n"
+    "   1,1,1,1,1,1,1,1,1,1,1,1,\n"
+    "   2,2,2,2,2,2,2,2,2,2,2,2,\n"
+    "   2,2,2,2,2,2,2,2,2,2,2,2,\n"
+    "   1,1,1,1,1,1,1,1,1,1,1,1 \n"
+    ");\n"
+#endif
+
+    "void main()\n"
+    "{\n"
+    "   vec4 pixel[3];\n"
+
+    "   pixel[0] = textureOffset(tex, texcoord, ivec2(-1,0));\n"
+    "   pixel[1] = textureOffset(tex, texcoord, ivec2(0,0));\n"
+    "   pixel[2] = textureOffset(tex, texcoord, ivec2(1,0));\n"
+
+    "   int screen_height = textureSize(tex, 0).y;\n"
+    "   float screen_y = (1.0 - texcoord.y) * float(screen_height);\n"
+    "   int wanted_y = int(screen_y + scroll_y);\n" /* from screen space to world space */
+    "   int w = abs(wanted_y) % wave.length();\n"
+    "   int k = wave[w];\n"
+    "   vec4 wanted_pixel = pixel[k];\n"
+
+    "   vec3 blended_pixel = mix(wanted_pixel.rgb, watercolor.rgb, watercolor.a);\n"
+    "   color = vec4(blended_pixel, 1.0);\n"
+    "}\n"
+;
 
 /* utils */
 #define DEFAULT_WATERLEVEL      LARGE_INT
 #define DEFAULT_WATERCOLOR()    color_rgba(0, 64, 255, 128)
 static int waterlevel = DEFAULT_WATERLEVEL;
 static color_t watercolor;
-static void render_simple(int y);
+static shader_t* watershader;
+static image_t* backbuffer;
+static void render_simple_effect(int y, color_t color);
+static void render_default_effect(int y, float camera_y, float offset, float timer, color_t color);
+static float* color_to_vec4(color_t color, float* vec4);
 
 
 
@@ -40,6 +107,8 @@ void waterfx_init()
 {
     waterlevel = DEFAULT_WATERLEVEL;
     watercolor = DEFAULT_WATERCOLOR();
+    watershader = shader_create("waterfx", watershader_glsl);
+    backbuffer = image_create_backbuffer(VIDEO_SCREEN_W, VIDEO_SCREEN_H, false);
 }
 
 /*
@@ -48,17 +117,58 @@ void waterfx_init()
  */
 void waterfx_release()
 {
-    ;
+    image_destroy(backbuffer);
 }
 
 /*
- * waterfx_render()
- * Render the water effect
+ * waterfx_render_fg()
+ * Render the water effect (foreground / main)
  */
-void waterfx_render(v2d_t camera_position)
+void waterfx_render_fg(v2d_t camera_position)
 {
     /* convert the waterlevel from world space to screen space */
-    int y = waterlevel - ((int)camera_position.y - VIDEO_SCREEN_H / 2);
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(camera_position, half_screen);
+    int y = waterlevel - topleft.y;
+
+    /* clip out */
+    if(y >= VIDEO_SCREEN_H)
+        return;
+
+    /* adjust y */
+    y = max(0, y);
+
+    /* if the active player is too fast,
+       maybe a simple effect will look better? */
+    const player_t* player = level_player();
+    if(player != NULL) {
+        static bool disabled_effect = false;
+        float abs_ysp = fabsf(player_ysp(player));
+
+        if(disabled_effect || abs_ysp >= 270.0f) {
+            disabled_effect = (abs_ysp > 180.0f);
+            render_simple_effect(y, watercolor);
+            return;
+        }
+    }
+
+    /* render */
+    if(video_get_quality() > VIDEOQUALITY_LOW)
+        render_default_effect(y, topleft.y, 0.0f, level_time(), watercolor);
+    else
+        render_simple_effect(y, watercolor);
+}
+
+/*
+ * waterfx_render_bg()
+ * Render the water effect (background)
+ */
+void waterfx_render_bg(v2d_t camera_position)
+{
+    /* convert the waterlevel from world space to screen space */
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(camera_position, half_screen);
+    int y = waterlevel - topleft.y;
 
     /* clip out */
     if(y >= VIDEO_SCREEN_H)
@@ -68,7 +178,10 @@ void waterfx_render(v2d_t camera_position)
     y = max(0, y);
 
     /* render */
-    render_simple(y);
+    if(video_get_quality() > VIDEOQUALITY_LOW) {
+        color_t transparent = color_rgba(0, 0, 0, 0);
+        render_default_effect(y, 0.0f, 18.0f, 2.0f * level_time(), transparent);
+    }
 }
 
 /*
@@ -134,11 +247,9 @@ color_t waterfx_default_color()
  */
 
 /* render a simple water effect
-   y is given in screen space */
-void render_simple(int y)
+   y >= 0 is given in screen space */
+void render_simple_effect(int y, color_t color)
 {
-    v2d_t screen_size = video_get_screen_size();
-
     /*
 
     Let's adjust the color of the water by pre-multiplying the alpha value
@@ -154,9 +265,56 @@ void render_simple(int y)
 
     */
     uint8_t red, green, blue, alpha;
-    color_unmap(watercolor, &red, &green, &blue, &alpha);
-    color_t color = color_premul_rgba(red, green, blue, alpha);
+    color_unmap(color, &red, &green, &blue, &alpha);
+    color_t premul_color = color_premul_rgba(red, green, blue, alpha);
 
     /* render the water */
-    image_rectfill(0, y, screen_size.x, screen_size.y, color);
+    v2d_t screen_size = video_get_screen_size();
+    image_rectfill(0, y, screen_size.x, screen_size.y, premul_color);
+}
+
+/* render the default water effect */
+void render_default_effect(int y, float camera_y, float offset, float timer, color_t color)
+{
+    /* copy the backbuffer */
+    image_t* target = image_drawing_target();
+    image_set_drawing_target(backbuffer);
+    {
+        image_clear(color_rgba(0, 0, 0, 0));
+        image_draw(video_get_backbuffer(), 0, 0, IF_NONE);
+    }
+    image_set_drawing_target(target);
+
+    /* scrolling */
+    const float speed = 32.0f; /* px/s */
+    float world_scroll_y = speed * timer + offset;
+    float scroll_y = world_scroll_y + camera_y;
+    shader_set_float(watershader, "scroll_y", scroll_y);
+
+    /* watercolor */
+    float vec4[4];
+    shader_set_float_vector(watershader, "watercolor", 4, color_to_vec4(color, vec4));
+
+    /* render */
+    const shader_t* prev = shader_get_active();
+    shader_set_active(watershader);
+    {
+        v2d_t screen_size = video_get_screen_size();
+        image_blit(backbuffer, 0, y, 0, y, screen_size.x, screen_size.y);
+    }
+    shader_set_active(prev);
+}
+
+/* convert a RGBA color to a vec4 in [0,1]^4 */
+float* color_to_vec4(color_t color, float* vec4)
+{
+    uint8_t r, g, b, a;
+    color_unmap(color, &r, &g, &b, &a);
+
+    vec4[0] = (float)r / 255.0f;
+    vec4[1] = (float)g / 255.0f;
+    vec4[2] = (float)b / 255.0f;
+    vec4[3] = (float)a / 255.0f;
+
+    return vec4;
 }
