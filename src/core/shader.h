@@ -21,6 +21,8 @@
 #ifndef _SHADER_H
 #define _SHADER_H
 
+#include <allegro5/allegro.h>
+
 typedef struct shader_t shader_t;
 struct image_t;
 
@@ -41,7 +43,7 @@ const shader_t* shader_get_default();
 void shader_set_float(shader_t* shader, const char* var_name, float value);
 void shader_set_int(shader_t* shader, const char* var_name, int value);
 void shader_set_bool(shader_t* shader, const char* var_name, bool value);
-void shader_set_float_vector(shader_t* shader, const char* var_name, int n, float* value);
+void shader_set_float_vector(shader_t* shader, const char* var_name, int num_components, const float* value);
 void shader_set_sampler(shader_t* shader, const char* var_name, const struct image_t* image);
 
 #if !defined(__ANDROID__)
@@ -49,5 +51,17 @@ void shader_set_sampler(shader_t* shader, const char* var_name, const struct ima
 #else
 #define SHADER_GLSL_PREFIX "#version 300 es\n"
 #endif
+
+#define FRAGMENT_SHADER_GLSL_PREFIX "" \
+    SHADER_GLSL_PREFIX \
+    \
+    "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n" \
+    "#define tex " ALLEGRO_SHADER_VAR_TEX "\n" \
+    "#define texcoord v_texcoord\n" \
+    \
+    "in vec4 v_color;\n" /* tint color */ \
+    "in vec2 v_texcoord;\n" \
+    "out vec4 color;\n" /* fragment color */ \
+    ""
 
 #endif

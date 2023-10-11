@@ -79,9 +79,7 @@ struct shader_uniform_t
         float f;
         int i;
         bool b;
-
         float fvec[4];
-
         const image_t* tex;
     } value;
 };
@@ -101,6 +99,8 @@ static const char default_vs_glsl[] = ""
     "#define projview " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX "\n"
     "#define use_texmatrix " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX "\n"
     "#define texmatrix " ALLEGRO_SHADER_VAR_TEX_MATRIX "\n"
+
+    "precision highp float;\n"
 
     "in vec4 a_position;\n"
     "in vec4 a_color;\n"
@@ -127,21 +127,12 @@ static const char default_vs_glsl[] = ""
 
 /* default fragment shader */
 static const char default_fs_glsl[] = ""
-    SHADER_GLSL_PREFIX
+    FRAGMENT_SHADER_GLSL_PREFIX
 
-    "#ifdef GL_ES\n"
     "precision lowp float;\n"
-    "#endif\n"
-
-    "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n"
-    "#define tex " ALLEGRO_SHADER_VAR_TEX "\n"
 
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"
-
-    "in vec4 v_color;\n" /* tint */
-    "in vec2 v_texcoord;\n"
-    "out vec4 color;\n" /* fragment color */
 
     "const vec3 MASK_COLOR = vec3(1.0, 0.0, 1.0);\n" /* magenta */
 
@@ -444,23 +435,23 @@ void shader_set_bool(shader_t* shader, const char* var_name, bool value)
 
 /*
  * shader_set_float_vector()
- * Set the value of a floating-point vector of n components
+ * Set the value of a floating-point vector of the given number of components
  */
-void shader_set_float_vector(shader_t* shader, const char* var_name, int n, float* value)
+void shader_set_float_vector(shader_t* shader, const char* var_name, int num_components, const float* value)
 {
-    assertx(n >= 2 && n <= 4);
+    assertx(num_components >= 2 && num_components <= 4);
     shader_uniform_t* stored_uniform = dictionary_get(shader->uniforms, var_name);
 
     if(stored_uniform == NULL) {
         /* add new uniform */
-        stored_uniform = create_uniform(TYPE_FLOAT2 + (n-2), var_name);
-        memcpy(stored_uniform->value.fvec, value, n * sizeof(*value));
+        stored_uniform = create_uniform(TYPE_FLOAT2 + (num_components-2), var_name);
+        memcpy(stored_uniform->value.fvec, value, num_components * sizeof(*value));
         dictionary_put(shader->uniforms, var_name, stored_uniform);
     }
     else {
         /* update uniform */
-        assertx(stored_uniform->type == TYPE_FLOAT2 + (n-2), "Can't change uniform type");
-        memcpy(stored_uniform->value.fvec, value, n * sizeof(*value));
+        assertx(stored_uniform->type == TYPE_FLOAT2 + (num_components-2), "Can't change uniform type");
+        memcpy(stored_uniform->value.fvec, value, num_components * sizeof(*value));
     }
 }
 
