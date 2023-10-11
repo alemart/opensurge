@@ -31,10 +31,10 @@
 static const char watershader_glsl[] = ""
     FRAGMENT_SHADER_GLSL_PREFIX
 
-    "precision mediump float;\n"
+    "precision lowp float;\n"
 
     "uniform sampler2D tex;\n"
-    "uniform float scroll_y;\n"
+    "uniform highp float scroll_y;\n"
     "uniform vec4 watercolor;\n"
 
 #if 0
@@ -74,9 +74,9 @@ static const char watershader_glsl[] = ""
     "   pixel[1] = textureOffset(tex, texcoord, ivec2(0,0));\n"
     "   pixel[2] = textureOffset(tex, texcoord, ivec2(1,0));\n"
 
-    "   int screen_height = textureSize(tex, 0).y;\n"
-    "   float screen_y = (1.0 - texcoord.y) * float(screen_height);\n"
-    "   int wanted_y = int(screen_y + scroll_y);\n" /* from screen space to world space */
+    "   mediump float screen_height = float(textureSize(tex, 0).y);\n"
+    "   mediump float screen_y = (1.0 - texcoord.y) * screen_height;\n"
+    "   highp int wanted_y = int(screen_y + scroll_y);\n" /* from screen space to world space */
     "   int w = abs(wanted_y) % wave.length();\n"
     "   int k = wave[w];\n"
     "   vec4 wanted_pixel = pixel[k];\n"
@@ -141,7 +141,7 @@ void waterfx_render_fg(v2d_t camera_position)
     /* if the active player is too fast,
        maybe a simple effect will look better? */
     const player_t* player = level_player();
-    if(player != NULL) {
+    if(player != NULL && !player_is_frozen(player)) {
         static bool disabled_effect = false;
         float abs_ysp = fabsf(player_ysp(player));
 
