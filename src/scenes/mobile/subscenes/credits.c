@@ -195,10 +195,11 @@ void render(mobile_subscene_t* subscene_ptr, v2d_t subscene_offset)
     int y = subscene_offset.y;
 
     /* render the font to the backbuffer of the subscene */
+    image_t* target = image_drawing_target();
     image_set_drawing_target(subscene->backbuffer);
         image_clear(color_hex(BACKGROUND_COLOR));
         font_render(subscene->font, camera);
-    image_set_drawing_target(video_get_backbuffer());
+    image_set_drawing_target(target);
 
     /* display the backbuffer of the subscene */
     image_draw(subscene->backbuffer, x, y, IF_NONE);
