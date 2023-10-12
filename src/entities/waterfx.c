@@ -40,14 +40,14 @@ static const char watershader_glsl[] = ""
 
     "void main()\n"
     "{\n"
-    "   vec4 pixel[3];\n"
+    "   mat4 pixel;\n"
 
     "   pixel[0] = textureOffset(tex, texcoord, ivec2(-1,0));\n"
     "   pixel[1] = textureOffset(tex, texcoord, ivec2(0,0));\n"
     "   pixel[2] = textureOffset(tex, texcoord, ivec2(1,0));\n"
 
     "   mediump float screen_height = float(textureSize(tex, 0).y);\n"
-    "   mediump float screen_y = (1.0 - texcoord.y) * screen_height;\n"
+    "   mediump float screen_y = screen_height - texcoord.y * screen_height;\n"
     "   highp float world_y = screen_y + scroll_y;\n" /* from screen space to world space */
     "   highp int wanted_y = int(abs(world_y));\n"
 
@@ -63,15 +63,16 @@ static const char watershader_glsl[] = ""
     "   );\n"
 
     "   int k = wave[wanted_y & 63];\n"
-    "   vec4 wanted_pixel = pixel[k];\n" /* slower */
+    "   vec3 wanted_pixel = pixel[k].rgb;\n" /* slower */
 #else
         /* faster version */
     "   int w = wanted_y & 63;\n"
-    "   int k = int(w >= 20) + int(w >= 32) * int(w <= 51);\n" /* waveform (0, 1, 2) */
-    "   vec4 wanted_pixel = float(k == 0) * pixel[0] + float(k == 1) * pixel[1] + float(k == 2) * pixel[2];\n"
+    "   int k = int(w >= 20) + int(w >= 32) * int(w <= 51);\n" /* waveform (k = 0, 1, 2) */
+    "   vec3 indicator = vec3(float(k == 0), float(k == 1), float(k == 2));\n"
+    "   vec3 wanted_pixel = mat3(pixel) * indicator;\n"
 #endif
 
-    "   vec3 blended_pixel = mix(wanted_pixel.rgb, watercolor.rgb, watercolor.a);\n"
+    "   vec3 blended_pixel = mix(wanted_pixel, watercolor.rgb, watercolor.a);\n"
     "   color = vec4(blended_pixel, 1.0);\n"
     "}\n"
 ;
@@ -100,15 +101,18 @@ static float* color_to_vec4(color_t color, float* vec4);
  */
 void waterfx_init()
 {
+    /* set default values */
     internal_timer = 0.0f;
-
     waterlevel = DEFAULT_WATERLEVEL;
     watercolor = DEFAULT_WATERCOLOR();
+
+    /* create the shader */
     watershader = shader_create("waterfx", watershader_glsl);
 
+    /* create the backbuffers used for post-processing */
     backbuffer_index = 0;
     for(int i = 0; i < NUMBER_OF_BACKBUFFERS; i++)
-        backbuffer[i] = image_create_backbuffer(VIDEO_SCREEN_W, VIDEO_SCREEN_H, false);
+        backbuffer[i] = image_create_ex(VIDEO_SCREEN_W, VIDEO_SCREEN_H, IC_BACKBUFFER | IC_WRAP_MIRROR);
 }
 
 /*
@@ -117,6 +121,7 @@ void waterfx_init()
  */
 void waterfx_release()
 {
+    /* destroy the backbuffers used for post-processing */
     for(int i = NUMBER_OF_BACKBUFFERS - 1; i >= 0; i--)
         image_destroy(backbuffer[i]);
 }
@@ -190,11 +195,9 @@ void waterfx_render_bg(v2d_t camera_position)
 
     /* render */
     if(video_get_quality() > VIDEOQUALITY_LOW) {
-        if(video_fps() >= 55) { /* skip if slow - not terribly important */
-            float camera_y = 0.0f; /* no camera */
-            color_t transparent = color_rgba(0, 0, 0, 0);
-            render_default_effect(y, camera_y, 16.0f, internal_timer, 64.0f, transparent);
-        }
+        float camera_y = 0.0f; /* no camera */
+        color_t transparent = color_rgba(0, 0, 0, 0);
+        render_default_effect(y, camera_y, 16.0f, internal_timer, 64.0f, transparent);
     }
 }
 
