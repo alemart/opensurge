@@ -38,16 +38,6 @@ static const char watershader_glsl[] = ""
     "uniform highp float scroll_y;\n"
     "uniform vec4 watercolor;\n"
 
-    /* golden ratio */
-    "const int wave[64] = int[64](\n"
-    "   0,0,0,0,0,0,0,0,0,0,\n"
-    "   0,0,0,0,0,0,0,0,0,0,\n"
-    "   1,1,1,1,1,1,1,1,1,1,1,1,\n"
-    "   2,2,2,2,2,2,2,2,2,2,\n"
-    "   2,2,2,2,2,2,2,2,2,2,\n"
-    "   1,1,1,1,1,1,1,1,1,1,1,1\n"
-    ");\n"
-
     "void main()\n"
     "{\n"
     "   vec4 pixel[3];\n"
@@ -60,22 +50,44 @@ static const char watershader_glsl[] = ""
     "   mediump float screen_y = (1.0 - texcoord.y) * screen_height;\n"
     "   highp float world_y = screen_y + scroll_y;\n" /* from screen space to world space */
     "   highp int wanted_y = int(abs(world_y));\n"
+
+#if 0
+        /* golden ratio */
+    "   const int wave[64] = int[64](\n"
+    "      0,0,0,0,0,0,0,0,0,0,\n"
+    "      0,0,0,0,0,0,0,0,0,0,\n"
+    "      1,1,1,1,1,1,1,1,1,1,1,1,\n"
+    "      2,2,2,2,2,2,2,2,2,2,\n"
+    "      2,2,2,2,2,2,2,2,2,2,\n"
+    "      1,1,1,1,1,1,1,1,1,1,1,1\n"
+    "   );\n"
+
     "   int k = wave[wanted_y & 63];\n"
-    "   vec4 wanted_pixel = pixel[k];\n"
+    "   vec4 wanted_pixel = pixel[k];\n" /* slower */
+#else
+        /* faster version */
+    "   int w = wanted_y & 63;\n"
+    "   int k = int(w >= 20) + int(w >= 32) * int(w <= 51);\n" /* waveform (0, 1, 2) */
+    "   vec4 wanted_pixel = float(k == 0) * pixel[0] + float(k == 1) * pixel[1] + float(k == 2) * pixel[2];\n"
+#endif
 
     "   vec3 blended_pixel = mix(wanted_pixel.rgb, watercolor.rgb, watercolor.a);\n"
     "   color = vec4(blended_pixel, 1.0);\n"
     "}\n"
 ;
 
-/* utils */
+/* backbuffers for post-processing */
+#define NUMBER_OF_BACKBUFFERS   2 /* bg, fg */
+static image_t* backbuffer[NUMBER_OF_BACKBUFFERS];
+static int backbuffer_index;
+
+/* internals */
 #define DEFAULT_WATERLEVEL      LARGE_INT
 #define DEFAULT_WATERCOLOR()    color_rgba(0, 64, 255, 128)
 static int waterlevel = DEFAULT_WATERLEVEL;
 static color_t watercolor;
 static float internal_timer;
 static shader_t* watershader;
-static image_t* backbuffer;
 static void render_simple_effect(int y, color_t color);
 static void render_default_effect(int y, float camera_y, float offset, float timer, float speed, color_t color);
 static float* color_to_vec4(color_t color, float* vec4);
@@ -89,10 +101,14 @@ static float* color_to_vec4(color_t color, float* vec4);
 void waterfx_init()
 {
     internal_timer = 0.0f;
+
     waterlevel = DEFAULT_WATERLEVEL;
     watercolor = DEFAULT_WATERCOLOR();
     watershader = shader_create("waterfx", watershader_glsl);
-    backbuffer = image_create_backbuffer(VIDEO_SCREEN_W, VIDEO_SCREEN_H, false);
+
+    backbuffer_index = 0;
+    for(int i = 0; i < NUMBER_OF_BACKBUFFERS; i++)
+        backbuffer[i] = image_create_backbuffer(VIDEO_SCREEN_W, VIDEO_SCREEN_H, false);
 }
 
 /*
@@ -101,7 +117,8 @@ void waterfx_init()
  */
 void waterfx_release()
 {
-    image_destroy(backbuffer);
+    for(int i = NUMBER_OF_BACKBUFFERS - 1; i >= 0; i--)
+        image_destroy(backbuffer[i]);
 }
 
 /*
@@ -173,9 +190,11 @@ void waterfx_render_bg(v2d_t camera_position)
 
     /* render */
     if(video_get_quality() > VIDEOQUALITY_LOW) {
-        float camera_y = 0.0f; /* no camera */
-        color_t transparent = color_rgba(0, 0, 0, 0);
-        render_default_effect(y, camera_y, 16.0f, internal_timer, 64.0f, transparent);
+        if(video_fps() >= 55) { /* skip if slow - not terribly important */
+            float camera_y = 0.0f; /* no camera */
+            color_t transparent = color_rgba(0, 0, 0, 0);
+            render_default_effect(y, camera_y, 16.0f, internal_timer, 64.0f, transparent);
+        }
     }
 }
 
@@ -272,8 +291,11 @@ void render_simple_effect(int y, color_t color)
 void render_default_effect(int y, float camera_y, float offset, float timer, float speed, color_t color)
 {
     /* copy the backbuffer */
+    /* possibly expensive on mobile platforms because we trigger a pipeline
+       flush when unbinding a partially rendered FBO, but we mitigate the cost
+       with low-res graphics. */
     image_t* target = image_drawing_target();
-    image_set_drawing_target(backbuffer);
+    image_set_drawing_target(backbuffer[backbuffer_index]);
     {
         image_clear(color_rgba(0, 0, 0, 0));
         image_draw(video_get_backbuffer(), 0, 0, IF_NONE);
@@ -294,9 +316,12 @@ void render_default_effect(int y, float camera_y, float offset, float timer, flo
     shader_set_active(watershader);
     {
         v2d_t screen_size = video_get_screen_size();
-        image_blit(backbuffer, 0, y, 0, y, screen_size.x, screen_size.y);
+        image_blit(backbuffer[backbuffer_index], 0, y, 0, y, screen_size.x, screen_size.y);
     }
     shader_set_active(prev);
+
+    /* round-robin */
+    backbuffer_index = (1 + backbuffer_index) % NUMBER_OF_BACKBUFFERS;
 }
 
 /* convert a RGBA color to a vec4 in [0,1]^4 */
