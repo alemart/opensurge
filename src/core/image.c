@@ -18,7 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define ALLEGRO_UNSTABLE /* al_set_new_bitmap_depth */
+#define ALLEGRO_UNSTABLE /* al_set_new_bitmap_depth(), al_set_new_bitmap_wrap() */
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_opengl.h>
 
 #include <string.h>
 #include <stdint.h>
@@ -30,12 +34,13 @@
 #include "../util/util.h"
 #include "../util/stringutil.h"
 
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_opengl.h>
+#if defined(ALLEGRO_VERSION_INT) && defined(AL_ID) && ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
+#define WANT_WRAP 1
+#else
+#define WANT_WRAP 0
+#endif
 
-/* convert imageflags_t to ALLEGRO_FLIP flags */
+/* convert image flip flags to ALLEGRO_FLIP flags */
 #define FLIPPY(flags) ((((flags) & IF_HFLIP) != 0) * ALLEGRO_FLIP_HORIZONTAL + (((flags) & IF_VFLIP) != 0) * ALLEGRO_FLIP_VERTICAL)
 
 /* check if an expression is a power of two */
@@ -220,22 +225,61 @@ image_t* image_create_shared(const image_t* parent, int x, int y, int width, int
  */
 image_t* image_create_backbuffer(int width, int height, bool want_depth_buffer)
 {
-    ALLEGRO_STATE state;
-    image_t* backbuffer;
-
-    al_store_state(&state, ALLEGRO_STATE_NEW_BITMAP_PARAMETERS);
-    al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP | ALLEGRO_NO_PRESERVE_TEXTURE);
+    int flags = IC_BACKBUFFER;
 
     if(want_depth_buffer)
+        flags |= IC_DEPTH;
+
+    return image_create_ex(width, height, flags);
+}
+
+/*
+ * image_create_ex()
+ * Create an image with extra options
+ */
+image_t* image_create_ex(int width, int height, int flags)
+{
+    /* save state */
+    int prev_new_bitmap_flags = al_get_new_bitmap_flags();
+    int prev_depth = al_get_new_bitmap_depth();
+
+#if WANT_WRAP
+    ALLEGRO_BITMAP_WRAP prev_u, prev_v;
+    al_get_new_bitmap_wrap(&prev_u, &prev_v);
+#endif
+
+    /* set the flags for new bitmaps */
+    int new_bitmap_flags = ALLEGRO_VIDEO_BITMAP;
+    if(flags & IC_BACKBUFFER)
+        new_bitmap_flags |= ALLEGRO_NO_PRESERVE_TEXTURE;
+
+    /* change state */
+    al_set_new_bitmap_flags(new_bitmap_flags);
+
+    if(flags & IC_DEPTH)
         al_set_new_bitmap_depth(16);
 
-    backbuffer = image_create(width, height);
+#if WANT_WRAP
+    if(flags & IC_WRAP_MIRROR)
+        al_set_new_bitmap_wrap(ALLEGRO_BITMAP_WRAP_MIRROR, ALLEGRO_BITMAP_WRAP_MIRROR);
+#endif
 
-    if(want_depth_buffer)
-        al_set_new_bitmap_depth(0);
+    /* create image */
+    image_t* image = image_create(width, height);
 
-    al_restore_state(&state);
-    return backbuffer;
+    /* restore state */
+#if WANT_WRAP
+    if(flags & IC_WRAP_MIRROR)
+        al_set_new_bitmap_wrap(prev_u, prev_v);
+#endif
+
+    if(flags & IC_DEPTH)
+        al_set_new_bitmap_depth(prev_depth);
+
+    al_set_new_bitmap_flags(prev_new_bitmap_flags);
+
+    /* done! */
+    return image;
 }
 
 /*
@@ -507,7 +551,7 @@ void image_blit(const image_t* src, int src_x, int src_y, int dest_x, int dest_y
  *
  * flags: refer to the IF_* defines (Image Flags)
  */
-void image_draw(const image_t* src, int x, int y, imageflags_t flags)
+void image_draw(const image_t* src, int x, int y, int flags)
 {
     al_draw_bitmap(src->data, x, y, FLIPPY(flags));
 }
@@ -523,7 +567,7 @@ void image_draw(const image_t* src, int x, int y, imageflags_t flags)
  *        (2.0, 2.0) stands for a double-sized image
  *        (0.5, 0.5) stands for a smaller image
  */
-void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags_t flags)
+void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, int flags)
 { 
     al_draw_scaled_bitmap(
         src->data,
@@ -537,7 +581,7 @@ void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags
  * image_draw_scaled_trans()
  * Draw scaled with alpha
  */
-void image_draw_scaled_trans(const image_t* src, int x, int y, v2d_t scale, float alpha, imageflags_t flags)
+void image_draw_scaled_trans(const image_t* src, int x, int y, v2d_t scale, float alpha, int flags)
 {
     float a = clip01(alpha);
     ALLEGRO_COLOR tint = al_map_rgba_f(a, a, a, a);
@@ -556,7 +600,7 @@ void image_draw_scaled_trans(const image_t* src, int x, int y, v2d_t scale, floa
  * radians: angle given in radians (counter-clockwise)
  * cx, cy: pivot positions
  */
-void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float radians, imageflags_t flags)
+void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float radians, int flags)
 {
     al_draw_rotated_bitmap(src->data, cx, cy, x, y, -radians, FLIPPY(flags));
 }
@@ -565,7 +609,7 @@ void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float 
  * image_draw_rotated_trans()
  * Draws a rotated image with alpha
  */
-void image_draw_rotated_trans(const image_t* src, int x, int y, int cx, int cy, float radians, float alpha, imageflags_t flags)
+void image_draw_rotated_trans(const image_t* src, int x, int y, int cx, int cy, float radians, float alpha, int flags)
 {
     float a = clip01(alpha);
     ALLEGRO_COLOR tint = al_map_rgba_f(a, a, a, a);
@@ -577,7 +621,7 @@ void image_draw_rotated_trans(const image_t* src, int x, int y, int cx, int cy, 
  * image_draw_scaled_rotated()
  * Draws a scaled and rotated image
  */
-void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, imageflags_t flags)
+void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, int flags)
 {
     al_draw_scaled_rotated_bitmap(src->data, cx, cy, x, y, scale.x, scale.y, -radians, FLIPPY(flags));
 }
@@ -586,7 +630,7 @@ void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy,
  * image_draw_scaled_rotated_trans()
  * Draws a scaled and rotated image with alpha
  */
-void image_draw_scaled_rotated_trans(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, float alpha, imageflags_t flags)
+void image_draw_scaled_rotated_trans(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, float alpha, int flags)
 {
     float a = clip01(alpha);
     ALLEGRO_COLOR tint = al_map_rgba_f(a, a, a, a);
@@ -599,7 +643,7 @@ void image_draw_scaled_rotated_trans(const image_t* src, int x, int y, int cx, i
  * Draws a translucent image
  * 0.0 (invisible) <= alpha <= 1.0 (opaque)
  */
-void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_t flags)
+void image_draw_trans(const image_t* src, int x, int y, float alpha, int flags)
 {
     float a = clip01(alpha);
     ALLEGRO_COLOR tint = al_map_rgba_f(a, a, a, a);
@@ -611,7 +655,7 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_
  * image_draw_lit()
  * Draws an image with a specific color
  */
-void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_t flags)
+void image_draw_lit(const image_t* src, int x, int y, color_t color, int flags)
 {
     /*
 
@@ -718,7 +762,7 @@ void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_
  * Image blending: multiplication mode
  * 0.0 <= alpha <= 1.0
  */
-void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags)
+void image_draw_tinted(const image_t* src, int x, int y, color_t color, int flags)
 {
     al_draw_tinted_bitmap(src->data, color._color, x, y, FLIPPY(flags));
 }

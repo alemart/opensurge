@@ -29,20 +29,29 @@
 /* opaque image type */
 typedef struct image_t image_t;
 
-/* image flags (allows bitwise OR) */
-typedef enum imageflags_t {
-    IF_NONE  = 0,
-    IF_HFLIP = 1, /* powers of 2 */
-    IF_VFLIP = 2
-} imageflags_t;
-
 /* opaque texture handle */
 typedef uint32_t texturehandle_t; /* GLuint */
+
+/* image flip flags */
+enum {
+    IF_NONE         = 0,        /* no flip */
+    IF_HFLIP        = 1 << 0,   /* flip horizontally */
+    IF_VFLIP        = 1 << 1    /* flip vertically */
+};
+
+/* image creation flags */
+enum {
+    IC_DEFAULT      = 0,        /* video bitmap */
+    IC_BACKBUFFER   = 1 << 0,   /* the image is going to be a drawing target (optimize) */
+    IC_DEPTH        = 1 << 1,   /* require a depth buffer */
+    IC_WRAP_MIRROR  = 1 << 2    /* mirror wrapping (shaders) */
+};
 
 /* image management */
 image_t* image_create(int width, int height); /* create an image */
 image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height); /* creates a shared sub-image */
 image_t* image_create_backbuffer(int width, int height, bool want_depth_buffer); /* create an optimized drawing target */
+image_t* image_create_ex(int width, int height, int flags); /* create an image with extra options */
 void image_destroy(image_t* img); /* call this after image_create() */
 
 /* load from file */
@@ -81,16 +90,16 @@ void image_rectfill(int x1, int y1, int x2, int y2, color_t color);
 
 /* rendering */
 void image_blit(const image_t* src, int src_x, int src_y, int dest_x, int dest_y, int width, int height);
-void image_draw(const image_t* src, int x, int y, imageflags_t flags);
-void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, imageflags_t flags);
-void image_draw_scaled_trans(const image_t* src, int x, int y, v2d_t scale, float alpha, imageflags_t flags);
-void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float radians, imageflags_t flags);
-void image_draw_rotated_trans(const image_t* src, int x, int y, int cx, int cy, float radians, float alpha, imageflags_t flags);
-void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, imageflags_t flags);
-void image_draw_scaled_rotated_trans(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, float alpha, imageflags_t flags);
-void image_draw_trans(const image_t* src, int x, int y, float alpha, imageflags_t flags);
-void image_draw_lit(const image_t* src, int x, int y, color_t color, imageflags_t flags);
-void image_draw_tinted(const image_t* src, int x, int y, color_t color, imageflags_t flags);
+void image_draw(const image_t* src, int x, int y, int flags);
+void image_draw_scaled(const image_t* src, int x, int y, v2d_t scale, int flags);
+void image_draw_scaled_trans(const image_t* src, int x, int y, v2d_t scale, float alpha, int flags);
+void image_draw_rotated(const image_t* src, int x, int y, int cx, int cy, float radians, int flags);
+void image_draw_rotated_trans(const image_t* src, int x, int y, int cx, int cy, float radians, float alpha, int flags);
+void image_draw_scaled_rotated(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, int flags);
+void image_draw_scaled_rotated_trans(const image_t* src, int x, int y, int cx, int cy, v2d_t scale, float radians, float alpha, int flags);
+void image_draw_trans(const image_t* src, int x, int y, float alpha, int flags);
+void image_draw_lit(const image_t* src, int x, int y, color_t color, int flags);
+void image_draw_tinted(const image_t* src, int x, int y, color_t color, int flags);
 
 /* retrieve Allegro bitmap */
 #define IMAGE2BITMAP(img)           (*((ALLEGRO_BITMAP**)(img)))
