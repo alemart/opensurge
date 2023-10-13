@@ -46,6 +46,22 @@ static const char watershader_glsl[] = ""
     "   pixel[1] = textureOffset(tex, texcoord, ivec2(0,0));\n"
     "   pixel[2] = textureOffset(tex, texcoord, ivec2(1,0));\n"
 
+#if defined(__ANDROID__)
+    /*
+     * Due to a rule set in the Android version of Allegro 5.2.8, more precisely
+     * at src/opengl/ogl_bitmap.c (_al_ogl_create_bitmap), the actual size of
+     * the input OpenGL texture may be larger than the size of its corresponding
+     * ALLEGRO_BITMAP, with no way to correct it in the API. The result is that
+     * the u,v wrapping behavior doesn't work as expected. This creates artifacts
+     * at the right edge of the screen, when we read pixels that are out of bounds.
+     *
+     * This little hack fixes the undesirable behavior by assuming that the input
+     * texture has been previously cleared to RGBA (0,0,0,0) and that we have set
+     * its GL_TEXTURE_WRAP_[UV] parameter to GL_MIRRORED_REPEAT.
+     */
+    "   pixel[2] += float(all(equal(pixel[2], vec4(0.0)))) * pixel[0];\n" /* pixel[2] becomes pixel[0] if it's zero */
+#endif
+
     "   highp float screen_height = float(textureSize(tex, 0).y);\n"
     "   highp float screen_y = screen_height - texcoord.y * screen_height;\n"
     "   highp float world_y = screen_y + scroll_y;\n" /* from screen space to world space */
@@ -62,8 +78,9 @@ static const char watershader_glsl[] = ""
     "      1,1,1,1,1,1,1,1,1,1,1,1\n"
     "   );\n"
 
+        /* slower version; I left it here for clarity */
     "   int k = wave[wanted_y & 63];\n"
-    "   vec3 wanted_pixel = pixel[k].rgb;\n" /* slower */
+    "   vec3 wanted_pixel = pixel[k].rgb;\n"
 #else
         /* faster version */
     "   int w = wanted_y & 63;\n"
@@ -397,6 +414,7 @@ color_t premultiply_alpha(color_t color)
     https://liballeg.org/a5docs/trunk/graphics.html#al_premul_rgba
 
     */
+
     uint8_t red, green, blue, alpha;
     color_unmap(color, &red, &green, &blue, &alpha);
     return color_premul_rgba(red, green, blue, alpha);
