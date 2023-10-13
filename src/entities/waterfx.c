@@ -79,8 +79,8 @@ static const char watershader_glsl[] = ""
 
 /* backbuffers for post-processing */
 #define NUMBER_OF_BACKBUFFERS   2 /* bg, fg */
-static image_t* backbuffer[NUMBER_OF_BACKBUFFERS];
-static int backbuffer_index;
+static image_t* backbuffer[NUMBER_OF_BACKBUFFERS] = { NULL, NULL };
+static int backbuffer_index = 0;
 static bool create_backbuffers();
 static void destroy_backbuffers();
 static void handle_video_event(const ALLEGRO_EVENT* event, void* context);
@@ -95,6 +95,7 @@ static shader_t* watershader;
 static void render_simple_effect(int y, color_t color);
 static void render_default_effect(int y, float camera_y, float offset, float timer, float speed, color_t color);
 static float* color_to_vec4(color_t color, float* vec4);
+static color_t premultiply_alpha(color_t color);
 
 /* log */
 #define LOG(...)                logfile_message("Waterfx: " __VA_ARGS__)
@@ -318,27 +319,8 @@ void handle_video_event(const ALLEGRO_EVENT* event, void* context)
    y >= 0 is given in screen space */
 void render_simple_effect(int y, color_t color)
 {
-    /*
-
-    Let's adjust the color of the water by pre-multiplying the alpha value
-
-    "By default Allegro uses pre-multiplied alpha for transparent blending of
-    bitmaps and primitives (see al_load_bitmap_flags for a discussion of that
-    feature). This means that if you want to tint a bitmap or primitive to be
-    transparent you need to multiply the color components by the alpha
-    components when you pass them to this function."
-
-    Source: Allegro manual at
-    https://liballeg.org/a5docs/trunk/graphics.html#al_premul_rgba
-
-    */
-    uint8_t red, green, blue, alpha;
-    color_unmap(color, &red, &green, &blue, &alpha);
-    color_t premul_color = color_premul_rgba(red, green, blue, alpha);
-
-    /* render the water */
     v2d_t screen_size = video_get_screen_size();
-    image_rectfill(0, y, screen_size.x, screen_size.y, premul_color);
+    image_rectfill(0, y, screen_size.x, screen_size.y, premultiply_alpha(watercolor));
 }
 
 /* render the default water effect */
@@ -396,4 +378,26 @@ float* color_to_vec4(color_t color, float* vec4)
     vec4[3] = (float)a / 255.0f;
 
     return vec4;
+}
+
+/* pre-multiply alpha */
+color_t premultiply_alpha(color_t color)
+{
+    /*
+
+    Let's adjust the color of the water by pre-multiplying the alpha value
+
+    "By default Allegro uses pre-multiplied alpha for transparent blending of
+    bitmaps and primitives (see al_load_bitmap_flags for a discussion of that
+    feature). This means that if you want to tint a bitmap or primitive to be
+    transparent you need to multiply the color components by the alpha
+    components when you pass them to this function."
+
+    Source: Allegro manual at
+    https://liballeg.org/a5docs/trunk/graphics.html#al_premul_rgba
+
+    */
+    uint8_t red, green, blue, alpha;
+    color_unmap(color, &red, &green, &blue, &alpha);
+    return color_premul_rgba(red, green, blue, alpha);
 }
