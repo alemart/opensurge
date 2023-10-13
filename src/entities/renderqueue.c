@@ -343,9 +343,7 @@ static const renderable_vtable_t VTABLE[] = {
 
 /* alpha testing shader */
 static const char fs_glsl_with_alpha_testing[] = ""
-    FRAGMENT_SHADER_GLSL_PREFIX
-
-    "precision lowp float;\n"
+    FRAGMENT_SHADER_GLSL_PREFIX("lowp")
 
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"

@@ -52,16 +52,18 @@ void shader_set_sampler(shader_t* shader, const char* var_name, const struct ima
 #define SHADER_GLSL_PREFIX "#version 300 es\n"
 #endif
 
-#define FRAGMENT_SHADER_GLSL_PREFIX "" \
+#define FRAGMENT_SHADER_GLSL_PREFIX(default_precision) "" \
     SHADER_GLSL_PREFIX \
     \
     "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n" \
     "#define tex " ALLEGRO_SHADER_VAR_TEX "\n" \
     "#define texcoord v_texcoord\n" \
     \
-    "in vec4 v_color;\n" /* tint color */ \
-    "in vec2 v_texcoord;\n" \
-    "out vec4 color;\n" /* fragment color */ \
+    "precision " default_precision " float;\n" \
+    \
+    "in highp vec2 v_texcoord;\n" \
+    "in lowp vec4 v_color;\n" /* tint color */ \
+    "out lowp vec4 color;\n" /* fragment color */ \
     ""
 
 #endif

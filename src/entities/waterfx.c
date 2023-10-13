@@ -30,13 +30,11 @@
 
 /* shader */
 static const char watershader_glsl[] = ""
-    FRAGMENT_SHADER_GLSL_PREFIX
+    FRAGMENT_SHADER_GLSL_PREFIX("lowp")
 
-    "precision lowp float;\n"
-
-    "uniform sampler2D tex;\n"
+    "uniform lowp sampler2D tex;\n"
+    "uniform lowp vec4 watercolor;\n"
     "uniform highp float scroll_y;\n"
-    "uniform vec4 watercolor;\n"
 
     "void main()\n"
     "{\n"
@@ -46,8 +44,8 @@ static const char watershader_glsl[] = ""
     "   pixel[1] = textureOffset(tex, texcoord, ivec2(0,0));\n"
     "   pixel[2] = textureOffset(tex, texcoord, ivec2(1,0));\n"
 
-    "   mediump float screen_height = float(textureSize(tex, 0).y);\n"
-    "   mediump float screen_y = screen_height - texcoord.y * screen_height;\n"
+    "   highp float screen_height = float(textureSize(tex, 0).y);\n"
+    "   highp float screen_y = screen_height - texcoord.y * screen_height;\n"
     "   highp float world_y = screen_y + scroll_y;\n" /* from screen space to world space */
     "   highp int wanted_y = int(abs(world_y));\n"
 

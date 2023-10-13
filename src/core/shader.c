@@ -127,9 +127,7 @@ static const char default_vs_glsl[] = ""
 
 /* default fragment shader */
 static const char default_fs_glsl[] = ""
-    FRAGMENT_SHADER_GLSL_PREFIX
-
-    "precision lowp float;\n"
+    FRAGMENT_SHADER_GLSL_PREFIX("lowp")
 
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"
