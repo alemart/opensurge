@@ -24,6 +24,8 @@
 #include "../core/video.h"
 #include "../core/shader.h"
 #include "../core/timer.h"
+#include "../core/logfile.h"
+#include "../core/engine.h"
 #include "../entities/player.h"
 #include "../scenes/level.h"
 #include "../util/util.h"
@@ -79,6 +81,9 @@ static const char watershader_glsl[] = ""
 #define NUMBER_OF_BACKBUFFERS   2 /* bg, fg */
 static image_t* backbuffer[NUMBER_OF_BACKBUFFERS];
 static int backbuffer_index;
+static bool create_backbuffers();
+static void destroy_backbuffers();
+static void handle_video_event(const ALLEGRO_EVENT* event, void* context);
 
 /* internals */
 #define DEFAULT_WATERLEVEL      LARGE_INT
@@ -90,6 +95,9 @@ static shader_t* watershader;
 static void render_simple_effect(int y, color_t color);
 static void render_default_effect(int y, float camera_y, float offset, float timer, float speed, color_t color);
 static float* color_to_vec4(color_t color, float* vec4);
+
+/* log */
+#define LOG(...)                logfile_message("Waterfx: " __VA_ARGS__)
 
 
 
@@ -109,8 +117,12 @@ void waterfx_init()
 
     /* create the backbuffers used for post-processing */
     backbuffer_index = 0;
-    for(int i = 0; i < NUMBER_OF_BACKBUFFERS; i++)
-        backbuffer[i] = image_create_ex(VIDEO_SCREEN_W, VIDEO_SCREEN_H, IC_BACKBUFFER | IC_WRAP_MIRROR);
+    if(!create_backbuffers())
+        LOG("Can't create the backbuffers!");
+
+    /* add event listeners */
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, NULL, handle_video_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, NULL, handle_video_event);
 }
 
 /*
@@ -119,9 +131,12 @@ void waterfx_init()
  */
 void waterfx_release()
 {
-    /* destroy the backbuffers used for post-processing */
-    for(int i = NUMBER_OF_BACKBUFFERS - 1; i >= 0; i--)
-        image_destroy(backbuffer[i]);
+    /* remove event listeners */
+    engine_remove_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, NULL, handle_video_event);
+    engine_remove_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, NULL, handle_video_event);
+
+    /* destroy backbuffers */
+    destroy_backbuffers();
 }
 
 /*
@@ -261,6 +276,44 @@ color_t waterfx_default_color()
  *
  */
 
+/* create the backbuffers used for post-processing */
+bool create_backbuffers()
+{
+    for(int i = 0; i < NUMBER_OF_BACKBUFFERS; i++) {
+        backbuffer[i] = image_create_ex(VIDEO_SCREEN_W, VIDEO_SCREEN_H, IC_BACKBUFFER | IC_WRAP_MIRROR);
+        if(backbuffer[i] == NULL)
+            return false;
+    }
+
+    return true;
+}
+
+/* destroy the backbuffers used for post-processing */
+void destroy_backbuffers()
+{
+    for(int i = NUMBER_OF_BACKBUFFERS - 1; i >= 0; i--) {
+        if(backbuffer[i] != NULL) {
+            image_destroy(backbuffer[i]);
+            backbuffer[i] = NULL;
+        }
+    }
+}
+
+/* handle a video event */
+void handle_video_event(const ALLEGRO_EVENT* event, void* context)
+{
+    switch(event->type) {
+        case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
+            destroy_backbuffers();
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
+            if(!create_backbuffers())
+                LOG("Can't recreate the backbuffers!");
+            break;
+    }
+}
+
 /* render a simple water effect
    y >= 0 is given in screen space */
 void render_simple_effect(int y, color_t color)
@@ -291,6 +344,12 @@ void render_simple_effect(int y, color_t color)
 /* render the default water effect */
 void render_default_effect(int y, float camera_y, float offset, float timer, float speed, color_t color)
 {
+    /* this should never happen; backbuffers may be recreated */
+    if(backbuffer[backbuffer_index] == NULL) {
+        /*render_simple_effect(y, color);*/
+        return;
+    }
+
     /* copy the backbuffer */
     /* possibly expensive on mobile platforms because we trigger a pipeline
        flush when unbinding a partially rendered FBO, but we mitigate the cost
