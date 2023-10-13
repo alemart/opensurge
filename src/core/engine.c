@@ -664,11 +664,22 @@ void release_event_listener_table()
  */
 void add_to_event_listener_table(event_listener_t event_listener)
 {
-    int index = event_listener.event_type % EVENT_LISTENER_TABLE_SIZE;
+    /* create a new node */
     event_listener_list_t* node = mallocx(sizeof *node);
     node->event_listener = event_listener;
-    node->next = event_listener_table[index];
-    event_listener_table[index] = node;
+    node->next = NULL;
+
+    /* add the node to the last position of the list, so that the listeners
+       that are registered first are executed first */
+    int index = event_listener.event_type % EVENT_LISTENER_TABLE_SIZE;
+    if(event_listener_table[index] != NULL) {
+        event_listener_list_t* last = event_listener_table[index];
+        while(last->next != NULL)
+            last = last->next;
+        last->next = node;
+    }
+    else
+        event_listener_table[index] = node;
 
     /* note: repeated elements are not handled */
 }
