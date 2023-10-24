@@ -66,6 +66,8 @@ FILE* fopen_utf8(const char* filepath, const char* mode); /* fopen() with UTF-8 
 const char* allegro_version_string(); /* version of the Allegro library */
 const char* surgescript_version_string(); /* version of the SurgeScript runtime */
 const char* physfs_version_string(); /* version of the PhysFS library */
+int parse_version_number(const char* version_string); /* convert a "x.y.z[.w]" version string to a version code, which is a comparable integer */
+char* stringify_version_number(int version_code, char* buffer, size_t buffer_size); /* convert a version code to a version string of the form x.y.z[.w] */
 const char* opensurge_game_name(); /* the sanitized name of the game / MOD that is being run in the engine */
 
 #endif

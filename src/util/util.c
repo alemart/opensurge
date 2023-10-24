@@ -273,6 +273,61 @@ const char* physfs_version_string()
 }
 
 /*
+ * parse_version_number()
+ * Convert a "x.y.z[.w]" version string to a version code,
+ * which is a comparable integer
+ */
+int parse_version_number(const char* version_string)
+{
+    char ver[16], *s;
+    int code[4] = { 0, 0, 0, 0 }, j = 0;
+
+    str_cpy(ver, version_string, sizeof(ver));
+
+    /* this will accept string format [x[.y[.z[.w]]]] with delim = .- */
+    s = strtok(ver, ".-");
+    while(s != NULL && j < 4) {
+        code[j++] = atoi(s);
+        s = strtok(NULL, ".-");
+    }
+
+    int x = clip(code[0], 0, 99);
+    int y = clip(code[1], 0, 99);
+    int z = clip(code[2], 0, 99);
+    int w = clip(code[3], 0, 99);
+
+    return x * 1000000 + y * 10000 + z * 100 + w;
+}
+
+/*
+ * stringify_version_number()
+ * Convert a version code to a version string of
+ * the form x.y.z[.w]
+ */
+char* stringify_version_number(int version_code, char* buffer, size_t buffer_size)
+{
+    const int MAX_VERSION = 99 * 1000000 + 99 * 10000 + 99 * 100 + 99;
+    int x, y, z, w;
+
+    if(version_code < 0)
+        version_code = 0;
+    else if(version_code > MAX_VERSION)
+        version_code = MAX_VERSION;
+
+    x = version_code / 1000000;
+    y = (version_code - x * 1000000) / 10000;
+    z = (version_code - x * 1000000 - y * 10000) / 100;
+    w = (version_code - x * 1000000 - y * 10000 - z * 100);
+
+    if(w != 0)
+        snprintf(buffer, buffer_size, "%d.%d.%d.%d", x, y, z, w);
+    else
+        snprintf(buffer, buffer_size, "%d.%d.%d", x, y, z);
+
+    return buffer;
+}
+
+/*
  * opensurge_game_name()
  * The sanitized name of the game / MOD that is being run in the engine
  */
@@ -315,7 +370,14 @@ void merge_sort(void *base, int num, size_t size, int (*comparator)(const void*,
 
 
 
-/* private stuff */
+
+
+/*
+ *
+ * private stuff
+ *
+ */
+
 void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q)
 {
     if(q > p) {
@@ -364,6 +426,8 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
     if(arr != tmp)
         free(arr);
 }
+
+
 
 #if defined(__ANDROID__)
 
