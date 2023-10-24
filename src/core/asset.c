@@ -28,6 +28,7 @@
 #include "logfile.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../scenes/util/levparser.h"
 #include "../third_party/ignorecase.h"
 
 /* The default directory of the game assets provided by upstream (*nix only) */
@@ -76,6 +77,7 @@ typedef char _user_datadirname_capacity_assert[ !!(sizeof(user_datadirname) == s
 
 /* Utilities */
 static char* gamedir = NULL; /* custom asset folder specified by the user */
+static char required_engine_version[16] = "0.5.0";
 
 static ALLEGRO_STATE state;
 static ALLEGRO_PATH* find_exedir();
@@ -91,6 +93,9 @@ static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, in
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
 static uint32_t hash32(const char* str);
 static bool is_valid_root_folder();
+static char* guess_required_engine_version(char* buffer, size_t buffer_size);
+static int scan_required_engine_version(const char* vpath, void* context);
+static bool scan_level_line(const char* vpath, int line, levparser_command_t command, const char* command_name, int param_count, const char** param, void* context);
 
 
 
@@ -107,6 +112,9 @@ void asset_init(const char* argv0, const char* optional_gamedir)
 
     /* log */
     LOG("Initializing the asset manager...");
+
+    /* save the I/O backend */
+    al_store_state(&state, ALLEGRO_STATE_NEW_FILE_INTERFACE);
 
     /* initialize physfs */
 #if !defined(__ANDROID__)
@@ -188,6 +196,12 @@ void asset_init(const char* argv0, const char* optional_gamedir)
             CRASH("Can't mount the game directory at %s. Error: %s", gamedir, PHYSFSx_getLastErrorMessage());
         LOG("Mounting gamedir: %s", gamedir);
 
+        /* which engine version does this MOD require? */
+        al_set_physfs_file_interface();
+        guess_required_engine_version(required_engine_version, sizeof(required_engine_version));
+        al_restore_state(&state);
+        LOG("Required engine version of this MOD: %s", required_engine_version);
+
         /* experimental compatibility option */
         if(experimental_compatibility) {
             ALLEGRO_PATH* shared_datadir = find_shared_datadir();
@@ -239,6 +253,10 @@ void asset_init(const char* argv0, const char* optional_gamedir)
             CRASH("Can't mount the shared data directory at %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
         LOG("Mounting shared data directory: %s", dirpath);
 
+        /* which engine version does this MOD require? */
+        str_cpy(required_engine_version, GAME_VERSION_STRING, sizeof(required_engine_version));
+        LOG("Required engine version of this MOD: %s", required_engine_version);
+
 #if defined(__ANDROID__)
         /* on Android, read from the assets/ folder inside the .apk */
         /*dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP);*/
@@ -260,7 +278,6 @@ void asset_init(const char* argv0, const char* optional_gamedir)
 
     /* enable the physfs file interface. This should be the last task
        performed in this function (e.g., see create_dir()) */
-    al_store_state(&state, ALLEGRO_STATE_NEW_FILE_INTERFACE);
     al_set_physfs_file_interface();
 
     /* done! */
@@ -814,4 +831,61 @@ uint32_t hash32(const char* str)
     hash += hash << 15;
 
     return hash;
+}
+
+/*
+ * guess_required_engine_version()
+ * Guess the required engine version of the currently running MOD
+ */
+char* guess_required_engine_version(char* buffer, size_t buffer_size)
+{
+    int max_version_code = 0;
+
+    /* begin with an initial guess */
+    const char* initial_guess = "0.5.0";
+    max_version_code = parse_version_number(initial_guess);
+
+    /* guess the required engine version by reading the .lev files */
+    assertx(asset_is_init());
+    asset_foreach_file("levels/", ".lev", scan_required_engine_version, &max_version_code, true);
+
+    /* return the guessed version */
+    return stringify_version_number(max_version_code, buffer, sizeof(buffer_size));
+}
+
+/*
+ * scan_required_engine_version()
+ * Scan a .lev file, looking for the "required" field
+ */
+int scan_required_engine_version(const char* vpath, void* context)
+{
+    levparser_parse(vpath, context, scan_level_line);
+    return 0;
+}
+
+/*
+ * scan_level_line()
+ * Scan a line of a .lev file, looking for the "required" field
+ */
+bool scan_level_line(const char* vpath, int line, levparser_command_t command, const char* command_name, int param_count, const char** param, void* context)
+{
+    /* skip */
+    if(command != LEVCOMMAND_REQUIRES)
+        return true;
+
+    /* invalid line? */
+    if(param_count == 0)
+        return true; /* skip */
+
+    /* read version */
+    const char* version = param[0];
+    int version_code = parse_version_number(version);
+
+    /* compare version */
+    int* max_version_code = (int*)context;
+    if(version_code > *max_version_code)
+        *max_version_code = version_code;
+
+    /* we're done reading this file */
+    return false;
 }
