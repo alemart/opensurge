@@ -25,8 +25,8 @@ object "Animal" is "entity", "private", "disposable"
 
     state "main"
     {
-        // play "appearing" animation
-        actor.anim = 2 * Math.clamp(id, 0, maxAnimals - 1);
+        // play the "appearing" animation
+        actor.anim = idToAnim(id);
         actor.zindex = zindex;
 
         // wait a bit
@@ -98,11 +98,18 @@ object "Animal" is "entity", "private", "disposable"
         // find the Animal theme manager
         animalManager = Level.child("Animals") || Level.spawn("Animals");
 
-        // pick a random animal
-        id = animalManager.pickAnimal();
-
         // read maxAnimals
         maxAnimals = animalManager.maxAnimals;
+
+        // pick a random animal
+        for(i = 0; i < 10; i++) {
+            id = animalManager.pickAnimal();
+
+            // check if the required animation has been defined in the .spr file
+            actor.anim = idToAnim(id);
+            if(actor.animation.exists)
+                break;
+        }
 
         // select the proper movement
         if(animalManager.animalType(id) == "bird") {
@@ -146,6 +153,11 @@ object "Animal" is "entity", "private", "disposable"
     fun isUnderwater()
     {
         return (transform.position.y >= Level.waterlevel);
+    }
+
+    fun idToAnim(id)
+    {
+        return 2 * Math.clamp(id, 0, maxAnimals - 1);
     }
 }
 
