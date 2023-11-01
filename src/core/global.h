@@ -53,8 +53,10 @@
 #endif
 
 /* Version code & string */
-#define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (to preserve compatibility) */
 #define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION_SUP) "." STRINGIFY(GAME_VERSION_SUB) "." STRINGIFY(GAME_VERSION_WIP) _GAME_VERSION_FIX _GAME_BUILD_VERSION /* must include GAME_BUILD_VERSION (to help differentiate between builds at runtime) */
+#define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (to preserve compatibility) */
+#define VERSION_CODE(x,y,z)     VERSION_CODE_EX((x), (y), (z), 0)
+#define VERSION_CODE_EX(x,y,z,w) ((x) * 1000000 + (y) * 10000 + (z) * 100 + (w))
 
 /* Copyright text */
 #define GAME_COPYRIGHT "" \
@@ -82,7 +84,6 @@
 /* Utilities */
 #define STRINGIFY(x)            _STRINGIFY(x)
 #define _STRINGIFY(x)           #x
-#define VERSION_CODE(x,y,z)     ((x) * 10000 + (y) * 100 + (z))
 
 /* Legacy constants */
 #undef TRUE

@@ -320,7 +320,7 @@ int parse_version_number_ex(const char* version_string, int* x, int* y, int* z, 
     if(z != NULL) *z = c;
     if(w != NULL) *w = d;
 
-    return a * 1000000 + b * 10000 + c * 100 + d;
+    return VERSION_CODE_EX(a, b, c, d);
 }
 
 /*
@@ -342,6 +342,7 @@ char* stringify_version_number(int version_code, char* buffer, size_t buffer_siz
     y = (version_code - x * 1000000) / 10000;
     z = (version_code - x * 1000000 - y * 10000) / 100;
     w = (version_code - x * 1000000 - y * 10000 - z * 100);
+    assertx(version_code == VERSION_CODE_EX(x, y, z, w));
 
     if(w != 0)
         snprintf(buffer, buffer_size, "%d.%d.%d.%d", x, y, z, w);
