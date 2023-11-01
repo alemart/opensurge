@@ -274,29 +274,53 @@ const char* physfs_version_string()
 
 /*
  * parse_version_number()
- * Convert a "x.y.z[.w]" version string to a version code,
- * which is a comparable integer
+ * Convert a "x.y.z[.w]" version string to a version code, which is
+ * a comparable integer.
  */
 int parse_version_number(const char* version_string)
 {
-    char ver[16], *s;
-    int code[4] = { 0, 0, 0, 0 }, j = 0;
+    return parse_version_number_ex(version_string, NULL, NULL, NULL, NULL);
+}
 
+/*
+ * parse_version_number_ex()
+ * Convert a "x.y.z[.w]" version string to a version code, which is
+ * a comparable integer. Output parameters x, y, w and w may be NULL
+ */
+int parse_version_number_ex(const char* version_string, int* x, int* y, int* z, int* w)
+{
+    char ver[16];
+    int code[4] = { 0, 0, 0, 0 };
+
+    /* copy the version string to a temporary buffer */
     str_cpy(ver, version_string, sizeof(ver));
 
-    /* this will accept string format [x[.y[.z[.w]]]] with delim = .- */
-    s = strtok(ver, ".-");
-    while(s != NULL && j < 4) {
-        code[j++] = atoi(s);
-        s = strtok(NULL, ".-");
+    /* the string format may be of the form x.y.z[.w][-some_string] */
+    for(char* h = ver; *h; h++) {
+        if(!((*h >= '0' && *h <= '9') || (*h == '.'))) {
+            *h = '\0';
+            break;
+        }
     }
 
-    int x = clip(code[0], 0, 99);
-    int y = clip(code[1], 0, 99);
-    int z = clip(code[2], 0, 99);
-    int w = clip(code[3], 0, 99);
+    /* this will accept string format [x[.y[.z[.w]]]] */
+    char* s = strtok(ver, ".");
+    for(int j = 0; s != NULL && j < 4; ) {
+        code[j++] = *s ? atoi(s) : 0;
+        s = strtok(NULL, ".");
+    }
 
-    return x * 1000000 + y * 10000 + z * 100 + w;
+    int a = clip(code[0], 0, 99);
+    int b = clip(code[1], 0, 99);
+    int c = clip(code[2], 0, 99);
+    int d = clip(code[3], 0, 99);
+
+    if(x != NULL) *x = a;
+    if(y != NULL) *y = b;
+    if(z != NULL) *z = c;
+    if(w != NULL) *w = d;
+
+    return a * 1000000 + b * 10000 + c * 100 + d;
 }
 
 /*
