@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * asset.h - asset manager (virtual filesystem)
+ * mods.h - utilities for MODs & compatibility mode
  * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -18,26 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _ASSET_H
-#define _ASSET_H
+#ifndef _MODS_H
+#define _MODS_H
 
 #include <stdlib.h>
-#include <stdbool.h>
 
-void asset_init(const char* argv0, const char* optional_gamedir, bool want_compatibility_mode);
-void asset_release();
-bool asset_is_init();
+bool generate_compatibility_pack(const char* engine_version, void** out_file_data, size_t* out_file_size);
+char* guess_required_engine_version(char* buffer, size_t buffer_size);
 
-bool asset_exists(const char* virtual_path);
-const char* asset_path(const char* virtual_path);
-void asset_foreach_file(const char* virtual_path_of_directory, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
-
-char* asset_user_datadir(char* dest, size_t dest_size);
-char* asset_shared_datadir(char* dest, size_t dest_size);
-bool asset_purge_user_data();
-
-const char* asset_gamedir();
-const char* asset_guessed_engine_version();
-bool asset_in_compatibility_mode();
+bool generate_pak_file(const char** file_list, int file_count, void** out_pak_data, size_t* out_pak_size);
+bool generate_pak_file_from_memory(const char** vpath, int file_count, const void** file_data, const size_t* file_size, void** out_pak_data, size_t* out_pak_size);
+void release_pak_file(void* pak);
 
 #endif

@@ -35,8 +35,7 @@ Run `opensurge --help`
 Extract the MOD to your filesystem and run the game.
 
 - Windows: launch the executable.
-- Linux: run `opensurge --game-folder /path/to/mod/folder/` on the command-line.
-- macOS: use the `--game-folder` command-line option or launch the native executable if provided.
+- Linux, macOS: run `opensurge --game /path/to/game/` on the command-line.
 
 Use preferably the same engine version as the MOD if a native executable isn't provided (check `logfile.txt`).
 
@@ -83,7 +82,7 @@ The default paths of these locations vary according to the platform:
     * `share`: `Contents/Resources`
     * `user`: `~/Library/Application Support/opensurge/` or `$OPENSURGE_USER_PATH`
 
-If you intend to hack the game, it's easier to have all files in the same place (read-write), because some of the above folders are read-only. [Download the sources](https://github.com/alemart/opensurge/releases), extract them to your filesystem and use the `--game-folder` command-line option as explained in [Running MODs](#running-mods).
+If you intend to hack the game, it's easier to have all files in the same place (read-write), because some of the above folders are read-only. [Download the sources](https://github.com/alemart/opensurge/releases), extract them to your filesystem and use the `--game` command-line option as explained in [Running MODs](#running-mods).
 
 Tip: since version 0.6.1 you can use the command-line option `--verbose` to see where the files are. The directories will appear at the beginning of the output.
 

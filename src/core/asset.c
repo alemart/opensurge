@@ -24,11 +24,11 @@
 #include <stdio.h>
 #include <string.h>
 #include "asset.h"
+#include "mods.h"
 #include "global.h"
 #include "logfile.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
-#include "../scenes/util/levparser.h"
 #include "../third_party/ignorecase.h"
 
 /* The default directory of the game assets provided by upstream (*nix only) */
@@ -53,11 +53,6 @@
 #define LOG(...)                        logfile_message("[asset] " __VA_ARGS__)
 #define WARN(...)                       do { fprintf(stderr, "[asset] " __VA_ARGS__); fprintf(stderr, "\n"); LOG(__VA_ARGS__); } while(0)
 #define CRASH(...)                      fatal_error("[asset] " __VA_ARGS__)
-#define ASSERT(expr) do { \
-    if(!(expr)) { \
-        CRASH("Assertion failed: " #expr " in %s at %s:%d", __func__, __FILE__, __LINE__); \
-    } \
-} while(0)
 
 /* Name of the user-modifiable asset directory */
 #define DEFAULT_USER_DATADIRNAME                    GAME_USERDIRNAME
@@ -73,11 +68,10 @@ typedef char _32bit_hash_assert[ !!(GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH == 
 typedef char _default_user_datadirname_assert[ !!(sizeof(user_datadirname) > DEFAULT_USER_DATADIRNAME_LENGTH) * 2 - 1 ];
 typedef char _user_datadirname_capacity_assert[ !!(sizeof(user_datadirname) == sizeof(_GENERATED_USER_DATADIRNAME)) * 2 - 1 ];
 
-
-
 /* Utilities */
 static char* gamedir = NULL; /* custom asset folder specified by the user */
 static char required_engine_version[16] = "0.5.0";
+static bool compatibility_mode = false;
 
 static ALLEGRO_STATE state;
 static ALLEGRO_PATH* find_exedir();
@@ -93,18 +87,21 @@ static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, in
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
 static uint32_t hash32(const char* str);
 static bool is_valid_root_folder();
-static char* guess_required_engine_version(char* buffer, size_t buffer_size);
-static int scan_required_engine_version(const char* vpath, void* context);
-static bool scan_level_line(const char* vpath, int line, levparser_command_t command, const char* command_name, int param_count, const char** param, void* context);
 
+static void setup_compatibility_scripts(const char* shared_dirpath, const char* engine_version);
+static void setup_compatibility_translations(const char* shared_dirpath);
+static int scan_translations(const char* vpath, void* context);
+static int append_translations(const char* vpath, void* context);
+static size_t crlf_to_lf(uint8_t* data, size_t size);
 
 
 /*
  * asset_init()
  * Initializes the asset manager.
  * Pass NULL to optional_gamedir to use the default search paths
+ * compatibility_mode is only applicable when optional_gamedir != NULL
  */
-void asset_init(const char* argv0, const char* optional_gamedir)
+void asset_init(const char* argv0, const char* optional_gamedir, bool want_compatibility_mode)
 {
     /* already initialized? */
     if(asset_is_init())
@@ -128,10 +125,9 @@ void asset_init(const char* argv0, const char* optional_gamedir)
     /* set the default name of the user-modifiable asset directory */
     str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
 
-    /* experimental compatibility option for old MODs: append gamedir to the default shared datadir */
-    bool experimental_compatibility = (optional_gamedir != NULL && *optional_gamedir == '+');
-    if(experimental_compatibility)
-        ++optional_gamedir;
+    /* compatibility mode */
+    if(optional_gamedir == NULL)
+        want_compatibility_mode = false;
 
     /* copy the gamedir, if specified */
     gamedir = (optional_gamedir != NULL) ? str_dup(optional_gamedir) : NULL;
@@ -201,11 +197,31 @@ void asset_init(const char* argv0, const char* optional_gamedir)
         guess_required_engine_version(required_engine_version, sizeof(required_engine_version));
         al_restore_state(&state);
         LOG("Required engine version of this MOD: %s", required_engine_version);
+        {
+            int sup, sub, wip;
+            int mod_version = parse_version_number_ex(required_engine_version, &sup, &sub, &wip, NULL);
+            int engine_version = parse_version_number(GAME_VERSION_STRING);
 
-        /* experimental compatibility option */
-        if(experimental_compatibility) {
+            if(game_version_compare(sup, sub, wip) < 0)
+                CRASH("This MOD requires a newer version of the engine, %s. Please upgrade the engine or downgrade the MOD to version %s of the engine.", required_engine_version, GAME_VERSION_STRING);
+            else if(engine_version < mod_version)
+                LOG("This MOD requires a newer version of the engine, %s. We'll try to run it anyway. Engine version is %s.", required_engine_version, GAME_VERSION_STRING);
+        }
+
+        /* compatibility mode */
+        compatibility_mode = want_compatibility_mode;
+        if(compatibility_mode) {
             ALLEGRO_PATH* shared_datadir = find_shared_datadir();
             const char* dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP);
+
+            /* log */
+            LOG("=== Using compatibility mode for MODs ===");
+
+            /* override scripts */
+            al_set_physfs_file_interface();
+            setup_compatibility_scripts(dirpath, required_engine_version);
+            setup_compatibility_translations(dirpath);
+            al_restore_state(&state);
 
             /* mount the default shared data directory with lower precedence */
             if(!PHYSFS_mount(dirpath, "/", 1))
@@ -259,7 +275,7 @@ void asset_init(const char* argv0, const char* optional_gamedir)
 
 #if defined(__ANDROID__)
         /* on Android, read from the assets/ folder inside the .apk */
-        /*dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP);*/
+        dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP); /* redundant */
         PHYSFS_setRoot(dirpath, "/assets");
 #endif
 
@@ -482,7 +498,34 @@ char* asset_shared_datadir(char* dest, size_t dest_size)
     return dest;
 }
 
+/*
+ * asset_gamedir()
+ * Custom asset folder specified by the user.
+ * Returns NULL if no such folder has been specified
+ */
+const char* asset_gamedir()
+{
+    return gamedir;
+}
 
+/*
+ * asset_guessed_engine_version()
+ * Guessed engine version, based on the assets.
+ * Returns a string of the x.y.z[.w] form.
+ */
+const char* asset_guessed_engine_version()
+{
+    return required_engine_version;
+}
+
+/*
+ * asset_in_compatibility_mode()
+ * Was the asset manager initialized in compatibility mode?
+ */
+bool asset_in_compatibility_mode()
+{
+    return compatibility_mode;
+}
 
 
 /*
@@ -497,7 +540,7 @@ char* asset_shared_datadir(char* dest, size_t dest_size)
 ALLEGRO_PATH* find_exedir()
 {
     ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_EXENAME_PATH);
-    ASSERT(path != NULL);
+    assertx(path != NULL);
 
     al_set_path_filename(path, NULL);
 
@@ -512,7 +555,7 @@ ALLEGRO_PATH* find_exedir()
 ALLEGRO_PATH* find_homedir()
 {
     ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_USER_HOME_PATH);
-    ASSERT(path != NULL);
+    assertx(path != NULL);
 
     return path;
 }
@@ -719,7 +762,7 @@ const char* case_insensitive_fix(const char* virtual_path)
 {
     static char buffer[ASSET_PATH_MAX];
 
-    ASSERT(strlen(virtual_path) < sizeof(buffer)); /* really?! */
+    assertx(strlen(virtual_path) < sizeof(buffer)); /* really?! */
     str_cpy(buffer, virtual_path, sizeof(buffer));
 
     if(0 == PHYSFSEXT_locateCorrectCase(buffer))
@@ -834,58 +877,206 @@ uint32_t hash32(const char* str)
 }
 
 /*
- * guess_required_engine_version()
- * Guess the required engine version of the currently running MOD
+ * setup_compatibility_scripts()
+ * Override scripts according to pre-defined compatibility rules
  */
-char* guess_required_engine_version(char* buffer, size_t buffer_size)
+void setup_compatibility_scripts(const char* shared_dirpath, const char* engine_version)
 {
-    int max_version_code = 0;
+    assertx(PHYSFS_isInit());
 
-    /* begin with an initial guess */
-    const char* initial_guess = "0.5.0";
-    max_version_code = parse_version_number(initial_guess);
+    /* log */
+    LOG("Will build a compatibility pack from %s", shared_dirpath);
 
-    /* guess the required engine version by reading the .lev files */
-    assertx(asset_is_init());
-    asset_foreach_file("levels/", ".lev", scan_required_engine_version, &max_version_code, true);
+    /* mount the default shared data directory with higher precedence */
+    if(!PHYSFS_mount(shared_dirpath, "/", 0))
+        CRASH("Can't mount the shared data directory at %s. Error: %s", shared_dirpath, PHYSFSx_getLastErrorMessage());
 
-    /* return the guessed version */
-    return stringify_version_number(max_version_code, buffer, sizeof(buffer_size));
+#if defined(__ANDROID__)
+    /* on Android, read from the assets/ folder inside the .apk */
+    PHYSFS_setRoot(shared_dirpath, "/assets");
+#endif
+
+    /* create compatibility pack */
+    void* pack_data = NULL;
+    size_t pack_size = 0;
+    if(!generate_compatibility_pack(engine_version, &pack_data, &pack_size))
+        CRASH("Can't build a compatibility pack from %s", shared_dirpath);
+
+    /* unmount the default shared data directory */
+    if(!PHYSFS_unmount(shared_dirpath))
+        CRASH("Can't unmount the shared data directory at %s. Error: %s", shared_dirpath, PHYSFSx_getLastErrorMessage());
+
+    /* mount the compatibility pack with higher precedence */
+    if(!PHYSFS_mountMemory(pack_data, pack_size, release_pak_file, "compatibility.pak", "/", 0)) {
+        release_pak_file(pack_data);
+        CRASH("Can't mount the compatibility pack. Error: %s", PHYSFSx_getLastErrorMessage());
+    }
 }
 
 /*
- * scan_required_engine_version()
- * Scan a .lev file, looking for the "required" field
+ * setup_compatibility_translations()
+ * Generate compatibility translation files (.lng)
  */
-int scan_required_engine_version(const char* vpath, void* context)
+void setup_compatibility_translations(const char* shared_dirpath)
 {
-    levparser_parse(vpath, context, scan_level_line);
+    assertx(PHYSFS_isInit());
+
+    /* log */
+    LOG("Will build a language compatibility pack from %s", shared_dirpath);
+
+    /* we'll store the language files in memory */
+    int file_count = 0;
+    char** file_vpath = NULL;
+    uint8_t** file_data = NULL;
+    size_t* file_size = NULL;
+    void* file_context[] = { &file_count, &file_vpath, &file_data, &file_size };
+
+    /* scan the language files of the gamedir */
+    asset_foreach_file("languages/", ".lng", scan_translations, file_context, true);
+    if(file_count == 0) {
+        WARN("No language files were found!");
+        return;
+    }
+
+    /* mount the default shared data directory with higher precedence */
+    if(!PHYSFS_mount(shared_dirpath, "/", 0))
+        CRASH("Can't mount the shared data directory at %s. Error: %s", shared_dirpath, PHYSFSx_getLastErrorMessage());
+
+    /* read the language files from the shared data directory */
+    for(int file_index = 0; file_index < file_count; file_index++) {
+        void* file_context[] = { &file_index, &file_vpath, &file_data, &file_size };
+        append_translations(file_vpath[file_index], file_context);
+    }
+
+    /* unmount the default shared data directory */
+    if(!PHYSFS_unmount(shared_dirpath))
+        CRASH("Can't unmount the shared data directory at %s. Error: %s", shared_dirpath, PHYSFSx_getLastErrorMessage());
+
+    /* read the language files from the gamedir */
+    for(int file_index = 0; file_index < file_count; file_index++) {
+        void* file_context[] = { &file_index, &file_vpath, &file_data, &file_size };
+        append_translations(file_vpath[file_index], file_context);
+    }
+
+    /* create a compatibility pack */
+    void* pack_data = NULL;
+    size_t pack_size = 0;
+    if(!generate_pak_file_from_memory((const char**)file_vpath, file_count, (const void**)file_data, file_size, &pack_data, &pack_size))
+        CRASH("Can't build a language compatibility pack from %s", shared_dirpath);
+
+    /* release the language files (we already have a .pak) */
+    for(int i = file_count - 1; i >= 0; i--) {
+        if(file_data[i] != NULL)
+            free(file_data[i]);
+        if(file_vpath[i] != NULL)
+            free(file_vpath[i]);
+    }
+    free(file_size);
+    free(file_data);
+    free(file_vpath);
+
+    /* mount the compatibility pack with higher precedence */
+    if(!PHYSFS_mountMemory(pack_data, pack_size, release_pak_file, "language_compatibility.pak", "/", 0)) {
+        release_pak_file(pack_data);
+        CRASH("Can't mount the language compatibility pack. Error: %s", PHYSFSx_getLastErrorMessage());
+    }
+}
+
+/*
+ * scan_translation()
+ * This callback for asset_foreach_file() scans the .lng files
+ */
+int scan_translations(const char* vpath, void* context)
+{
+    void** file_context = (void**)context;
+    int* file_count = file_context[0];
+    char*** file_vpath = file_context[1];
+    uint8_t*** file_data = file_context[2];
+    size_t** file_size = file_context[3];
+
+    int last = (*file_count)++;
+
+    *file_vpath = reallocx(*file_vpath, (*file_count) * sizeof(char*));
+    (*file_vpath)[last] = str_dup(vpath);
+
+    *file_data = reallocx(*file_data, (*file_count) * sizeof(uint8_t*));
+    (*file_data)[last] = NULL;
+
+    *file_size = reallocx(*file_size, (*file_count) * sizeof(size_t));
+    (*file_size)[last] = 0;
+
     return 0;
 }
 
 /*
- * scan_level_line()
- * Scan a line of a .lev file, looking for the "required" field
+ * append_translations()
+ * Append a .lng file to a memory buffer
  */
-bool scan_level_line(const char* vpath, int line, levparser_command_t command, const char* command_name, int param_count, const char** param, void* context)
+int append_translations(const char* vpath, void* context)
 {
-    /* skip */
-    if(command != LEVCOMMAND_REQUIRES)
-        return true;
+    /* the glue */
+    const uint8_t glue[] = "\n\n// [[ compatibility mode ]]\n\n";
+    const int glue_length = sizeof(glue) - 1;
 
-    /* invalid line? */
-    if(param_count == 0)
-        return true; /* skip */
+    /* the merged file stored in memory */
+    void** file_context = (void**)context;
+    int file_index = *((int*)(file_context[0]));
+    char** file_vpath = *((char***)(file_context[1]));
+    uint8_t** file_data = *((uint8_t***)(file_context[2]));
+    size_t* file_size = *((size_t**)(file_context[3]));
 
-    /* read version */
-    const char* version = param[0];
-    int version_code = parse_version_number(version);
+    /* open the .lng file */
+    ALLEGRO_FILE* fp = al_fopen(file_vpath[file_index], "rb");
+    if(fp == NULL) {
+        WARN("Can't open \"%s\" for reading!", file_vpath[file_index]);
+        return 0;
+    }
 
-    /* compare version */
-    int* max_version_code = (int*)context;
-    if(version_code > *max_version_code)
-        *max_version_code = version_code;
+    /* find the size of the .lng file and reallocate the buffer */
+    size_t lng_size = al_fsize(fp);
+    file_data[file_index] = reallocx(file_data[file_index], file_size[file_index] + lng_size + glue_length);
 
-    /* we're done reading this file */
-    return false;
+    /* read to buffer */
+    size_t read_bytes = al_fread(fp, file_data[file_index] + file_size[file_index], lng_size);
+    if(lng_size != read_bytes) {
+        WARN("Expected to read %lu bytes (instead of %lu) from \"%s\"",
+            (unsigned long)lng_size, (unsigned long)read_bytes, file_vpath[file_index]);
+    }
+    else {
+        /* the physfs file I/O only works in binary mode
+           it's not strictly necessary to convert the translation files from CRLF to LF, but it's good to do... */
+        lng_size = crlf_to_lf(file_data[file_index] + file_size[file_index], read_bytes);
+        if(lng_size < read_bytes)
+            LOG("Converted \"%s\" from CRLF to LF", file_vpath[file_index]);
+    }
+
+    /* append glue */
+    memcpy(file_data[file_index] + file_size[file_index] + lng_size, glue, glue_length);
+
+    /* increase file size */
+    file_size[file_index] += lng_size + glue_length;
+
+    /* done! */
+    al_fclose(fp);
+    return 0;
+}
+
+/*
+ * crlf_to_lf()
+ * Convert CRLF to LF in a memory buffer
+ */
+size_t crlf_to_lf(uint8_t* data, size_t size)
+{
+    size_t i, j;
+
+    for(i = j = 0; i < size; i++) {
+        if(data[i] == '\r' && i+1 < size && data[i+1] == '\n') {
+            data[j++] = '\n';
+            i++;
+        }
+        else
+            data[j++] = data[i];
+    }
+
+    return j;
 }

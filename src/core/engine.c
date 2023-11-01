@@ -313,6 +313,7 @@ void render_overlay()
 void init_basic_stuff(const commandline_t* cmd)
 {
     const char* gamedir = commandline_getstring(cmd->gamedir, NULL);
+    bool compatibility_mode = commandline_getint(cmd->compatibility_mode, FALSE);
 
     /* basic initialization */
     srand(time(NULL)); /* randomize */
@@ -341,7 +342,7 @@ void init_basic_stuff(const commandline_t* cmd)
     if(commandline_getint(cmd->verbose, FALSE))
         logfile_init(LOGFILE_CONSOLE);
 
-    asset_init(cmd->argv[0], gamedir);
+    asset_init(cmd->argv[0], gamedir, compatibility_mode);
     logfile_init(LOGFILE_TXT);
 
     /* initialize prefs and nanoparser */

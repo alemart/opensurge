@@ -37,6 +37,7 @@ struct commandline_t
     /* other options */
     int mobile;
     int verbose;
+    int compatibility_mode;
 
     /* filepaths */
     char gamedir[COMMANDLINE_PATHMAX];

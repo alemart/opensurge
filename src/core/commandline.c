@@ -113,7 +113,9 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
                 "    --quest \"filepath\"               run the specified quest (e.g., quests/default.qst)\n"
                 "    --language \"filepath\"            use the specified language (e.g., languages/english.lng)\n"
+                "    --game \"/path/to/game\"           same as --game-folder \"/path/to/game\" --compatibility-mode\n"
                 "    --game-folder \"/path/to/game\"    use game assets only from the specified folder\n"
+                "    --compatibility-mode             compatibility mode. To be combined with --game-folder\n"
                 "    --reset                          factory reset: clear all user-space files & changes\n"
                 "    --import \"/path/to/game\"         import an Open Surge game from the specified folder\n"
                 "    --import-wizard                  import an Open Surge game using a wizard\n"
@@ -214,12 +216,24 @@ commandline_t commandline_parse(int argc, char **argv)
                 crash("%s: missing --language parameter", program);
         }
 
+        else if(strcmp(argv[i], "--game") == 0) {
+            if(++i < argc && *(argv[i]) != '-') {
+                str_cpy(cmd.gamedir, argv[i], sizeof(cmd.gamedir));
+                cmd.compatibility_mode = TRUE;
+            }
+            else
+                crash("%s: missing --game parameter", program);
+        }
+
         else if(strcmp(argv[i], "--game-folder") == 0) {
             if(++i < argc && *(argv[i]) != '-')
                 str_cpy(cmd.gamedir, argv[i], sizeof(cmd.gamedir));
             else
                 crash("%s: missing --game-folder parameter", program);
         }
+
+        else if(strcmp(argv[i], "--compatibility-mode") == 0)
+            cmd.compatibility_mode = TRUE;
 
         else if(strcmp(argv[i], "--reset") == 0) {
             static char user_datadir[1024];

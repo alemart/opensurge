@@ -293,6 +293,7 @@ SET(GAME_SRCS
   src/core/keyframes.c
   src/core/lang.c
   src/core/logfile.c
+  src/core/mods.c
   src/core/nanoparser.c
   src/core/prefs.c
   src/core/quest.c
@@ -435,6 +436,7 @@ SET(GAME_HEADERS
   src/core/keyframes.h
   src/core/lang.h
   src/core/logfile.h
+  src/core/mods.h
   src/core/nanoparser.h
   src/core/prefs.h
   src/core/quest.h
