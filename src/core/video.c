@@ -56,7 +56,7 @@
 #define DEFAULT_WINDOW_TITLE (GAME_TITLE " " GAME_VERSION_STRING)
 static char window_title[256] = DEFAULT_WINDOW_TITLE;
 static ALLEGRO_DISPLAY* display = NULL; /* game window */
-static bool create_display();
+static bool create_display(int width, int height);
 static void destroy_display();
 static void reconfigure_display();
 static void compute_display_transform(ALLEGRO_TRANSFORM* transform);
@@ -254,8 +254,8 @@ void video_init()
     fps_time = 0.0;
 
     /* create the display */
-    if(!create_display())
-        FATAL("Failed to create the display");
+    if(!create_display(game_screen_width, game_screen_height))
+        FATAL("Failed to create a %dx%d display", game_screen_width, game_screen_height);
 
     /* create the backbuffer */
     if(!create_backbuffer())
@@ -728,7 +728,7 @@ bool video_use_default_shader()
  */
 
 /* Create the display (window) */
-bool create_display()
+bool create_display(int width, int height)
 {
     ALLEGRO_STATE state;
 
@@ -761,6 +761,8 @@ bool create_display()
     /* create an OpenGL context with "default" settings. Will likely work.
        (we should require 3.3+ instead, or ES 3.0+) */
     ;
+
+    /*al_set_new_display_option(ALLEGRO_CAN_DRAW_INTO_BITMAP, 1, ALLEGRO_REQUIRE);*/
 #endif
 
     al_set_new_display_option(
@@ -770,8 +772,7 @@ bool create_display()
             ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT,
         ALLEGRO_REQUIRE
     );
-    al_set_new_display_option(ALLEGRO_SUPPORT_NPOT_BITMAP, 1, ALLEGRO_SUGGEST);
-    al_set_new_display_option(ALLEGRO_CAN_DRAW_INTO_BITMAP, 1, ALLEGRO_REQUIRE);
+
 #if defined(ALLEGRO_VERSION_INT) && defined(AL_ID) && ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
     al_set_new_display_option(ALLEGRO_DEFAULT_SHADER_PLATFORM, ALLEGRO_SHADER_GLSL_MINIMAL, ALLEGRO_REQUIRE); /* faster shader with no alpha testing */
 #endif
@@ -783,7 +784,7 @@ bool create_display()
 #if defined(__ANDROID__)
     display = al_create_display(0, 0); /* occupy the entire screen on mobile */
 #else
-    display = al_create_display(game_screen_width, game_screen_height);
+    display = al_create_display(width, height);
 #endif
 
     al_restore_state(&state);
