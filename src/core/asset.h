@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-void asset_init(const char* argv0, const char* optional_gamedir, bool want_compatibility_mode);
+void asset_init(const char* argv0, const char* optional_gamedir, const char* compatibility_version);
 void asset_release();
 bool asset_is_init();
 
@@ -37,7 +37,6 @@ char* asset_shared_datadir(char* dest, size_t dest_size);
 bool asset_purge_user_data();
 
 const char* asset_gamedir();
-const char* asset_guessed_engine_version();
-bool asset_in_compatibility_mode();
+int asset_compatibility_version_code();
 
 #endif

@@ -69,9 +69,9 @@ typedef char _default_user_datadirname_assert[ !!(sizeof(user_datadirname) > DEF
 typedef char _user_datadirname_capacity_assert[ !!(sizeof(user_datadirname) == sizeof(_GENERATED_USER_DATADIRNAME)) * 2 - 1 ];
 
 /* Utilities */
+#define DEFAULT_COMPATIBILITY_VERSION_CODE VERSION_CODE_EX(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP, GAME_VERSION_FIX)
+static int compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE; /* for the compatibility mode */
 static char* gamedir = NULL; /* custom asset folder specified by the user */
-static char required_engine_version[16] = "0.5.0";
-static bool compatibility_mode = false;
 
 static ALLEGRO_STATE state;
 static ALLEGRO_PATH* find_exedir();
@@ -99,9 +99,12 @@ static size_t crlf_to_lf(uint8_t* data, size_t size);
  * asset_init()
  * Initializes the asset manager.
  * Pass NULL to optional_gamedir to use the default search paths
- * compatibility_mode is only applicable when optional_gamedir != NULL
+ * compatibility_version is only applicable when optional_gamedir != NULL and may be set to:
+ * - NULL to disable compatibility mode;
+ * - an empty string "" to enable compatibility with an automatically picked version of the engine;
+ * - a version string "x.y.z" to enable compatibility with that version of the engine.
  */
-void asset_init(const char* argv0, const char* optional_gamedir, bool want_compatibility_mode)
+void asset_init(const char* argv0, const char* optional_gamedir, const char* compatibility_version)
 {
     /* already initialized? */
     if(asset_is_init())
@@ -124,10 +127,6 @@ void asset_init(const char* argv0, const char* optional_gamedir, bool want_compa
 
     /* set the default name of the user-modifiable asset directory */
     str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
-
-    /* compatibility mode */
-    if(optional_gamedir == NULL)
-        want_compatibility_mode = false;
 
     /* copy the gamedir, if specified */
     gamedir = (optional_gamedir != NULL) ? str_dup(optional_gamedir) : NULL;
@@ -193,8 +192,9 @@ void asset_init(const char* argv0, const char* optional_gamedir, bool want_compa
         LOG("Mounting gamedir: %s", gamedir);
 
         /* which engine version does this MOD require? */
+        char required_engine_version[16] = "0.5.0";
         al_set_physfs_file_interface();
-        guess_required_engine_version(required_engine_version, sizeof(required_engine_version));
+        guess_engine_version_of_mod(required_engine_version, sizeof(required_engine_version));
         al_restore_state(&state);
         LOG("Required engine version of this MOD: %s", required_engine_version);
         {
@@ -209,17 +209,44 @@ void asset_init(const char* argv0, const char* optional_gamedir, bool want_compa
         }
 
         /* compatibility mode */
-        compatibility_mode = want_compatibility_mode;
-        if(compatibility_mode) {
+        if(compatibility_version != NULL) {
+            char buffer[16];
+            LOG("Using compatibility mode for MODs");
+
+            /* validate compatibility version */
+            if(*compatibility_version != '\0') {
+                /* manually set compatibility version */
+                LOG("Manually set compatibility version: %s", compatibility_version);
+                int version_code = parse_version_number(compatibility_version);
+                int min_version = parse_version_number(required_engine_version);
+                int max_version = parse_version_number(GAME_VERSION_STRING);
+
+                if(version_code < min_version) {
+                    compatibility_version = required_engine_version;
+                    LOG("Adjusting the compatibility version to %s", compatibility_version);
+                }
+                else if(version_code > max_version) {
+                    LOG("Can't set the compatibility version to %s", compatibility_version);
+                    compatibility_version = stringify_version_number(max_version, buffer, sizeof(buffer));
+                    LOG("Adjusting the compatibility version to %s", compatibility_version);
+                }
+            }
+            else {
+                /* automatically set compatibility version */
+                compatibility_version = required_engine_version;
+                LOG("Automatically set compatibility version: %s", compatibility_version);
+            }
+
+            /* store the compatibility version code */
+            compatibility_version_code = parse_version_number(compatibility_version);
+
+            /* find the directory of the base game */
             ALLEGRO_PATH* shared_datadir = find_shared_datadir();
             const char* dirpath = al_path_cstr(shared_datadir, ALLEGRO_NATIVE_PATH_SEP);
 
-            /* log */
-            LOG("=== Using compatibility mode for MODs ===");
-
             /* override scripts */
             al_set_physfs_file_interface();
-            setup_compatibility_scripts(dirpath, required_engine_version);
+            setup_compatibility_scripts(dirpath, compatibility_version);
             setup_compatibility_translations(dirpath);
             al_restore_state(&state);
 
@@ -235,6 +262,10 @@ void asset_init(const char* argv0, const char* optional_gamedir, bool want_compa
 
             al_destroy_path(shared_datadir); /* invalidates dirpath */
         }
+        else {
+            /* not in compatibility mode */
+            compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE;
+        }
 
         /* done */
         if(generated_user_datadir != NULL)
@@ -247,6 +278,9 @@ void asset_init(const char* argv0, const char* optional_gamedir, bool want_compa
         ALLEGRO_PATH* shared_datadir = find_shared_datadir();
         ALLEGRO_PATH* user_datadir = find_user_datadir(user_datadirname);
         const char* dirpath;
+
+        /* not in compatibility mode */
+        compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE;
 
         /* create the user dir if it doesn't exist */
         create_dir(user_datadir);
@@ -268,10 +302,6 @@ void asset_init(const char* argv0, const char* optional_gamedir, bool want_compa
         if(!PHYSFS_mount(dirpath, "/", 1))
             CRASH("Can't mount the shared data directory at %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
         LOG("Mounting shared data directory: %s", dirpath);
-
-        /* which engine version does this MOD require? */
-        str_cpy(required_engine_version, GAME_VERSION_STRING, sizeof(required_engine_version));
-        LOG("Required engine version of this MOD: %s", required_engine_version);
 
 #if defined(__ANDROID__)
         /* on Android, read from the assets/ folder inside the .apk */
@@ -509,23 +539,15 @@ const char* asset_gamedir()
 }
 
 /*
- * asset_guessed_engine_version()
- * Guessed engine version, based on the assets.
- * Returns a string of the x.y.z[.w] form.
+ * asset_compatibility_version_code()
+ * Compatibility mode: engine version code. If the compatibility mode
+ * is disabled, the current version code of the engine is returned.
  */
-const char* asset_guessed_engine_version()
+int asset_compatibility_version_code()
 {
-    return required_engine_version;
+    return compatibility_version_code;
 }
 
-/*
- * asset_in_compatibility_mode()
- * Was the asset manager initialized in compatibility mode?
- */
-bool asset_in_compatibility_mode()
-{
-    return compatibility_mode;
-}
 
 
 /*

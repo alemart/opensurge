@@ -30,6 +30,7 @@
 #include "asset.h"
 #include "import.h"
 #include "../util/stringutil.h"
+#include "../util/util.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -113,9 +114,9 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --level \"filepath\"               run the specified level (e.g., levels/my_level.lev)\n"
                 "    --quest \"filepath\"               run the specified quest (e.g., quests/default.qst)\n"
                 "    --language \"filepath\"            use the specified language (e.g., languages/english.lng)\n"
-                "    --game \"/path/to/game\"           same as --game-folder \"/path/to/game\" --compatibility-mode\n"
+                "    --game \"/path/to/game\"           play a game; the same as --game-folder with --compatibility-mode\n"
                 "    --game-folder \"/path/to/game\"    use game assets from the specified folder\n"
-                "    --compatibility-mode             compatibility mode for MODs. To be combined with --game-folder\n"
+                "    --compatibility-mode [version]   compatibility mode for MODs. To be combined with --game-folder\n"
                 "    --reset                          factory reset: clear all user-space files & changes\n"
                 "    --import \"/path/to/game\"         import an Open Surge game from the specified folder\n"
                 "    --import-wizard                  import an Open Surge game using a wizard\n"
@@ -220,6 +221,7 @@ commandline_t commandline_parse(int argc, char **argv)
             if(++i < argc && *(argv[i]) != '-') {
                 str_cpy(cmd.gamedir, argv[i], sizeof(cmd.gamedir));
                 cmd.compatibility_mode = TRUE;
+                cmd.compatibility_version[0] = '\0';
             }
             else
                 crash("%s: missing --game parameter", program);
@@ -232,8 +234,20 @@ commandline_t commandline_parse(int argc, char **argv)
                 crash("%s: missing --game-folder parameter", program);
         }
 
-        else if(strcmp(argv[i], "--compatibility-mode") == 0)
+        else if(strcmp(argv[i], "--compatibility-mode") == 0) {
             cmd.compatibility_mode = TRUE;
+            cmd.compatibility_version[0] = '\0';
+            if(i+1 < argc && *(argv[i+1]) != '-') {
+                char version_string[sizeof(cmd.compatibility_version)];
+                str_cpy(version_string, argv[++i], sizeof(version_string));
+
+                int version_code = parse_version_number(version_string);
+                stringify_version_number(version_code, cmd.compatibility_version, sizeof(cmd.compatibility_version));
+
+                if(0 != strcmp(version_string, cmd.compatibility_version))
+                    crash("%s: invalid compatibility mode version \"%s\". Did you mean %s?", program, version_string, cmd.compatibility_version);
+            }
+        }
 
         else if(strcmp(argv[i], "--reset") == 0) {
             static char user_datadir[1024];

@@ -314,6 +314,7 @@ void init_basic_stuff(const commandline_t* cmd)
 {
     const char* gamedir = commandline_getstring(cmd->gamedir, NULL);
     bool compatibility_mode = commandline_getint(cmd->compatibility_mode, FALSE);
+    const char* compatibility_version = commandline_getstring(cmd->compatibility_version, "");
 
     /* basic initialization */
     srand(time(NULL)); /* randomize */
@@ -342,7 +343,7 @@ void init_basic_stuff(const commandline_t* cmd)
     if(commandline_getint(cmd->verbose, FALSE))
         logfile_init(LOGFILE_CONSOLE);
 
-    asset_init(cmd->argv[0], gamedir, compatibility_mode);
+    asset_init(cmd->argv[0], gamedir, compatibility_mode ? compatibility_version : NULL);
     logfile_init(LOGFILE_TXT);
 
     /* initialize prefs and nanoparser */
