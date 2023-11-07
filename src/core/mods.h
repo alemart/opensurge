@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 bool generate_compatibility_pack(const char* engine_version, void** out_file_data, size_t* out_file_size);
-char* guess_required_engine_version(char* buffer, size_t buffer_size);
+char* guess_engine_version_of_mod(char* buffer, size_t buffer_size);
 
 bool generate_pak_file(const char** file_list, int file_count, void** out_pak_data, size_t* out_pak_size);
 bool generate_pak_file_from_memory(const char** vpath, int file_count, const void** file_data, const size_t* file_size, void** out_pak_data, size_t* out_pak_size);

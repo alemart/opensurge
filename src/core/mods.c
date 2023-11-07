@@ -138,10 +138,10 @@ static bool scan_level_line(const char* vpath, int line, levparser_command_t com
  */
 
 /*
- * guess_required_engine_version()
+ * guess_engine_version_of_mod()
  * Guess the required engine version of the currently running MOD
  */
-char* guess_required_engine_version(char* buffer, size_t buffer_size)
+char* guess_engine_version_of_mod(char* buffer, size_t buffer_size)
 {
     int max_version_code = 0;
 
