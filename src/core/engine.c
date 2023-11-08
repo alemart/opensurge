@@ -275,6 +275,21 @@ void engine_remove_event_source(ALLEGRO_EVENT_SOURCE* event_source)
     al_unregister_event_source(a5_event_queue, event_source);
 }
 
+/*
+ * engine_compatibility_version_code()
+ * An engine version code when in compatibility mode. When not in
+ * compatibility mode, this will be just the version code of this
+ * release of the engine. Compare it with VERSION_CODE().
+ */
+int engine_compatibility_version_code()
+{
+    return asset_compatibility_version_code();
+}
+
+
+
+
+
 
 /* private functions */
 

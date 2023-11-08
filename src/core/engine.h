@@ -35,5 +35,7 @@ bool engine_remove_event_listener(ALLEGRO_EVENT_TYPE event_type, void* data, voi
 void engine_add_event_source(ALLEGRO_EVENT_SOURCE* event_source);
 void engine_remove_event_source(ALLEGRO_EVENT_SOURCE* event_source);
 
+int engine_compatibility_version_code();
+
 #endif
 
