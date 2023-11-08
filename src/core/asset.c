@@ -85,8 +85,10 @@ static const char* find_extension(const char* path);
 static const char* case_insensitive_fix(const char* virtual_path);
 static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
+static char* generate_writedirname(const char* gamedir, char* buffer, size_t buffer_size);
 static uint32_t hash32(const char* str);
 static bool is_valid_root_folder();
+static char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size);
 
 static void setup_compatibility_scripts(const char* shared_dirpath, const char* engine_version);
 static void setup_compatibility_translations(const char* shared_dirpath);
@@ -147,17 +149,19 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             CRASH("Can't use game directory %s. Make sure that it exists and that it is readable.", gamedir);
 
         }
-        else if(!(mode & ALLEGRO_FILEMODE_WRITE)) {
 
-            /* gamedir isn't writable... could this be flatpak?
+        /* set the write dir to gamedir if possible;
+           otherwise set it to a generated directory */
+        const char* writedir = gamedir;
+        if(!(mode & ALLEGRO_FILEMODE_ISDIR) || !PHYSFS_setWriteDir(writedir)) {
+            /* log */
+            if(mode & ALLEGRO_FILEMODE_ISDIR)
+                LOG("Can't set the write directory to %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
+
+            /* gamedir either isn't writable or isn't a folder...
+               could this be flatpak? or a compressed archive?
                let's generate a write folder based on gamedir */
-            snprintf(
-                user_datadirname, sizeof(user_datadirname),
-                "%s%0*x",
-                GENERATED_USER_DATADIRNAME_PREFIX,
-                (int)(GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH),
-                hash32(gamedir)
-            );
+            generate_writedirname(gamedir, user_datadirname, sizeof(user_datadirname));
 
             /* find the path to the writable folder and create it if necessary */
             ALLEGRO_PATH* user_datadir = find_user_datadir(user_datadirname);
@@ -165,31 +169,27 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             create_dir(user_datadir);
             al_destroy_path(user_datadir);
 
-            /* log */
-            LOG("The specified game directory isn't writable. Trying %s", generated_user_datadir);
-
-#if 0
-            /* check the permissions of the generated write folder */
-            uint32_t gmode = get_fs_mode(generated_user_datadir);
-            if(!(gmode & ALLEGRO_FILEMODE_WRITE)) /* for whatever reason this fails with a chmod 777 folder. Why? */
-                CRASH("Can't use game directory %s because it's not writable. Write directory %s is also not writable. Check the permissions of your filesystem.", gamedir, generated_user_datadir);
-            else if(!(gmode & ALLEGRO_FILEMODE_READ)) /* not needed. good to have */
-                WARN("Can't use game directory %s because it's not writable. Write directory %s is writable but not readable. Check the permissions of your filesystem.", gamedir, generated_user_datadir);
-#endif
-
+            /* try again */
+            writedir = generated_user_datadir;
+            if(!PHYSFS_setWriteDir(writedir))
+                CRASH("Can't set the write directory to %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
         }
-
-        /* set the write dir to gamedir if possible;
-           otherwise set it to a generated directory */
-        const char* writedir = generated_user_datadir != NULL ? generated_user_datadir : gamedir;
-        if(!PHYSFS_setWriteDir(writedir))
-            CRASH("Can't set the write directory to %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
         LOG("Setting the write directory to %s", writedir);
 
         /* mount gamedir to the root */
         if(!PHYSFS_mount(gamedir, "/", 1))
             CRASH("Can't mount the game directory at %s. Error: %s", gamedir, PHYSFSx_getLastErrorMessage());
         LOG("Mounting gamedir: %s", gamedir);
+
+        /* if gamedir is a compressed archive, do we need to change the root? */
+        if(!(mode & ALLEGRO_FILEMODE_ISDIR)) {
+            char real_root[256];
+            find_root_directory("/", real_root, sizeof(real_root));
+
+            LOG("Detected root: %s", real_root);
+            if(0 != strcmp("/", real_root))
+                PHYSFS_setRoot(gamedir, real_root);
+        }
 
         /* which engine version does this MOD require? */
         char required_engine_version[16] = "0.5.0";
@@ -871,6 +871,52 @@ const char* find_extension(const char* path)
 bool is_valid_root_folder()
 {
     return PHYSFS_exists("surge.rocks") || PHYSFS_exists("surge.prefs") || PHYSFS_exists("surge.cfg") || PHYSFS_exists("languages/english.lng");
+}
+
+/*
+ * generate_writedirname()
+ * Generate the name of a write directory (given a gamedir)
+ */
+char* generate_writedirname(const char* gamedir, char* buffer, size_t buffer_size)
+{
+    uint32_t game_id = hash32(str_basename(gamedir));
+
+    snprintf(
+        user_datadirname, sizeof(user_datadirname),
+        "%s%0*x",
+        GENERATED_USER_DATADIRNAME_PREFIX,
+        (int)(GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH),
+        game_id
+    );
+
+    return buffer;
+}
+
+/*
+ * find_root_directory()
+ * Find the real root directory at a mount point
+ * (e.g., "/" may have a single directory - that would be the root)
+ */
+char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size)
+{
+    PHYSFS_Stat stat;
+    int dircount = 0;
+    const char* dirname = NULL;
+    char** list = PHYSFS_enumerateFiles(mount_point);
+
+    for(char* const* it = list; *it != NULL; it++) {
+        if(PHYSFS_stat(*it, &stat) && stat.filetype == PHYSFS_FILETYPE_DIRECTORY) {
+            dirname = *it;
+            dircount++;
+        }
+    }
+
+    str_cpy(buffer, "/", buffer_size);
+    if(dircount == 1 && buffer_size > 1)
+        str_cpy(buffer+1, dirname, buffer_size-1);
+
+    PHYSFS_freeList(list);
+    return buffer;
 }
 
 /*
