@@ -320,6 +320,10 @@ void init_basic_stuff(const commandline_t* cmd)
     srand(time(NULL)); /* randomize */
     force_quit = false;
 
+    /* set Allegro's trace level to debug before calling al_init() */
+    if(commandline_getint(cmd->verbose, FALSE))
+        al_set_config_value(al_get_system_config(), "trace", "level", "debug");
+
     /* initialize Allegro */
     if(!al_init())
         fatal_error("Can't initialize Allegro");

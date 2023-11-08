@@ -121,7 +121,7 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --import \"/path/to/game\"         import an Open Surge game from the specified folder\n"
                 "    --import-wizard                  import an Open Surge game using a wizard\n"
                 "    --mobile                         enable mobile device simulation\n"
-                "    --verbose                        print logs to stdout\n"
+                "    --verbose                        enable verbose logging with debug messages\n"
                 "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
                 GAME_HEADER, program
             );
