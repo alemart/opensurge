@@ -54,19 +54,9 @@
 #define WARN(...)                       do { fprintf(stderr, "[asset] " __VA_ARGS__); fprintf(stderr, "\n"); LOG(__VA_ARGS__); } while(0)
 #define CRASH(...)                      fatal_error("[asset] " __VA_ARGS__)
 
-/* Name of the user-modifiable asset directory */
-#define DEFAULT_USER_DATADIRNAME                    GAME_USERDIRNAME
-#define DEFAULT_USER_DATADIRNAME_LENGTH             (sizeof(_DEFAULT_USER_DATADIRNAME) - 1)
-#define GENERATED_USER_DATADIRNAME_PREFIX           DEFAULT_USER_DATADIRNAME "_" /* a constant, known string */
-#define GENERATED_USER_DATADIRNAME_SUFFIX           "12345678" /* template for a 32-bit hash */
-#define GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH    (sizeof(_GENERATED_USER_DATADIRNAME_SUFFIX) - 1)
-static const char _GENERATED_USER_DATADIRNAME_SUFFIX[] = GENERATED_USER_DATADIRNAME_SUFFIX;
-static const char _GENERATED_USER_DATADIRNAME[] = GENERATED_USER_DATADIRNAME_PREFIX GENERATED_USER_DATADIRNAME_SUFFIX;
-static const char _DEFAULT_USER_DATADIRNAME[] = DEFAULT_USER_DATADIRNAME;
-static char user_datadirname[sizeof(_GENERATED_USER_DATADIRNAME)] = DEFAULT_USER_DATADIRNAME;
-typedef char _32bit_hash_assert[ !!(GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH == 8) * 2 - 1 ];
-typedef char _default_user_datadirname_assert[ !!(sizeof(user_datadirname) > DEFAULT_USER_DATADIRNAME_LENGTH) * 2 - 1 ];
-typedef char _user_datadirname_capacity_assert[ !!(sizeof(user_datadirname) == sizeof(_GENERATED_USER_DATADIRNAME)) * 2 - 1 ];
+/* Name of the user-modifiable asset sub-directory */
+#define DEFAULT_USER_DATADIRNAME        "Surge the Rabbit"
+static char user_datadirname[256] = DEFAULT_USER_DATADIRNAME;
 
 /* Utilities */
 #define DEFAULT_COMPATIBILITY_VERSION_CODE VERSION_CODE_EX(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP, GAME_VERSION_FIX)
@@ -85,7 +75,7 @@ static const char* find_extension(const char* path);
 static const char* case_insensitive_fix(const char* virtual_path);
 static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
-static char* generate_writedirname(const char* gamedir, char* buffer, size_t buffer_size);
+static char* generate_user_datadirname(const char* gamedir, char* buffer, size_t buffer_size);
 static uint32_t hash32(const char* str);
 static bool is_valid_root_folder();
 static char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size);
@@ -127,7 +117,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         CRASH("Can't initialize physfs. %s", PHYSFSx_getLastErrorMessage());
 #endif
 
-    /* set the default name of the user-modifiable asset directory */
+    /* set the default name of the user-modifiable asset sub-directory */
     str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
 
     /* copy the gamedir, if specified */
@@ -161,7 +151,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             /* gamedir either isn't writable or isn't a folder...
                could this be flatpak? or a compressed archive?
                let's generate a write folder based on gamedir */
-            generate_writedirname(gamedir, user_datadirname, sizeof(user_datadirname));
+            generate_user_datadirname(gamedir, user_datadirname, sizeof(user_datadirname));
 
             /* find the path to the writable folder and create it if necessary */
             ALLEGRO_PATH* user_datadir = find_user_datadir(user_datadirname);
@@ -173,6 +163,10 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             writedir = generated_user_datadir;
             if(!PHYSFS_setWriteDir(writedir))
                 CRASH("Can't set the write directory to %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
+        }
+        else {
+            /* the writable user directory is now gamedir */
+            user_datadirname[0] = '\0';
         }
         LOG("Setting the write directory to %s", writedir);
 
@@ -297,8 +291,8 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         LOG("Setting the write directory to %s", dirpath);
 
         /* mount the user path to the root (higher precedence) */
-        /*dirpath = al_path_cstr(user_datadir, ALLEGRO_NATIVE_PATH_SEP);*/
-        if(!PHYSFS_mount(dirpath, "/", 1))
+        dirpath = al_path_cstr(user_datadir, ALLEGRO_NATIVE_PATH_SEP); /* redundant */
+        if(!PHYSFS_mount(dirpath, "/", 0))
             CRASH("Can't mount the user data directory at %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
         LOG("Mounting user data directory: %s", dirpath);
 
@@ -456,6 +450,12 @@ bool asset_purge_user_data()
     if(PHYSFS_isInit())
         return false;
 
+    /* fail if a custom gamedir was specified and it is the write folder */
+    if(gamedir != NULL && user_datadirname[0] == '\0') {
+        WARN("Unsupported operation when a custom gamedir is specified and it is the user-writable folder");
+        return false;
+    }
+
     /* uninitialized Allegro? */
     if(!al_is_system_installed())
         al_init();
@@ -491,7 +491,7 @@ bool asset_purge_user_data()
 char* asset_user_datadir(char* dest, size_t dest_size)
 {
     /* custom gamedir? */
-    if(gamedir != NULL && 0 != strcmp(user_datadirname, DEFAULT_USER_DATADIRNAME))
+    if(gamedir != NULL && user_datadirname[0] == '\0')
         return str_cpy(dest, gamedir, dest_size);
 
     /* uninitialized Allegro? */
@@ -509,7 +509,7 @@ char* asset_user_datadir(char* dest, size_t dest_size)
 }
 
 /*
- * asset_user_datadir()
+ * asset_shared_datadir()
  * Get the absolute path to the data folder provided by upstream
  * Return dest
  */
@@ -603,6 +603,7 @@ ALLEGRO_PATH* find_shared_datadir()
 #elif defined(__ANDROID__)
 
     /* on Android, treat the .apk itself as the shared datadir (it's a .zip file) */
+    /* note: the assets/ subfolder will be defined as the root on physfs */
     return al_get_standard_path(ALLEGRO_EXENAME_PATH);
 
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -643,6 +644,9 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
     if(env != NULL)
         return al_create_path_for_directory(env);
 
+    /* validate */
+    assertx(*dirname != '\0');
+
 #if (GAME_RUNINPLACE) || defined(_WIN32)
 
     ALLEGRO_PATH* path = find_exedir();
@@ -650,10 +654,9 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
     /* If a custom gamedir is specified and that directory is
        not writable, then a new write directory will be created.
        If the game runs in place, then that write directory will
-       be a subdirectory of the folder of the executable.
-       This situation should happen rarely. */
+       be a subdirectory of the folder of the executable. */
     if(0 != strcmp(dirname, DEFAULT_USER_DATADIRNAME)) {
-        al_append_path_component(path, "__mods__");
+        al_append_path_component(path, "__user__");
         al_append_path_component(path, dirname);
     }
 
@@ -662,11 +665,9 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
 
 #elif defined(__ANDROID__)
 
-    ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_USER_DATA_PATH);
-
     /* ALLEGRO_USER_DATA_PATH relies on getFilesDir() of the Activity */
-    /*al_append_path_component(path, dirname);*/
-    (void)dirname;
+    ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_USER_DATA_PATH);
+    al_append_path_component(path, dirname);
 
     (void)find_homedir;
     return path;
@@ -675,13 +676,14 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
 #elif defined(__APPLE__) && defined(__MACH__)
 
     /*
-    Return ~/Library/Application Support/opensurge/
+    Return ~/Library/Application Support/opensurge/<dirname>
     */
 
     ALLEGRO_PATH* path = find_homedir();
 
     al_append_path_component(path, "Library");
     al_append_path_component(path, "Application Support");
+    al_append_path_component(path, GAME_USERDIRNAME);
     al_append_path_component(path, dirname);
 
     return path;
@@ -689,8 +691,8 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
 #elif defined(__unix__) || defined(__unix)
 
     /*
-    Return $XDG_DATA_HOME/opensurge/
-    or ~/.local/share/opensurge/
+    Return $XDG_DATA_HOME/opensurge/<dirname>
+    or ~/.local/share/opensurge/<dirname>
     */
 
     const char* xdg_data_home = getenv("XDG_DATA_HOME");
@@ -704,6 +706,7 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
     else
         path = al_create_path_for_directory(xdg_data_home);
 
+    al_append_path_component(path, GAME_USERDIRNAME);
     al_append_path_component(path, dirname);
     return path;
 
@@ -879,21 +882,29 @@ bool is_valid_root_folder()
 }
 
 /*
- * generate_writedirname()
- * Generate the name of a write directory (given a gamedir)
+ * generate_user_datadirname()
+ * Generate the name of a write sub-directory (given a gamedir)
  */
-char* generate_writedirname(const char* gamedir, char* buffer, size_t buffer_size)
+char* generate_user_datadirname(const char* gamedir, char* buffer, size_t buffer_size)
 {
-    uint32_t game_id = hash32(str_basename(gamedir));
+    char* ext;
 
-    snprintf(
-        user_datadirname, sizeof(user_datadirname),
-        "%s%0*x",
-        GENERATED_USER_DATADIRNAME_PREFIX,
-        (int)(GENERATED_USER_DATADIRNAME_SUFFIX_LENGTH),
-        game_id
-    );
+    /* get the basename of gamedir. Remove the extension, if any
+       (gamedir may be a .zip archive, for example) */
+    str_cpy(buffer, str_basename(gamedir), buffer_size);
+    if(NULL != (ext = strrchr(buffer, '.')))
+        *ext = '\0';
 
+    /* the generated directory name should not be the default.
+       If it is, generate a code string. This should not happen. */
+    if(0 == strcmp(buffer, DEFAULT_USER_DATADIRNAME)) {
+        uint32_t game_id = hash32(str_basename(gamedir));
+        const char* prefix = GAME_USERDIRNAME "_";
+
+        snprintf(buffer, buffer_size, "%s%08x", prefix, game_id);
+    }
+
+    /* done! */
     return buffer;
 }
 
@@ -1137,19 +1148,21 @@ int append_translations(const char* vpath, void* context)
 /*
  * crlf_to_lf()
  * Convert CRLF to LF in a memory buffer
+ * Return the new size of the buffer, which is less than or equal to the old size
  */
 size_t crlf_to_lf(uint8_t* data, size_t size)
 {
     size_t i, j;
 
     for(i = j = 0; i < size; i++) {
-        if(data[i] == '\r' && i+1 < size && data[i+1] == '\n') {
-            data[j++] = '\n';
-            i++;
-        }
+        if(data[i] == '\r' && i+1 < size && data[i+1] == '\n')
+            data[j++] = data[++i]; /* data[j++] := '\n' */
         else
             data[j++] = data[i];
     }
+
+    for(i = j; i < size; i++)
+        data[i] = '\0';
 
     return j;
 }
