@@ -187,8 +187,13 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             find_root_directory("/", real_root, sizeof(real_root));
 
             LOG("Detected root: %s", real_root);
-            if(0 != strcmp("/", real_root))
+            if(0 != strcmp("/", real_root)) {
+#if VERSION_CODE(PHYSFS_VER_MAJOR, PHYSFS_VER_MINOR, PHYSFS_VER_PATCH) >= VERSION_CODE(3,2,0)
                 PHYSFS_setRoot(gamedir, real_root);
+#else
+                CRASH("Please extract the game archive or, to use it as is, upgrade physfs to version 3.2.0 and recompile the engine (this build uses outdated version %d.%d.%d).", PHYSFS_VER_MAJOR, PHYSFS_VER_MINOR, PHYSFS_VER_PATCH);
+#endif
+            }
         }
 
         /* which engine version does this MOD require? */
