@@ -28,6 +28,8 @@
 #include "../core/video.h"
 #include "../core/input.h"
 #include "../core/timer.h"
+#include "../core/engine.h"
+#include "../core/global.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
 
@@ -122,6 +124,8 @@ struct physicsactor_t
     double reference_time; /* used in fixed_update */
     double fixed_time;
     bool delayed_jump;
+
+    int compatibility_version; /* used for compatibility with previous versions */
 };
 
 /* observer pattern */
@@ -346,6 +350,7 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->reference_time = 0.0;
     pa->fixed_time = 0.0;
     pa->delayed_jump = false;
+    pa->compatibility_version = engine_compatibility_version_code();
 
     /* initialize the physics model */
     physicsactor_reset_model_parameters(pa);
@@ -459,6 +464,12 @@ void physicsactor_reset_model_parameters(physicsactor_t* pa)
 
     /* recompute airdrag coefficients */
     physicsactor_set_airdrag(pa, pa->airdrag);
+
+    /* compatibility settings */
+    if(pa->compatibility_version < VERSION_CODE(0,6,1)) {
+        pa->topyspeed = 12.0f * fpsmul;
+        /*pa->falloffthreshold = 0.625f * fpsmul;*/ /* maybe not a good idea... */
+    }
 }
 
 void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
@@ -900,6 +911,24 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
     h -= 2 * AB_SENSOR_OFFSET; /* subtract two offsets: one from A, another from D */
     h -= 6;
     w -= 2;
+
+    /* compatibility settings */
+    if(pa->compatibility_version < VERSION_CODE(0,6,1)) {
+        /* older versions had a larger hit box:
+           21x45 normal; 23x31 jumproll; 23x45 springing / midair */
+        if(pa->state == PAS_JUMPING || pa->state == PAS_ROLLING) {
+            w = 23;
+            h = 31;
+        }
+        else if(pa->midair || pa->state == PAS_SPRINGING) {
+            w = 23;
+            h = 45;
+        }
+        else {
+            w = 21;
+            h = 45;
+        }
+    }
 
     /* find center */
     int x = (int)floor(pa->xpos);
