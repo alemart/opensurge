@@ -221,19 +221,14 @@ object "Pipe Sensor" is "private", "entity"
             //if(entrance && !player.hasFocus()) return; // FIXME
             insidePipe = pipeManager.isInsidePipe(player);
             if((entrance && !insidePipe) || (!entrance && insidePipe)) {
+                // set the center of the player.collider to the center of this.collider
                 player.transform.position = transform.position
-                    .plus(player.animation.hotSpot)
-                    .minus(ballCenter(player))
+                    .minus(player.collider.center)
+                    .plus(player.transform.position)
                 ;
                 parent.onPipeActivate(player);
             }
         }
-    }
-
-    fun ballCenter(player)
-    {
-        player.springify(); // hack: unroll to adjust collider
-        return Vector2(player.width / 2, Math.floor(player.height - player.collider.height * 0.3));
     }
 
     fun constructor()

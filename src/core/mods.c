@@ -107,7 +107,7 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/items/collectibles.ss",                    ":",                        /* performance updates in 0.6.1 */
     "scripts/items/tubes.ss",                           ":",
     "scripts/items/pipes.ss",                           ":",                        /* changes to the entity system in 0.6.1; omit warnings */
-    "scripts/items/zipline.ss",                         ":",                        /* changes to the physics system in 0.6.1; player hitbox; change the collider */
+    "scripts/items/zipline.ss",                         ":",                        /* changes to the physics system in 0.6.1; player hitbox; change the collider and the repositioning method of the pipe sensor */
     /*"sprites/items/zipline.spr",                      "0.5.0:0.6.0.3",*/          /* add action spot to the zipline */
     "scripts/items/bridge.ss",                          ":",                        /* optimized collisions in 0.6.1 */
     "scripts/items/audio_source.ss",                    ":",                        /* optimizations in 0.6.1 */
