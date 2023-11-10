@@ -810,9 +810,19 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
                         return false;
                     }
                     else if(peek == '\n') {
+                        #if 0
+                        /* crash: syntax error */
                         symbol_buffer[symbol_length++] = '\0';
                         crash("Unexpected line break at %s:%d", lexer->filepath, state.line);
                         return false;
+                        #else
+                        /* nanoparser was rewritten on engine version 0.6.1;
+                           accept the missing quote for backwards compatibility;
+                           consider the newline to be the end of the quote */
+                        peek = quote;
+                        symbol_buffer[symbol_length++] = quote;
+                        break;
+                        #endif
                     }
                     else if(peek != '\\') {
                         /* any character, except the closing quote and a backslash */
