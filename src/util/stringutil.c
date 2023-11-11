@@ -216,8 +216,11 @@ bool str_is_boolean(const char* str)
  */
 char* str_cpy(char* dest, const char* src, size_t dest_size)
 {
-    strncpy(dest, src, dest_size);
-    dest[dest_size - 1] = 0;
+    if(dest_size == 0)
+        return dest;
+
+    dest[0] = '\0';
+    strncat(dest, src, dest_size - 1);
     return dest;
 }
 
@@ -339,16 +342,34 @@ const char* str_from_int(int integer, char* buffer, size_t buffer_size)
 
 /*
  * str_basename()
- * returns the filename of the path 
+ * Returns the filename of the path
  */
 const char* str_basename(const char *path)
 {
     const char *p = strpbrk(path, "\\/");
+
     while(p != NULL) {
         path = p+1;
         p = strpbrk(path, "\\/");
     }
+
     return path;
+}
+
+
+/*
+ * str_basename_without_extension()
+ * Returns the filename of the path, without extension
+ */
+char* str_basename_without_extension(const char* path, char* buffer, size_t buffer_size)
+{
+    char* ext;
+
+    str_cpy(buffer, str_basename(path), buffer_size);
+    if(NULL != (ext = strrchr(buffer, '.')))
+        *ext = '\0';
+
+    return buffer;
 }
 
 

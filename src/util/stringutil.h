@@ -46,6 +46,7 @@ char* str_addslashes(const char* str, char* buffer, size_t buffer_size); /* repl
 char* str_normalize_slashes(char* str); /* replaces '\\' by '/' in-place */
 const char* str_from_int(int integer, char* buffer, size_t buffer_size); /* converts integer to string; if no buffer is specified, returns a static char* */
 const char* str_basename(const char* path); /* the filename of the path */
+char* str_basename_without_extension(const char* path, char* buffer, size_t buffer_size); /* the filename of the path, without extension */
 char* x64_to_str(uint64_t value, char* buf, size_t size); /* converts a 64-bit value to a padded hex-string */
 uint64_t str_to_x64(const char* buf); /* converts a hex-string to a 64-bit value */
 
