@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * mods.h - utilities for MODs & compatibility mode
+ * modutils.h - utilities for MODs & compatibility mode
  * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
@@ -21,13 +21,11 @@
 #ifndef _MODS_H
 #define _MODS_H
 
+#include <stdint.h>
 #include <stdlib.h>
 
-bool generate_compatibility_pack(const char* engine_version, void** out_file_data, size_t* out_file_size);
+uint32_t find_game_id(const char* game_dirname, const char* required_engine_version);
 char* guess_engine_version_of_mod(char* buffer, size_t buffer_size);
-
-bool generate_pak_file(const char** file_list, int file_count, void** out_pak_data, size_t* out_pak_size);
-bool generate_pak_file_from_memory(const char** vpath, int file_count, const void** file_data, const size_t* file_size, void** out_pak_data, size_t* out_pak_size);
-void release_pak_file(void* pak);
+const char** select_files_for_compatibility_pack(const char* engine_version);
 
 #endif

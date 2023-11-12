@@ -20,11 +20,12 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_physfs.h>
+#include <allegro5/allegro_memfile.h>
 #include <physfs.h>
 #include <stdio.h>
 #include <string.h>
 #include "asset.h"
-#include "mods.h"
+#include "modutils.h"
 #include "global.h"
 #include "logfile.h"
 #include "../util/util.h"
@@ -55,12 +56,12 @@
 #define CRASH(...)                      fatal_error("[asset] " __VA_ARGS__)
 
 /* Name of the user-modifiable asset sub-directory */
-#define DEFAULT_USER_DATADIRNAME        "Surge the Rabbit"
+#define DEFAULT_GAME_NAME               "Surge the Rabbit"
+#define DEFAULT_USER_DATADIRNAME        DEFAULT_GAME_NAME
 static char user_datadirname[256] = DEFAULT_USER_DATADIRNAME;
 
 /* Utilities */
 #define DEFAULT_COMPATIBILITY_VERSION_CODE VERSION_CODE_EX(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP, GAME_VERSION_FIX)
-static int compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE; /* for the compatibility mode */
 static char* gamedir = NULL; /* custom asset folder specified by the user */
 
 static ALLEGRO_STATE state;
@@ -75,16 +76,21 @@ static const char* find_extension(const char* path);
 static const char* case_insensitive_fix(const char* virtual_path);
 static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
-static char* generate_user_datadirname(const char* gamedir, char* buffer, size_t buffer_size);
-static uint32_t hash32(const char* str);
+static char* generate_user_datadirname(const char* game_name, uint32_t game_id, char* buffer, size_t buffer_size);
 static bool is_valid_root_folder();
 static char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size);
 
-static void setup_compatibility_scripts(const char* shared_dirpath, const char* engine_version);
-static void setup_compatibility_translations(const char* shared_dirpath);
+static void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version);
 static int scan_translations(const char* vpath, void* context);
 static int append_translations(const char* vpath, void* context);
 static size_t crlf_to_lf(uint8_t* data, size_t size);
+
+static bool has_pak_support();
+bool generate_pak_file(const char** vpath, int file_count, const void** file_data, const size_t* file_size, void** out_pak_data, size_t* out_pak_size);
+void release_pak_file(void* pak);
+
+bool read_file(const char* vpath, void** out_file_data, size_t* out_file_size);
+bool write_file(const char* vpath, void* file_data, size_t file_size);
 
 
 /*
@@ -94,10 +100,13 @@ static size_t crlf_to_lf(uint8_t* data, size_t size);
  * compatibility_version is only applicable when optional_gamedir != NULL and may be set to:
  * - NULL to disable compatibility mode;
  * - an empty string "" to enable compatibility with an automatically picked version of the engine;
- * - a version string "x.y.z" to enable compatibility with that version of the engine.
+ * - a version string "x.y.z" to indicate a *preference* for compatibility with that version of the engine.
  */
-void asset_init(const char* argv0, const char* optional_gamedir, const char* compatibility_version)
+void asset_init(const char* argv0, const char* optional_gamedir, const char* compatibility_version, uint32_t* out_game_id, int* out_compatibility_version_code)
 {
+    uint32_t game_id = 0;
+    int compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE;
+
     /* already initialized? */
     if(asset_is_init())
         return;
@@ -121,13 +130,29 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
     str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
 
     /* copy the gamedir, if specified */
-    gamedir = (optional_gamedir != NULL) ? str_dup(optional_gamedir) : NULL;
+    gamedir = NULL;
+    if(optional_gamedir != NULL && *optional_gamedir != '\0') {
+        gamedir = str_dup(optional_gamedir);
+
+        /* remove trailing slashes, if any */
+        int length = strlen(gamedir);
+        while(length > 0 && (gamedir[length-1] == '/' || gamedir[length-1] == '\\'))
+            gamedir[--length] = '\0';
+
+        /* no blank names */
+        if(*gamedir == '\0') {
+            free(gamedir);
+            gamedir = NULL;
+        }
+    }
 
     /* set the search path to the specified gamedir */
     if(gamedir != NULL) {
 
-        uint32_t mode = get_fs_mode(gamedir);
+        char game_dirname[256] = "";
+        char required_engine_version[16] = "0.5.0";
         char* generated_user_datadir = NULL;
+        uint32_t mode = get_fs_mode(gamedir);
 
         /* log */
         LOG("Using a custom game directory: %s", gamedir);
@@ -140,6 +165,56 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
 
         }
 
+        /* Get the name of the folder of the game */
+        str_basename_without_extension(gamedir, game_dirname, sizeof(game_dirname));
+
+        /* mount gamedir to the root */
+        if(!PHYSFS_mount(gamedir, "/", 1))
+            CRASH("Can't mount the game directory at %s. Error: %s", gamedir, PHYSFSx_getLastErrorMessage());
+        LOG("Mounting gamedir: %s", gamedir);
+
+        /* if gamedir is a compressed archive, do we need to change the root? */
+        if(!(mode & ALLEGRO_FILEMODE_ISDIR)) {
+            char real_root[256];
+            find_root_directory("/", real_root, sizeof(real_root));
+
+            LOG("Detected root: %s", real_root);
+            if(0 != strcmp("/", real_root)) {
+                /* change the root */
+#if VERSION_CODE(PHYSFS_VER_MAJOR, PHYSFS_VER_MINOR, PHYSFS_VER_PATCH) >= VERSION_CODE(3,2,0)
+                PHYSFS_setRoot(gamedir, real_root);
+#else
+                CRASH("Please extract the game archive or, to use it as is, upgrade physfs to version 3.2.0 and recompile the engine (this build uses outdated version %d.%d.%d).", PHYSFS_VER_MAJOR, PHYSFS_VER_MINOR, PHYSFS_VER_PATCH);
+#endif
+                /* Get the name of the folder of the game again */
+                str_basename_without_extension(real_root, game_dirname, sizeof(game_dirname));
+            }
+        }
+
+        /* validate asset folder */
+        if(!is_valid_root_folder())
+            CRASH("Not a valid Open Surge game directory: %s", gamedir);
+
+        /* which engine version does this MOD require? */
+        al_set_physfs_file_interface();
+        guess_engine_version_of_mod(required_engine_version, sizeof(required_engine_version));
+        al_restore_state(&state);
+        LOG("Required engine version of this MOD: %s", required_engine_version);
+        {
+            int sup, sub, wip;
+            int mod_version = parse_version_number_ex(required_engine_version, &sup, &sub, &wip, NULL);
+            int engine_version = parse_version_number(GAME_VERSION_STRING);
+
+            if(game_version_compare(sup, sub, wip) < 0)
+                CRASH("This MOD requires a newer version of the engine, %s. Please upgrade the engine or downgrade the MOD to version %s of the engine.", required_engine_version, GAME_VERSION_STRING);
+            else if(engine_version < mod_version)
+                LOG("This MOD requires a newer version of the engine, %s. We'll try to run it anyway. Engine version is %s.", required_engine_version, GAME_VERSION_STRING);
+        }
+
+        /* find the game ID */
+        game_id = find_game_id(game_dirname, required_engine_version);
+        LOG("Game ID: %08x (\"%s\")", game_id, game_dirname);
+
         /* set the write dir to gamedir if possible;
            otherwise set it to a generated directory */
         const char* writedir = gamedir;
@@ -151,7 +226,8 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             /* gamedir either isn't writable or isn't a folder...
                could this be flatpak? or a compressed archive?
                let's generate a write folder based on gamedir */
-            generate_user_datadirname(gamedir, user_datadirname, sizeof(user_datadirname));
+            const char* game_name = game_dirname;
+            generate_user_datadirname(game_name, game_id, user_datadirname, sizeof(user_datadirname));
 
             /* find the path to the writable folder and create it if necessary */
             ALLEGRO_PATH* user_datadir = find_user_datadir(user_datadirname);
@@ -169,43 +245,6 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             user_datadirname[0] = '\0';
         }
         LOG("Setting the write directory to %s", writedir);
-
-        /* mount gamedir to the root */
-        if(!PHYSFS_mount(gamedir, "/", 1))
-            CRASH("Can't mount the game directory at %s. Error: %s", gamedir, PHYSFSx_getLastErrorMessage());
-        LOG("Mounting gamedir: %s", gamedir);
-
-        /* if gamedir is a compressed archive, do we need to change the root? */
-        if(!(mode & ALLEGRO_FILEMODE_ISDIR)) {
-            char real_root[256];
-            find_root_directory("/", real_root, sizeof(real_root));
-
-            LOG("Detected root: %s", real_root);
-            if(0 != strcmp("/", real_root)) {
-#if VERSION_CODE(PHYSFS_VER_MAJOR, PHYSFS_VER_MINOR, PHYSFS_VER_PATCH) >= VERSION_CODE(3,2,0)
-                PHYSFS_setRoot(gamedir, real_root);
-#else
-                CRASH("Please extract the game archive or, to use it as is, upgrade physfs to version 3.2.0 and recompile the engine (this build uses outdated version %d.%d.%d).", PHYSFS_VER_MAJOR, PHYSFS_VER_MINOR, PHYSFS_VER_PATCH);
-#endif
-            }
-        }
-
-        /* which engine version does this MOD require? */
-        char required_engine_version[16] = "0.5.0";
-        al_set_physfs_file_interface();
-        guess_engine_version_of_mod(required_engine_version, sizeof(required_engine_version));
-        al_restore_state(&state);
-        LOG("Required engine version of this MOD: %s", required_engine_version);
-        {
-            int sup, sub, wip;
-            int mod_version = parse_version_number_ex(required_engine_version, &sup, &sub, &wip, NULL);
-            int engine_version = parse_version_number(GAME_VERSION_STRING);
-
-            if(game_version_compare(sup, sub, wip) < 0)
-                CRASH("This MOD requires a newer version of the engine, %s. Please upgrade the engine or downgrade the MOD to version %s of the engine.", required_engine_version, GAME_VERSION_STRING);
-            else if(engine_version < mod_version)
-                LOG("This MOD requires a newer version of the engine, %s. We'll try to run it anyway. Engine version is %s.", required_engine_version, GAME_VERSION_STRING);
-        }
 
         /* compatibility mode */
         if(compatibility_version != NULL) {
@@ -245,8 +284,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
 
             /* override scripts */
             al_set_physfs_file_interface();
-            setup_compatibility_scripts(dirpath, compatibility_version);
-            setup_compatibility_translations(dirpath);
+            setup_compatibility_pack(dirpath, compatibility_version);
             al_restore_state(&state);
 
             /* mount the default shared data directory with lower precedence */
@@ -308,18 +346,27 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         PHYSFS_setRoot(dirpath, "/assets");
 #endif
 
+        /* validate asset folder */
+        if(!is_valid_root_folder())
+            CRASH("Not a valid Open Surge installation. Please reinstall the game.");
+
+        /* find the game ID */
+        game_id = find_game_id(NULL, NULL);
+        LOG("Game ID: %08x (\"%s\")", game_id, DEFAULT_GAME_NAME);
+
         /* done! */
         al_destroy_path(user_datadir);
         al_destroy_path(shared_datadir);
     }
 
-    /* validate */
-    if(!is_valid_root_folder()) {
-        if(gamedir == NULL)
-            CRASH("Not a valid Open Surge installation. Please reinstall the game.");
-        else
-            CRASH("Not a valid Open Surge game directory: %s", gamedir);
-    }
+    /* set the game ID */
+    assertx(game_id != 0);
+    if(out_game_id != NULL)
+        *out_game_id = game_id;
+
+    /* set the compatibility version code */
+    if(out_compatibility_version_code != NULL)
+        *out_compatibility_version_code = compatibility_version_code;
 
     /* enable the physfs file interface. This should be the last task
        performed in this function (e.g., see create_dir()) */
@@ -541,16 +588,6 @@ char* asset_shared_datadir(char* dest, size_t dest_size)
 const char* asset_gamedir()
 {
     return gamedir;
-}
-
-/*
- * asset_compatibility_version_code()
- * Compatibility mode: engine version code. If the compatibility mode
- * is disabled, the current version code of the engine is returned.
- */
-int asset_compatibility_version_code()
-{
-    return compatibility_version_code;
 }
 
 
@@ -810,6 +847,7 @@ bool foreach_file(ALLEGRO_PATH* path, const char* extension_filter, int (*callba
     bool stop = false;
     const char* virtual_path = al_path_cstr(path, '/');
     char** list = PHYSFS_enumerateFiles(virtual_path); /* get sorted items without duplicates */
+    assertx(list != NULL);
 
     /* PHYSFS_enumerate() maintains a global mutex:
        https://github.com/icculus/physfs/issues/13
@@ -883,26 +921,21 @@ bool is_valid_root_folder()
 
 /*
  * generate_user_datadirname()
- * Generate the name of a write sub-directory (given a gamedir)
+ * Generate the name of a write sub-directory
  */
-char* generate_user_datadirname(const char* gamedir, char* buffer, size_t buffer_size)
+char* generate_user_datadirname(const char* game_name, uint32_t game_id, char* buffer, size_t buffer_size)
 {
-    char* ext;
+    /* try using the name of the game first */
+    str_cpy(buffer, game_name, sizeof(buffer));
 
-    /* get the basename of gamedir. Remove the extension, if any
-       (gamedir may be a .zip archive, for example) */
-    str_cpy(buffer, str_basename(gamedir), buffer_size);
-    if(NULL != (ext = strrchr(buffer, '.')))
-        *ext = '\0';
-
-    /* the generated directory name should not be the default.
-       If it is, generate a code string. This should not happen. */
-    if(0 == strcmp(buffer, DEFAULT_USER_DATADIRNAME)) {
-        uint32_t game_id = hash32(str_basename(gamedir));
-        const char* prefix = GAME_USERDIRNAME "_";
-
-        snprintf(buffer, buffer_size, "%s%08x", prefix, game_id);
-    }
+#if 0
+    /* the generated directory name should not be DEFAULT_USER_DATADIRNAME when
+       using a custom gamedir. If it is, use the game id. This should not happen. */
+    if(0 == strcmp(buffer, DEFAULT_USER_DATADIRNAME))
+        snprintf(buffer, buffer_size, "%08x", game_id);
+#else
+    (void)game_id;
+#endif
 
     /* done! */
     return buffer;
@@ -915,10 +948,14 @@ char* generate_user_datadirname(const char* gamedir, char* buffer, size_t buffer
  */
 char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size)
 {
+    if(buffer_size == 0)
+        return buffer;
+
     PHYSFS_Stat stat;
     int dircount = 0;
     const char* dirname = NULL;
     char** list = PHYSFS_enumerateFiles(mount_point);
+    assertx(list != NULL);
 
     for(char* const* it = list; *it != NULL; it++) {
         if(PHYSFS_stat(*it, &stat) && stat.filetype == PHYSFS_FILETYPE_DIRECTORY) {
@@ -935,41 +972,55 @@ char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_s
     return buffer;
 }
 
-/*
- * hash32()
- * Jenkins' hash function
- */
-uint32_t hash32(const char* str)
-{
-    const unsigned char* p = (const unsigned char*)str;
-    uint32_t hash = 0;
 
-    if(str == NULL)
-        return 0;
 
-    while(*p) {
-        hash += *(p++);
-        hash += hash << 10;
-        hash ^= hash >> 6;
-    }
 
-    hash += hash << 3;
-    hash ^= hash >> 11;
-    hash += hash << 15;
 
-    return hash;
-}
+
 
 /*
- * setup_compatibility_scripts()
- * Override scripts according to pre-defined compatibility rules
+ *
+ * compatibility packs
+ *
  */
-void setup_compatibility_scripts(const char* shared_dirpath, const char* engine_version)
+
+
+/*
+ * setup_compatibility_pack()
+ * Generates and mounts the compatibility pack, which overrides
+ * scripts and translations according to pre-defined rules based
+ * on a compatibility version string. Ensure that the physfs I/O
+ * interface (Allegro) is activated before calling this function.
+ */
+void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version)
 {
-    assertx(PHYSFS_isInit());
+    /* we'll read files to memory */
+    int file_count = 0;
+    char** file_vpath = NULL;
+    uint8_t** file_data = NULL;
+    size_t* file_size = NULL;
 
     /* log */
     LOG("Will build a compatibility pack from %s", shared_dirpath);
+    assertx(PHYSFS_isInit());
+
+    /* validate */
+    if(!has_pak_support())
+        CRASH("Compatibility mode is not available because PhysFS has been compiled without PAK support.");
+
+
+
+    /*
+     * ----------------------
+     * UPDATE TRANSLATIONS
+     * ----------------------
+     */
+
+    /* scan the language files of the gamedir */
+    void* file_context[] = { &file_count, &file_vpath, &file_data, &file_size };
+    asset_foreach_file("languages/", ".lng", scan_translations, file_context, true);
+    if(file_count == 0)
+        CRASH("No language files were found!");
 
     /* mount the default shared data directory with higher precedence */
     if(!PHYSFS_mount(shared_dirpath, "/", 0))
@@ -979,52 +1030,6 @@ void setup_compatibility_scripts(const char* shared_dirpath, const char* engine_
     /* on Android, read from the assets/ folder inside the .apk */
     PHYSFS_setRoot(shared_dirpath, "/assets");
 #endif
-
-    /* create compatibility pack */
-    void* pack_data = NULL;
-    size_t pack_size = 0;
-    if(!generate_compatibility_pack(engine_version, &pack_data, &pack_size))
-        CRASH("Can't build a compatibility pack from %s", shared_dirpath);
-
-    /* unmount the default shared data directory */
-    if(!PHYSFS_unmount(shared_dirpath))
-        CRASH("Can't unmount the shared data directory at %s. Error: %s", shared_dirpath, PHYSFSx_getLastErrorMessage());
-
-    /* mount the compatibility pack with higher precedence */
-    if(!PHYSFS_mountMemory(pack_data, pack_size, release_pak_file, "compatibility.pak", "/", 0)) {
-        release_pak_file(pack_data);
-        CRASH("Can't mount the compatibility pack. Error: %s", PHYSFSx_getLastErrorMessage());
-    }
-}
-
-/*
- * setup_compatibility_translations()
- * Generate compatibility translation files (.lng)
- */
-void setup_compatibility_translations(const char* shared_dirpath)
-{
-    assertx(PHYSFS_isInit());
-
-    /* log */
-    LOG("Will build a language compatibility pack from %s", shared_dirpath);
-
-    /* we'll store the language files in memory */
-    int file_count = 0;
-    char** file_vpath = NULL;
-    uint8_t** file_data = NULL;
-    size_t* file_size = NULL;
-    void* file_context[] = { &file_count, &file_vpath, &file_data, &file_size };
-
-    /* scan the language files of the gamedir */
-    asset_foreach_file("languages/", ".lng", scan_translations, file_context, true);
-    if(file_count == 0) {
-        WARN("No language files were found!");
-        return;
-    }
-
-    /* mount the default shared data directory with higher precedence */
-    if(!PHYSFS_mount(shared_dirpath, "/", 0))
-        CRASH("Can't mount the shared data directory at %s. Error: %s", shared_dirpath, PHYSFSx_getLastErrorMessage());
 
     /* read the language files from the shared data directory */
     for(int file_index = 0; file_index < file_count; file_index++) {
@@ -1042,27 +1047,97 @@ void setup_compatibility_translations(const char* shared_dirpath)
         append_translations(file_vpath[file_index], file_context);
     }
 
+    /* TODO: diff & patch? */
+
+
+
+
+    /*
+     * ----------------------
+     * PICK SCRIPTS & MISC
+     * ----------------------
+     */
+
+    /* mount the default shared data directory with higher precedence */
+    if(!PHYSFS_mount(shared_dirpath, "/", 0))
+        CRASH("Can't mount the shared data directory at %s. Error: %s", shared_dirpath, PHYSFSx_getLastErrorMessage());
+
+#if defined(__ANDROID__)
+    /* on Android, read from the assets/ folder inside the .apk */
+    PHYSFS_setRoot(shared_dirpath, "/assets");
+#endif
+
+    /* select & read scripts of the shared data directory for compatibility */
+    const char** file_list = select_files_for_compatibility_pack(engine_version);
+    for(const char** vpath = file_list; *vpath != NULL; vpath++) {
+        int last = file_count++;
+
+        file_vpath = reallocx(file_vpath, file_count * sizeof(*file_vpath));
+        file_vpath[last] = str_dup(*vpath);
+
+        file_data = reallocx(file_data, file_count * sizeof(*file_data));
+        file_data[last] = NULL;
+
+        file_size = reallocx(file_size, file_count * sizeof(*file_size));
+        file_size[last] = 0;
+
+        if(!read_file(file_vpath[last], (void**)&file_data[last], &file_size[last])) {
+            WARN("Can't add file \"%s\" to the compatibility pack!", file_vpath[last]);
+            free(file_vpath[last]);
+            --file_count;
+        }
+        else
+            LOG("Added file \"%s\" to the compatibility pack", file_vpath[last]);
+    }
+
+    /* unmount the default shared data directory */
+    if(!PHYSFS_unmount(shared_dirpath))
+        CRASH("Can't unmount the shared data directory at %s. Error: %s", shared_dirpath, PHYSFSx_getLastErrorMessage());
+
+
+
+
+    /*
+     * ----------------------
+     * GENERATE PACKAGE
+     * ----------------------
+     */
+
     /* create a compatibility pack */
     void* pack_data = NULL;
     size_t pack_size = 0;
-    if(!generate_pak_file_from_memory((const char**)file_vpath, file_count, (const void**)file_data, file_size, &pack_data, &pack_size))
-        CRASH("Can't build a language compatibility pack from %s", shared_dirpath);
-
-    /* release the language files (we already have a .pak) */
-    for(int i = file_count - 1; i >= 0; i--) {
-        if(file_data[i] != NULL)
-            free(file_data[i]);
-        if(file_vpath[i] != NULL)
-            free(file_vpath[i]);
-    }
-    free(file_size);
-    free(file_data);
-    free(file_vpath);
+    if(!generate_pak_file((const char**)file_vpath, file_count, (const void**)file_data, file_size, &pack_data, &pack_size))
+        CRASH("Can't build a compatibility pack from %s", shared_dirpath);
 
     /* mount the compatibility pack with higher precedence */
-    if(!PHYSFS_mountMemory(pack_data, pack_size, release_pak_file, "language_compatibility.pak", "/", 0)) {
+    if(!PHYSFS_mountMemory(pack_data, pack_size, release_pak_file, "compatibility.pak", "/", 0)) {
         release_pak_file(pack_data);
-        CRASH("Can't mount the language compatibility pack. Error: %s", PHYSFSx_getLastErrorMessage());
+        CRASH("Can't mount the compatibility pack. Error: %s", PHYSFSx_getLastErrorMessage());
+    }
+
+    /* write the compatibility pack to secondary storage
+       (for debugging purposes) */
+    if(!write_file("compatibility.pak", pack_data, pack_size))
+        WARN("Can't write the compatibility pack to the disk!");
+
+    /* cleanup */
+    if(file_size != NULL)
+        free(file_size);
+
+    if(file_data != NULL) {
+        for(int i = file_count - 1; i >= 0; i--) {
+            if(file_data[i] != NULL)
+                free(file_data[i]);
+        }
+        free(file_data);
+    }
+
+    if(file_vpath != NULL) {
+        for(int i = file_count - 1; i >= 0; i--) {
+            if(file_vpath[i] != NULL)
+                free(file_vpath[i]);
+        }
+        free(file_vpath);
     }
 }
 
@@ -1165,4 +1240,256 @@ size_t crlf_to_lf(uint8_t* data, size_t size)
         data[i] = '\0';
 
     return j;
+}
+
+
+
+
+
+/*
+ *
+ * .pak files
+ *
+ */
+
+/*
+ * has_pak_support()
+ * Checks if physfs has been compiled with .PAK file support
+ */
+bool has_pak_support()
+{
+    assertx(PHYSFS_isInit());
+
+    for(const PHYSFS_ArchiveInfo **i = PHYSFS_supportedArchiveTypes(); *i != NULL; i++) {
+        if(str_icmp((*i)->extension, "PAK") == 0)
+            return true;
+    }
+
+    return false;
+}
+
+/*
+ * generate_pak_file()
+ * Generate a .pak archive with files stored in memory.
+ * Call release_pak_file() on the output data after usage.
+ */
+bool generate_pak_file(const char** vpath, int file_count, const void** file_data, const size_t* file_size, void** out_pak_data, size_t* out_pak_size)
+{
+    uint8_t* pack_data = NULL;
+
+    /* validation */
+    if(vpath == NULL || file_count == 0) {
+        WARN("No files have been added to the compatibility pack!");
+        goto error;
+    }
+
+    /* accumulate file_size[] */
+    size_t* accum_file_size = alloca((1 + file_count) * sizeof(*accum_file_size));
+
+    accum_file_size[0] = 0;
+    for(int i = 0; i < file_count; i++)
+        accum_file_size[i+1] = accum_file_size[i] + file_size[i];
+
+    /* compute the size of the pack */
+    const size_t header_size = 16;
+    const size_t toc_entry_size = 64;
+    size_t toc_size = file_count * toc_entry_size;
+    size_t data_size = accum_file_size[file_count];
+    size_t pack_size = header_size + toc_size + data_size;
+
+    /* allocate memory for the pack file */
+    pack_data = mallocx(pack_size);
+
+    /* open the pack file for writing */
+    ALLEGRO_FILE* packf = al_open_memfile(pack_data, pack_size, "wb");
+    if(NULL == packf) {
+        LOG("Can't open the compatibility pack file for writing!");
+        goto error;
+    }
+
+    /* ----- */
+
+    /* write the header (16 bytes) */
+    al_fwrite(packf, "PACK", 4); /* signature (4 bytes) */
+    al_fwrite32le(packf, header_size); /* position of the table of contents (4 bytes) */
+    al_fwrite32le(packf, toc_size); /* size in bytes of the table of contents (4 bytes) */
+    al_fwrite(packf, "COOL", 4); /* magic blanks (4 bytes) */
+
+    /* ----- */
+
+    /* write the table of contents (each is an entry of 64 bytes) */
+    char filename[56];
+    uint32_t data_start = header_size + toc_size;
+
+    for(int i = 0; i < file_count; i++) {
+
+        /* validate the data */
+        assertx(file_data[i] != NULL || file_size[i] == 0);
+
+        /* validate the filename */
+        int length_of_filename = strlen(vpath[i]);
+        assertx(length_of_filename > 0 && length_of_filename < sizeof(filename));
+
+        /* write the filename (56 bytes) */
+        memset(filename, 0, sizeof(filename));
+        str_cpy(filename, vpath[i], sizeof(filename));
+        al_fwrite(packf, filename, sizeof(filename));
+
+        /* write the position of the file (4 bytes) */
+        al_fwrite32le(packf, data_start + accum_file_size[i]);
+
+        /* write the size of the file (4 bytes) */
+        al_fwrite32le(packf, file_size[i]);
+
+    }
+
+    /* ----- */
+
+    /* tightly write the file data */
+    for(int i = 0; i < file_count; i++) {
+        size_t n = al_fwrite(packf, file_data[i], file_size[i]);
+        if(n < file_size[i]) {
+            WARN("Can't add file \"%s\" to the compatibility pack!", vpath[i]);
+            goto error;
+        }
+    }
+
+    /* ----- */
+
+    /* close the pack file */
+    al_fclose(packf);
+
+    /* done! */
+    *out_pak_data = (void*)pack_data;
+    *out_pak_size = pack_size;
+    return true;
+
+    /* error */
+    error:
+
+    if(pack_data != NULL)
+        free(pack_data);
+
+    *out_pak_data = NULL;
+    *out_pak_size = 0;
+    return false;
+}
+
+/*
+ * release_pak_file()
+ * Releases a .pak file previously generated with generate_pak_file()
+ */
+void release_pak_file(void* pak)
+{
+    uint8_t* file_data = (uint8_t*)pak;
+
+    if(file_data != NULL)
+        free(file_data);
+}
+
+
+
+
+
+/*
+ *
+ * general read & write utilities
+ *
+ */
+
+/*
+ * read_file()
+ * Read a file to memory. Returns true on success.
+ * You must free() the output void* pointer on success.
+ */
+bool read_file(const char* vpath, void** out_file_data, size_t* out_file_size)
+{
+    void* buffer = NULL;
+    ALLEGRO_FILE* fp = NULL;
+
+    /* does the file exist? */
+    if(PHYSFS_isInit() && !PHYSFS_exists(vpath)) {
+        WARN("File \"%s\" doesn't exist", vpath);
+        goto error;
+    }
+
+    /* open the file */
+    if(NULL == (fp = al_fopen(vpath, "rb"))) {
+        WARN("Can't open file \"%s\" for reading", vpath);
+        goto error;
+    }
+
+    /* find its size */
+    int64_t size = al_fsize(fp);
+    if(size < 0) {
+        WARN("Can't determine the size of file \"%s\"", vpath);
+        goto error;
+    }
+
+    /* allocate a buffer */
+    buffer = mallocx(size);
+
+    /* read the file */
+    size_t n = al_fread(fp, buffer, size);
+    if(n < size) {
+        WARN("Can't successfully read file \"%s\". Read %lu bytes, but expected %lu.", vpath, (unsigned long)n, (unsigned long)size);
+        goto error;
+    }
+
+    /* close the file */
+    al_fclose(fp);
+
+    /* success! */
+    *out_file_data = buffer;
+    *out_file_size = size;
+    return true;
+
+    /* error */
+    error:
+
+    if(buffer != NULL)
+        free(buffer);
+
+     if(fp != NULL)
+        al_fclose(fp);
+
+    *out_file_data = NULL;
+    *out_file_size = 0;
+    return false;
+}
+
+/*
+ * write_file()
+ * Write a memory buffer to a file. Returns true on success.
+ */
+bool write_file(const char* vpath, void* file_data, size_t file_size)
+{
+    ALLEGRO_FILE* fp = NULL;
+
+    /* open the file */
+    if(NULL == (fp = al_fopen(vpath, "wb"))) {
+        WARN("Can't open file \"%s\" for writing", vpath);
+        goto error;
+    }
+
+    /* write the data */
+    size_t n = al_fwrite(fp, file_data, file_size);
+    if(n < file_size) {
+        WARN("Can't successfully write file \"%s\". Wrote %lu bytes out of a total of %lu.", vpath, (unsigned long)n, (unsigned long)file_size);
+        goto error;
+    }
+
+    /* close the file */
+    al_fclose(fp);
+
+    /* success! */
+    return true;
+
+    /* error */
+    error:
+
+    if(fp != NULL)
+        al_fclose(fp);
+
+    return false;
 }

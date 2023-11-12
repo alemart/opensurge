@@ -133,6 +133,12 @@ static bool force_quit = false;
 /* Global Prefs */
 prefs_t* prefs = NULL; /* public */
 
+/* MODs */
+static int compatibility_version_code = 0;
+static uint32_t game_id = 0;
+
+
+
 
 
 /* public functions */
@@ -276,6 +282,16 @@ void engine_remove_event_source(ALLEGRO_EVENT_SOURCE* event_source)
 }
 
 /*
+ * engine_game_id()
+ * A number that uniquely identifies the currently-running release
+ * of the currently-running opensurge game
+ */
+uint32_t engine_game_id()
+{
+    return game_id;
+}
+
+/*
  * engine_compatibility_version_code()
  * An engine version code when in compatibility mode. When not in
  * compatibility mode, this will be just the version code of this
@@ -283,7 +299,7 @@ void engine_remove_event_source(ALLEGRO_EVENT_SOURCE* event_source)
  */
 int engine_compatibility_version_code()
 {
-    return asset_compatibility_version_code();
+    return compatibility_version_code;
 }
 
 
@@ -362,7 +378,11 @@ void init_basic_stuff(const commandline_t* cmd)
     if(commandline_getint(cmd->verbose, FALSE))
         logfile_init(LOGFILE_CONSOLE);
 
-    asset_init(cmd->argv[0], gamedir, compatibility_mode ? compatibility_version : NULL);
+    asset_init(
+        cmd->argv[0], gamedir,
+        compatibility_mode ? compatibility_version : NULL,
+        &game_id, &compatibility_version_code
+    );
     logfile_init(LOGFILE_TXT);
 
     /* initialize prefs and nanoparser */
@@ -370,6 +390,9 @@ void init_basic_stuff(const commandline_t* cmd)
     nanoparser_set_error_function(parser_error);
     nanoparser_set_warning_function(parser_warning);
     init_nanocalc();
+
+    /* logs */
+    logfile_message("Game ID: %08x", game_id);
 }
 
 
