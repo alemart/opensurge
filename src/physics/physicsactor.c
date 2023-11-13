@@ -762,6 +762,15 @@ void physicsactor_springify(physicsactor_t *pa)
     if(pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
         return;
 
+    if(pa->state != PAS_SPRINGING) {
+        pa->want_to_detach_from_ground = pa->want_to_detach_from_ground || (
+            (pa->movmode == MM_FLOOR && pa->ysp < 0.0) ||
+            (pa->movmode == MM_RIGHTWALL && pa->xsp < 0.0) ||
+            (pa->movmode == MM_CEILING && pa->ysp > 0.0) ||
+            (pa->movmode == MM_LEFTWALL && pa->xsp > 0.0)
+        );
+    }
+
     pa->state = PAS_SPRINGING;
 }
 
@@ -1284,7 +1293,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
             pa->gsp = multiplier * (2.0 + pa->charge_intensity);
             pa->charge_intensity = 0.0;
-            pa->jump_lock_timer = 6.0 / TARGET_FPS;
+            pa->jump_lock_timer = 2.0 / TARGET_FPS;
             pa->state = PAS_ROLLING;
 
             notify_observers(pa, PAE_RELEASE);
@@ -1457,13 +1466,6 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
     if(pa->state == PAS_SPRINGING) {
         if(pa->midair && pa->ysp > 0.0)
             pa->state = PAS_WALKING;
-
-        pa->want_to_detach_from_ground = pa->want_to_detach_from_ground || (
-            (pa->movmode == MM_FLOOR && pa->ysp < 0.0) ||
-            (pa->movmode == MM_RIGHTWALL && pa->xsp < 0.0) ||
-            (pa->movmode == MM_CEILING && pa->ysp > 0.0) ||
-            (pa->movmode == MM_LEFTWALL && pa->xsp > 0.0)
-        );
     }
 
     /*
@@ -2236,8 +2238,10 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         if(!obstacle_point_collision(*at_A, tail))
             *at_A = NULL;
         else if(pa->midair && pa->movmode == MM_FLOOR && pa->angle == 0x0) {
+            /* the player is too far below the ground level */
             int ygnd = obstacle_ground_position(*at_A, tail.x, tail.y, GD_DOWN);
-            *at_A = (tail.y < ygnd + CLOUD_OFFSET || pa->ysp > 0.0) ? *at_A : NULL;
+            if(tail.y >= ygnd + CLOUD_OFFSET)
+                *at_A = NULL;
         }
     }
 
@@ -2247,25 +2251,40 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         if(!obstacle_point_collision(*at_B, tail))
             *at_B = NULL;
         else if(pa->midair && pa->movmode == MM_FLOOR && pa->angle == 0x0) {
+            /* the player is too far below the ground level */
             int ygnd = obstacle_ground_position(*at_B, tail.x, tail.y, GD_DOWN);
-            *at_B = (tail.y < ygnd + CLOUD_OFFSET || pa->ysp > 0.0) ? *at_B : NULL;
+            if(tail.y >= ygnd + CLOUD_OFFSET)
+                *at_B = NULL;
         }
     }
 
-    /* A, B: special logic when both are clouds and A != B */
-    if(*at_A != NULL && *at_B != NULL && *at_A != *at_B && !obstacle_is_solid(*at_A) && !obstacle_is_solid(*at_B)) {
-        if(pa->movmode == MM_FLOOR) {
-            point2d_t tail_a = sensor_tail(a, position, pa->movmode);
-            point2d_t tail_b = sensor_tail(b, position, pa->movmode);
-            int gnd_a = obstacle_ground_position(*at_A, tail_a.x, tail_a.y, GD_DOWN);
-            int gnd_b = obstacle_ground_position(*at_B, tail_b.x, tail_b.y, GD_DOWN);
-            if(abs(gnd_a - gnd_b) > 8) {
-                if(gnd_a < gnd_b)
-                    *at_A = NULL;
-                else
-                    *at_B = NULL;
+    /* A, B: conflict resolution when A != B */
+    if(*at_A != NULL && *at_B != NULL && *at_A != *at_B) {
+
+        /* A: if B is a solid and A is a cloud, ignore A */
+        if(!obstacle_is_solid(*at_A) && obstacle_is_solid(*at_B))
+            *at_A = NULL;
+
+        /* B: if A is a solid and B is a cloud, ignore B */
+        else if(obstacle_is_solid(*at_A) && !obstacle_is_solid(*at_B))
+            *at_B = NULL;
+
+        /* A, B: special logic when both are clouds and one is much taller than the other */
+        else if(!obstacle_is_solid(*at_A) && !obstacle_is_solid(*at_B)) {
+            if(pa->movmode == MM_FLOOR) {
+                point2d_t tail_a = sensor_tail(a, position, pa->movmode);
+                point2d_t tail_b = sensor_tail(b, position, pa->movmode);
+                int gnd_a = obstacle_ground_position(*at_A, tail_a.x, tail_a.y, GD_DOWN);
+                int gnd_b = obstacle_ground_position(*at_B, tail_b.x, tail_b.y, GD_DOWN);
+                if(abs(gnd_a - gnd_b) > 8) {
+                    if(gnd_a < gnd_b)
+                        *at_A = NULL;
+                    else
+                        *at_B = NULL;
+                }
             }
         }
+
     }
 
     /* set flags */
