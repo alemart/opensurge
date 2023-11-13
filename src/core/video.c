@@ -761,17 +761,20 @@ bool create_display(int width, int height)
     /* create an OpenGL context with "default" settings. Will likely work.
        (we should require 3.3+ instead, or ES 3.0+) */
     ;
-
-    /*al_set_new_display_option(ALLEGRO_CAN_DRAW_INTO_BITMAP, 1, ALLEGRO_REQUIRE);*/
 #endif
 
-    al_set_new_display_option(
-        ALLEGRO_SUPPORTED_ORIENTATIONS,
-        game_screen_width >= game_screen_height ?
-            ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE :
-            ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT,
-        ALLEGRO_REQUIRE
-    );
+#if 0
+    /* specifying these may not work as expected? should be a given in newer OpenGL versions */
+    al_set_new_display_option(ALLEGRO_SUPPORT_NPOT_BITMAP, 1, ALLEGRO_SUGGEST);
+    al_set_new_display_option(ALLEGRO_CAN_DRAW_INTO_BITMAP, 1, ALLEGRO_REQUIRE);
+    /*al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_SUGGEST);*/
+#endif
+    al_set_new_display_option(ALLEGRO_COLOR_SIZE, 32, ALLEGRO_SUGGEST);
+
+    if(game_screen_width >= game_screen_height)
+        al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_LANDSCAPE, ALLEGRO_SUGGEST);
+    else
+        al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT, ALLEGRO_SUGGEST);
 
 #if defined(ALLEGRO_VERSION_INT) && defined(AL_ID) && ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
     al_set_new_display_option(ALLEGRO_DEFAULT_SHADER_PLATFORM, ALLEGRO_SHADER_GLSL_MINIMAL, ALLEGRO_REQUIRE); /* faster shader with no alpha testing */
