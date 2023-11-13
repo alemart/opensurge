@@ -83,10 +83,11 @@ static struct {
 
 /* joystick input */
 #define MAX_JOYS         8 /* maximum number of joysticks */
-#define AXIS_X           0 /* x-axis of a stick */
-#define AXIS_Y           1 /* y-axis of a stick */
+#define MIN_BUTTONS      4 /* minimum number of buttons for a joystick to be considered a gamepad */
 #define REQUIRED_AXES    2 /* required number of axes of a stick */
-#define REQUIRED_BUTTONS 4 /* minimum number of buttons for a joystick to be considered a gamepad */
+
+/* axes of a stick */
+enum { AXIS_X = 0, AXIS_Y = 1 };
 
 static struct {
     float axis[REQUIRED_AXES]; /* -1.0 <= axis[i] <= 1.0 */
@@ -98,12 +99,16 @@ static bool ignore_joystick = false;
 /* dead-zone for analog input */
 static const float DEADZONE_THRESHOLD = 0.2f;
 
-/* analog to digital conversion thresholds for the (x,y) axes */
-static const float analog2digital_threshold[REQUIRED_AXES] = {
+/* analog sticks: sensitivity threshold */
+static const float ANALOG_SENSITIVITY_THRESHOLD = 0.5f; /* a value in [0,1] */
+
+/* analog sticks: thresholds for the (x,y) axes */
+static const float ANALOG_AXIS_THRESHOLD[REQUIRED_AXES] = {
 
     /* Pressing up + jump won't make the player jump */
-    [AXIS_X] = 0.25f,
-    [AXIS_Y] = 0.75f
+    [AXIS_X] = 0.609f,/* cos(52.5 degrees) ~ 105 degrees horizontally */
+    [AXIS_Y] = 0.752f /* sin(48.75 degrees) ~ 97.5 degrees vertically */
+    /*[AXIS_Y] = 0.707f*/ /* sin(45 degrees) ~ 90 degrees vertically */
 
 };
 
@@ -320,7 +325,7 @@ void input_update()
         int num_buttons = al_get_joystick_num_buttons(joystick);
 
         /* filter out undesirable devices such as accelerometers */
-        if(num_buttons < REQUIRED_BUTTONS)
+        if(num_buttons < MIN_BUTTONS)
             continue;
 
         /* remap joystick */
@@ -799,10 +804,20 @@ void inputuserdefined_update(input_t* in)
     if(im->joystick.enabled && input_is_joystick_enabled()) {
         int joy_id = im->joystick.id;
         if(joy_id < MAX_JOYS && wanted_joy[joy_id] != NULL) {
-            in->state[IB_UP] = in->state[IB_UP] || (wanted_joy[joy_id]->axis[AXIS_Y] <= -analog2digital_threshold[AXIS_Y]);
-            in->state[IB_DOWN] = in->state[IB_DOWN] || (wanted_joy[joy_id]->axis[AXIS_Y] >= analog2digital_threshold[AXIS_Y]);
-            in->state[IB_LEFT] = in->state[IB_LEFT] || (wanted_joy[joy_id]->axis[AXIS_X] <= -analog2digital_threshold[AXIS_X]);
-            in->state[IB_RIGHT] = in->state[IB_RIGHT] || (wanted_joy[joy_id]->axis[AXIS_X] >= analog2digital_threshold[AXIS_X]);
+            v2d_t axis = v2d_new(wanted_joy[joy_id]->axis[AXIS_X], wanted_joy[joy_id]->axis[AXIS_Y]);
+            v2d_t abs_axis = v2d_new(fabsf(axis.x), fabsf(axis.y));
+            float norm_inf = max(abs_axis.x, abs_axis.y);
+
+            if(norm_inf >= ANALOG_SENSITIVITY_THRESHOLD) {
+                v2d_t normalized_axis = v2d_normalize(axis);
+
+                in->state[IB_UP] = in->state[IB_UP] || (normalized_axis.y <= -ANALOG_AXIS_THRESHOLD[AXIS_Y]);
+                in->state[IB_DOWN] = in->state[IB_DOWN] || (normalized_axis.y >= ANALOG_AXIS_THRESHOLD[AXIS_Y]);
+                in->state[IB_LEFT] = in->state[IB_LEFT] || (normalized_axis.x <= -ANALOG_AXIS_THRESHOLD[AXIS_X]);
+                in->state[IB_RIGHT] = in->state[IB_RIGHT] || (normalized_axis.x >= ANALOG_AXIS_THRESHOLD[AXIS_X]);
+
+                /*video_showmessage("%f,%f => %f", normalized_axis.x, normalized_axis.y, RAD2DEG * atan2f(normalized_axis.y, normalized_axis.x));*/
+            }
 
             for(inputbutton_t button = 0; button < IB_MAX; button++) {
                 uint32_t button_mask = im->joystick.button_mask[(int)button];
