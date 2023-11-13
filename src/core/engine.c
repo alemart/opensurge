@@ -33,13 +33,14 @@
 #include "video.h"
 #include "audio.h"
 #include "input.h"
-#include "fadefx.h"
+#include "font.h"
 #include "sprite.h"
 #include "lang.h"
 #include "screenshot.h"
+#include "fadefx.h"
 #include "prefs.h"
 #include "commandline.h"
-#include "font.h"
+#include "modutils.h"
 #include "nanoparser.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
@@ -283,8 +284,8 @@ void engine_remove_event_source(ALLEGRO_EVENT_SOURCE* event_source)
 
 /*
  * engine_game_id()
- * A number that uniquely identifies the currently-running release
- * of the currently-running opensurge game
+ * A number that uniquely identifies the current release of the
+ * currently-running opensurge game. Will be zero if unavailable.
  */
 uint32_t engine_game_id()
 {
@@ -392,7 +393,8 @@ void init_basic_stuff(const commandline_t* cmd)
     init_nanocalc();
 
     /* logs */
-    logfile_message("Game ID: %08x", game_id);
+    if(game_id != GAME_ID_UNAVAILABLE)
+        logfile_message("Game ID: %08x", game_id);
 }
 
 

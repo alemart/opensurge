@@ -18,14 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MODS_H
-#define _MODS_H
+#ifndef _MODUTILS_H
+#define _MODUTILS_H
 
 #include <stdint.h>
 #include <stdlib.h>
 
+#define GAME_ID_UNAVAILABLE         0xFFFFFFFFu
+
 uint32_t find_game_id(const char* game_dirname, const char* required_engine_version);
 char* guess_engine_version_of_mod(char* buffer, size_t buffer_size);
-const char** select_files_for_compatibility_pack(const char* engine_version);
+const char** select_files_for_compatibility_pack(const char* engine_version, uint32_t game_id);
 
 #endif

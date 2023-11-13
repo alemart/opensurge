@@ -32,6 +32,14 @@
 #include "../util/stringutil.h"
 #include "../third_party/ignorecase.h"
 
+/* require alloca */
+#if !(defined(__APPLE__) || defined(MACOSX) || defined(macintosh) || defined(Macintosh))
+#include <malloc.h>
+#if defined(__linux__) || defined(__linux) || defined(__EMSCRIPTEN__)
+#include <alloca.h>
+#endif
+#endif
+
 /* The default directory of the game assets provided by upstream (*nix only) */
 #ifndef GAME_DATADIR
 #define GAME_DATADIR                    "/usr/share/games/" GAME_UNIXNAME
@@ -73,6 +81,7 @@ static ALLEGRO_PATH* find_user_datadir(const char* dirname);
 static void create_dir(const ALLEGRO_PATH* path);
 static uint32_t get_fs_mode(const char* path);
 static const char* find_extension(const char* path);
+static char* find_gamedirname(const char* gamedir, char* buffer, size_t buffer_size);
 static const char* case_insensitive_fix(const char* virtual_path);
 static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
@@ -80,7 +89,7 @@ static char* generate_user_datadirname(const char* game_name, uint32_t game_id, 
 static bool is_valid_root_folder();
 static char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size);
 
-static void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version);
+static void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version, uint32_t game_id);
 static int scan_translations(const char* vpath, void* context);
 static int append_translations(const char* vpath, void* context);
 static size_t crlf_to_lf(uint8_t* data, size_t size);
@@ -131,20 +140,8 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
 
     /* copy the gamedir, if specified */
     gamedir = NULL;
-    if(optional_gamedir != NULL && *optional_gamedir != '\0') {
+    if(optional_gamedir != NULL && *optional_gamedir != '\0')
         gamedir = str_dup(optional_gamedir);
-
-        /* remove trailing slashes, if any */
-        int length = strlen(gamedir);
-        while(length > 0 && (gamedir[length-1] == '/' || gamedir[length-1] == '\\'))
-            gamedir[--length] = '\0';
-
-        /* no blank names */
-        if(*gamedir == '\0') {
-            free(gamedir);
-            gamedir = NULL;
-        }
-    }
 
     /* set the search path to the specified gamedir */
     if(gamedir != NULL) {
@@ -166,7 +163,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         }
 
         /* Get the name of the folder of the game */
-        str_basename_without_extension(gamedir, game_dirname, sizeof(game_dirname));
+        find_gamedirname(gamedir, game_dirname, sizeof(game_dirname));
 
         /* mount gamedir to the root */
         if(!PHYSFS_mount(gamedir, "/", 1))
@@ -187,7 +184,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
                 CRASH("Please extract the game archive or, to use it as is, upgrade physfs to version 3.2.0 and recompile the engine (this build uses outdated version %d.%d.%d).", PHYSFS_VER_MAJOR, PHYSFS_VER_MINOR, PHYSFS_VER_PATCH);
 #endif
                 /* Get the name of the folder of the game again */
-                str_basename_without_extension(real_root, game_dirname, sizeof(game_dirname));
+                find_gamedirname(real_root, game_dirname, sizeof(game_dirname));
             }
         }
 
@@ -209,6 +206,8 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
                 CRASH("This MOD requires a newer version of the engine, %s. Please upgrade the engine or downgrade the MOD to version %s of the engine.", required_engine_version, GAME_VERSION_STRING);
             else if(engine_version < mod_version)
                 LOG("This MOD requires a newer version of the engine, %s. We'll try to run it anyway. Engine version is %s.", required_engine_version, GAME_VERSION_STRING);
+            else if(mod_version < VERSION_CODE(0,5,0))
+                LOG("Legacy games are unsupported. Detected version: %s", required_engine_version);
         }
 
         /* find the game ID */
@@ -284,7 +283,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
 
             /* override scripts */
             al_set_physfs_file_interface();
-            setup_compatibility_pack(dirpath, compatibility_version);
+            setup_compatibility_pack(dirpath, compatibility_version, game_id);
             al_restore_state(&state);
 
             /* mount the default shared data directory with lower precedence */
@@ -319,6 +318,10 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         /* not in compatibility mode */
         compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE;
 
+        /* the game ID is unavailable */
+        game_id = find_game_id(NULL, GAME_VERSION_STRING);
+        assertx(game_id == GAME_ID_UNAVAILABLE);
+
         /* create the user dir if it doesn't exist */
         create_dir(user_datadir);
 
@@ -350,17 +353,12 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         if(!is_valid_root_folder())
             CRASH("Not a valid Open Surge installation. Please reinstall the game.");
 
-        /* find the game ID */
-        game_id = find_game_id(NULL, NULL);
-        LOG("Game ID: %08x (\"%s\")", game_id, DEFAULT_GAME_NAME);
-
         /* done! */
         al_destroy_path(user_datadir);
         al_destroy_path(shared_datadir);
     }
 
     /* set the game ID */
-    assertx(game_id != 0);
     if(out_game_id != NULL)
         *out_game_id = game_id;
 
@@ -911,6 +909,28 @@ const char* find_extension(const char* path)
 }
 
 /*
+ * find_gamedirname()
+ * Find the name of the game folder, given its absolute path
+ */
+char* find_gamedirname(const char* gamedir, char* buffer, size_t buffer_size)
+{
+    char* tmp = str_dup(gamedir);
+
+    /* remove trailing slashes, if any */
+    int length = strlen(tmp);
+    while(length > 0 && (tmp[length-1] == '/' || tmp[length-1] == '\\'))
+        tmp[--length] = '\0';
+
+    /* remove the extension, if any
+       (gamedir may be a .zip archive) */
+    str_basename_without_extension(tmp, buffer, buffer_size);
+
+    /* done! */
+    free(tmp);
+    return buffer;
+}
+
+/*
  * is_valid_root_folder()
  * Check if the root directory of the physfs filesystem is a valid Open Surge folder
  */
@@ -992,7 +1012,7 @@ char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_s
  * on a compatibility version string. Ensure that the physfs I/O
  * interface (Allegro) is activated before calling this function.
  */
-void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version)
+void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version, uint32_t game_id)
 {
     /* we'll read files to memory */
     int file_count = 0;
@@ -1068,7 +1088,7 @@ void setup_compatibility_pack(const char* shared_dirpath, const char* engine_ver
 #endif
 
     /* select & read scripts of the shared data directory for compatibility */
-    const char** file_list = select_files_for_compatibility_pack(engine_version);
+    const char** file_list = select_files_for_compatibility_pack(engine_version, game_id);
     for(const char** vpath = file_list; *vpath != NULL; vpath++) {
         int last = file_count++;
 
@@ -1081,10 +1101,23 @@ void setup_compatibility_pack(const char* shared_dirpath, const char* engine_ver
         file_size = reallocx(file_size, file_count * sizeof(*file_size));
         file_size[last] = 0;
 
-        if(!read_file(file_vpath[last], (void**)&file_data[last], &file_size[last])) {
-            WARN("Can't add file \"%s\" to the compatibility pack!", file_vpath[last]);
+        if(file_vpath[last][0] == '-') {
+            LOG("Will ignore file \"%s\"...", file_vpath[last] + 1);
             free(file_vpath[last]);
-            --file_count;
+
+            /* make the file blank, effectively removing it from the tree */
+            file_vpath[last] = str_dup(*vpath + 1);
+            file_data[last] = NULL;
+            file_size[last] = 0;
+        }
+        else if(!read_file(file_vpath[last], (void**)&file_data[last], &file_size[last])) {
+            WARN("Can't add file \"%s\" to the compatibility pack!", file_vpath[last]);
+
+            /* the file probably no longer exists. Make it blank,
+               effectively removing it from the tree */
+            WARN("Will make \"%s\" an empty file", file_vpath[last]);
+            file_data[last] = NULL;
+            file_size[last] = 0;
         }
         else
             LOG("Added file \"%s\" to the compatibility pack", file_vpath[last]);

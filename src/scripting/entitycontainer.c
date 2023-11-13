@@ -27,6 +27,8 @@
 #include "../core/image.h"
 #include "../core/sprite.h"
 #include "../core/animation.h"
+#include "../core/engine.h"
+#include "../core/global.h"
 #include "../entities/renderqueue.h"
 
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -263,7 +265,11 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_object_t* entity_manager = get_entity_manager(object);
+
+    /* flags */
     int flags = surgescript_var_get_rawbits(param[0]);
+    bool want_gizmos = (0 != (flags & RENDERFLAGS_WANT_GIZMOS));
+    bool want_legacy_method = (engine_compatibility_version_code() < VERSION_CODE(0,6,1)); /* performance penalty */
 
     /* can we clip out an entity? */
     #if 1
@@ -341,8 +347,7 @@ surgescript_var_t* fun_render(surgescript_object_t* object, const surgescript_va
                 continue;
 
             /* search the sub-tree for renderables */
-            bool want_gizmos = (0 != (flags & RENDERFLAGS_WANT_GIZMOS));
-            surgescript_object_traverse_tree_ex(entity, &flags, want_gizmos ? render_subtree : render_subtree_faster);
+            surgescript_object_traverse_tree_ex(entity, &flags, want_gizmos || want_legacy_method ? render_subtree : render_subtree_faster);
         }
         iterator_destroy(it);
 

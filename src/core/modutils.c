@@ -28,22 +28,14 @@
 #include "../util/stringutil.h"
 #include "../scenes/util/levparser.h"
 
-/* require alloca */
-#if !(defined(__APPLE__) || defined(MACOSX) || defined(macintosh) || defined(Macintosh))
-#include <malloc.h>
-#if defined(__linux__) || defined(__linux) || defined(__EMSCRIPTEN__)
-#include <alloca.h>
-#endif
-#endif
-
 /* utility macros */
-#define LOG(...)                        logfile_message("[mod-compat] " __VA_ARGS__)
-#define WARN(...)                       do { fprintf(stderr, "[mod-compat] " __VA_ARGS__); fprintf(stderr, "\n"); LOG(__VA_ARGS__); } while(0)
-#define CRASH(...)                      fatal_error("[mod-compat] " __VA_ARGS__)
+#define LOG(...)                        logfile_message("[modutils] " __VA_ARGS__)
+#define WARN(...)                       do { fprintf(stderr, "[modutils] " __VA_ARGS__); fprintf(stderr, "\n"); LOG(__VA_ARGS__); } while(0)
+#define CRASH(...)                      fatal_error("[modutils] " __VA_ARGS__)
 
 /*
 
-COMPATIBILITY MODE
+Compatibility mode
 ------------------
 
 In compatibility mode, we automatically generate a compatibility pack based on
@@ -51,83 +43,105 @@ the engine version of the MOD and on the engine version of the executable. This
 pack overrides any files of the MOD.
 
 The compatibility pack is a small set of files (mostly scripts) that allows a
-MOD to run in the present versin of the engine with no errors, no warnings and
-no missing features.
+MOD to run in the present version of the engine with - ideally - no errors, no
+warnings and no missing features.
 
-The compatibility pack is generated on a file-by-file basis. It is a subset of
-the compatibility list below. Each file is link to a version range of the form
-[first:last] (inclusive). If the engine version of the MOD falls within the
-range, the corresponding file will be included in the compatibility pack.
+The compatibility pack is generated on a file-by-file basis. It is generated
+with a subset of the compatibility list below. Each file is linked to a version
+range of the form [first:last] (inclusive). If the compatibility version falls
+within the range, the corresponding file will be included in the compatibility
+pack. The compatibility version is usually the engine version of the MOD. When
+writing the "last" part of the range, consider the development builds as well.
 
 If a particular file is added to the compatibility pack but does not exist in
-the present version of the engine, then the file will be considered empty,
+the present version of the engine, then that file will be considered empty,
 effectively removing it from the MOD.
 
-Note: this assumes that the user has been using the Open Surge Import Utility
-to port his or her MOD to newer versions of the engine. If the user intentionally
-mixes up old scripts with new versions of the engine, the outcome is undefined
-behavior.
+Note: we assume that the user has been using the Open Surge Import Utility to
+port his or her MOD to newer versions of the engine. The files listed below
+are assumed to be the latest versions of the official releases of the engine.
+If the user intentionally mixes up old scripts with new versions of the engine,
+the outcome is undefined behavior.
+
+
+
+Usage policy
+------------
+
+Even though overwriting files of a MOD may work fine, it is nonetheless an
+invasive operation. Doing so may lead to undefined behavior in the case of
+merge conflicts. Therefore, we wish to change the MOD as little as possible.
+We adopt the following policy to minimize the number of file substitutions:
+
+1) keep the list of files small; don't include a script unless there is a
+   good reason for it. You may include it due to some new feature that is
+   required in newer engine versions, or to fix an observed bug.
+
+2) restrict the version range of the included files as much as possible.
+
+Ideally, old scripts shipped with the MOD will run fine in new versions of
+the engine. Occasionally this is not possible, as in the case of required
+new features or bugfixes. Bugfixes that are not critical may be left out of
+the compatibility pack, or they may be added if a merge conflict is unlikely.
+
+It's safer to substitute files that the user is unlikely to change in a
+breaking way. If a file substitution leads to error in a particular MOD due
+to a merge conflict, then we can patch the MOD individually or drop the
+substitution in that case - if it's not critical. TODO
 
 */
 static const char* const COMPATIBILITY_LIST[] = {
     /* filepath (up to 55 characters) */                /* version range */         /* notes */
 
-    /* compatibility fixes */
-    "sprites/ui/pause.spr",                             ":0.6.0.3",                 /* introduce a new pause menu in 0.6.1 */
-    "scripts/core/hud.ss",                              ":0.6.0.3",                 /* mobile: add pause button to the HUD */
-    "scripts/core/water.ss",                            "0.5.0:0.6.0.3",            /* changes to the entity system; omit warnings */
-    "scripts/functions/ui/show_message.ss",             "0.5.0:0.6.0.3",            /* changes to the entity system; omit warnings */
-    "scripts/functions/camera/lock_camera.ss",          "0.5.0:0.6.0.3",            /* changes to the entity system; omit warnings */
-    "scripts/functions/player/give_extra_lives.ss",     "0.5.0:0.6.0.3",            /* changes to the entity system; omit warnings */
-    "scripts/misc/lucky_bonus.ss",                      "0.5.0:0.6.0.3",            /* changes to the entity system; omit warnings */
-    "scripts/items/power_pluggy.ss",                    "0.6.0:0.6.0.3",            /* changes to the physics system */
-    "scripts/items/salamander_bridge.ss",               "0.6.0:0.6.0.3",            /* changes to the physics system; prevent soft lock */
-    "scripts/enemies/marmotred.ss",                     "0.5.0:0.6.0.3",            /* changes to the entity system; omit warnings */
-    "scripts/misc/animal.ss",                           "0.5.0:0.6.0.3",            /* animation fix in 0.6.1 */
-    "scripts/players/lock_angle.ss",                    "0.5.0:0.6.0.3",            /* changes to the update cycle; now using lateUpdate() */
-    "scripts/ui/menubuttonlist.ss",                     "0.5.0:0.6.0.3",            /* changes to the entity system; omit warnings */
+    /* TODO move this list to a CSV file? */
 
-#if 0
-    /* cancelled changes */
+#if 1
+    /* active changes */
+    "sprites/ui/pause.spr",                             ":0.6.1",                   /* introduce a new pause menu in 0.6.1 */
+    "scripts/core/hud.ss",                              ":0.6.1",                   /* mobile: add pause button to the Default HUD in 0.6.1 */
+    "scripts/core/pause.ss",                            ":0.6.1",                   /* better user experience in 0.6.1 */
+    "inputs/default.in",                                ":0.6.1",                   /* updated mappings are better */
 
-    /* the physics hitbox matches the old one in compatibility mode */
-    "scripts/players/dash_smoke.ss",                    "0.5.0:0.6.0.3",            /* changes to the physics system; player hitbox */
+    "scripts/core/camera.ss",                           ":0.6.1",                   /* changes to the update cycle in 0.6.1; now using lateUpdate() */
+    "scripts/items/walk_on_water.ss",                   "0.6.0:0.6.1",              /* changes to the update cycle in 0.6.1; now using lateUpdate() */
+    "scripts/players/lock_angle.ss",                    ":0.6.1",                   /* changes to the update cycle in 0.6.1; now using lateUpdate() */
 
+    "scripts/core/water.ss",                            ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/items/bg_xchg.ss",                         ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/items/event_trigger.ss",                   ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/enemies/marmotred.ss",                     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/functions/ui/show_message.ss",             ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/functions/camera/lock_camera.ss",          ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/functions/player/give_extra_lives.ss",     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/misc/lucky_bonus.ss",                      ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/ui/menubuttonlist.ss",                     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
 
+    "scripts/items/power_pluggy.ss",                    "0.6.0:0.6.1",              /* changes to the physics and to the entity system in 0.6.1; using lateUpdate(), increased the size of a collider, and more */
+    "scripts/items/salamander_bridge.ss",               "0.6.0:0.6.1",              /* changes to the physics system in 0.6.1; prevent soft lock */
+    "scripts/items/pipes.ss",                           ":0.6.1",                   /* changes to the physics system in 0.6.1; player hitbox; change the collider and the repositioning method of the pipe sensor */
 
-    /* future changes TODO */
-
-    /* better with a diff */
-    "scripts/core/cleared.ss",                          "0.5.0:0.6.0.3",            /* changes to the entity system; omit warnings */
-
-    /* better with a diff */
-    /* hud.ss */
-#endif
-
-    /* basic scripts (keep updated with bugfixes, etc.);
-       these scripts must all be backwards-compatible;
-       it's like they're built into the engine */
-
-    "scripts/behaviors/circular_movement.ss",           ":",
-    "scripts/behaviors/directional_movement.ss",        ":",
-    "scripts/behaviors/enemy.ss",                       ":",
-    "scripts/behaviors/platformer.ss",                  ":",
+    "scripts/items/tubes.ss",                           ":0.6.1",                   /* bugfixes in 0.6.1; prevent soft lock */
+    "scripts/items/bridge.ss",                          ":0.6.1",                   /* optimized collisions in 0.6.1 */
+    "scripts/items/collectibles.ss",                    ":0.6.1",                   /* performance updates in 0.6.1 */
+    "scripts/items/audio_source.ss",                    ":0.6.1",                   /* optimizations in 0.6.1 */
+    "scripts/misc/animal.ss",                           ":0.6.1",                   /* animation fix in 0.6.1 */
+    "scripts/behaviors/platformer.ss",                  ":0.6.0",                   /* since 0.6.1, animal.ss uses Platformer.gravityMultiplier introduced in 0.6.0 (underwater effect) */
 
     "scripts/items/profiler.ss",                        ":",                        /* always use own Profiler */
-    "scripts/core/surge_gameplay.ss",                   "0.6.0:",                   /* update Surge Gameplay */
-    "scripts/core/camera.ss",                           ":",                        /* changes to the update cycle in 0.6.1; now using lateUpdate() */
-    "scripts/items/springs.ss",                         ":",                        /* changes to the physics in 0.6.1 */
-    "scripts/items/spring_booster.ss",                  ":",
-    "scripts/items/collectibles.ss",                    ":",                        /* performance updates in 0.6.1 */
-    "scripts/items/tubes.ss",                           ":",
-    "scripts/items/pipes.ss",                           ":",                        /* changes to the entity system in 0.6.1; omit warnings */
-    "scripts/items/zipline.ss",                         ":",                        /* changes to the physics system in 0.6.1; player hitbox; change the collider and the repositioning method of the pipe sensor */
-    /*"sprites/items/zipline.spr",                      "0.5.0:0.6.0.3",*/          /* add action spot to the zipline */
-    "scripts/items/bridge.ss",                          ":",                        /* optimized collisions in 0.6.1 */
-    "scripts/items/audio_source.ss",                    ":",                        /* optimizations in 0.6.1 */
-    "scripts/items/walk_on_water.ss",                   "0.6.0:",                   /* changes to the update cycle in 0.6.1; now using lateUpdate() */
-    "scripts/items/bg_xchg.ss",                         ":",                        /* changes to the entity system in 0.6.1; omit warnings */
-    "scripts/items/event_trigger.ss",                   ":",                        /* changes to the entity system in 0.6.1; omit warnings */
+#endif
+
+#if 0
+    /* removed changes */
+    "scripts/core/cleared.ss",                          ":0.6.1",                   /* mobile: show and hide the mobile gamepad; need special exception */
+
+    "scripts/players/dash_smoke.ss",                    ":0.6.1",                   /* changes to the physics system in 0.6.1; repositioned due to the updated hitbox of the player */
+
+    "sprites/items/zipline.spr",                        ":0.6.1",                   /* add action spot to the zipline */
+    "scripts/items/zipline.ss",                         ":0.6.1",                   /* changes to the physics systems in 0.6.1; fix collisions due to a changed player hitbox */
+                                                                                    /* > not really needed? */
+
+    "-scripts/core/motd.ss",                            "0.6.1:",                   /* example: prefix a file with '-' to remove it (make it blank) */
+#endif
 
     /* NULL-terminated array */
     NULL, NULL
@@ -150,9 +164,8 @@ static bool scan_level_line(const char* vpath, int line, levparser_command_t com
 
 /*
  * find_game_id()
- * Compute the ID of an opensurge game
- * Pass NULL to game_dirname, and optionally to required_engine_version,
- * if playing the base game
+ * Compute the ID of an opensurge game. You may pass NULL to game_dirname,
+ * in which case GAME_ID_UNAVAILABLE will be returned
  */
 uint32_t find_game_id(const char* game_dirname, const char* required_engine_version)
 {
@@ -160,6 +173,15 @@ uint32_t find_game_id(const char* game_dirname, const char* required_engine_vers
 
     The game ID is a 32-bit number intended to uniquely identify a specific
     release ("version") of an opensurge game.
+
+    ---
+
+    The present method computes the ID based on the --game-folder command
+    line argument. It works, but it is limited. It doesn't give an ID when
+    the game runs in-place. While limited, this method has the merit of its
+    simplicity. When do we want a game ID?
+
+    ---
 
     Using the name of the game folder to determine the game ID is simple and
     fast to compute, as well as a reasonable choice, but is it robust?
@@ -170,11 +192,30 @@ uint32_t find_game_id(const char* game_dirname, const char* required_engine_vers
     the required engine vesion of the game. If multiple releases of a game
     share a required engine version, then this information is insufficient.
 
+    Limitation of this method: the name of the folder isn't reliable data
+    when running the game in-place (i.e., no --game-folder). Such a case is
+    not currently distinguishable from the base game.
+
     Using user-supplied names & versions is not necessarily robust. A user-
-    supplied name (e.g., in surge.cfg) is less likely to change in different
-    versions than the name of the folder of the game. Using a user-supplied
-    version string is reasonable but not foolproof: it may change in unknown
-    ways, or not change at all. Maybe use a checksum in the future?
+    supplied name (e.g., in surge.cfg or the name of the executable file) is
+    less likely to change in different versions than the name of the folder
+    of the game. Using a user-supplied version string is reasonable but not
+    foolproof: it may change in unknown ways, or not change at all.
+
+    Maybe use a checksum in the future?
+
+    ---
+
+    Idea for a different method: assign an ID at random. Store it in a file
+    and change it whenever the build version of the engine changes. If the
+    ID is not stored, fallback to the game folder method.
+
+    How can we distinguish between a mod and the base game? By looking at the
+    name of the game? This method is also not robust: two versions of a game
+    may be created using the same build of the engine (e.g., a stable build).
+    Also, storing the ID may lead to modifications and it not being unique.
+
+    ---
 
     Important: any changes to this method should be backwards-compatible.
 
@@ -183,14 +224,13 @@ uint32_t find_game_id(const char* game_dirname, const char* required_engine_vers
     char buffer[256], version_string[16];
     int length = 0, c = 0;
 
-    /* check if base game */
-    if(game_dirname == NULL) {
-        game_dirname = "./" GAME_UNIXNAME;
-        if(required_engine_version == NULL)
-            required_engine_version = GAME_VERSION_STRING;
-    }
+    /* the game ID is unavailable */
+    if(game_dirname == NULL)
+        return GAME_ID_UNAVAILABLE;
+
+    /* validate input */
     assertx(*game_dirname != '\0');
-    assertx(required_engine_version != NULL && *required_engine_version != '\0');
+    assertx(*required_engine_version != '\0');
 
     /* enforce a valid format for the engine version; remove any -suffix */
     int wip = 0, dots = 0;
@@ -226,7 +266,7 @@ char* guess_engine_version_of_mod(char* buffer, size_t buffer_size)
     int max_version_code = 0;
 
     /* begin with an initial guess */
-    const char* initial_guess = "0.5.0";
+    const char* initial_guess = "0.0.0";
     max_version_code = parse_version_number(initial_guess);
 
     /* guess the required engine version by reading the .lev files */
@@ -240,6 +280,35 @@ char* guess_engine_version_of_mod(char* buffer, size_t buffer_size)
     /* logfile.txt isn't a reliable source! */
     /* we could look for "Open Surge Engine version ... [space]" in the .exe, if available,
        but then we would not be able to downgrade the game as easily */
+}
+
+/*
+ * select_files_for_compatibility_pack()
+ * Returns a NULL-terminated array of statically allocated strings of suitable
+ * files for a compatibility pack, given an engine version.
+ */
+const char** select_files_for_compatibility_pack(const char* engine_version, uint32_t game_id)
+{
+    static const char* array[1 + COMPATIBILITY_PACK_MAX_FILE_COUNT];
+    (void)game_id;
+
+    /* initialize the array */
+    array[0] = NULL;
+
+    /* test each file */
+    for(int i = 0, j = 0; COMPATIBILITY_LIST[i] != NULL; i += 2) {
+        const char* filepath = COMPATIBILITY_LIST[i];
+        const char* version_range = COMPATIBILITY_LIST[1+i];
+
+        if(falls_within_version_range(engine_version, version_range)) {
+            LOG("Picking \"%s\"...", filepath);
+            array[j++] = filepath;
+            array[j] = NULL;
+        }
+    }
+
+    /* done! */
+    return array;
 }
 
 
@@ -328,32 +397,4 @@ bool falls_within_version_range(const char* version, const char* range)
 
     /* test if the engine version falls within the interval */
     return first <= test_version && test_version <= last;
-}
-
-/*
- * select_files_for_compatibility_pack()
- * Returns a NULL-terminated array of statically allocated strings of suitable
- * files for a compatibility pack, given an engine version.
- */
-const char** select_files_for_compatibility_pack(const char* engine_version)
-{
-    static const char* array[1 + COMPATIBILITY_PACK_MAX_FILE_COUNT];
-
-    /* initialize the array */
-    array[0] = NULL;
-
-    /* test each file */
-    for(int i = 0, j = 0; COMPATIBILITY_LIST[i] != NULL; i += 2) {
-        const char* filepath = COMPATIBILITY_LIST[i];
-        const char* version_range = COMPATIBILITY_LIST[1+i];
-
-        if(falls_within_version_range(engine_version, version_range)) {
-            LOG("Picking \"%s\"...", filepath);
-            array[j++] = filepath;
-            array[j] = NULL;
-        }
-    }
-
-    /* done! */
-    return array;
 }
