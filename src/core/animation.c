@@ -522,7 +522,7 @@ int traverse_animation_attributes(const parsetree_statement_t *stmt, void *anima
         anim->prog_anim_name = str_dup(name);
     }
     else
-        nanoparser_crash(stmt, "Unknown identifier \"%s\"", identifier);
+        nanoparser_warn(stmt, "Unknown identifier \"%s\"", identifier);
 
     return 0;
 }

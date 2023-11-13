@@ -428,7 +428,7 @@ int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
         );
     }
     else
-        nanoparser_crash(stmt, "Unknown identifier \"%s\"", identifier);
+        nanoparser_warn(stmt, "Unknown identifier \"%s\"", identifier);
 
     return 0;
 }
@@ -530,7 +530,7 @@ int traverse_keyframe(const parsetree_statement_t* stmt, void* context)
         keyframe->opacity = parse_percentage(p1);
     }
     else
-        nanoparser_crash(stmt, "Unknown identifier \"%s\"", identifier);
+        nanoparser_warn(stmt, "Unknown identifier \"%s\"", identifier);
 
     return 0;
 }
@@ -580,7 +580,7 @@ proganim_easing_t parse_easing_function(const parsetree_parameter_t* param)
         return easing_linear;
 
     /* error */
-    nanoparser_crash(stmt, "Invalid easing function \"%s\"", str);
+    nanoparser_warn(stmt, "Invalid easing function \"%s\"", str);
     return easing_linear;
 }
 

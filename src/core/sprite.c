@@ -1033,7 +1033,7 @@ int traverse(const parsetree_statement_t *stmt, void *vpath)
         }
     }
     else
-        nanoparser_crash(stmt, "Unknown identifier \"%s\"", identifier);
+        nanoparser_warn(stmt, "Unknown identifier \"%s\"", identifier);
 
     return 0;
 }
@@ -1214,7 +1214,7 @@ int traverse_sprite_attributes(const parsetree_statement_t *stmt, void *spritein
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), s->user_properties, traverse_user_properties);
     }
     else
-        nanoparser_crash(stmt, "Unknown identifier \"%s\"", identifier);
+        nanoparser_warn(stmt, "Unknown identifier \"%s\"", identifier);
 
     return 0;
 }
