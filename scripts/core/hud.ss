@@ -23,6 +23,7 @@ object "Default HUD" is "entity", "detached", "awake", "private"
     lives = spawn("DefaultHUD.Lives");
     powerups = spawn("DefaultHUD.Powerups");
     pause = spawn("DefaultHUD.PauseButton");
+    forcedClear = false;
 
     state "main"
     {
@@ -32,7 +33,7 @@ object "Default HUD" is "entity", "detached", "awake", "private"
 
     state "active"
     {
-        if(Level.cleared) {
+        if(Level.cleared || forcedClear) {
             timer.block();
             state = "cleared";
         }
@@ -41,6 +42,11 @@ object "Default HUD" is "entity", "detached", "awake", "private"
     state "cleared"
     {
         //transform.translateBy(-Screen.width * Time.delta, 0);
+    }
+
+    fun clear()
+    {
+        forcedClear = true;
     }
 
     // base zindex for the components of the HUD
