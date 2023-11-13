@@ -136,7 +136,7 @@ prefs_t* prefs = NULL; /* public */
 
 /* MODs */
 static int compatibility_version_code = 0;
-static uint32_t game_id = 0;
+static uint32_t game_id = GAME_ID_UNAVAILABLE;
 
 
 
@@ -285,7 +285,8 @@ void engine_remove_event_source(ALLEGRO_EVENT_SOURCE* event_source)
 /*
  * engine_game_id()
  * A number that uniquely identifies the current release of the
- * currently-running opensurge game. Will be zero if unavailable.
+ * currently-running opensurge game. Will be GAME_ID_UNAVAILABLE
+ * if unavailable.
  */
 uint32_t engine_game_id()
 {

@@ -167,7 +167,7 @@ static bool scan_level_line(const char* vpath, int line, levparser_command_t com
  * Compute the ID of an opensurge game. You may pass NULL to game_dirname,
  * in which case GAME_ID_UNAVAILABLE will be returned
  */
-uint32_t find_game_id(const char* game_dirname, const char* required_engine_version)
+uint32_t find_game_id(const char* game_title, const char* game_dirname, const char* required_engine_version)
 {
     /*
 
@@ -176,85 +176,29 @@ uint32_t find_game_id(const char* game_dirname, const char* required_engine_vers
 
     ---
 
-    The present method computes the ID based on the --game-folder command
-    line argument. It works, but it is limited. It doesn't give an ID when
-    the game runs in-place. While limited, this method has the merit of its
-    simplicity. When do we want a game ID?
+    How to compute an ID:
 
-    ---
+    1. Use a user-supplied game title, the required engine version and the
+       recursive directory listing of levels/, converting all .lev filenames
+       to uppercase and replacing \ by / for cross-platform consistency.
 
-    Using the name of the game folder to determine the game ID is simple and
-    fast to compute, as well as a reasonable choice, but is it robust?
+    2. If a user-supplied game title is not available, use in its place the
+       name of the directory informed via --game-folder (command line option).
 
-    We want to be able to distinguish between different releases of the same
-    game. The name of the game folder may or may not reflect that difference.
-    If it doesn't, this distinction can be done (to an extent) by looking at
-    the required engine vesion of the game. If multiple releases of a game
-    share a required engine version, then this information is insufficient.
+    3. If the name of the directory is not available, then that is probably
+       a legacy game running in-place. [... to be continued ...]
 
-    Limitation of this method: the name of the folder isn't reliable data
-    when running the game in-place (i.e., no --game-folder). Such a case is
-    not currently distinguishable from the base game.
+    Compute a 32-bit hash of the data and return it as the game ID. Lowercase
+    or uppercase letters should not change the ID.
 
-    Using user-supplied names & versions is not necessarily robust. A user-
-    supplied name (e.g., in surge.cfg or the name of the executable file) is
-    less likely to change in different versions than the name of the folder
-    of the game. Using a user-supplied version string is reasonable but not
-    foolproof: it may change in unknown ways, or not change at all.
-
-    Maybe use a checksum in the future?
-
-    ---
-
-    Idea for a different method: assign an ID at random. Store it in a file
-    and change it whenever the build version of the engine changes. If the
-    ID is not stored, fallback to the game folder method.
-
-    How can we distinguish between a mod and the base game? By looking at the
-    name of the game? This method is also not robust: two versions of a game
-    may be created using the same build of the engine (e.g., a stable build).
-    Also, storing the ID may lead to modifications and it not being unique.
-
-    ---
+    The ID should be computed quickly.
 
     Important: any changes to this method should be backwards-compatible.
 
     */
-    const char salt[] = ":/";
-    char buffer[256], version_string[16];
-    int length = 0, c = 0;
 
-    /* the game ID is unavailable */
-    if(game_dirname == NULL)
-        return GAME_ID_UNAVAILABLE;
-
-    /* validate input */
-    assertx(*game_dirname != '\0');
-    assertx(*required_engine_version != '\0');
-
-    /* enforce a valid format for the engine version; remove any -suffix */
-    int wip = 0, dots = 0;
-    int version_code = parse_version_number_ex(required_engine_version, NULL, NULL, NULL, &wip);
-    stringify_version_number(version_code, version_string, sizeof(version_string));
-    for(char* p = version_string; *p != '\0'; p++) dots += (*p == '.');
-    assertx(wip != 0 || dots <= 2); /* accept x.y.z; reject x.y.z.0 */
-
-    /* generate a salted string */
-    str_cpy(buffer, version_string, sizeof(buffer));
-    length += strlen(buffer);
-    str_cpy(buffer + length, salt, sizeof(buffer) - length);
-    length += sizeof(salt) - 1; /* remove '\0' */
-    assertx(length < sizeof(buffer));
-    str_cpy(buffer + length, game_dirname, sizeof(buffer) - length);
-
-    /* compute a modified, case insensitive djb2 hash of the salted string
-       collisions are unlikely in actual games */
-    uint32_t hash = 5381;
-    for(char* str = buffer; (c = *((unsigned char*)(str++)));)
-        hash = ((hash << 5) + hash) + toupper(c); /* hash * 33 + c */
-
-    /* done! */
-    return hash;
+   /* TODO */
+   return GAME_ID_UNAVAILABLE;
 }
 
 /*

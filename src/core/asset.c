@@ -211,8 +211,8 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         }
 
         /* find the game ID */
-        game_id = find_game_id(game_dirname, required_engine_version);
-        LOG("Game ID: %08x (\"%s\")", game_id, game_dirname);
+        game_id = find_game_id(NULL, game_dirname, required_engine_version);
+        LOG("Game ID: %08x", game_id);
 
         /* set the write dir to gamedir if possible;
            otherwise set it to a generated directory */
@@ -318,9 +318,9 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         /* not in compatibility mode */
         compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE;
 
-        /* the game ID is unavailable */
-        game_id = find_game_id(NULL, GAME_VERSION_STRING);
-        assertx(game_id == GAME_ID_UNAVAILABLE);
+        /* find the game ID */
+        game_id = find_game_id(NULL, NULL, GAME_VERSION_STRING);
+        LOG("Game ID: %08x", game_id);
 
         /* create the user dir if it doesn't exist */
         create_dir(user_datadir);
