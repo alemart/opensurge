@@ -26,20 +26,19 @@
 #include "../util/point2d.h"
 
 /*
- * an obstacle may be anything "physical": a non-passable brick,
- * built-in item or custom object. The Physics Engine works with
- * obstacles only.
+ * an obstacle may be anything "physical": a non-passable brick or a custom
+ * object created with scripting. The physics engine works with obstacles only.
  */
 struct obstacle_t;
 typedef struct obstacle_t obstacle_t;
 
 /* obstacle flags */
 enum {
-    OF_SOLID = 0x0,
-    OF_CLOUD = 0x1,
-    OF_HFLIP = 0x2,
-    OF_VFLIP = 0x4,
-    OF_VHFLIP = OF_VFLIP | OF_HFLIP
+    OF_CLOUD = 0x1, /* one-way platform */
+    OF_HFLIP = 0x2, /* horizontally flipped */
+    OF_VFLIP = 0x4, /* vertically flipped */
+    OF_VHFLIP = OF_VFLIP | OF_HFLIP,
+    OF_NONSTATIC = 0x8 /* possibly moving / not static */
 };
 
 /* obstacle layer */
@@ -59,6 +58,7 @@ obstacle_t* obstacle_destroy(obstacle_t *obstacle);
 point2d_t obstacle_get_position(const obstacle_t *obstacle); /* get position (in world coordinates) */
 void obstacle_set_position(obstacle_t* obstacle, point2d_t position); /* set position (in world coordinates) */
 bool obstacle_is_solid(const obstacle_t *obstacle); /* is it solid or oneway? */
+bool obstacle_is_static(const obstacle_t *obstacle); /* not a moving obstacle? */
 int obstacle_get_width(const obstacle_t *obstacle); /* width of the bounding box */
 int obstacle_get_height(const obstacle_t *obstacle); /* height of the bounding box */
 bool obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2); /* check for collision with sensor (x1,y1,x2,y2); x1<=x2, y1<=y2 */

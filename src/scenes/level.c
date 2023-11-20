@@ -2815,7 +2815,7 @@ obstacle_t* item2obstacle(const item_t* item)
 {
     const collisionmask_t* mask = item->mask;
     v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
-    return obstacle_create(mask, point2d_new(position.x, position.y), OL_DEFAULT, OF_SOLID);
+    return obstacle_create(mask, point2d_new(position.x, position.y), OL_DEFAULT, OF_NONSTATIC);
 }
 
 /* converts a legacy object to an obstacle */
@@ -2823,16 +2823,19 @@ obstacle_t* object2obstacle(const object_t* object)
 {
     const collisionmask_t* mask = object->mask;
     v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
-    return obstacle_create(mask, point2d_new(position.x, position.y), OL_DEFAULT, OF_SOLID);
+    return obstacle_create(mask, point2d_new(position.x, position.y), OL_DEFAULT, OF_NONSTATIC);
 }
 
 /* converts a brick-like SurgeScript object to an obstacle */
 obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
 {
     v2d_t position = v2d_subtract(scripting_util_world_position(object), scripting_brick_hotspot(object));
-    int flags = (scripting_brick_type(object) == BRK_SOLID) ? OF_SOLID : OF_CLOUD;
     bricklayer_t brick_layer = scripting_brick_layer(object);
     obstaclelayer_t layer = ((brick_layer == BRL_GREEN) ? OL_GREEN : ((brick_layer == BRL_YELLOW) ? OL_YELLOW : OL_DEFAULT));
+    int flags = OF_NONSTATIC;
+
+    if(scripting_brick_type(object) == BRK_CLOUD)
+        flags |= OF_CLOUD;
 
     collisionmask_t* clone = create_collisionmask_of_bricklike_object(object);
     return obstacle_create_ex(

@@ -102,6 +102,11 @@ bool obstacle_is_solid(const obstacle_t *obstacle)
     return !(obstacle->flags & OF_CLOUD);
 }
 
+bool obstacle_is_static(const obstacle_t *obstacle)
+{
+    return !(obstacle->flags & OF_NONSTATIC);
+}
+
 int obstacle_get_width(const obstacle_t *obstacle)
 {
     return obstacle->width;

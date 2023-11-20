@@ -831,7 +831,7 @@ int brick_is_alive(const brick_t* brk)
 }
 
 /*
- * brick_is_moving()
+ * brick_has_movement_path()
  * Checks if a brick has a movement path
  */
 bool brick_has_movement_path(const brick_t* brk)
@@ -1213,9 +1213,10 @@ obstacle_t* destroy_obstacle(obstacle_t* obstacle)
 int get_obstacle_flags(const brick_t* brick)
 {
     return
-        ((brick_type(brick) == BRK_SOLID) ? OF_SOLID : OF_CLOUD) |
+        ((brick_type(brick) == BRK_CLOUD) ? OF_CLOUD : 0) |
         ((brick->flip & BRF_HFLIP) ? OF_HFLIP : 0) |
-        ((brick->flip & BRF_VFLIP) ? OF_VFLIP : 0)
+        ((brick->flip & BRF_VFLIP) ? OF_VFLIP : 0) |
+        (brick_has_movement_path(brick) ? OF_NONSTATIC : 0)
     ;
 }
 
