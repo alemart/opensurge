@@ -1681,6 +1681,18 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /*
      *
+     * getting smashed
+     *
+     */
+
+    if(is_smashed(pa, obstaclemap)) {
+        notify_observers(pa, PAE_SMASH);
+        physicsactor_kill(pa);
+        return;
+    }
+
+    /*
+     *
      * wall collisions
      *
      */
@@ -1805,18 +1817,6 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
                 pa->facing_right = false;
             }
         }
-    }
-
-    /*
-     *
-     * getting smashed
-     *
-     */
-
-    if(is_smashed(pa, obstaclemap)) {
-        notify_observers(pa, PAE_SMASH);
-        physicsactor_kill(pa);
-        return;
     }
 
     /*
@@ -2407,15 +2407,21 @@ const obstacle_t* find_ground_with_extended_sensor(const physicsactor_t* pa, con
     return obstaclemap_find_ground(obstaclemap, x1, y1, x2, y2, pa->layer, MM_TO_GD(pa->movmode), out_ground_position);
 }
 
-/* check if the physics actor is smashed */
+/* check if the physics actor is smashed / crushed / squashed */
 bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
 {
     v2d_t position = physicsactor_get_position(pa);
 
-    /* first, we check if sensor U is overlapping a solid obstacle */
+    /* quit if midair */
+    if(pa->midair)
+        return false;
+
+#if 1
+    /* check if sensor U is overlapping a solid obstacle */
     const obstacle_t* at_U = sensor_check(sensor_U(pa), position, pa->movmode, pa->layer, obstaclemap);
     if(!(at_U != NULL && obstacle_is_solid(at_U))) /* sensor U is assumed to be enabled */
         return false; /* quit if no collision */
+#endif
 
     /* next, we check other sensors to make sure */
     sensor_t* a = sensor_A(pa);
@@ -2438,20 +2444,28 @@ bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
     const obstacle_t* at_C = sensor_check(c, position, pa->movmode, pa->layer, obstaclemap);
     const obstacle_t* at_D = sensor_check(d, position, pa->movmode, pa->layer, obstaclemap);
 
-    bool smashed =  ((
-        (at_A != NULL && obstacle_is_solid(at_A)) &&
-        (at_B != NULL && obstacle_is_solid(at_B))
-    ) && (
-        (at_C != NULL && obstacle_is_solid(at_C)) && /* '||' is too sensitive */
-        (at_D != NULL && obstacle_is_solid(at_D))
-    ));
-
     sensor_set_enabled(d, d_enabled);
     sensor_set_enabled(c, c_enabled);
     sensor_set_enabled(b, b_enabled);
     sensor_set_enabled(a, a_enabled);
 
-    return smashed;
+    /* possibly_smashed may be true when the player is being repositioned */
+    bool possibly_smashed = (
+        (at_A != NULL && obstacle_is_solid(at_A)) &&
+        (at_B != NULL && obstacle_is_solid(at_B)) &&
+        (at_C != NULL && obstacle_is_solid(at_C)) &&
+        (at_D != NULL && obstacle_is_solid(at_D))
+    );
+
+    /* check also if the player is touching a moving obstacle */
+    bool is_smashed = possibly_smashed && (
+        (at_D != NULL && !obstacle_is_static(at_D)) ||
+        (at_C != NULL && !obstacle_is_static(at_C)) ||
+        (at_B != NULL && !obstacle_is_static(at_B)) ||
+        (at_A != NULL && !obstacle_is_static(at_A))
+    );
+
+    return is_smashed;
 }
 
 /* renders an angle sensor */
