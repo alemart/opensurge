@@ -124,6 +124,7 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/items/bridge.ss",                          ":0.6.1",                   /* optimized collisions in 0.6.1 */
     "scripts/items/collectibles.ss",                    ":0.6.1",                   /* performance updates in 0.6.1 */
     "scripts/items/audio_source.ss",                    ":0.6.1",                   /* optimizations in 0.6.1 */
+    "scripts/items/springs.ss",                         ":0.6.1",                   /* bugfix in 0.6.1 */
     "scripts/misc/animal.ss",                           ":0.6.1",                   /* animation fix in 0.6.1 */
     "scripts/behaviors/platformer.ss",                  ":0.6.0",                   /* since 0.6.1, animal.ss uses Platformer.gravityMultiplier introduced in 0.6.0 (underwater effect) */
 
