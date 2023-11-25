@@ -252,8 +252,10 @@ static void unload_ttf(fontdrv_ttf_t* f);
 void font_init()
 {
     /* initializing Allegro's TTF addon */
-    if(!al_init_ttf_addon())
-        fatal_error("Can't initialize Allegro's TTF addon");
+    if(!al_is_ttf_addon_initialized()) {
+        if(!al_init_ttf_addon())
+            fatal_error("Can't initialize Allegro's TTF addon");
+    }
 
     /* basic initialization */
     fontdrv_list_init();

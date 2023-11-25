@@ -26,6 +26,7 @@
 /* internal data */
 static double start_time = 0.0;
 static double current_time = 0.0;
+static double previous_time = 0.0;
 static double delta_time = 0.0;
 static int64_t frames = 0;
 
@@ -47,6 +48,7 @@ void timer_init()
 
     start_time = al_get_time();
     current_time = 0.0;
+    previous_time = 0.0;
     delta_time = 0.0;
     frames = 0;
 
@@ -64,7 +66,6 @@ void timer_update()
 {
     const double minimum_delta = 1.0 / 60.0; /* 60 fps */
     const double maximum_delta = 1.0 / 50.0; /* 50 fps */
-    static double old_time = 0.0;
 
     /* paused timer? */
     if(is_paused) {
@@ -76,7 +77,7 @@ void timer_update()
     current_time = timer_get_now();
 
     /* compute the delta time */
-    delta_time = current_time - old_time;
+    delta_time = current_time > previous_time ? current_time - previous_time : 0.0;
 
     if(delta_time < minimum_delta)
         ; /* do nothing, since the framerate is controlled by Allegro */
@@ -84,7 +85,7 @@ void timer_update()
     if(delta_time > maximum_delta)
         delta_time = maximum_delta;
 
-    old_time = current_time;
+    previous_time = current_time;
 
     /* increment counter */
     ++frames;
@@ -139,7 +140,7 @@ int64_t timer_get_frames()
  */
 double timer_get_now()
 {
-    return al_get_time() - pause_duration - start_time;
+    return (al_get_time() - start_time) - pause_duration;
 }
 
 
@@ -173,4 +174,3 @@ void timer_resume()
 
     logfile_message("The time manager has been resumed");
 }
-

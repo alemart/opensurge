@@ -142,35 +142,46 @@ static struct {
  */
 void input_init()
 {
+    /* initialize the Allegro input system */
     logfile_message("Initializing the input system...");
 
-    /* initialize the Allegro input system */
-    if(!al_install_keyboard())
-        fatal_error("Can't initialize the keyboard");
+    /* initialize the keyboard */
+    if(!al_is_keyboard_installed()) {
+        if(!al_install_keyboard())
+            fatal_error("Can't initialize the keyboard");
+    }
     engine_add_event_source(al_get_keyboard_event_source());
     engine_add_event_listener(ALLEGRO_EVENT_KEY_DOWN, NULL, a5_handle_keyboard_event);
     engine_add_event_listener(ALLEGRO_EVENT_KEY_UP, NULL, a5_handle_keyboard_event);
 
-    if(!al_install_mouse())
-        fatal_error("Can't initialize the mouse");
+    /* initialize the mouse */
+    if(!al_is_mouse_installed()) {
+        if(!al_install_mouse())
+            fatal_error("Can't initialize the mouse");
+    }
     engine_add_event_source(al_get_mouse_event_source());
     engine_add_event_listener(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, NULL, a5_handle_mouse_event);
     engine_add_event_listener(ALLEGRO_EVENT_MOUSE_BUTTON_UP, NULL, a5_handle_mouse_event);
     engine_add_event_listener(ALLEGRO_EVENT_MOUSE_AXES, NULL, a5_handle_mouse_event);
 
-    if(!al_install_joystick())
-        fatal_error("Can't initialize the joystick subsystem");
+    /* initialize the joystick */
+    if(!al_is_joystick_installed()) {
+        if(!al_install_joystick())
+            fatal_error("Can't initialize the joystick subsystem");
+    }
     engine_add_event_source(al_get_joystick_event_source());
     engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_CONFIGURATION, NULL, a5_handle_joystick_event);
     /*engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_AXIS, NULL, a5_handle_joystick_event);
     engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN, NULL, a5_handle_joystick_event);
     engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_BUTTON_UP, NULL, a5_handle_joystick_event);*/
 
-    if(!al_install_touch_input()) {
-        logfile_message("Can't initialize the multi-touch subsystem");
-        emulated_mouse.initialized = false;
+    /* initialize touch input */
+    if(!al_is_touch_input_installed()) {
+        if(!al_install_touch_input())
+            logfile_message("Can't initialize the multi-touch subsystem");
     }
-    else {
+
+    if(al_is_touch_input_installed()) {
         logfile_message("Touch input is available");
 
         logfile_message("Enabling mouse emulation via touch input");
@@ -183,6 +194,10 @@ void input_init()
         engine_add_event_listener(ALLEGRO_EVENT_TOUCH_END, NULL, a5_handle_touch_event);
         engine_add_event_listener(ALLEGRO_EVENT_TOUCH_MOVE, NULL, a5_handle_touch_event);
         engine_add_event_listener(ALLEGRO_EVENT_TOUCH_CANCEL, NULL, a5_handle_touch_event);
+    }
+    else {
+        logfile_message("Touch input is unavailable");
+        emulated_mouse.initialized = false;
     }
 
     /* initialize the input list */

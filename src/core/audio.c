@@ -489,11 +489,15 @@ void audio_init()
     master_volume = 1.0f;
     globally_muted = false;
 
-    if(!al_install_audio())
-        fatal_error("Can't initialize Allegro's audio addon");
+    if(!al_is_audio_installed()) {
+        if(!al_install_audio())
+            fatal_error("Can't initialize Allegro's audio addon");
+    }
 
-    if(!al_init_acodec_addon())
-        fatal_error("Can't initialize Allegro's acodec addon");
+    if(!al_is_acodec_addon_initialized()) {
+        if(!al_init_acodec_addon())
+            fatal_error("Can't initialize Allegro's acodec addon");
+    }
 
     for(int samples = PREFERRED_NUMBER_OF_SAMPLES; samples > 0; samples /= 2) {
         if(al_reserve_samples(samples)) {

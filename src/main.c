@@ -21,6 +21,7 @@
 #include <allegro5/allegro.h> /* included for cross-platform compatibility; see https://liballeg.org/a5docs/5.2.7/getting_started.html#the-main-function */
 #include "core/global.h"
 #include "core/engine.h"
+#include "core/commandline.h"
 
 
 /*
@@ -35,9 +36,13 @@ int main(int argc, char **argv)
     argv = args;
 #endif
 
-    engine_init(argc, argv);
-    engine_mainloop();
-    engine_release();
+    commandline_t cmd = commandline_parse(argc, argv);
+
+    do {
+        engine_init(&cmd);
+        engine_mainloop();
+        engine_release();
+    } while(engine_must_restart(&cmd));
 
     return 0;
 }

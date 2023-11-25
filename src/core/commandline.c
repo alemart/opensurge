@@ -67,7 +67,7 @@ static const char LICENSE[] = ""
  */
 commandline_t commandline_parse(int argc, char **argv)
 {
-    const char* program = str_basename(argv[0]);
+    const char* program = argc > 0 ? str_basename(argv[0]) : GAME_UNIXNAME;
     commandline_t cmd;
 
     /* initializing values */

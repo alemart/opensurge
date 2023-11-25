@@ -24,10 +24,14 @@
 #include <stdbool.h>
 #include <allegro5/allegro.h>
 
-void engine_init(int argc, char **argv);
+struct commandline_t;
+
+void engine_init(const struct commandline_t* cmd);
 void engine_mainloop();
 void engine_release();
 void engine_quit();
+void engine_restart(const struct commandline_t* cmd);
+bool engine_must_restart(struct commandline_t* cmd);
 
 void engine_add_event_listener(ALLEGRO_EVENT_TYPE event_type, void* data, void (*callback)(const ALLEGRO_EVENT*,void*));
 bool engine_remove_event_listener(ALLEGRO_EVENT_TYPE event_type, void* data, void (*callback)(const ALLEGRO_EVENT*,void*));

@@ -228,14 +228,20 @@ void video_init()
     LOG("Initializing the video manager...");
 
     /* initialize Allegro */
-    if(!al_init_image_addon())
-        FATAL("Can't initialize Allegro's image addon");
+    if(!al_is_image_addon_initialized()) {
+        if(!al_init_image_addon())
+            FATAL("Can't initialize Allegro's image addon");
+    }
 
-    if(!al_init_primitives_addon())
-        FATAL("Can't initialize Allegro's primitives addon");
+    if(!al_is_primitives_addon_initialized()) {
+        if(!al_init_primitives_addon())
+            FATAL("Can't initialize Allegro's primitives addon");
+    }
 
-    if(!al_init_font_addon()) /* initialize the font addon before creating the console font */
-        FATAL("Can't initialize Allegro's font addon");
+    if(!al_is_font_addon_initialized()) {
+        if(!al_init_font_addon()) /* initialize the font addon before creating the console font */
+            FATAL("Can't initialize Allegro's font addon");
+    }
 
     al_inhibit_screensaver(true);
 

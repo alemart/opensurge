@@ -130,6 +130,8 @@ static const double TARGET_FPS = 60.0; /* frames per second */
 static const double GC_INTERVAL = 10.0; /* in seconds (garbage collector) */
 static ALLEGRO_TIMER* a5_timer = NULL;
 static bool force_quit = false;
+static bool wants_to_restart = false;
+static commandline_t stored_cmd;
 
 /* Global Prefs */
 prefs_t* prefs = NULL; /* public */
@@ -148,19 +150,17 @@ static uint32_t game_id = GAME_ID_UNAVAILABLE;
  * engine_init()
  * Initializes the subsystems of the engine
  */
-void engine_init(int argc, char **argv)
+void engine_init(const commandline_t* cmd)
 {
-    commandline_t cmd = commandline_parse(argc, argv);
-
     /* initialize subsystems */
-    init_basic_stuff(&cmd);
-    init_managers(&cmd);
-    init_accessories(&cmd);
+    init_basic_stuff(cmd);
+    init_managers(cmd);
+    init_accessories(cmd);
 
     /* initialize game data */
     player_set_lives(PLAYER_INITIAL_LIVES);
     player_set_score(0);
-    push_initial_scene(&cmd);
+    push_initial_scene(cmd);
 }
 
 
@@ -233,6 +233,39 @@ void engine_quit()
 {
     force_quit = true;
 }
+
+/*
+ * engine_restart()
+ * Schedules an engine restart with the given command line arguments
+ * If cmd is NULL, the previous command line arguments will be reused
+ */
+void engine_restart(const commandline_t* cmd)
+{
+    logfile_message("Will restart the engine...");
+
+    if(cmd != NULL)
+        stored_cmd = *cmd;
+
+    wants_to_restart = true;
+    engine_quit();
+}
+
+/*
+ * engine_must_restart()
+ * Checks if there is a scheduled restart. The cmd struct will be filled
+ */
+bool engine_must_restart(commandline_t* cmd)
+{
+    if(cmd != NULL)
+        *cmd = stored_cmd;
+
+    return wants_to_restart;
+}
+
+
+
+
+
 
 /*
  * engine_add_event_listener()
@@ -350,23 +383,31 @@ void init_basic_stuff(const commandline_t* cmd)
     const char* compatibility_version = commandline_getstring(cmd->compatibility_version, "");
 
     /* basic initialization */
-    srand(time(NULL)); /* randomize */
     force_quit = false;
+    wants_to_restart = false;
+    stored_cmd = *cmd;
+
+    /* randomize */
+    srand(time(NULL));
 
     /* set Allegro's trace level to debug before calling al_init() */
     if(commandline_getint(cmd->verbose, FALSE))
         al_set_config_value(al_get_system_config(), "trace", "level", "debug");
 
     /* initialize Allegro */
-    if(!al_init())
-        fatal_error("Can't initialize Allegro");
+    if(!al_is_system_installed()) { /* true when the engine is restarted */
+        if(!al_init())
+            fatal_error("Can't initialize Allegro");
+    }
 
     if(NULL == (a5_event_queue = al_create_event_queue()))
         fatal_error("Can't create Allegro's event queue");
 
 #if !defined(__ANDROID__)
-    if(!al_init_native_dialog_addon())
-        fatal_error("Can't initialize Allegro's native dialog addon");
+    if(!al_is_native_dialog_addon_initialized()) {
+        if(!al_init_native_dialog_addon())
+            fatal_error("Can't initialize Allegro's native dialog addon");
+    }
 #endif
 
     /* initialize the table of event listeners */
