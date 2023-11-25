@@ -35,31 +35,31 @@ static bool parse_line(const char* filepath, int fileline, char* line, void* dat
 static inline levparser_command_t find_command(const char* command_name);
 
 /* identifiers */
-static const uint64_t NAME = DJB2("name");
-static const uint64_t AUTHOR = DJB2("author");
-static const uint64_t VERSION = DJB2("version");
-static const uint64_t LICENSE = DJB2("license");
-static const uint64_t REQUIRES = DJB2("requires");
-static const uint64_t ACT = DJB2("act");
-static const uint64_t READONLY = DJB2("readonly");
-static const uint64_t THEME = DJB2("theme");
-static const uint64_t BGTHEME = DJB2("bgtheme");
-static const uint64_t MUSIC = DJB2("music");
-static const uint64_t WATERLEVEL = DJB2("waterlevel");
-static const uint64_t WATERCOLOR = DJB2("watercolor");
-static const uint64_t SPAWNPOINT = DJB2("spawn_point");
-static const uint64_t PLAYERS = DJB2("players");
-static const uint64_t SETUP = DJB2("setup");
-static const uint64_t BRICK = DJB2("brick");
-static const uint64_t ENTITY = DJB2("entity");
+#define NAME        DJB2_CONST('n','a','m','e')
+#define AUTHOR      DJB2_CONST('a','u','t','h','o','r')
+#define VERSION     DJB2_CONST('v','e','r','s','i','o','n')
+#define LICENSE     DJB2_CONST('l','i','c','e','n','s','e')
+#define REQUIRES    DJB2_CONST('r','e','q','u','i','r','e','s')
+#define ACT         DJB2_CONST('a','c','t')
+#define READONLY    DJB2_CONST('r','e','a','d','o','n','l','y')
+#define THEME       DJB2_CONST('t','h','e','m','e')
+#define BGTHEME     DJB2_CONST('b','g','t','h','e','m','e')
+#define MUSIC       DJB2_CONST('m','u','s','i','c')
+#define WATERLEVEL  DJB2_CONST('w','a','t','e','r','l','e','v','e','l')
+#define WATERCOLOR  DJB2_CONST('w','a','t','e','r','c','o','l','o','r')
+#define SPAWNPOINT  DJB2_CONST('s','p','a','w','n','_','p','o','i','n','t')
+#define PLAYERS     DJB2_CONST('p','l','a','y','e','r','s')
+#define SETUP       DJB2_CONST('s','e','t','u','p')
+#define BRICK       DJB2_CONST('b','r','i','c','k')
+#define ENTITY      DJB2_CONST('e','n','t','i','t','y')
 
 /* legacy identifiers */
-static const uint64_t STARTUP = DJB2("startup"); /* retro-compatibility */
-static const uint64_t OBJECT = DJB2("object");
-static const uint64_t ENEMY = DJB2("enemy");
-static const uint64_t ITEM = DJB2("item");
-static const uint64_t GROUPTHEME = DJB2("grouptheme");
-static const uint64_t DIALOGBOX = DJB2("dialogbox");
+#define STARTUP     DJB2_CONST('s','t','a','r','t','u','p') /* retro-compatibility */
+#define OBJECT      DJB2_CONST('o','b','j','e','c','t')
+#define ENEMY       DJB2_CONST('e','n','e','m','y')
+#define ITEM        DJB2_CONST('i','t','e','m')
+#define GROUPTHEME  DJB2_CONST('g','r','o','u','p','t','h','e','m','e')
+#define DIALOGBOX   DJB2_CONST('d','i','a','l','o','g','b','o','x')
 
 
 

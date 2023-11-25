@@ -41,9 +41,9 @@ static surgescript_var_t* fun_getscrolldown(surgescript_object_t* object, const 
 static const surgescript_heapptr_t POSITION_ADDR = 0;
 
 /* button hashes */
-static const uint64_t BUTTON_LEFT = DJB2("left");
-static const uint64_t BUTTON_RIGHT = DJB2("right");
-static const uint64_t BUTTON_MIDDLE = DJB2("middle");
+#define BUTTON_LEFT     DJB2_CONST('l','e','f','t')
+#define BUTTON_RIGHT    DJB2_CONST('r','i','g','h','t')
+#define BUTTON_MIDDLE   DJB2_CONST('m','i','d','d','l','e')
 
 /*
  * scripting_register_mouse()

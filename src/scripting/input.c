@@ -35,19 +35,19 @@ static surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const
 static surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
-/* button hashes: "up", "down", "left", "right", "fire1", "fire2", ..., "fire8" */
-static const uint64_t BUTTON_UP = DJB2("up");
-static const uint64_t BUTTON_DOWN = DJB2("down");
-static const uint64_t BUTTON_LEFT = DJB2("left");
-static const uint64_t BUTTON_RIGHT = DJB2("right");
-static const uint64_t BUTTON_FIRE1 = DJB2("fire1");
-static const uint64_t BUTTON_FIRE2 = DJB2("fire2");
-static const uint64_t BUTTON_FIRE3 = DJB2("fire3");
-static const uint64_t BUTTON_FIRE4 = DJB2("fire4");
-static const uint64_t BUTTON_FIRE5 = DJB2("fire5");
-static const uint64_t BUTTON_FIRE6 = DJB2("fire6");
-static const uint64_t BUTTON_FIRE7 = DJB2("fire7");
-static const uint64_t BUTTON_FIRE8 = DJB2("fire8");
+/* button hashes */
+#define BUTTON_UP       DJB2_CONST('u','p')
+#define BUTTON_DOWN     DJB2_CONST('d','o','w','n')
+#define BUTTON_LEFT     DJB2_CONST('l','e','f','t')
+#define BUTTON_RIGHT    DJB2_CONST('r','i','g','h','t')
+#define BUTTON_FIRE1    DJB2_CONST('f','i','r','e','1')
+#define BUTTON_FIRE2    DJB2_CONST('f','i','r','e','2')
+#define BUTTON_FIRE3    DJB2_CONST('f','i','r','e','3')
+#define BUTTON_FIRE4    DJB2_CONST('f','i','r','e','4')
+#define BUTTON_FIRE5    DJB2_CONST('f','i','r','e','5')
+#define BUTTON_FIRE6    DJB2_CONST('f','i','r','e','6')
+#define BUTTON_FIRE7    DJB2_CONST('f','i','r','e','7')
+#define BUTTON_FIRE8    DJB2_CONST('f','i','r','e','8')
 
 /* misc */
 static const surgescript_heapptr_t IS_OWN_INPUT_POINTER = 0;
