@@ -79,6 +79,8 @@ commandline_t commandline_parse(int argc, char **argv)
 
     cmd.mobile = COMMANDLINE_UNDEFINED;
     cmd.verbose = COMMANDLINE_UNDEFINED;
+    cmd.compatibility_mode = COMMANDLINE_UNDEFINED;
+    cmd.compatibility_version[0] = '\0';
 
     cmd.custom_level_path[0] = '\0';
     cmd.custom_quest_path[0] = '\0';
