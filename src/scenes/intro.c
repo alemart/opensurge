@@ -45,6 +45,7 @@
 #define SECONDARY_COLOR     "657392"
 static float elapsed_time;
 static bool developer_mode;
+static int counter;
 static font_t* fnt;
 static input_t* in;
 static image_t* box;
@@ -64,6 +65,7 @@ void intro_init(void *foo)
     /* initialize variables */
     elapsed_time = 0.0f;
     developer_mode = false;
+    counter = 0;
     in = input_create_user(NULL);
 
     /* create box */
@@ -107,8 +109,6 @@ void intro_release()
  */
 void intro_update()
 {
-    static int cnt = 0;
-
     /* reset state */
     mobilegamepad_fadeout();
     music_stop();
@@ -127,6 +127,7 @@ void intro_update()
             if(developer_mode)
                 scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &developer_mode);
 
+            counter = 0;
             mobilegamepad_fadein();
             return;
         }
@@ -135,15 +136,15 @@ void intro_update()
 
     /* secret */
     if(input_button_pressed(in, IB_RIGHT)) {
-        if(!developer_mode && ++cnt == 3) {
+        if(!developer_mode && ++counter == 3) {
             sound_play(SFX_SECRET);
             elapsed_time += INTRO_TIMEOUT;
             developer_mode = true;
-            cnt = 0;
+            counter = 0;
         }
     }
-    else if(any_button_pressed(in) && cnt < 3)
-        cnt = 0;
+    else if(any_button_pressed(in) && counter < 3)
+        counter = 0;
 }
 
 /*
