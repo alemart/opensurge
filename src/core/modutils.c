@@ -93,7 +93,8 @@ substitution in that case - if it's not critical. TODO
 static const char* const COMPATIBILITY_LIST[] = {
     /* filepath (up to 55 characters) */                /* version range */         /* notes */
 
-    /* TODO move this list to a CSV file? */
+    /* TODO move this list to a CSV file?
+       TODO exclusion filter? */
 
 #if 1
     /* active changes */
