@@ -42,6 +42,7 @@ static void console_print(char *fmt, ...);
 static bool console_ask(const char* fmt, ...);
 
 static int COMMANDLINE_UNDEFINED = -1;
+static char* DEFAULT_ARGS[1] = { GAME_UNIXNAME };
 
 static const char LICENSE[] = ""
 "This program is free software; you can redistribute it and/or modify\n"
@@ -67,10 +68,15 @@ static const char LICENSE[] = ""
  */
 commandline_t commandline_parse(int argc, char **argv)
 {
-    const char* program = argc > 0 ? str_basename(argv[0]) : GAME_UNIXNAME;
+    /* accept empty input */
+    if(argc == 0) {
+        argv = DEFAULT_ARGS;
+        argc = sizeof(DEFAULT_ARGS) / sizeof(DEFAULT_ARGS[0]);
+    }
+
+    /* initialize values */
     commandline_t cmd;
 
-    /* initializing values */
     cmd.video_resolution = COMMANDLINE_UNDEFINED;
     cmd.video_quality = COMMANDLINE_UNDEFINED;
     cmd.fullscreen = COMMANDLINE_UNDEFINED;
@@ -89,10 +95,10 @@ commandline_t commandline_parse(int argc, char **argv)
 
     cmd.user_argv = NULL;
     cmd.user_argc = 0;
-    cmd.argv = (const char**)argv;
-    cmd.argc = argc;
+    str_cpy(cmd.argv0, argv[0], sizeof(cmd.argv0));
 
     /* reading data... */
+    const char* program = str_basename(argv[0]);
     for(int i = 1; i < argc; i++) {
 
         if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {

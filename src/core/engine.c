@@ -243,8 +243,14 @@ void engine_restart(const commandline_t* cmd)
 {
     logfile_message("Will restart the engine...");
 
-    if(cmd != NULL)
+    if(cmd != NULL) {
+        char* argv0 = str_dup(stored_cmd.argv0); /* we'll keep the original argv[0] */
+
         stored_cmd = *cmd;
+
+        str_cpy(stored_cmd.argv0, argv0, sizeof(stored_cmd.argv0));
+        free(argv0);
+    }
 
     wants_to_restart = true;
     engine_quit();
@@ -422,7 +428,7 @@ void init_basic_stuff(const commandline_t* cmd)
         logfile_init(LOGFILE_CONSOLE);
 
     asset_init(
-        cmd->argv[0], gamedir,
+        cmd->argv0, gamedir,
         compatibility_mode ? compatibility_version : NULL,
         &game_id, &compatibility_version_code
     );

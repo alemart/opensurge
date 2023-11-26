@@ -50,9 +50,8 @@ struct commandline_t
     const char** user_argv;
     int user_argc;
 
-    /* argv and argc as passed to main() */
-    const char** argv;
-    int argc;
+    /* argv[0] as passed to main() */
+    char argv0[COMMANDLINE_PATHMAX];
 };
 
 
