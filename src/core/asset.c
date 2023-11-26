@@ -946,7 +946,7 @@ bool is_valid_root_folder()
 char* generate_user_datadirname(const char* game_name, uint32_t game_id, char* buffer, size_t buffer_size)
 {
     /* try using the name of the game first */
-    str_cpy(buffer, game_name, sizeof(buffer));
+    str_cpy(buffer, game_name, buffer_size);
 
 #if 0
     /* the generated directory name should not be DEFAULT_USER_DATADIRNAME when
