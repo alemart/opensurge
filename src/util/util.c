@@ -18,13 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
-#include <math.h>
 #include <surgescript.h>
 #include <physfs.h>
 #include "util.h"
@@ -49,6 +45,8 @@
 #if defined(_WIN32)
 #include <windows.h>
 #include <wchar.h>
+#else
+#include <sys/stat.h>
 #endif
 
 /* private stuff */
@@ -226,6 +224,24 @@ FILE* fopen_utf8(const char* filepath, const char* mode)
     return fp;
 #else
     return fopen(filepath, mode);
+#endif
+}
+
+/*
+ * file_exists()
+ * Checks if the given absolute filepath exists
+ */
+bool file_exists(const char *filepath)
+{
+#if !defined(_WIN32)
+    struct stat st;
+    return (stat(filepath, &st) == 0);
+#else
+    FILE* fp = fopen(filepath, "rb");
+    bool valid = (fp != NULL);
+    if(fp != NULL)
+        fclose(fp);
+    return valid;
 #endif
 }
 

@@ -25,7 +25,6 @@
 
 #if !defined(_WIN32)
 #include <unistd.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #else
 #include <windows.h>
@@ -47,7 +46,6 @@
 
 
 /* private stuff */
-static bool file_exists(const char *filepath);
 static inline char ch2hex(unsigned char code);
 static char *url_encode(const char *url);
 
@@ -112,17 +110,17 @@ bool launch_url(const char *url)
             argv[1] = safe_url;
             argv[2] = NULL;
         }
-        else if(file_exists("/usr/bin/firefox")) {
-            argv[0] = "/usr/bin/firefox";
-            argv[1] = safe_url;
-            argv[2] = NULL;
-        }
         else if(file_exists("/usr/bin/python")) {
             argv[0] = "/usr/bin/python";
             argv[1] = "-m";
             argv[2] = "webbrowser";
             argv[3] = safe_url;
             argv[4] = NULL;
+        }
+        else if(file_exists("/usr/bin/firefox")) {
+            argv[0] = "/usr/bin/firefox";
+            argv[1] = safe_url;
+            argv[2] = NULL;
         }
         else
             success = false;
@@ -158,21 +156,6 @@ bool launch_url(const char *url)
 
 
 /* private methods */
-
-/* checks if the given absolute filepath exists */
-bool file_exists(const char *filepath)
-{
-#if !defined(_WIN32)
-    struct stat st;
-    return (stat(filepath, &st) == 0);
-#else
-    FILE* fp = fopen(filepath, "rb");
-    bool valid = (fp != NULL);
-    if(fp != NULL)
-        fclose(fp);
-    return valid;
-#endif
-}
 
 /* converts to hex */
 char ch2hex(unsigned char code) {
