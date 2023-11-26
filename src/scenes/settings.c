@@ -22,6 +22,8 @@
 #define ALLEGRO_UNSTABLE
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_android.h>
+#else
+#include <allegro5/allegro_native_dialog.h>
 #endif
 
 #include <stdbool.h>
@@ -31,6 +33,8 @@
 #include "../core/animation.h"
 #include "../core/audio.h"
 #include "../core/video.h"
+#include "../core/engine.h"
+#include "../core/commandline.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
 #include "../core/fadefx.h"
@@ -69,8 +73,8 @@ struct settings_entryvt_t
 
     void (*on_init)(settings_entry_t*);
     void (*on_release)(settings_entry_t*);
-
     void (*on_update)(settings_entry_t*);
+
     bool (*is_visible)(settings_entry_t*);
 };
 
@@ -117,12 +121,17 @@ static const char* FADE_COLOR = "000000";
 
 /* helpers */
 #if defined(__ANDROID__)
-enum { IS_MOBILE = 1 };
+#define IS_MOBILE_PLATFORM 1
 #else
-enum { IS_MOBILE = 0 };
+#define IS_MOBILE_PLATFORM 0
+#endif
+#define in_mobile_mode() mobilegamepad_is_available()
+
+#ifndef WANT_PLAYMOD
+#define WANT_PLAYMOD 0
 #endif
 
-#define MULTIPLICATION_SIGN     "\xc3\x97" /* utf-8 encoding for hex code point D7 */
+#define MULTIPLICATION_SIGN     "\xc3\x97" /* utf-8 encoding for code point 0xD7 */
 #define _X(k)                   #k MULTIPLICATION_SIGN
 
 /* languages */
@@ -155,21 +164,21 @@ static void nop(settings_entry_t* e) { (void)e; } /* no operation */
 static bool visible(settings_entry_t* e) { (void)e; return true; } /* make visible */
 static bool invisible(settings_entry_t* e) { (void)e; return false; } /* make invisible */
 
-
-#define vt_graphics (settings_entryvt_t) { nop, nop, nop, nop, nop, nop, visible }
-
 #define vt_back (settings_entryvt_t){ nop, go_back, nop, nop, nop, nop, visible }
 static void go_back(settings_entry_t* e);
+
+/* Graphics */
+#define vt_graphics (settings_entryvt_t) { nop, nop, nop, nop, nop, nop, visible }
 
 #define vt_quality (settings_entryvt_t){ change_quality, nop, nop, init_quality, nop, nop, visible }
 static void init_quality(settings_entry_t* e);
 static void change_quality(settings_entry_t* e);
 
-#define vt_resolution (settings_entryvt_t){ change_resolution, nop, nop, init_resolution, nop, nop, !IS_MOBILE ? visible : invisible }
+#define vt_resolution (settings_entryvt_t){ change_resolution, nop, nop, init_resolution, nop, nop, !IS_MOBILE_PLATFORM ? visible : invisible }
 static void init_resolution(settings_entry_t* e);
 static void change_resolution(settings_entry_t* e);
 
-#define vt_fullscreen (settings_entryvt_t){ change_fullscreen, nop, nop, init_fullscreen, nop, update_fullscreen, !IS_MOBILE ? visible : invisible }
+#define vt_fullscreen (settings_entryvt_t){ change_fullscreen, nop, nop, init_fullscreen, nop, update_fullscreen, !IS_MOBILE_PLATFORM ? visible : invisible }
 static void init_fullscreen(settings_entry_t* e);
 static void change_fullscreen(settings_entry_t* e);
 static void update_fullscreen(settings_entry_t* e);
@@ -178,8 +187,7 @@ static void update_fullscreen(settings_entry_t* e);
 static void init_showfps(settings_entry_t* e);
 static void change_showfps(settings_entry_t* e);
 
-
-
+/* Audio */
 #define vt_audio (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
 
 #define vt_volume (settings_entryvt_t){ change_volume, nop, nop, init_volume, nop, nop, visible }
@@ -191,8 +199,7 @@ static void init_mute(settings_entry_t* e);
 static void change_mute(settings_entry_t* e);
 static void update_mute(settings_entry_t* e);
 
-
-
+/* Controls */
 #define vt_controls (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, display_gamepadopacity }
 
 #define vt_gamepadopacity (settings_entryvt_t){ change_gamepadopacity, nop, nop, init_gamepadopacity, nop, nop, display_gamepadopacity }
@@ -200,8 +207,7 @@ static void init_gamepadopacity(settings_entry_t* e);
 static void change_gamepadopacity(settings_entry_t* e);
 static bool display_gamepadopacity(settings_entry_t* e);
 
-
-
+/* Game */
 #define vt_game (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
 
 #define vt_language (settings_entryvt_t){ change_language, nop, nop, init_language, nop, nop, visible }
@@ -223,9 +229,24 @@ static void release_stageselect(settings_entry_t* e);
 #define vt_credits (settings_entryvt_t){ nop, enter_credits, nop, nop, nop, nop, visible }
 static void enter_credits(settings_entry_t* e);
 
+/* MODs */
+#define vt_mods (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, display_mods }
+static bool want_compatibility_mode = true;
+static bool want_zipped_mods = false;
+static bool is_valid_gamedir(const char* gamedir);
+static bool display_mods(settings_entry_t* e);
 
+#define vt_playgame (settings_entryvt_t){ nop, enter_playgame, nop, nop, nop, nop, display_mods }
+static void enter_playgame(settings_entry_t* e);
 
-#define vt_extra (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
+#define vt_modstorage (settings_entryvt_t){ change_modstorage, nop, nop, nop, nop, nop, display_mods }
+static void change_modstorage(settings_entry_t* e);
+
+#define vt_compatibilitymode (settings_entryvt_t) { change_compatibilitymode, nop, nop, nop, nop, nop, display_mods }
+static void change_compatibilitymode(settings_entry_t* e);
+
+/* Engine */
+#define vt_engine (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
 
 #define vt_info (settings_entryvt_t){ nop, show_info, nop, nop, nop, nop, visible }
 static void show_info(settings_entry_t* e);
@@ -276,8 +297,14 @@ static const struct
     { TYPE_SETTING, "$OPTIONS_STAGESELECT", (const char*[]){ NULL }, 0, vt_stageselect, 0 },
     { TYPE_SETTING, "$OPTIONS_CREDITS", (const char*[]){ NULL }, 0, vt_credits, 0 },
 
-    /* Extra */
-    { TYPE_SUBTITLE, "$OPTIONS_EXTRA", (const char*[]){ NULL }, 0, vt_extra, 8 },
+    /* MODs */
+    { TYPE_SUBTITLE, "$OPTIONS_MODS", (const char*[]) { NULL }, 0, vt_mods, 8 },
+    { TYPE_SETTING, "$OPTIONS_PLAYMOD", (const char*[]) { NULL }, 0, vt_playgame, 8 },
+    { TYPE_SETTING, "$OPTIONS_MODSTORAGE", (const char*[]) { "$OPTIONS_MODSTORAGE_FOLDER", "$OPTIONS_MODSTORAGE_ARCHIVE", NULL }, 0, vt_modstorage, 0 },
+    { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 1, vt_compatibilitymode, 0 },
+
+    /* Engine */
+    { TYPE_SUBTITLE, "$OPTIONS_ENGINE", (const char*[]){ NULL }, 0, vt_engine, 8 },
     { TYPE_SETTING, "$OPTIONS_INFO", (const char*[]){ NULL }, 0, vt_info, 8 },
     { TYPE_SETTING, "$OPTIONS_SHARE", (const char*[]){ NULL }, 0, vt_share, 0 },
     { TYPE_SETTING, "$OPTIONS_DOWNLOAD", (const char*[]){ NULL }, 0, vt_website, 0 },
@@ -327,7 +354,11 @@ void settings_init(void* data)
     fade_out = false;
     next_scene = NULL;
     next_scene_arg = NULL;
+
+    /* options */
     enable_developermode = false;
+    want_compatibility_mode = true;
+    want_zipped_mods = false;
 
     /* initialize objects */
     background = background_load(BGFILE);
@@ -882,7 +913,7 @@ void init_quality(settings_entry_t* e)
 
 void change_fullscreen(settings_entry_t* e)
 {
-    bool new_fullscreen = (e->index_of_current_value == 1);
+    bool new_fullscreen = (e->index_of_current_value != 0);
     video_set_fullscreen(new_fullscreen);
 }
 
@@ -909,7 +940,7 @@ void update_fullscreen(settings_entry_t* e)
 
 void change_showfps(settings_entry_t* e)
 {
-    bool new_showfps = (e->index_of_current_value == 1);
+    bool new_showfps = (e->index_of_current_value != 0);
     video_set_fps_visible(new_showfps);
 }
 
@@ -1213,4 +1244,124 @@ void share(settings_entry_t* e)
     launch_url(create_url("/share"));
     (void)e;
 #endif
+}
+
+
+/*
+ * MODs
+ */
+
+bool display_mods(settings_entry_t* e)
+{
+#if WANT_PLAYMOD
+    /* only Surge the Rabbit can be reliably expected to have the
+       correct scripts for a proper experience of the compatibility mode */
+    return 0 == strcmp(opensurge_game_name(), "Surge the Rabbit");
+#else
+    /* experimental */
+    return false;
+#endif
+}
+
+void enter_playgame(settings_entry_t* e)
+{
+    enum { PATH_MAXSIZE = sizeof(((commandline_t*)0)->gamedir) };
+    char path_to_game[PATH_MAXSIZE] = "";
+
+    /* show a file chooser */
+#if !defined(__ANDROID__)
+    int mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST;
+
+    if(!want_zipped_mods)
+        mode |= ALLEGRO_FILECHOOSER_FOLDER;
+
+    ALLEGRO_FILECHOOSER* chooser = al_create_native_file_dialog(
+        NULL,
+        "Select a game",
+        want_zipped_mods ? "*.zip;*.7z" : "",
+        mode
+    );
+
+    if(chooser == NULL) {
+        /* error */
+        video_showmessage("Can't create native dialog");
+        return;
+    }
+    else if(!al_show_native_file_dialog(NULL, chooser)) {
+        /* error */
+        video_showmessage("Can't show native dialog");
+    }
+    else if(0 == al_get_native_file_dialog_count(chooser)) {
+        /* cancelled */
+        ;
+    }
+    else {
+        /* success */
+        const char* dialog_path = al_get_native_file_dialog_path(chooser, 0);
+        str_cpy(path_to_game, dialog_path, sizeof(path_to_game));
+    }
+
+    /* done */
+    al_destroy_native_file_dialog(chooser);
+#else
+    /* TODO */
+#endif
+
+    /* load the game */
+    if(path_to_game[0] != '\0') {
+        if(want_zipped_mods /* .zip/.7z pre-validation: not implemented */ || is_valid_gamedir(path_to_game)) {
+            commandline_t cmd = commandline_parse(0, NULL);
+            str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
+            cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
+            cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
+
+            engine_restart(&cmd);
+        }
+        else {
+            sound_play(SFX_DENY);
+            alert("%s", lang_get("OPTIONS_PLAYMOD_ERROR"));
+        }
+    }
+}
+
+void change_modstorage(settings_entry_t* e)
+{
+    want_zipped_mods = (e->index_of_current_value != 0);
+}
+
+void change_compatibilitymode(settings_entry_t* e)
+{
+    want_compatibility_mode = (e->index_of_current_value != 0);
+}
+
+bool is_valid_gamedir(const char* gamedir)
+{
+    const char* file_list[] = {
+        "surge.rocks",
+        "surge.prefs",
+        "surge.cfg",
+        "languages/english.lng",
+        NULL
+    };
+
+    ALLEGRO_PATH* base_path = al_create_path_for_directory(gamedir);
+    bool valid_gamedir = false;
+
+    /* for each file in file_list, check if it exists relative to gamedir (absolute path) */
+    for(const char** vpath = file_list; *vpath != NULL && !valid_gamedir; vpath++) {
+        ALLEGRO_PATH* path = al_clone_path(base_path);
+        ALLEGRO_PATH* tail = al_create_path(*vpath);
+
+        if(al_join_paths(path, tail)) {
+            const char* fullpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+            if(file_exists(fullpath))
+                valid_gamedir = true;
+        }
+
+        al_destroy_path(tail);
+        al_destroy_path(path);
+    }
+
+    al_destroy_path(base_path);
+    return valid_gamedir;
 }

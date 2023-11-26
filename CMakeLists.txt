@@ -75,6 +75,12 @@ IF(WANT_BUILD_DATE)
   LIST(APPEND DEFS "GAME_BUILD_DATE=__DATE__")
 ENDIF()
 
+# Play a MOD (options screen)
+OPTION(WANT_PLAYMOD "Display the Play a MOD feature in the options screen (experimental)" OFF)
+IF(WANT_PLAYMOD)
+  LIST(APPEND DEFS "WANT_PLAYMOD=1")
+ENDIF()
+
 # User-specified paths
 SET(ALLEGRO_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for Allegro & its dependencies")
 SET(ALLEGRO_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of Allegro")

@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-09-26"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-11-25"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -67,7 +67,8 @@ OPTIONS_TITLE               "<color=$COLOR_TITLE>CONFIGURAÇÕES</color>"
 OPTIONS_GRAPHICS            "Gráficos"
 OPTIONS_CONTROLS            "Controles"
 OPTIONS_GAME                "Jogo"
-OPTIONS_EXTRA               "Extra"
+OPTIONS_ENGINE              "Engine"
+OPTIONS_MODS                "MODs"
 OPTIONS_AUDIO               "Áudio"
 OPTIONS_BACK                "Voltar"
 OPTIONS_YES                 "Sim"
@@ -92,6 +93,12 @@ OPTIONS_DONATE              "Doar para o Open Surge"
 OPTIONS_INFO                "Informações da engine"
 OPTIONS_SHARE               "Compartilhar a engine"
 OPTIONS_DOWNLOAD            "Baixar a engine para PC & mobile"
+OPTIONS_PLAYMOD             "Jogar um game"
+OPTIONS_PLAYMOD_ERROR       "Este não é um jogo do Open Surge!"
+OPTIONS_MODSTORAGE          "Armazenamento"
+OPTIONS_MODSTORAGE_FOLDER   "Pasta de arquivos"
+OPTIONS_MODSTORAGE_ARCHIVE  "Arquivo .zip"
+OPTIONS_COMPATIBILITYMODE   "Modo de compatibilidade"
 
 // Stage Select
 STAGESELECT_TITLE           "<color=$COLOR_TITLE>SELEÇÃO DE FASES</color>"
