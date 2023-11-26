@@ -164,6 +164,33 @@ void fatal_error(const char *fmt, ...)
 #endif
 }
 
+/*
+ * alert()
+ * Displays a message box (printf format)
+ */
+void alert(const char* fmt, ...)
+{
+    char buf[1024];
+    va_list args;
+
+    /* format message */
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    /* log */
+    logfile_message("<< alert >> %s", buf);
+
+    /* show message box */
+#if defined(__ANDROID__)
+    android_show_alert_dialog(GAME_TITLE, buf);
+#else
+    /* al_show_native_message_box may be called without Allegro being initialized.
+       https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
+    al_show_native_message_box(al_get_current_display(),
+        GAME_TITLE, GAME_TITLE, buf,  NULL, ALLEGRO_MESSAGEBOX_WARN);
+#endif
+}
 
 /*
  * random64()
