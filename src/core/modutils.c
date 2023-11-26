@@ -126,6 +126,8 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/items/collectibles.ss",                    ":0.6.1",                   /* performance updates in 0.6.1 */
     "scripts/items/audio_source.ss",                    ":0.6.1",                   /* optimizations in 0.6.1 */
     "scripts/items/springs.ss",                         ":0.6.1",                   /* bugfix in 0.6.1 */
+    "scripts/items/zipline.ss",                         ":0.6.1",                   /* changes to the physics systems in 0.6.1; fix collisions due to a changed player hitbox */
+    "sprites/items/zipline.spr",                        ":0.6.1",                   /* add action spot to the zipline */
     "scripts/misc/animal.ss",                           ":0.6.1",                   /* animation fix in 0.6.1 */
     "scripts/behaviors/platformer.ss",                  ":0.6.0",                   /* since 0.6.1, animal.ss uses Platformer.gravityMultiplier introduced in 0.6.0 (underwater effect) */
 
@@ -135,13 +137,7 @@ static const char* const COMPATIBILITY_LIST[] = {
 #if 0
     /* removed changes */
     "scripts/core/cleared.ss",                          ":0.6.1",                   /* mobile: show and hide the mobile gamepad; need special exception */
-
     "scripts/players/dash_smoke.ss",                    ":0.6.1",                   /* changes to the physics system in 0.6.1; repositioned due to the updated hitbox of the player */
-
-    "sprites/items/zipline.spr",                        ":0.6.1",                   /* add action spot to the zipline */
-    "scripts/items/zipline.ss",                         ":0.6.1",                   /* changes to the physics systems in 0.6.1; fix collisions due to a changed player hitbox */
-                                                                                    /* > not really needed? */
-
     "-scripts/core/motd.ss",                            "0.6.1:",                   /* example: prefix a file with '-' to remove it (make it blank) */
 #endif
 
