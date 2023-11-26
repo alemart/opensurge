@@ -163,7 +163,7 @@ static const grounddir_t _MM_TO_GD[4] = {
 #define WANT_DEBUG              0
 #define WANT_JUMP_ATTENUATION   0
 #define AB_SENSOR_OFFSET        1 /* test with 0 and 1; with 0 it misbehaves a bit (unstable pa->midair) */
-#define CLOUD_OFFSET            12
+#define CLOUD_OFFSET            16
 #define TARGET_FPS              60.0 /* target framerate of the simulation */
 #define HARD_CAPSPEED           (24.0 * TARGET_FPS)
 static void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt);
@@ -2232,30 +2232,25 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         }
     }
 
-    /* A: ignore if it's a cloud and if the tail of the sensor is not touching it */
-    if(*at_A != NULL && !obstacle_is_solid(*at_A)) {
-        point2d_t tail = sensor_tail(a, position, pa->movmode);
-        if(!obstacle_point_collision(*at_A, tail))
-            *at_A = NULL;
-        else if(pa->midair && pa->movmode == MM_FLOOR && pa->angle == 0x0) {
-            /* the player is too far below the ground level */
+    /* A, B: cloud height */
+    if(pa->midair && pa->angle == 0x0 && pa->ysp / 60.0f < CLOUD_OFFSET * 0.5f) {
+
+        /* A: ignore if it's a cloud and if the tail of the sensor is too far away from the ground level */
+        if(*at_A != NULL && !obstacle_is_solid(*at_A)) {
+            point2d_t tail = sensor_tail(a, position, pa->movmode);
             int ygnd = obstacle_ground_position(*at_A, tail.x, tail.y, GD_DOWN);
             if(tail.y >= ygnd + CLOUD_OFFSET)
                 *at_A = NULL;
         }
-    }
 
-    /* B: ignore if it's a cloud and if the tail of the sensor is not touching it */
-    if(*at_B != NULL && !obstacle_is_solid(*at_B)) {
-        point2d_t tail = sensor_tail(b, position, pa->movmode);
-        if(!obstacle_point_collision(*at_B, tail))
-            *at_B = NULL;
-        else if(pa->midair && pa->movmode == MM_FLOOR && pa->angle == 0x0) {
-            /* the player is too far below the ground level */
+        /* B: ignore if it's a cloud and if the tail of the sensor is too far away from the ground level */
+        if(*at_B != NULL && !obstacle_is_solid(*at_B)) {
+            point2d_t tail = sensor_tail(b, position, pa->movmode);
             int ygnd = obstacle_ground_position(*at_B, tail.x, tail.y, GD_DOWN);
             if(tail.y >= ygnd + CLOUD_OFFSET)
                 *at_B = NULL;
         }
+
     }
 
     /* A, B: conflict resolution when A != B */
