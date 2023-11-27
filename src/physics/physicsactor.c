@@ -1693,9 +1693,27 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /*
      *
+     * wall collisions x ground & ceiling collisions
+     *
+     */
+
+    /* we generally test for wall collisions first. However, this may not be
+       appropriate when |ysp| is too large because the player may be spuriously
+       repositioned when hitting the ground or the ceiling */
+    bool delayed_wall_collisions = (fabs(pa->ysp) >= 900.0 && fabs(pa->ysp) > fabs(pa->xsp));
+
+    /* splitting these into function calls would be much nicer... :\
+       TODO reformulate macros UPDATE_SENSORS(), FORCE_ANGLE(), etc. */
+    if(delayed_wall_collisions)
+        goto ceiling_collisions;
+
+    /*
+     *
      * wall collisions
      *
      */
+
+    wall_collisions:
 
     /* right wall */
     if(at_N != NULL) {
@@ -1819,11 +1837,16 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
         }
     }
 
+    if(delayed_wall_collisions)
+        goto end_of_collisions;
+
     /*
      *
-     * ceiling collision
+     * ceiling collisions
      *
      */
+
+    ceiling_collisions:
 
     if(pa->midair && pa->touching_ceiling) {
         bool must_reattach = false;
@@ -2025,6 +2048,12 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
     /* reset counter */
     if(pa->unstable_angle_counter > 0)
         --pa->unstable_angle_counter;
+
+    /* end of collisions */
+    if(delayed_wall_collisions)
+        goto wall_collisions;
+
+    end_of_collisions:
 
     /*
      *
