@@ -98,7 +98,7 @@ static const char* const COMPATIBILITY_LIST[] = {
 
 #if 1
     /* active changes */
-    "sprites/ui/pause.spr",                             ":0.6.1",                   /* introduce a new pause menu in 0.6.1 */
+    "sprites/ui/pause.spr",                             ":0.6.0.3",                 /* introduce a new pause menu in 0.6.1 */
     "scripts/core/hud.ss",                              ":0.6.1",                   /* mobile: add pause button to the Default HUD in 0.6.1 */
     "scripts/core/pause.ss",                            ":0.6.1",                   /* better user experience in 0.6.1 */
     "inputs/default.in",                                ":0.6.1",                   /* updated mappings are better */
