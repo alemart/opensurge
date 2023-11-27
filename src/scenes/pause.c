@@ -60,7 +60,7 @@ static pause_state_t state = INITIAL_STATE;
 static void update_appearing();
 static void update_waiting();
 static void update_disappearing();
-static void (*update[])() = {
+static void (*update_fn[])() = {
     [STATE_APPEARING] = update_appearing,
     [STATE_IDLE] = update_waiting,
     [STATE_DISAPPEARING] = update_disappearing
@@ -102,7 +102,7 @@ static pause_option_t option = INITIAL_OPTION;
 static void confirm_continue();
 static void confirm_restart();
 static void confirm_exit();
-static void (*confirm[])() = {
+static void (*confirm_fn[])() = {
     [OPTION_CONTINUE] = confirm_continue,
     [OPTION_RESTART] = confirm_restart,
     [OPTION_EXIT] = confirm_exit
@@ -513,7 +513,7 @@ void pause_update()
     }
 
     /* state update */
-    update[state]();
+    update_fn[state]();
     if(changed_scene())
         return;
 
@@ -644,7 +644,7 @@ void update_disappearing()
         return;
 
     /* perform the necessary action */
-    confirm[option]();
+    confirm_fn[option]();
     /*if(changed_scene()) return;*/
 }
 
