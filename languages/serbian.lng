@@ -73,6 +73,8 @@ FIXME OPTIONS_AUDIO               "Audio"
 FIXME OPTIONS_BACK                "Back"
 FIXME OPTIONS_YES                 "Yes"
 FIXME OPTIONS_NO                  "No"
+FIXME OPTIONS_ON                  "On" // alternatively: Enabled
+FIXME OPTIONS_OFF                 "Off" // alternatively: Disabled
 OPTIONS_FULLSCREEN          "Цели екран"
 OPTIONS_RESOLUTION          "Величина екрана"
 FIXME OPTIONS_QUALITY             "Quality"
@@ -94,9 +96,10 @@ FIXME OPTIONS_INFO                "Engine information"
 FIXME OPTIONS_SHARE               "Share the engine"
 FIXME OPTIONS_DOWNLOAD            "Get the engine for PC & mobile"
 FIXME OPTIONS_PLAYMOD             "Play a game"
-FIXME OPTIONS_PLAYMOD_ERROR       "This is not an Open Surge game!"
+FIXME OPTIONS_PLAYMOD_ERROR       "The selected item is not an Open Surge game!"
+FIXME OPTIONS_PLAYMOD_WARNING     "The compatibility mode is disabled. Do you want to continue anyway?"
 FIXME OPTIONS_MODSTORAGE          "Storage"
-FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // also: Directory
+FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
 FIXME OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
 FIXME OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
 

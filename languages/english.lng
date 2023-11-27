@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-11-25"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-11-27"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -80,6 +80,8 @@ OPTIONS_MODS                "MODs"
 OPTIONS_BACK                "Back"
 OPTIONS_YES                 "Yes"
 OPTIONS_NO                  "No"
+OPTIONS_ON                  "On" // alternatively: Enabled
+OPTIONS_OFF                 "Off" // alternatively: Disabled
 OPTIONS_FULLSCREEN          "Fullscreen"
 OPTIONS_RESOLUTION          "Screen size"
 OPTIONS_QUALITY             "Quality"
@@ -101,9 +103,10 @@ OPTIONS_INFO                "Engine information"
 OPTIONS_SHARE               "Share the engine"
 OPTIONS_DOWNLOAD            "Get the engine for PC & mobile"
 OPTIONS_PLAYMOD             "Play a game"
-OPTIONS_PLAYMOD_ERROR       "This is not an Open Surge game!"
+OPTIONS_PLAYMOD_ERROR       "The selected item is not an Open Surge game!"
+OPTIONS_PLAYMOD_WARNING     "The compatibility mode is disabled. Do you want to continue anyway?"
 OPTIONS_MODSTORAGE          "Storage"
-OPTIONS_MODSTORAGE_FOLDER   "Folder"
+OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
 OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
 OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
 

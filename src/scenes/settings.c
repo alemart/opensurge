@@ -301,7 +301,7 @@ static const struct
     { TYPE_SUBTITLE, "$OPTIONS_MODS", (const char*[]) { NULL }, 0, vt_mods, 8 },
     { TYPE_SETTING, "$OPTIONS_PLAYMOD", (const char*[]) { NULL }, 0, vt_playgame, 8 },
     { TYPE_SETTING, "$OPTIONS_MODSTORAGE", (const char*[]) { "$OPTIONS_MODSTORAGE_FOLDER", "$OPTIONS_MODSTORAGE_ARCHIVE", NULL }, 0, vt_modstorage, 0 },
-    { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 1, vt_compatibilitymode, 0 },
+    { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", NULL }, 1, vt_compatibilitymode, 0 },
 
     /* Engine */
     { TYPE_SUBTITLE, "$OPTIONS_ENGINE", (const char*[]){ NULL }, 0, vt_engine, 8 },
@@ -569,16 +569,16 @@ void handle_controls()
     if(index_of_highlighted_setting > 0) {
         if(input_button_pressed(input, IB_UP)) {
             int i = --index_of_highlighted_setting;
-            setting[i]->vt->on_highlight(setting[i]);
             sound_play(SFX_CHOOSE);
+            setting[i]->vt->on_highlight(setting[i]);
         }
     }
 
     if(index_of_highlighted_setting < number_of_settings - 1) {
         if(input_button_pressed(input, IB_DOWN)) {
             int i = ++index_of_highlighted_setting;
-            setting[i]->vt->on_highlight(setting[i]);
             sound_play(SFX_CHOOSE);
+            setting[i]->vt->on_highlight(setting[i]);
         }
     }
 
@@ -587,9 +587,9 @@ void handle_controls()
         int i = index_of_highlighted_setting;
         int n = setting[i]->number_of_possible_values;
         if(n > 1 && setting[i]->index_of_current_value > 0) {
+            sound_play(SFX_CHOOSE);
             setting[i]->index_of_current_value--;
             setting[i]->vt->on_change(setting[i]);
-            sound_play(SFX_CHOOSE);
         }
     }
 
@@ -597,9 +597,9 @@ void handle_controls()
         int i = index_of_highlighted_setting;
         int n = setting[i]->number_of_possible_values;
         if(n > 1 && setting[i]->index_of_current_value < n-1) {
+            sound_play(SFX_CHOOSE);
             setting[i]->index_of_current_value++;
             setting[i]->vt->on_change(setting[i]);
-            sound_play(SFX_CHOOSE);
         }
     }
 
@@ -607,10 +607,10 @@ void handle_controls()
         int i = index_of_highlighted_setting;
         int n = setting[i]->number_of_possible_values;
         if(n > 1) {
+            sound_play(SFX_CHOOSE);
             setting[i]->index_of_current_value++;
             setting[i]->index_of_current_value %= n;
             setting[i]->vt->on_change(setting[i]);
-            sound_play(SFX_CHOOSE);
         }
     }
 
@@ -619,16 +619,16 @@ void handle_controls()
         int i = index_of_highlighted_setting;
         int n = setting[i]->number_of_possible_values;
         if(n == 0) {
-            setting[i]->vt->on_enter(setting[i]);
             sound_play(i < index_of_back ? SFX_CONFIRM : SFX_BACK);
+            setting[i]->vt->on_enter(setting[i]);
         }
     }
 
     /* go back by pressing fire2 or fire4 */
     if(input_button_pressed(input, IB_FIRE2) || input_button_pressed(input, IB_FIRE4)) {
         int i = index_of_back;
-        setting[i]->vt->on_enter(setting[i]);
         sound_play(SFX_BACK);
+        setting[i]->vt->on_enter(setting[i]);
     }
 
     /* update all settings */
@@ -1255,7 +1255,7 @@ bool display_mods(settings_entry_t* e)
 {
 #if WANT_PLAYMOD
     /* only Surge the Rabbit can be reliably expected to have the
-       correct scripts for a proper experience of the compatibility mode */
+       correct scripts for a proper compatibility experience */
     return 0 == strcmp(opensurge_game_name(), "Surge the Rabbit");
 #else
     /* experimental */
@@ -1309,18 +1309,26 @@ void enter_playgame(settings_entry_t* e)
 
     /* load the game */
     if(path_to_game[0] != '\0') {
-        if(want_zipped_mods /* .zip/.7z pre-validation: not implemented */ || is_valid_gamedir(path_to_game)) {
-            commandline_t cmd = commandline_parse(0, NULL);
-            str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
-            cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
-            cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
 
-            engine_restart(&cmd);
+        /* pre-validate: is the selected item a valid Open Surge game? */
+        if(want_zipped_mods /* .zip/.7z pre-validation: not implemented */ || is_valid_gamedir(path_to_game)) {
+
+            /* warn the user if the compatibility mode is disabled */
+            if(want_compatibility_mode || confirm("%s", lang_get("OPTIONS_PLAYMOD_WARNING"))) {
+                commandline_t cmd = commandline_parse(0, NULL);
+                str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
+                cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
+                cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
+
+                engine_restart(&cmd);
+            }
+
         }
         else {
             sound_play(SFX_DENY);
             alert("%s", lang_get("OPTIONS_PLAYMOD_ERROR"));
         }
+
     }
 }
 
