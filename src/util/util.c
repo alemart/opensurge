@@ -166,7 +166,7 @@ void fatal_error(const char *fmt, ...)
 
 /*
  * alert()
- * Displays a message box (printf format)
+ * Displays a message box with an OK button
  */
 void alert(const char* fmt, ...)
 {
@@ -179,7 +179,7 @@ void alert(const char* fmt, ...)
     va_end(args);
 
     /* log */
-    logfile_message("<< alert >> %s", buf);
+    logfile_message("<< %s >> %s", __func__, buf);
 
     /* show message box */
 #if defined(__ANDROID__)
@@ -188,8 +188,43 @@ void alert(const char* fmt, ...)
     /* al_show_native_message_box may be called without Allegro being initialized.
        https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
     al_show_native_message_box(al_get_current_display(),
-        GAME_TITLE, GAME_TITLE, buf,  NULL, ALLEGRO_MESSAGEBOX_WARN);
+        GAME_TITLE, GAME_TITLE, buf, NULL, ALLEGRO_MESSAGEBOX_WARN);
 #endif
+}
+
+/*
+ * confirm()
+ * Displays a message box with Yes/No buttons
+ */
+bool confirm(const char* fmt, ...)
+{
+    char buf[1024];
+    int result;
+    va_list args;
+
+    /* format message */
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    /* log */
+    logfile_message("<< %s >> %s", __func__, buf);
+
+    /* show message box */
+#if defined(__ANDROID__)
+    result = android_show_confirm_dialog(GAME_TITLE, buf);
+#else
+    /* al_show_native_message_box may be called without Allegro being initialized.
+       https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
+    result = al_show_native_message_box(al_get_current_display(),
+        GAME_TITLE, GAME_TITLE, buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO | ALLEGRO_MESSAGEBOX_QUESTION);
+#endif
+
+    /* log result */
+    logfile_message("<< %s >> result: %d", __func__, result);
+
+    /* done! */
+    return 1 == result;
 }
 
 /*
@@ -517,5 +552,31 @@ void android_show_alert_dialog(const char* title, const char* message)
 
     (*env)->DeleteLocalRef(env, class_id);
 }
+
+/* Show a native confirm dialog on Android
+
+   Possible return values:
+   0 if the dialog box was closed without picking a button
+   1 if Yes was pressed
+   2 if No was pressed */
+int android_show_confirm_dialog(const char* title, const char* message)
+{
+    JNIEnv* env = al_android_get_jni_env();
+    jobject activity = al_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "showConfirmDialog", "(Ljava/lang/String;Ljava/lang/String;)I");
+
+    jstring jtitle = (*env)->NewStringUTF(env, title);
+    jstring jmessage = (*env)->NewStringUTF(env, message);
+    jint jresult = (*env)->CallIntMethod(env, activity, method_id, jtitle, jmessage);
+    (*env)->DeleteLocalRef(env, jmessage);
+    (*env)->DeleteLocalRef(env, jtitle);
+
+    (*env)->DeleteLocalRef(env, class_id);
+
+    return (int)jresult;
+}
+
 
 #endif

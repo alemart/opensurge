@@ -61,7 +61,8 @@ void* __reallocx(void *ptr, size_t bytes, const char* location, int line);
 /* General utilities */
 int game_version_compare(int sup_version, int sub_version, int wip_version); /* compare to this version of the game engine */
 void fatal_error(const char *fmt, ...); /* crash the program with a message */
-void alert(const char* fmt, ...); /* display a message box */
+void alert(const char* fmt, ...); /* display a message box with an OK button */
+bool confirm(const char* fmt, ...); /* display a message box with Yes/No buttons */
 void merge_sort(void *base, int num, size_t size, int (*comparator)(const void*,const void*)); /* similar to stdlib's qsort, but merge_sort is a stable sorting algorithm */
 uint64_t random64(); /* pseudo-random 64-bit number */
 FILE* fopen_utf8(const char* filepath, const char* mode); /* fopen() with UTF-8 filename support */
