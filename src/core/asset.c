@@ -1127,6 +1127,28 @@ void setup_compatibility_pack(const char* shared_dirpath, const char* engine_ver
     if(!PHYSFS_unmount(shared_dirpath))
         CRASH("Can't unmount the shared data directory at %s. Error: %s", shared_dirpath, PHYSFSx_getLastErrorMessage());
 
+    /* add a default surge.cfg if that file doesn't exist in the game */
+    if(!PHYSFS_exists("surge.cfg")) {
+        const char DEFAULT_SURGE_CFG[] = ""
+            "game {\n"
+            "   title \"Untitled game\"\n"
+            "}\n"
+        "";
+        const size_t DEFAULT_SURGE_CFG_SIZE = sizeof(DEFAULT_SURGE_CFG) - 1;
+
+        int last = file_count++;
+
+        file_vpath = reallocx(file_vpath, file_count * sizeof(*file_vpath));
+        file_vpath[last] = str_dup("surge.cfg");
+
+        file_data = reallocx(file_data, file_count * sizeof(*file_data));
+        file_data[last] = memcpy(malloc(DEFAULT_SURGE_CFG_SIZE), DEFAULT_SURGE_CFG, DEFAULT_SURGE_CFG_SIZE);
+
+        file_size = reallocx(file_size, file_count * sizeof(*file_size));
+        file_size[last] = DEFAULT_SURGE_CFG_SIZE;
+
+        LOG("Added a default \"surge.cfg\" to the compatibility pack");
+    }
 
 
 
