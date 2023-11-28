@@ -253,6 +253,29 @@ const char** select_files_for_compatibility_pack(const char* engine_version, uin
     return array;
 }
 
+/*
+ * generate_surge_cfg()
+ * Generates a surge.cfg file in-memory. You must free() the output void* pointer afterwards.
+ * Returns true on success
+ */
+bool generate_surge_cfg(const char* game_title, void** out_file_data, size_t* out_file_size)
+{
+    char buffer[256], title[64], fmt[] = ""
+        "game {\n"
+        "    title \"%.63s\"\n"
+        "}\n"
+    ;
+
+    str_addslashes(game_title, title, sizeof(title));
+    snprintf(buffer, sizeof(buffer), fmt, title);
+
+    int text_length = strlen(buffer);
+    size_t file_size = text_length * sizeof(uint8_t);
+    *out_file_data = memcpy(mallocx(file_size), buffer, file_size);
+    *out_file_size = file_size;
+
+    return true;
+}
 
 
 

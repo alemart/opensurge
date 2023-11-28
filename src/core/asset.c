@@ -89,7 +89,7 @@ static char* generate_user_datadirname(const char* game_name, uint32_t game_id, 
 static bool is_valid_root_folder();
 static char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size);
 
-static void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version, uint32_t game_id);
+static void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version, uint32_t game_id, const char* guessed_game_title);
 static int scan_translations(const char* vpath, void* context);
 static int append_translations(const char* vpath, void* context);
 static size_t crlf_to_lf(uint8_t* data, size_t size);
@@ -283,7 +283,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
 
             /* override scripts */
             al_set_physfs_file_interface();
-            setup_compatibility_pack(dirpath, compatibility_version, game_id);
+            setup_compatibility_pack(dirpath, compatibility_version, game_id, game_dirname);
             al_restore_state(&state);
 
             /* mount the default shared data directory with lower precedence */
@@ -1012,7 +1012,7 @@ char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_s
  * on a compatibility version string. Ensure that the physfs I/O
  * interface (Allegro) is activated before calling this function.
  */
-void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version, uint32_t game_id)
+void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version, uint32_t game_id, const char* guessed_game_title)
 {
     /* we'll read files to memory */
     int file_count = 0;
@@ -1129,25 +1129,25 @@ void setup_compatibility_pack(const char* shared_dirpath, const char* engine_ver
 
     /* add a default surge.cfg if that file doesn't exist in the game */
     if(!PHYSFS_exists("surge.cfg")) {
-        const char DEFAULT_SURGE_CFG[] = ""
-            "game {\n"
-            "   title \"Untitled game\"\n"
-            "}\n"
-        "";
-        const size_t DEFAULT_SURGE_CFG_SIZE = sizeof(DEFAULT_SURGE_CFG) - 1;
+        uint8_t* surge_cfg_data = NULL;
+        size_t surge_cfg_size = 0;
 
-        int last = file_count++;
+        if(generate_surge_cfg(guessed_game_title, (void**)&surge_cfg_data, &surge_cfg_size)) {
+            int last = file_count++;
 
-        file_vpath = reallocx(file_vpath, file_count * sizeof(*file_vpath));
-        file_vpath[last] = str_dup("surge.cfg");
+            file_vpath = reallocx(file_vpath, file_count * sizeof(*file_vpath));
+            file_vpath[last] = str_dup("surge.cfg");
 
-        file_data = reallocx(file_data, file_count * sizeof(*file_data));
-        file_data[last] = memcpy(malloc(DEFAULT_SURGE_CFG_SIZE), DEFAULT_SURGE_CFG, DEFAULT_SURGE_CFG_SIZE);
+            file_data = reallocx(file_data, file_count * sizeof(*file_data));
+            file_data[last] = surge_cfg_data;
 
-        file_size = reallocx(file_size, file_count * sizeof(*file_size));
-        file_size[last] = DEFAULT_SURGE_CFG_SIZE;
+            file_size = reallocx(file_size, file_count * sizeof(*file_size));
+            file_size[last] = surge_cfg_size;
 
-        LOG("Added a default \"surge.cfg\" to the compatibility pack");
+            LOG("Added a default \"surge.cfg\" to the compatibility pack");
+        }
+        else
+            WARN("Can't add a default \"surge.cfg\" to the compatibility pack");
     }
 
 
