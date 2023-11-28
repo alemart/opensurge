@@ -45,6 +45,7 @@
 
 
 /* private data */
+#define CREDITS_MOD_FILE "credits.txt"
 static const char* CREDITS_BGFILE = "themes/scenes/credits.bg";
 static const float SCROLL_SPEED = 30.0f;
 extern const char CREDITS_TEXT[];
@@ -109,7 +110,7 @@ void credits_init(void *foo)
     /* load the font that will display the credits */
     text = font_create("MenuText");
     font_set_textargumentsv(text, assets_argc, assets_argv);
-    font_set_text(text, "%s", base_text);
+    font_set_text(text, "%s\n%s", credits_mod_text(), base_text);
     font_set_width(text, VIDEO_SCREEN_W - 20);
     font_set_position(text, v2d_new(10, VIDEO_SCREEN_H));
     text_height = font_get_textsize(text).y;
@@ -218,17 +219,14 @@ void credits_render()
 void credits_text(const char** base_text, int* assets_argc, const char*** assets_argv)
 {
     static const char* assets_arguments[ASSETS_CATEGORIES]; /* must allocate statically */
-    bool uninitialized = (*assets_text_buffer == '\0');
 
     /* parse the text from the assets CSV file */
     for(int i = 0; i < ASSETS_CATEGORIES; i++) {
         char* text_buffer = assets_text_buffer + i * ASSETS_TEXT_MAXLEN;
 
-        if(uninitialized) {
-            assets_aggregator_t helper = { assets_filter[i], "", "", 0 };
-            csv_parse(CREDITS_ASSETS_CSV, ";", aggregate_assets, &helper);
-            str_cpy(text_buffer, helper.text_buffer, ASSETS_TEXT_MAXLEN);
-        }
+        assets_aggregator_t helper = { assets_filter[i], "", "", 0 };
+        csv_parse(CREDITS_ASSETS_CSV, ";", aggregate_assets, &helper);
+        str_cpy(text_buffer, helper.text_buffer, ASSETS_TEXT_MAXLEN);
 
         assets_arguments[i] = text_buffer;
     }
@@ -238,6 +236,87 @@ void credits_text(const char** base_text, int* assets_argc, const char*** assets
     *assets_argc = ASSETS_CATEGORIES;
     *assets_argv = assets_arguments;
 }
+
+/*
+ * credits_mod_text()
+ * Credits text of a mod; returns a statically allocated buffer
+ */
+const char* credits_mod_text()
+{
+    static char buffer[65536] = "";
+    const char* game_name = opensurge_game_name();
+    bool verbatim = false;
+
+    /* not a mod? */
+    buffer[0] = '\0';
+    if(0 == strcmp(game_name, "Surge the Rabbit"))
+        return buffer;
+
+    /* add a default text */
+    snprintf(buffer, sizeof(buffer),
+        "<color=$COLOR_HIGHLIGHT>%.48s</color>\n"
+        "Created by %.48s authors\n\n"
+        "(missing %s file)\n\n",
+        game_name,
+        game_name,
+        CREDITS_MOD_FILE
+    );
+
+    /* read MOD credits file, if it exists */
+    const char* fullpath = asset_path(CREDITS_MOD_FILE);
+    ALLEGRO_FILE* fp = al_fopen(fullpath, "r");
+
+    if(fp != NULL) {
+        const int64_t max_file_size = sizeof(buffer) - 3;
+        int64_t file_size = al_fsize(fp);
+
+        if(file_size > max_file_size) /* we don't expect large files */
+            file_size = max_file_size;
+
+        if(file_size > 0) {
+            size_t size = (size_t)file_size;
+            size_t n = al_fread(fp, buffer, size);
+
+            buffer[n] = '\n';
+            buffer[n+1] = '\n';
+            buffer[n+2] = '\0';
+
+            verbatim = true;
+        }
+
+        al_fclose(fp);
+    }
+
+    /* a limitation of the current approach is that the MOD credits file may
+       unduly trigger text arguments $1 ... $9 . Not sure this is the best way :/ */
+    if(verbatim) {
+        for(char* p = buffer; *p != '\0'; p++) {
+
+            /* we can't write "$9.99", but we can write "$ 9.99" */
+            if(*p == '$' && *(p+1) >= '0' && *(p+1) <= '9')
+                *p = ' '; /* not correct */
+
+            /* text <within tags> won't show up either, so... I should add a
+               <verbatim> mode to the font module, so that text shows up unprocessed */
+            else if(*p == '<')
+                *p = '[';
+            else if(*p == '>')
+                *p = ']';
+
+        }
+    }
+
+    /* add a horizontal line */
+    const char hr[] = "_____________________[ Engine / base ]_____________________";
+    size_t length = strlen(buffer);
+    if(sizeof(buffer) - 1 > length)
+        str_cpy(buffer + length, hr, sizeof(buffer) - 1 - length);
+
+    /* done! */
+    return buffer;
+}
+
+
 
 /* private stuff */
 

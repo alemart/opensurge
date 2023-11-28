@@ -55,9 +55,6 @@ static const v2d_t FONT_POSITION = { .x = 4, .y = 128 };
 static const char FONT_NAME[] = "MenuText";
 static const float SCROLL_SPEED = 30.0f;
 
-#define MOD_CREDITS_FILE "credits.txt"
-static const char* mod_credits();
-
 static float SMOOTH_SCROLL_COEFFICIENT = 0.97f;
 static void on_touch_start(v2d_t touch_start, void* subscene_ptr);
 static void on_touch_move(v2d_t touch_start, v2d_t touch_current, void* subscene_ptr);
@@ -119,7 +116,7 @@ void init(mobile_subscene_t* subscene_ptr)
 
     /* set the credits text */
     font_set_textargumentsv(font, assets_argc, assets_argv);
-    font_set_text(font, "%s\n\n%s\n%s", "$CREDITS_TITLE", mod_credits(), base_text);
+    font_set_text(font, "%s\n\n%s\n%s", "$CREDITS_TITLE", credits_mod_text(), base_text);
 
     /* misc */
     subscene->text_height = font_get_textsize(font).y;
@@ -225,62 +222,4 @@ void on_touch_start(v2d_t touch_start, void* subscene_ptr)
     mobile_subscene_credits_t* subscene = (mobile_subscene_credits_t*)subscene_ptr;
 
     subscene->touch_previous = touch_start;
-}
-
-
-
-/* consider this to be experimental. I'm not quite sure this is the best design. */
-const char* mod_credits()
-{
-    static char buffer[65536] = "";
-
-    /* return the cached text */
-    if(*buffer != '\0')
-        return buffer;
-
-    /* add a default text */
-    const char* game_name = opensurge_game_name();
-    bool show_warning = (0 != strcmp(game_name, "Surge the Rabbit"));
-    snprintf(buffer, sizeof(buffer),
-        "%.48s\n"
-        "Created by %.48s authors\n\n"
-        "%s"
-        "___________________________________________________\n\n",
-        game_name,
-        game_name,
-        show_warning ? "(missing " MOD_CREDITS_FILE " file)\n\n" : ""
-    );
-
-    /* read MOD credits file, if it exists */
-    const char* fullpath = asset_path(MOD_CREDITS_FILE);
-    ALLEGRO_FILE* fp = al_fopen(fullpath, "r");
-
-    if(fp != NULL) {
-        int64_t file_size = al_fsize(fp);
-
-        if(file_size > 0) {
-            size_t size = min((size_t)file_size, sizeof(buffer) - 1); /* we don't expect large files */
-            size_t n = al_fread(fp, buffer, size);
-
-            buffer[n] = '\0';
-        }
-
-        al_fclose(fp);
-    }
-
-    /* a limitation of the current approach is that the MOD credits file may
-       unduly trigger text arguments $1 ... $9 . Not sure this is the best way :/ */
-    for(char* p = buffer; *p != '\0'; p++) {
-
-        /* we can't write "$9.99", but we can write "$ 9.99" */
-        if(*p == '$' && *(p+1) >= '0' && *(p+1) <= '9')
-            *p = ' '; /* not correct */
-
-        /* text <within tags> won't show up either, so... I should add a
-           <verbatim> mode to the font module, so that text shows up unprocessed */
-
-    }
-
-    /* done! */
-    return buffer;
 }
