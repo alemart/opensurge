@@ -245,16 +245,16 @@ char* str_trim(char* dest, const char* src, size_t dest_size)
     return dest;
 }
 
-
-
 /*
  * str_dup()
- * Duplicates a string
+ * Duplicates a string. You must free() the returned pointer after usage.
  */
 char* str_dup(const char* str)
 {
-    char *p = mallocx((strlen(str) + 1) * sizeof(char));
-    return strcpy(p, str);
+    size_t n = 1 + strlen(str);
+    char *p = mallocx(n * sizeof(char));
+
+    return memcpy(p, str, n);
 }
 
 /*
