@@ -887,8 +887,8 @@ void remap_joystick_buttons(int joy_id)
     android/gradle_project/allegro/src/main/java/org/liballeg/android/AllegroActivity.java
 
     My joystick-related modifications to Allegro 5.2.9:
-    https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1483.patch
-    https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1507.patch (apply with fuzz=3)
+    1) https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1483.patch
+    2) https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1507.patch (apply with fuzz=3)
 
     */
     enum {
