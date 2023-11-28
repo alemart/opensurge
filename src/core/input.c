@@ -861,41 +861,58 @@ void remap_joystick_buttons(int joy_id)
 {
     /* Allegro's numbers for XINPUT button input
        from: src/win/wjoyxi.c (Allegro's source code) */
-    const int XINPUT_A = 0;
-    const int XINPUT_B = 1;
-    const int XINPUT_X = 2;
-    const int XINPUT_Y = 3;
-    const int XINPUT_RB = 4;
-    const int XINPUT_LB = 5;
-    const int XINPUT_RT = 6;
-    const int XINPUT_LT = 7;
-    const int XINPUT_BACK = 8;
-    const int XINPUT_START = 9;
-    const int XINPUT_DPAD_R = 10;
-    const int XINPUT_DPAD_L = 11;
-    const int XINPUT_DPAD_D = 12;
-    const int XINPUT_DPAD_U = 13;
+    enum {
+        XINPUT_A = 0,
+        XINPUT_B = 1,
+        XINPUT_X = 2,
+        XINPUT_Y = 3,
+        XINPUT_RB = 4,
+        XINPUT_LB = 5,
+        XINPUT_RT = 6,
+        XINPUT_LT = 7,
+        XINPUT_BACK = 8,
+        XINPUT_START = 9,
+        XINPUT_DPAD_R = 10,
+        XINPUT_DPAD_L = 11,
+        XINPUT_DPAD_D = 12,
+        XINPUT_DPAD_U = 13
+    };
 
 #if defined(__ANDROID__)
     /*
 
     Remap Allegro's JS_* button constants to Allegro's buttons of the Windows XInput driver.
 
-    The following JS_* constants are defined in the source code of Allegro 5.2.8 at:
+    The following JS_* constants are defined in the source code of MODIFIED Allegro 5.2.9 at:
     android/gradle_project/allegro/src/main/java/org/liballeg/android/AllegroActivity.java
 
+    My joystick-related modifications to Allegro 5.2.9:
+    https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1483.patch
+    https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1507.patch (apply with fuzz=3)
+
     */
-    const int JS_A = 0;
-    const int JS_B = 1;
-    const int JS_X = 2;
-    const int JS_Y = 3;
-    const int JS_L1 = 4;
-    const int JS_R1 = 5;
-    const int JS_DPAD_L = 6;
-    const int JS_DPAD_R = 7;
-    const int JS_DPAD_U = 8;
-    const int JS_DPAD_D = 9;
-    const int JS_MENU = 10;
+    enum {
+        JS_A = 0,
+        JS_B = 1,
+        JS_X = 2,
+        JS_Y = 3,
+        JS_L1 = 4,
+        JS_R1 = 5,
+        JS_DPAD_L = 6,
+        JS_DPAD_R = 7,
+        JS_DPAD_U = 8,
+        JS_DPAD_D = 9,
+        JS_START = 10,
+        JS_SELECT = 11,
+        JS_MODE = 12,
+        JS_THUMBL = 13,
+        JS_THUMBR = 14,
+        JS_L2 = 15,
+        JS_R2 = 16,
+        JS_C = 17,
+        JS_Z = 18,
+        JS_DPAD_CENTER = 19
+    };
 
     const int remap[] = {
         [JS_A] = XINPUT_A, /* BUTTON_A := primary action button */
@@ -908,55 +925,33 @@ void remap_joystick_buttons(int joy_id)
         [JS_DPAD_R] = XINPUT_DPAD_R,
         [JS_DPAD_U] = XINPUT_DPAD_U,
         [JS_DPAD_D] = XINPUT_DPAD_D,
-        [JS_MENU] = -1 /* unused */
+        [JS_START] = XINPUT_START,
+        [JS_SELECT] = XINPUT_BACK,
+        [JS_MODE] = -1, /* unused */
+        [JS_THUMBL] = XINPUT_RT,
+        [JS_THUMBR] = XINPUT_LT,
+        [JS_L2] = -1, /* unused */
+        [JS_R2] = -1, /* unused */
+        [JS_C] = -1, /* unused */
+        [JS_Z] = -1, /* unused */
+        [JS_DPAD_CENTER] = XINPUT_A
     };
 
     const int n = sizeof(remap) / sizeof(int);
 
-    /* clear any unknown buttons just to be sure */
-    const uint32_t mask = (1u << n) - 1u;
-    joy[joy_id].button &= mask;
-
     /* store the state of the buttons */
     uint32_t buttons = joy[joy_id].button;
+
+    /* clear the state of the buttons */
+    joy[joy_id].button = 0;
 
     /* remap buttons */
     for(int js = 0; js < n; js++) {
         if((buttons & (1 << js)) != 0) {
-            joy[joy_id].button &= ~(1 << js);
-            joy[joy_id].button |= (remap[js] >= 0) ? (1 << remap[js]) : 0;
+            if(remap[js] >= 0)
+                joy[joy_id].button |= (1 << remap[js]);
         }
     }
-
-    /* Allegro 5.2.8 will not remap the following keys to joystick input.
-       We'll do it here. */
-    if(a5_key[ALLEGRO_KEY_START])
-        joy[joy_id].button |= 1 << XINPUT_START;
-    if(a5_key[ALLEGRO_KEY_SELECT])
-        joy[joy_id].button |= 1 << XINPUT_BACK;
-#if 1
-    if(a5_key[ALLEGRO_KEY_THUMBL]) /* which joy_id generated this? */
-        joy[joy_id].button |= 1 << XINPUT_LT;
-    if(a5_key[ALLEGRO_KEY_THUMBR])
-        joy[joy_id].button |= 1 << XINPUT_RT;
-#endif
-
-    /* back button */
-    if(a5_key[ALLEGRO_KEY_BACK])
-        joy[joy_id].button |= 1 << XINPUT_BACK;
-
-    /* D-Pad Center (Android TV) */
-    static float dwell_time = 0.0f;
-    if(a5_key[ALLEGRO_KEY_DPAD_CENTER] || a5_key[ALLEGRO_KEY_PAD_ENTER]) {
-        joy[joy_id].button |= 1 << XINPUT_A; /* primary action button */
-
-        /* check if holding the button */
-        dwell_time += timer_get_delta();
-        if(dwell_time >= 3.0f)
-            joy[joy_id].button |= 1 << XINPUT_START;
-    }
-    else
-        dwell_time = 0.0f;
 
     /*
 
