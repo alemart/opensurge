@@ -1699,8 +1699,13 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /* we generally test for wall collisions first. However, this may not be
        appropriate when |ysp| is too large because the player may be spuriously
-       repositioned when hitting the ground or the ceiling */
-    bool delayed_wall_collisions = (fabs(pa->ysp) >= 900.0 && fabs(pa->ysp) > fabs(pa->xsp));
+       repositioned when hitting the ground or the ceiling.
+
+       delaying wall collision may cause wall bugs. Restrict this a lot. */
+    bool delayed_wall_collisions = (
+        fabs(pa->ysp) >= 900.0 && /* note: default topyspeed is 960 px/s */
+        fabs(pa->xsp) <= 30.0 /* almost a vertical movement */
+    );
 
     /* splitting these into function calls would be much nicer... :\
        TODO reformulate macros UPDATE_SENSORS(), FORCE_ANGLE(), etc. */
