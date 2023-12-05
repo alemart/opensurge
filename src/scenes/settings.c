@@ -119,6 +119,21 @@ static const char* FONT_COLOR_DEFAULT = "ffffff";
 static const float FADE_TIME = 0.5f;
 static const char* FADE_COLOR = "000000";
 
+/* file chooser */
+#define EVENT_FILECHOOSER_ASYNC ALLEGRO_GET_EVENT_TYPE('F', 'I', 'L', 'E')
+
+typedef struct {
+    ALLEGRO_EVENT_SOURCE event_source;
+#if !defined(__ANDROID__)
+    ALLEGRO_FILECHOOSER* file_chooser[2];
+#endif
+    ALLEGRO_THREAD* thread;
+    bool want_chooser_of_folders;
+} filechooser_data_t;
+
+static void* filechooser_run(ALLEGRO_THREAD* thread, void* arg);
+static void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg);
+
 /* helpers */
 #if defined(__ANDROID__)
 #define IS_MOBILE_PLATFORM 1
@@ -236,8 +251,10 @@ static bool want_zipped_mods = false;
 static bool is_valid_gamedir(const char* gamedir);
 static bool display_mods(settings_entry_t* e);
 
-#define vt_playgame (settings_entryvt_t){ nop, enter_playgame, nop, nop, nop, nop, display_mods }
+#define vt_playgame (settings_entryvt_t){ nop, enter_playgame, nop, init_playgame, release_playgame, nop, display_mods }
 static void enter_playgame(settings_entry_t* e);
+static void init_playgame(settings_entry_t* e);
+static void release_playgame(settings_entry_t* e);
 
 #define vt_modstorage (settings_entryvt_t){ change_modstorage, nop, nop, nop, nop, nop, display_mods }
 static void change_modstorage(settings_entry_t* e);
@@ -1265,71 +1282,71 @@ bool display_mods(settings_entry_t* e)
 
 void enter_playgame(settings_entry_t* e)
 {
-    enum { PATH_MAXSIZE = sizeof(((commandline_t*)0)->gamedir) };
-    char path_to_game[PATH_MAXSIZE] = "";
+    filechooser_data_t* f = (filechooser_data_t*)e->data;
+    f->want_chooser_of_folders = !want_zipped_mods;
 
-    /* show a file chooser */
+    /* create and start a new thread
+       only one file chooser must be active at any given time */
+    if(f->thread != NULL)
+        al_destroy_thread(f->thread); /* blocking */
+    f->thread = al_create_thread(filechooser_run, f);
+    al_start_thread(f->thread);
+
 #if !defined(__ANDROID__)
-    int mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST;
+    /* wait for the file chooser */
+    al_join_thread(f->thread, NULL);
+#else
+    /* Android: need to handle ALLEGRO_EVENT_DISPLAY_HALT_DRAWING
+       before the blocking call to the file chooser returns */
 
-    if(!want_zipped_mods)
-        mode |= ALLEGRO_FILECHOOSER_FOLDER;
+    /* no need to wait for the file chooser with al_join_thread()
+       because the Activity will be paused */
+#endif
+}
 
-    ALLEGRO_FILECHOOSER* chooser = al_create_native_file_dialog(
-        NULL,
-        "Select a game",
-        want_zipped_mods ? "*.zip;*.7z" : "",
-        mode
+void init_playgame(settings_entry_t* e)
+{
+    filechooser_data_t* f = mallocx(sizeof *f);
+
+    al_init_user_event_source(&f->event_source);
+    engine_add_event_source(&f->event_source);
+    engine_add_event_listener(EVENT_FILECHOOSER_ASYNC, f, filechooser_handle_event);
+
+#if !defined(__ANDROID__)
+    f->file_chooser[0] = al_create_native_file_dialog(
+        NULL, "Select a game", "*.zip;*.7z",
+        ALLEGRO_FILECHOOSER_FILE_MUST_EXIST
     );
 
-    if(chooser == NULL) {
-        /* error */
-        video_showmessage("Can't create native dialog");
-        return;
-    }
-    else if(!al_show_native_file_dialog(NULL, chooser)) {
-        /* error */
-        video_showmessage("Can't show native dialog");
-    }
-    else if(0 == al_get_native_file_dialog_count(chooser)) {
-        /* cancelled */
-        ;
-    }
-    else {
-        /* success */
-        const char* dialog_path = al_get_native_file_dialog_path(chooser, 0);
-        str_cpy(path_to_game, dialog_path, sizeof(path_to_game));
-    }
-
-    /* done */
-    al_destroy_native_file_dialog(chooser);
-#else
-    /* TODO */
+    f->file_chooser[1] = al_create_native_file_dialog(
+        NULL, "Select a game", "",
+        ALLEGRO_FILECHOOSER_FILE_MUST_EXIST | ALLEGRO_FILECHOOSER_FOLDER
+    );
 #endif
 
-    /* load the game */
-    if(path_to_game[0] != '\0') {
+    f->thread = NULL;
+    f->want_chooser_of_folders = false;
 
-        /* pre-validate: is the selected item a valid Open Surge game? */
-        if(want_zipped_mods /* .zip/.7z pre-validation: not implemented */ || is_valid_gamedir(path_to_game)) {
+    e->data = f;
+}
 
-            /* warn the user if the compatibility mode is disabled */
-            if(want_compatibility_mode || confirm("%s", lang_get("OPTIONS_PLAYMOD_WARNING"))) {
-                commandline_t cmd = commandline_parse(0, NULL);
-                str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
-                cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
-                cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
+void release_playgame(settings_entry_t* e)
+{
+    filechooser_data_t* f = (filechooser_data_t*)e->data;
 
-                engine_restart(&cmd);
-            }
+    if(f->thread != NULL)
+        al_destroy_thread(f->thread); /* blocking */
 
-        }
-        else {
-            sound_play(SFX_DENY);
-            alert("%s", lang_get("OPTIONS_PLAYMOD_ERROR"));
-        }
+#if !defined(__ANDROID__)
+    al_destroy_native_file_dialog(f->file_chooser[1]);
+    al_destroy_native_file_dialog(f->file_chooser[0]);
+#endif
 
-    }
+    engine_remove_event_listener(EVENT_FILECHOOSER_ASYNC, f, filechooser_handle_event);
+    engine_remove_event_source(&f->event_source);
+    al_destroy_user_event_source(&f->event_source);
+
+    free(f);
 }
 
 void change_modstorage(settings_entry_t* e)
@@ -1372,4 +1389,92 @@ bool is_valid_gamedir(const char* gamedir)
 
     al_destroy_path(base_path);
     return valid_gamedir;
+}
+
+/*
+ * File Chooser
+ */
+
+void* filechooser_run(ALLEGRO_THREAD* thread, void* arg)
+{
+    filechooser_data_t* f = (filechooser_data_t*)arg;
+
+#if !defined(__ANDROID__)
+    /* select the file chooser */
+    ALLEGRO_FILECHOOSER* file_chooser = f->file_chooser[f->want_chooser_of_folders ? 1 : 0];
+
+    if(file_chooser == NULL) {
+        /* error */
+        video_showmessage("Can't create native dialog");
+        return NULL;
+    }
+
+    /* show the file chooser (this call is blocking) */
+    if(!al_show_native_file_dialog(NULL, file_chooser)) {
+        /* error */
+        video_showmessage("Can't show native dialog");
+        return NULL;
+    }
+#endif
+
+    /* emit an event */
+    ALLEGRO_EVENT event;
+    event.type = EVENT_FILECHOOSER_ASYNC;
+
+    if(!al_emit_user_event(&f->event_source, &event, NULL))
+        video_showmessage("Can't emit event");
+
+    /* done! */
+    return NULL;
+}
+
+void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
+{
+    const filechooser_data_t* f = (const filechooser_data_t*)arg;
+    const char* path_to_game = NULL;
+
+    if(event->type != EVENT_FILECHOOSER_ASYNC)
+        return;
+
+#if !defined(__ANDROID__)
+    /* get the result of the file chooser */
+    ALLEGRO_FILECHOOSER* file_chooser = f->file_chooser[f->want_chooser_of_folders ? 1 : 0];
+
+    if(file_chooser == NULL) {
+        /* error */
+        return;
+    }
+    else if(0 == al_get_native_file_dialog_count(file_chooser)) {
+        /* cancelled */
+        return;
+    }
+    else {
+        /* success */
+        path_to_game = al_get_native_file_dialog_path(file_chooser, 0);
+    }
+#endif
+
+    /* load the game */
+    if(path_to_game != NULL && path_to_game[0] != '\0') {
+
+        /* pre-validate: is the selected item a valid Open Surge game? */
+        if(want_zipped_mods /* .zip/.7z pre-validation: not implemented */ || is_valid_gamedir(path_to_game)) {
+
+            /* warn the user if the compatibility mode is disabled */
+            if(want_compatibility_mode || confirm("%s", lang_get("OPTIONS_PLAYMOD_WARNING"))) {
+                commandline_t cmd = commandline_parse(0, NULL);
+                str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
+                cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
+                cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
+
+                engine_restart(&cmd);
+            }
+
+        }
+        else {
+            sound_play(SFX_DENY);
+            alert("%s", lang_get("OPTIONS_PLAYMOD_ERROR"));
+        }
+
+    }
 }
