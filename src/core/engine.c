@@ -184,6 +184,7 @@ void engine_release()
  */
 void engine_mainloop()
 {
+    ALLEGRO_EVENT event;
     bool is_active = true;
     bool should_redraw = false;
 
@@ -204,7 +205,6 @@ void engine_mainloop()
     while(!force_quit && !scenestack_empty()) {
 
         /* handle events & update game logic */
-        ALLEGRO_EVENT event;
         al_wait_for_event(a5_event_queue, &event);
         call_event_listeners(&event);
 

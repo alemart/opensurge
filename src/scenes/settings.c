@@ -132,7 +132,7 @@ static const char* FADE_COLOR = "000000";
 #endif
 
 #define MULTIPLICATION_SIGN     "\xc3\x97" /* utf-8 encoding for code point 0xD7 */
-#define _X(k)                   #k MULTIPLICATION_SIGN
+#define TIMES(k)                #k MULTIPLICATION_SIGN
 
 /* languages */
 #define MAX_LANGUAGES 63
@@ -277,7 +277,7 @@ static const struct
     /* Graphics */
     { TYPE_SUBTITLE, "$OPTIONS_GRAPHICS", (const char*[]){ NULL }, 0, vt_graphics, 8 },
     { TYPE_SETTING, "$OPTIONS_QUALITY", (const char*[]){ "$OPTIONS_QUALITY_LOW", "$OPTIONS_QUALITY_MEDIUM", "$OPTIONS_QUALITY_HIGH", NULL }, 1, vt_quality, 8 },
-    { TYPE_SETTING, "$OPTIONS_RESOLUTION", (const char*[]){ _X(1), _X(2), _X(3), _X(4), NULL }, 1, vt_resolution, 0 },
+    { TYPE_SETTING, "$OPTIONS_RESOLUTION", (const char*[]){ TIMES(1), TIMES(2), TIMES(3), TIMES(4), NULL }, 1, vt_resolution, 0 },
     { TYPE_SETTING, "$OPTIONS_FULLSCREEN", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_fullscreen, 0 },
     { TYPE_SETTING, "$OPTIONS_FPS", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_showfps, 0 },
 
