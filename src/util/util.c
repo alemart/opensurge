@@ -36,6 +36,7 @@
 #define ALLEGRO_UNSTABLE /* required for al_android_get_jni_env(), al_android_get_activity() */
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_android.h>
+#include <allegro5/allegro_native_dialog.h>
 #include <android/log.h>
 #else
 #include <allegro5/allegro.h>
@@ -53,9 +54,6 @@
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
 static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
 
-#if defined(__ANDROID__)
-static void android_show_alert_dialog(const char* title, const char* message);
-#endif
 
 
 
@@ -135,8 +133,8 @@ void fatal_error(const char *fmt, ...)
 
 #if defined(__ANDROID__)
     __android_log_print(ANDROID_LOG_FATAL, GAME_UNIXNAME, "Surgexception Error: %s", buf);
-    android_show_alert_dialog("Ooops... Surgexception!", buf);
-#else
+#endif
+
     /* al_show_native_message_box may be called without Allegro being initialized.
        https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
     al_show_native_message_box(al_get_current_display(),
@@ -144,7 +142,6 @@ void fatal_error(const char *fmt, ...)
         "Ooops... Surgexception!",
         buf,
     NULL, ALLEGRO_MESSAGEBOX_ERROR);
-#endif
 
     /* clear up resources */
     if(resourcemanager_is_initialized()) {
@@ -182,14 +179,10 @@ void alert(const char* fmt, ...)
     logfile_message("<< %s >> %s", __func__, buf);
 
     /* show message box */
-#if defined(__ANDROID__)
-    android_show_alert_dialog(GAME_TITLE, buf);
-#else
     /* al_show_native_message_box may be called without Allegro being initialized.
        https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
     al_show_native_message_box(al_get_current_display(),
         GAME_TITLE, GAME_TITLE, buf, NULL, ALLEGRO_MESSAGEBOX_WARN);
-#endif
 }
 
 /*
@@ -211,14 +204,10 @@ bool confirm(const char* fmt, ...)
     logfile_message("<< %s >> %s", __func__, buf);
 
     /* show message box */
-#if defined(__ANDROID__)
-    result = android_show_confirm_dialog(GAME_TITLE, buf);
-#else
     /* al_show_native_message_box may be called without Allegro being initialized.
        https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
     result = al_show_native_message_box(al_get_current_display(),
-        GAME_TITLE, GAME_TITLE, buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO | ALLEGRO_MESSAGEBOX_QUESTION);
-#endif
+        GAME_TITLE, GAME_TITLE, buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO | ALLEGRO_MESSAGEBOX_WARN);
 
     /* log result */
     logfile_message("<< %s >> result: %d", __func__, result);
@@ -529,54 +518,3 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
     if(arr != tmp)
         free(arr);
 }
-
-
-
-#if defined(__ANDROID__)
-
-/* Show a native alert dialog on Android */
-void android_show_alert_dialog(const char* title, const char* message)
-{
-    /* See https://liballeg.org/a5docs/trunk/platform.html#al_android_get_jni_env */
-    JNIEnv* env = al_android_get_jni_env();
-    jobject activity = al_android_get_activity();
-
-    jclass class_id = (*env)->GetObjectClass(env, activity);
-    jmethodID method_id = (*env)->GetMethodID(env, class_id, "showAlertDialog", "(Ljava/lang/String;Ljava/lang/String;)V");
-
-    jstring jtitle = (*env)->NewStringUTF(env, title);
-    jstring jmessage = (*env)->NewStringUTF(env, message);
-    (*env)->CallVoidMethod(env, activity, method_id, jtitle, jmessage);
-    (*env)->DeleteLocalRef(env, jmessage);
-    (*env)->DeleteLocalRef(env, jtitle);
-
-    (*env)->DeleteLocalRef(env, class_id);
-}
-
-/* Show a native confirm dialog on Android
-
-   Possible return values:
-   0 if the dialog box was closed without picking a button
-   1 if Yes was pressed
-   2 if No was pressed */
-int android_show_confirm_dialog(const char* title, const char* message)
-{
-    JNIEnv* env = al_android_get_jni_env();
-    jobject activity = al_android_get_activity();
-
-    jclass class_id = (*env)->GetObjectClass(env, activity);
-    jmethodID method_id = (*env)->GetMethodID(env, class_id, "showConfirmDialog", "(Ljava/lang/String;Ljava/lang/String;)I");
-
-    jstring jtitle = (*env)->NewStringUTF(env, title);
-    jstring jmessage = (*env)->NewStringUTF(env, message);
-    jint jresult = (*env)->CallIntMethod(env, activity, method_id, jtitle, jmessage);
-    (*env)->DeleteLocalRef(env, jmessage);
-    (*env)->DeleteLocalRef(env, jtitle);
-
-    (*env)->DeleteLocalRef(env, class_id);
-
-    return (int)jresult;
-}
-
-
-#endif

@@ -19,6 +19,7 @@
  */
 
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_native_dialog.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -28,22 +29,6 @@
 #include "global.h"
 #include "asset.h"
 #include "../util/stringutil.h"
-
-#if defined(__ANDROID__)
-#define WANT_IMPORT_WIZARD 0
-#else
-#define WANT_IMPORT_WIZARD 1
-#endif
-
-#if WANT_IMPORT_WIZARD
-#include <allegro5/allegro_native_dialog.h>
-#else
-#define ALLEGRO_MESSAGEBOX_WARN 0
-#define ALLEGRO_MESSAGEBOX_ERROR 0
-#define ALLEGRO_MESSAGEBOX_QUESTION 0
-#define ALLEGRO_MESSAGEBOX_YES_NO 0
-#define ALLEGRO_TEXTLOG void
-#endif
 
 /*
 
@@ -99,16 +84,12 @@ the directory of the executable (which is the default behavior). Simply put,
     } \
 } while(0)
 
-#if WANT_IMPORT_WIZARD
 #define PRINT_TO_TEXTLOG(...)       do { \
     if(textlog != NULL) { \
         al_append_native_text_log(textlog, __VA_ARGS__); \
         al_append_native_text_log(textlog, "\n"); \
     } \
 } while(0)
-#else
-#define PRINT_TO_TEXTLOG(...)
-#endif
 
 #define PRINT(...)      do { \
     PRINT_TO_CONSOLE(__VA_ARGS__); \
@@ -325,8 +306,6 @@ void import_game(const char* gamedir)
  */
 void import_wizard()
 {
-#if WANT_IMPORT_WIZARD
-
     ALLEGRO_FILECHOOSER* dialog = NULL;
     const char* gamedir = NULL;
 
@@ -483,12 +462,6 @@ done:
     /* clean up */
     if(dialog != NULL)
         al_destroy_native_file_dialog(dialog);
-
-#else /* WANT_IMPORT_WIZARD */
-
-    ERROR("The Import Wizard isn't available in this platform.");
-
-#endif /* WANT_IMPORT_WIZARD */
 }
 
 
@@ -509,20 +482,12 @@ bool init_allegro()
 /* initialize Allegro's native dialog addon */
 bool init_dialog()
 {
-#if WANT_IMPORT_WIZARD
-
     if(!al_is_native_dialog_addon_initialized()) {
         if(!al_init_native_dialog_addon())
             return false;
     }
 
     return true;
-
-#else
-
-    return false;
-
-#endif
 }
 
 /* is the import utility is available? */
@@ -538,8 +503,6 @@ bool is_import_utility_available()
 /* display a message box */
 int message_box(int flags, const char* format, ...)
 {
-#if WANT_IMPORT_WIZARD
-
     char buffer[4096];
     va_list args;
 
@@ -550,20 +513,6 @@ int message_box(int flags, const char* format, ...)
     /* According to the Allegro manual, al_show_native_message_box() may be called
        without Allegro being initialized. */
     return al_show_native_message_box(NULL, TITLE_WIZARD, TITLE_WIZARD, buffer, NULL, flags);
-
-#else
-
-    va_list args;
-
-    va_start(args, format);
-    vfprintf(stdout, format, args);
-    va_end(args);
-
-    /* According to the Allegro manual, al_show_native_message_box() [unavailable]
-       returns "0 if the dialog window was closed without activating a button." */
-    return 0;
-
-#endif
 }
 
 /* is gamedir a valid opensurge game directory? */
