@@ -50,9 +50,14 @@
 #define GAME_USERDIRNAME                GAME_UNIXNAME
 #endif
 
-/* If RUNINPLACE is non-zero, then the assets will be read only from the directory of the executable */
+/* If GAME_RUNINPLACE is non-zero, then the assets will be read from the directory of the executable */
 #ifndef GAME_RUNINPLACE
 #define GAME_RUNINPLACE                 0
+#endif
+
+/* GAME_RUNINPLACE is not supported on Android */
+#if (GAME_RUNINPLACE) && defined(__ANDROID__)
+#error GAME_RUNINPLACE is not supported on this platform
 #endif
 
 /* Utility macros */
@@ -88,6 +93,12 @@ static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
 static char* generate_user_datadirname(const char* game_name, uint32_t game_id, char* buffer, size_t buffer_size);
 static bool is_valid_root_folder();
 static char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size);
+
+static bool is_uncompressed_gamedir(const char* fullpath);
+static bool is_compressed_gamedir(const char* fullpath);
+static bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context);
+static bool actual_file_exists(const char* filepath, void* context);
+static bool virtual_file_exists(const char* filepath, void* context);
 
 static void setup_compatibility_pack(const char* shared_dirpath, const char* engine_version, uint32_t game_id, const char* guessed_game_title);
 static int scan_translations(const char* vpath, void* context);
@@ -149,7 +160,12 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         char game_dirname[256] = "";
         char required_engine_version[16] = "0.5.0";
         char* generated_user_datadir = NULL;
+#if !defined(__ANDROID__)
         uint32_t mode = get_fs_mode(gamedir);
+#else
+        uint32_t mode = ALLEGRO_FILEMODE_READ | ALLEGRO_FILEMODE_ISFILE;
+        (void)get_fs_mode;
+#endif
 
         /* log */
         LOG("Using a custom game directory: %s", gamedir);
@@ -588,6 +604,39 @@ const char* asset_gamedir()
     return gamedir;
 }
 
+/*
+ * asset_is_gamedir()
+ * Checks if a folder or compressed archive stores an opensurge game
+ * Both allegro and physfs must be initialized before calling this
+ */
+bool asset_is_gamedir(const char* fullpath)
+{
+    bool ret = false;
+
+    assertx(al_is_system_installed());
+    assertx(PHYSFS_isInit());
+    assertx(fullpath);
+
+    ALLEGRO_FS_ENTRY* e = al_create_fs_entry(fullpath);
+    uint32_t mode = al_get_fs_entry_mode(e);
+
+    if(mode & ALLEGRO_FILEMODE_READ) {
+        if(mode & ALLEGRO_FILEMODE_ISDIR)
+            ret = is_uncompressed_gamedir(fullpath);
+#if !defined(__ANDROID__)
+        else if(mode & ALLEGRO_FILEMODE_ISFILE)
+#else
+        /* the ISFILE flag doesn't work on Android, why? */
+        else
+#endif
+            ret = is_compressed_gamedir(fullpath);
+    }
+
+    al_destroy_fs_entry(e);
+    return ret;
+}
+
+
 
 
 /*
@@ -639,6 +688,8 @@ ALLEGRO_PATH* find_shared_datadir()
 
     /* on Android, treat the .apk itself as the shared datadir (it's a .zip file) */
     /* note: the assets/ subfolder will be defined as the root on physfs */
+
+    (void)find_exedir;
     return al_get_standard_path(ALLEGRO_EXENAME_PATH);
 
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -936,7 +987,7 @@ char* find_gamedirname(const char* gamedir, char* buffer, size_t buffer_size)
  */
 bool is_valid_root_folder()
 {
-    return PHYSFS_exists("surge.rocks") || PHYSFS_exists("surge.prefs") || PHYSFS_exists("surge.cfg") || PHYSFS_exists("languages/english.lng");
+    return is_gamedir("/", virtual_file_exists, NULL);
 }
 
 /*
@@ -975,10 +1026,16 @@ char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_s
     int dircount = 0;
     const char* dirname = NULL;
     char** list = PHYSFS_enumerateFiles(mount_point);
+    char path[256];
     assertx(list != NULL);
 
+    if(mount_point == NULL || *mount_point == '\0')
+        mount_point = "/";
+    bool has_trailing_slash = (mount_point[strlen(mount_point)-1] == '/');
+
     for(char* const* it = list; *it != NULL; it++) {
-        if(PHYSFS_stat(*it, &stat) && stat.filetype == PHYSFS_FILETYPE_DIRECTORY) {
+        snprintf(path, sizeof(path), (!has_trailing_slash ? "%s/%s" : "%s%s"), mount_point, *it);
+        if(PHYSFS_stat(path, &stat) && stat.filetype == PHYSFS_FILETYPE_DIRECTORY) {
             dirname = *it;
             dircount++;
         }
@@ -993,6 +1050,117 @@ char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_s
 }
 
 
+
+
+
+
+/*
+ *
+ * validate gamedir
+ *
+ */
+
+/*
+ * is_uncompressed_gamedir()
+ * Checks if a folder is a valid opensurge game
+ */
+bool is_uncompressed_gamedir(const char* fullpath)
+{
+    return is_gamedir(fullpath, actual_file_exists, NULL);
+}
+
+/*
+ * is_compressed_gamedir()
+ * Checks if a compressed archive stores a valid opensurge game
+ * The compressed archive must be of a type supported by physfs
+ */
+bool is_compressed_gamedir(const char* fullpath)
+{
+    const char PREFIX[] = "/__validate__";
+    const size_t PREFIX_SIZE = sizeof(PREFIX) - 1;
+    char root[256] = "";
+    bool ret = false;
+
+    assertx(PHYSFS_isInit());
+
+    if(!PHYSFS_mount(fullpath, PREFIX, 0)) {
+        const char* err = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        logfile_message("%s: can't mount %s. %s", __func__, fullpath, err);
+        return ret;
+    }
+
+    strcpy(root, PREFIX);
+    find_root_directory(PREFIX, root + PREFIX_SIZE, sizeof(root) - PREFIX_SIZE);
+    LOG("%s: testing %s", __func__, root + PREFIX_SIZE);
+
+    ret = is_gamedir(root, virtual_file_exists, NULL);
+
+    if(!PHYSFS_unmount(fullpath)) {
+        const char* err = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        logfile_message("%s: can't unmount %s. %s", __func__, fullpath, err);
+    }
+
+    return ret;
+}
+
+/*
+ * is_gamedir()
+ * A helper to check if a generic root folder stores an opensurge game
+ */
+bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context)
+{
+    const char* file_list[] = {
+        "surge.rocks",
+        "surge.prefs",
+        "surge.cfg",
+        "languages/english.lng",
+        NULL
+    };
+
+    ALLEGRO_PATH* base_path = al_create_path_for_directory(root);
+    bool valid_gamedir = false;
+
+    /* for each file in file_list, check if it exists relative to the root (absolute path) */
+    for(const char** vpath = file_list; *vpath != NULL && !valid_gamedir; vpath++) {
+        ALLEGRO_PATH* path = al_clone_path(base_path);
+        ALLEGRO_PATH* tail = al_create_path(*vpath);
+
+        if(al_join_paths(path, tail)) {
+            const char* fullpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+            if(file_exists(fullpath, context))
+                valid_gamedir = true;
+        }
+
+        al_destroy_path(tail);
+        al_destroy_path(path);
+    }
+
+    al_destroy_path(base_path);
+    return valid_gamedir;
+}
+
+/*
+ * actual_file_exists()
+ * A helper to is_gamedir() that checks if a file path exists in the filesystem
+ */
+bool actual_file_exists(const char* filepath, void* context)
+{
+    (void)context;
+
+    return file_exists(filepath);
+}
+
+/*
+ * virtual_file_exists()
+ * A helper to is_gamedir() that checks if a file path exists in the
+ * mounted filesystem of physfs
+ */
+bool virtual_file_exists(const char* filepath, void* context)
+{
+    (void)context;
+
+    return PHYSFS_exists(filepath);
+}
 
 
 

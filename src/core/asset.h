@@ -38,5 +38,6 @@ char* asset_shared_datadir(char* dest, size_t dest_size);
 bool asset_purge_user_data();
 
 const char* asset_gamedir();
+bool asset_is_gamedir(const char* fullpath);
 
 #endif
