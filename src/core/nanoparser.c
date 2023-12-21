@@ -27,6 +27,8 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "nanoparser.h"
+#include "engine.h"
+#include "global.h"
 #include "../util/darray.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
@@ -682,6 +684,9 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
     size_t read_bytes = al_fread(fp, state.buffer, LEXER_BUFFER_SIZE - 1);
     state.buffer[read_bytes] = state.buffer[LEXER_BUFFER_SIZE - 1] = state.buffer[2 * LEXER_BUFFER_SIZE - 1] = 0;
 
+    /* legacy comments (backwards compatibility with nanoparser v1) */
+    bool accept_legacy_comments = (engine_compatibility_version_code() < VERSION_CODE(0,6,1));
+
     #if 0
     /* debug */
     while(EOF != (peek = lexer_getc(&state)))
@@ -751,14 +756,15 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
             }
         }
 
-        /* preprocessor (backwards compatibility) */
-        else if(peek == '#') {
+        /* legacy comments (backwards compatibility) */
+        else if(accept_legacy_comments && (peek == '#' || peek == ';')) {
 
             /* line start? */
             if(darray_length(lexer->token) <= 0 || lexer->token[darray_length(lexer->token)-1].type == TOKEN_LINEBREAK) {
 
                 /* warning */
-                warning("Obsolete: ignored preprocessor directive at %s:%d", lexer->filepath, state.line);
+                if(peek == '#')
+                    warning("Obsolete: ignored preprocessor directive at %s:%d", lexer->filepath, state.line);
 
                 /* treat it as a single-line comment */
                 while(EOF != (peek = lexer_getc(&state))) {
