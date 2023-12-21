@@ -277,9 +277,6 @@ void video_init()
 
     /* initialize the console */
     init_console();
-
-    /* initialize in immersive mode */
-    video_set_immersive(true);
 }
 
 /*
@@ -474,14 +471,42 @@ void video_set_immersive(bool immersive)
         LOG("%s immersive mode", immersive ? "Enabling" : "Disabling");
 
 #if defined(__ANDROID__)
-    /* Android-only */
-    al_set_display_flag(display, ALLEGRO_FRAMELESS, immersive);
 
-    /* restore the default shader */
-    if(changed_mode) {
-        if(!use_default_shader())
-            LOG("Can't set the default shader");
+    /* Android-only */
+
+    /* If the engine is being restarted, changing the display flag below causes
+       an AllegroActivity.nativeOnChange() call, which in turn triggers an
+       ALLEGRO_EVENT_DISPLAY_RESIZE event. Allegro will wait on the main thread
+       until the game calls al_acknowledge_resize(), but by that time we'll be
+       trying to destroy the display. Allegro will call postDestroySurface(),
+       which intends to make the main thread call destroySurface(). The latter
+       will never be called, because Allegro is waiting on the main thread.
+       Since destroySurface() is not called, AllegroSurface.surfaceDestroyed()
+       isn't called either. Therefore, AllegroSurface.nativeOnDestroy() won't
+       ever be called and Allegro will freeze on android_destroy_display().
+       It will be waiting both on the main thread and in the game thread.
+       This causes the game to freeze. Tested with Allegro 5.2.9. */
+    if(engine_is_init() && !engine_must_quit() && !engine_must_restart(NULL)) {
+
+        /* change the display flag */
+        al_set_display_flag(display, ALLEGRO_FRAMELESS, immersive);
+
+        /* restore the default shader */
+        if(changed_mode) {
+            if(!use_default_shader())
+                LOG("Can't set the default shader");
+        }
+
     }
+    else {
+        LOG("ERROR: can't change the immersive mode!");
+        return;
+    }
+
+#else
+
+    /* the immersive mode is unavailable in this platform */
+
 #endif
 
     /* update the internal flag */
@@ -737,6 +762,7 @@ bool video_use_default_shader()
 bool create_display(int width, int height)
 {
     ALLEGRO_STATE state;
+    const char* opengl_variant;
 
     LOG("Creating the display...");
 
@@ -790,18 +816,16 @@ bool create_display(int width, int height)
     set_display_icon(NULL);
 #endif
 
-#if defined(__ANDROID__)
-    display = al_create_display(0, 0); /* occupy the entire screen on mobile */
-#else
-    display = al_create_display(width, height);
-#endif
+    al_set_new_window_title(window_title);
 
+    display = al_create_display(width, height);
     al_restore_state(&state);
+
     if(display == NULL)
         return false;
 
     /* the display was created. Log OpenGL version & variant */
-    const char* opengl_variant = (al_get_opengl_variant() == ALLEGRO_OPENGL_ES) ? "OpenGL ES" : "OpenGL";
+    opengl_variant = (al_get_opengl_variant() == ALLEGRO_OPENGL_ES) ? "OpenGL ES" : "OpenGL";
     LOG("We're using %s version 0x%08x", opengl_variant, al_get_opengl_version());
 
     /* configure the display */
@@ -869,6 +893,9 @@ void reconfigure_display()
         else
             LOG("Can't resize the display to %dx%d", new_display_width, new_display_height);
     }
+#else
+    /* On Android, we can't change any display flag while the engine is restarting.
+       The game will freeze if we try. (see an explanation of this at video_set_immersive()) */
 #endif
 }
 
