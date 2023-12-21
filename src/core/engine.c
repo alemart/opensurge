@@ -60,11 +60,7 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
-#if !defined(__ANDROID__)
 #include <allegro5/allegro_native_dialog.h>
-#else
-#include <jni.h>
-#endif
 
 /* minimum Allegro version */
 #if ALLEGRO_VERSION_INT < ALLEGRO_MIN_VERSION_INT
@@ -129,8 +125,9 @@ static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 static const double TARGET_FPS = 60.0; /* frames per second */
 static const double GC_INTERVAL = 10.0; /* in seconds (garbage collector) */
 static ALLEGRO_TIMER* a5_timer = NULL;
-static bool force_quit = false;
+static bool wants_to_quit = false;
 static bool wants_to_restart = false;
+static bool is_initialized = false;
 static commandline_t stored_cmd;
 
 /* Global Prefs */
@@ -157,10 +154,15 @@ void engine_init(const commandline_t* cmd)
     init_managers(cmd);
     init_accessories(cmd);
 
+    is_initialized = true;
+
     /* initialize game data */
     player_set_lives(PLAYER_INITIAL_LIVES);
     player_set_score(0);
     push_initial_scene(cmd);
+
+    /* initialize in immersive mode */
+    video_set_immersive(true);
 }
 
 
@@ -171,6 +173,8 @@ void engine_init(const commandline_t* cmd)
  */
 void engine_release()
 {
+    is_initialized = false;
+
     release_accessories();
     release_managers();
     release_basic_stuff();
@@ -202,7 +206,7 @@ void engine_mainloop()
     al_start_timer(a5_timer);
 
     /* game loop */
-    while(!force_quit && !scenestack_empty()) {
+    while(!wants_to_quit && !wants_to_restart && !scenestack_empty()) {
 
         /* handle events & update game logic */
         al_wait_for_event(a5_event_queue, &event);
@@ -231,7 +235,7 @@ void engine_mainloop()
  */
 void engine_quit()
 {
-    force_quit = true;
+    wants_to_quit = true;
 }
 
 /*
@@ -253,7 +257,6 @@ void engine_restart(const commandline_t* cmd)
     }
 
     wants_to_restart = true;
-    engine_quit();
 }
 
 /*
@@ -268,6 +271,23 @@ bool engine_must_restart(commandline_t* cmd)
     return wants_to_restart;
 }
 
+/*
+ * engine_must_quit()
+ * Checks if there is a scheduled quit
+ */
+bool engine_must_quit()
+{
+    return wants_to_quit;
+}
+
+/*
+ * engine_is_init()
+ * Is the engine initialized?
+ */
+bool engine_is_init()
+{
+    return is_initialized;
+}
 
 
 
@@ -389,7 +409,7 @@ void init_basic_stuff(const commandline_t* cmd)
     const char* compatibility_version = commandline_getstring(cmd->compatibility_version, "");
 
     /* basic initialization */
-    force_quit = false;
+    wants_to_quit = false;
     wants_to_restart = false;
     stored_cmd = *cmd;
 
@@ -406,15 +426,13 @@ void init_basic_stuff(const commandline_t* cmd)
             fatal_error("Can't initialize Allegro");
     }
 
-    if(NULL == (a5_event_queue = al_create_event_queue()))
-        fatal_error("Can't create Allegro's event queue");
-
-#if !defined(__ANDROID__)
     if(!al_is_native_dialog_addon_initialized()) {
         if(!al_init_native_dialog_addon())
             fatal_error("Can't initialize Allegro's native dialog addon");
     }
-#endif
+
+    if(NULL == (a5_event_queue = al_create_event_queue()))
+        fatal_error("Can't create Allegro's event queue");
 
     /* initialize the table of event listeners */
     init_event_listener_table();
@@ -669,6 +687,9 @@ void release_basic_stuff()
     /* Release Allegro */
     al_destroy_event_queue(a5_event_queue);
     a5_event_queue = NULL;
+
+    if(!wants_to_restart)
+        al_uninstall_system();
 }
 
 /*

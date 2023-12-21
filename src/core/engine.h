@@ -27,9 +27,13 @@
 struct commandline_t;
 
 void engine_init(const struct commandline_t* cmd);
+bool engine_is_init();
 void engine_mainloop();
 void engine_release();
+
 void engine_quit();
+bool engine_must_quit();
+
 void engine_restart(const struct commandline_t* cmd);
 bool engine_must_restart(struct commandline_t* cmd);
 
