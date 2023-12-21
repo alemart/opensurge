@@ -43,6 +43,9 @@ struct physicsactor_t
     double xpos; /* x position in world space */
     double ypos; /* y position in world space */
 
+    double dx; /* delta x position */
+    double dy; /* delta y position */
+
     double xsp; /* x speed */
     double ysp; /* y speed */
     double gsp; /* ground speed */
@@ -146,6 +149,7 @@ static char pick_the_best_floor(const physicsactor_t *pa, const obstacle_t *a, c
 static char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
 static const obstacle_t* find_ground_with_extended_sensor(const physicsactor_t* pa, const obstaclemap_t* obstaclemap, const sensor_t* sensor, int extended_sensor_length, int* out_ground_position);
 static bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap);
+static bool got_moving_obstacle_at_sensor(const physicsactor_t* pa, const obstaclemap_t* obstaclemap, const sensor_t* s);
 static inline int distance_between_angle_sensors(const physicsactor_t* pa);
 static inline int delta_angle(int alpha, int beta);
 static int interpolate_angle(int alpha, int beta, float t);
@@ -318,6 +322,9 @@ physicsactor_t* physicsactor_create(v2d_t position)
     /* initializing... */
     pa->xpos = position.x;
     pa->ypos = position.y;
+
+    pa->dx = 0.0;
+    pa->dy = 0.0;
 
     pa->xsp = 0.0;
     pa->ysp = 0.0;
@@ -1157,6 +1164,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
 void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt)
 {
     const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M, *at_N;
+    double prev_xpos, prev_ypos;
 
     /*
      *
@@ -1166,6 +1174,8 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /* save previous state */
     UPDATE_SENSORS();
+    prev_xpos = pa->xpos;
+    prev_ypos = pa->ypos;
     pa->prev_angle = pa->angle;
     pa->was_midair = pa->midair; /* set after UPDATE_SENSORS() */
 
@@ -2195,6 +2205,10 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
             pa->state = PAS_WINNING;
     }
 
+    /* save the delta position */
+    pa->dx = pa->xpos - prev_xpos;
+    pa->dy = pa->ypos - prev_ypos;
+
     /* update the midair_timer */
     if(pa->midair)
         pa->midair_timer += dt;
@@ -2221,8 +2235,9 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         sensor_set_enabled(b, true);
         sensor_set_enabled(c, wanna_jump);
         sensor_set_enabled(d, wanna_jump);
-        sensor_set_enabled(m, wanna_middle && (pa->gsp <= pa->movethreshold));  /* gsp <= 0.0 */ /* regular movement & moving platforms */
-        sensor_set_enabled(n, wanna_middle && (pa->gsp >= -pa->movethreshold)); /* gsp >= 0.0 */
+        sensor_set_enabled(m, wanna_middle && (pa->gsp <=  pa->movethreshold || (pa->angle == 0x0 && pa->dx <= -1.0) /*|| got_moving_obstacle_at_sensor(pa, obstaclemap, a)*/)); /* gsp <= 0.0 */ /* regular movement & moving platforms */
+        sensor_set_enabled(n, wanna_middle && (pa->gsp >= -pa->movethreshold || (pa->angle == 0x0 && pa->dx >=  1.0) /*|| got_moving_obstacle_at_sensor(pa, obstaclemap, b)*/)); /* gsp >= 0.0 */
+        (void)got_moving_obstacle_at_sensor;
     }
     else {
 #if 0
@@ -2327,7 +2342,7 @@ void update_movmode(physicsactor_t* pa)
     /* angles 0x20, 0x60, 0xA0, 0xE0
        do not change the movmode */
     if(pa->angle < 0x20 || pa->angle > 0xE0) {
-#if 0
+#if 1
         if(pa->movmode == MM_CEILING)
             pa->gsp = -pa->gsp;
 #endif
@@ -2434,6 +2449,18 @@ const obstacle_t* find_ground_with_extended_sensor(const physicsactor_t* pa, con
     y2 = max(head.y, tail.y);
 
     return obstaclemap_find_ground(obstaclemap, x1, y1, x2, y2, pa->layer, MM_TO_GD(pa->movmode), out_ground_position);
+}
+
+/* checks if there is a moving obstacle colliding with the sensor */
+bool got_moving_obstacle_at_sensor(const physicsactor_t* pa, const obstaclemap_t* obstaclemap, const sensor_t* s)
+{
+    if(s == NULL)
+        return false;
+
+    v2d_t position = physicsactor_get_position(pa);
+    const obstacle_t* at_S = sensor_check(s, position, pa->movmode, pa->layer, obstaclemap); /* XXX multiple? */
+
+    return (at_S != NULL) && !obstacle_is_static(at_S);
 }
 
 /* check if the physics actor is smashed / crushed / squashed */
