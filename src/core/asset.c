@@ -24,6 +24,7 @@
 #include <physfs.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "asset.h"
 #include "modutils.h"
 #include "global.h"
@@ -60,6 +61,13 @@
 #error GAME_RUNINPLACE is not supported on this platform
 #endif
 
+/* Do we have an application cache directory? */
+#if defined(__ANDROID__)
+#define HAVE_CACHE_DIR                  1
+#else
+#define HAVE_CACHE_DIR                  0
+#endif
+
 /* Utility macros */
 #define ENVIRONMENT_VARIABLE_NAME       "OPENSURGE_USER_PATH"
 #define ASSET_PATH_MAX                  4096
@@ -90,9 +98,14 @@ static char* find_gamedirname(const char* gamedir, char* buffer, size_t buffer_s
 static const char* case_insensitive_fix(const char* virtual_path);
 static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
+static bool clear_dir_ex(ALLEGRO_FS_ENTRY* entry, int* out_number_of_removed_entries, bool (*predicate)(ALLEGRO_FS_ENTRY*,void*), void* context);
+static bool clear_dir_predicate_true(ALLEGRO_FS_ENTRY* entry, void* context);
 static char* generate_user_datadirname(const char* game_name, uint32_t game_id, char* buffer, size_t buffer_size);
 static bool is_valid_root_folder();
 static char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size);
+static ALLEGRO_PATH* create_path_at_cache(const char* filename, const char* dirpath);
+static bool clear_cached_games();
+static bool clear_cached_files(const char* folder_name, time_t time_to_live);
 
 static bool is_uncompressed_gamedir(const char* fullpath);
 static bool is_compressed_gamedir(const char* fullpath);
@@ -382,6 +395,9 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
     if(out_compatibility_version_code != NULL)
         *out_compatibility_version_code = compatibility_version_code;
 
+    /* clear cached games */
+    clear_cached_games();
+
     /* enable the physfs file interface. This should be the last task
        performed in this function (e.g., see create_dir()) */
     al_set_physfs_file_interface();
@@ -529,7 +545,7 @@ bool asset_purge_user_data()
     ALLEGRO_FS_ENTRY* entry = al_create_fs_entry(user_datadir);
     bool valid = al_fs_entry_exists(entry);
     if(!valid)
-        WARN("Invalid directory: %s. errno = %d", user_datadir, al_get_errno());
+        WARN("Invalid directory: %s. %s. errno = %d", user_datadir, strerror(al_get_errno()), al_get_errno());
 
     /* clear & remove folder */
     bool success = valid && clear_dir(entry) && al_remove_fs_entry(entry);
@@ -636,6 +652,54 @@ bool asset_is_gamedir(const char* fullpath)
     return ret;
 }
 
+/*
+ * asset_cache_path()
+ * Generate the absolute path of a file or directory stored in the application cache.
+ * If a directory is requested, its relative_path must include a trailing directory
+ * separator (slash). Subdirectories will be created as needed.
+ */
+char* asset_cache_path(const char* relative_path, char* buffer, size_t buffer_size)
+{
+    char path[1024];
+
+    /* sanity check */
+    if(buffer == NULL || buffer_size == 0)
+        return buffer;
+    *buffer = '\0';
+
+    /* do we just want the absolute path of the cache directory? */
+    if(relative_path == NULL || *relative_path == '\0')
+        relative_path = "/";
+
+    /* copy relative_path to a local variable */
+    size_t len = strlen(relative_path);
+    assertx(len+1 <= sizeof(path));
+    memcpy(path, relative_path, len+1);
+
+    /* split the path between dirpath and filename */
+    const char* dirpath = path;
+    const char* filename = "";
+    char* z = strrchr(path, '/');
+#if !defined(_WIN32)
+    if(z != NULL) {
+#else
+    if(NULL != z || NULL != (z = strrchr(path, '\\'))) {
+#endif
+        *z = '\0';
+        filename = z+1;
+    }
+
+    /* generate the absolute path, creating subdirectories as needed,
+       and copy the generated path to the output */
+    ALLEGRO_PATH* cache = create_path_at_cache(filename, dirpath);
+    if(cache != NULL) {
+        str_cpy(buffer, al_path_cstr(cache, ALLEGRO_NATIVE_PATH_SEP), buffer_size);
+        al_destroy_path(cache);
+    }
+
+    /* done! */
+    return buffer;
+}
 
 
 
@@ -810,7 +874,7 @@ void create_dir(const ALLEGRO_PATH* path)
     const char* path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 
     if(!al_make_directory(path_str))
-        LOG("Can't create directory %s. errno = %d", path_str, al_get_errno());
+        LOG("Can't create directory %s. %s. errno = %d", path_str, strerror(al_get_errno()), al_get_errno());
 }
 
 /*
@@ -819,30 +883,54 @@ void create_dir(const ALLEGRO_PATH* path)
  */
 bool clear_dir(ALLEGRO_FS_ENTRY* entry)
 {
+    return clear_dir_ex(entry, NULL, clear_dir_predicate_true, NULL);
+}
+
+/*
+ * clear_dir_ex()
+ * Remove all entries of a directory that satisfy a predicate.
+ * Return true on success
+ */
+bool clear_dir_ex(ALLEGRO_FS_ENTRY* entry, int* out_number_of_removed_entries, bool (*predicate)(ALLEGRO_FS_ENTRY*,void*), void* context)
+{
     ALLEGRO_FS_ENTRY* next;
     uint32_t mode = al_get_fs_entry_mode(entry);
     bool success = true;
+    int tmp;
+
+    if(out_number_of_removed_entries == NULL)
+        out_number_of_removed_entries = &tmp;
+    *out_number_of_removed_entries = 0;
 
     if(!(mode & ALLEGRO_FILEMODE_ISDIR)) {
-        WARN("Not a directory: %s. errno = %d", al_get_fs_entry_name(entry), al_get_errno());
+        WARN("Not a directory: %s. %s. errno = %d", al_get_fs_entry_name(entry), strerror(al_get_errno()), al_get_errno());
         return false;
     }
 
     if(!al_open_directory(entry)) {
-        WARN("Can't open directory %s. errno = %d", al_get_fs_entry_name(entry), al_get_errno());
+        WARN("Can't open directory %s. %s. errno = %d", al_get_fs_entry_name(entry), strerror(al_get_errno()), al_get_errno());
         return false;
     }
 
     while(NULL != (next = al_read_directory(entry))) {
         /* recurse on directories */
         mode = al_get_fs_entry_mode(next);
-        if(mode & ALLEGRO_FILEMODE_ISDIR)
-            success = success && clear_dir(next);
+        if(mode & ALLEGRO_FILEMODE_ISDIR) {
+            int n = 0;
+            bool s = clear_dir_ex(next, &n, predicate, context);
 
-        /* remove entry */
-        if(!al_remove_fs_entry(next)) {
-            WARN("Can't remove %s. errno = %d", al_get_fs_entry_name(next), al_get_errno());
-            success = false;
+            success = success && s;
+            (*out_number_of_removed_entries) += n;
+        }
+
+        /* remove entry if it satisfies the given predicate */
+        if(predicate(next, context)) {
+            if(!al_remove_fs_entry(next)) {
+                WARN("Can't remove %s. %s. errno = %d", al_get_fs_entry_name(next), strerror(al_get_errno()), al_get_errno());
+                success = false;
+            }
+            else
+                ++(*out_number_of_removed_entries);
         }
         
         /* we're done with this entry */
@@ -850,11 +938,47 @@ bool clear_dir(ALLEGRO_FS_ENTRY* entry)
     }
 
     if(!al_close_directory(entry)) {
-        WARN("Can't close directory %s. errno = %d", al_get_fs_entry_name(entry), al_get_errno());
+        WARN("Can't close directory %s. %s. errno = %d", al_get_fs_entry_name(entry), strerror(al_get_errno()), al_get_errno());
         return false;
     }
 
     return success;
+}
+
+/*
+ * clear_dir_predicate_true()
+ * A true predicate for clear_dir_ex()
+ */
+bool clear_dir_predicate_true(ALLEGRO_FS_ENTRY* entry, void* context)
+{
+    (void)entry;
+    (void)context;
+
+    return true;
+}
+
+/*
+ * clear_dir_predicate_coldfile()
+ * A predicate for clear_dir_ex() that checks if an entry is a regular file
+ * that hasn't been accessed lately
+ */
+bool clear_dir_predicate_coldfile(ALLEGRO_FS_ENTRY* entry, void* context)
+{
+    uint32_t mode = al_get_fs_entry_mode(entry);
+
+#if 0
+    if(!(mode & ALLEGRO_FILEMODE_ISFILE)) /* ISFILE not reliable on Android?! */
+        return false;
+#else
+    if(mode & ALLEGRO_FILEMODE_ISDIR)
+        return false;
+#endif
+
+    time_t time_to_live = *((time_t*)context); /* given in seconds */
+    time_t last_access = al_get_fs_entry_atime(entry);
+    time_t current_time = time(NULL); /* y2k38 */
+
+    return current_time > last_access + time_to_live;
 }
 
 /*
@@ -1049,7 +1173,121 @@ char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_s
     return buffer;
 }
 
+/*
+ * create_path_at_cache()
+ * Generate the absolute path to a file stored in the application cache.
+ * dirpath is a relative/path/inside/the/cache or an empty string or NULL.
+ * filename may be an empty string or NULL. Return NULL on error.
+ */
+ALLEGRO_PATH* create_path_at_cache(const char* filename, const char* dirpath)
+{
+    const char SLASH = ALLEGRO_NATIVE_PATH_SEP;
+    ALLEGRO_PATH* cache = NULL;
 
+#if !(HAVE_CACHE_DIR)
+    assertx(!("Unsupported operation: no cache dir"));
+#endif
+
+    /* There must not be a trailing directory separator on the path */
+    assertx(dirpath && *dirpath && 0 == strspn(dirpath + (strlen(dirpath) - 1), "/\\"));
+
+    if(NULL != (cache = al_get_standard_path(ALLEGRO_TEMP_PATH))) {
+
+        /* set and create the subfolders (if specified) */
+        if(dirpath != NULL && *dirpath != '\0') {
+            al_append_path_component(cache, dirpath);
+            if(0 != mkpath(al_path_cstr(cache, SLASH), 0666))
+                LOG("Can't mkdir at cache: \"%s\". %s", al_path_cstr(cache, SLASH), strerror(errno));
+        }
+
+        /* set the filename */
+        if(filename != NULL && *filename != '\0')
+            al_set_path_filename(cache, filename);
+
+    }
+
+    return cache;
+}
+
+/*
+ * clear_cached_games()
+ * Clear games that have not been accessed lately from the application cache.
+ * Return true on success.
+ */
+bool clear_cached_games()
+{
+    const time_t MAX_DAYS = 3;
+    const time_t SECONDS_IN_A_DAY = 86400;
+    const time_t TIME_TO_LIVE = MAX_DAYS * SECONDS_IN_A_DAY;
+
+    return clear_cached_files("games", TIME_TO_LIVE);
+}
+
+/*
+ * clear_cached_files()
+ * Clear all files from a sub-folder of the application cache directory that
+ * have not been accessed for time_to_live seconds. Return true on success.
+ */
+bool clear_cached_files(const char* folder_name, time_t time_to_live)
+{
+#if HAVE_CACHE_DIR
+
+    ALLEGRO_STATE state;
+    bool error = true;
+    int n = 0;
+
+    assertx(al_is_system_installed());
+    al_store_state(&state, ALLEGRO_STATE_NEW_FILE_INTERFACE);
+    al_set_standard_file_interface();
+
+    ALLEGRO_PATH* path = create_path_at_cache(NULL, folder_name);
+    if(path == NULL) {
+        WARN("No cache directory was found");
+        goto finally;
+    }
+
+    ALLEGRO_FS_ENTRY* entry = al_create_fs_entry(al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP));
+    if(entry == NULL) {
+        WARN("No cache filesystem entry was found");
+        goto finally;
+    }
+
+    if(al_fs_entry_exists(entry)) {
+        LOG("Clearing cached files at %s/...", folder_name);
+        clear_dir_ex(entry, &n, clear_dir_predicate_coldfile, &time_to_live);
+    }
+
+    if(n > 0)
+        LOG("Removed %d cached file%s at %s/", n, n != 1 ? "s" : "", folder_name);
+    else
+        LOG("No cached files to clear at %s/", folder_name);
+
+    error = false; /* success! */
+
+
+
+    finally:
+
+    if(entry != NULL)
+        al_destroy_fs_entry(entry);
+
+    if(path != NULL)
+        al_destroy_path(path);
+
+    al_restore_state(&state);
+    return !error;
+
+#else
+
+    (void)folder_name;
+    (void)time_to_live;
+
+    LOG("%s: unsupported", __func__);
+
+    return true;
+
+#endif
+}
 
 
 
