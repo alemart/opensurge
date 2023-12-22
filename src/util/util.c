@@ -56,8 +56,8 @@
 #endif
 
 /* private stuff */
-static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
-static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
+static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, uint8_t *tmp, size_t tmp_size);
+static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m, uint8_t *tmp, size_t tmp_size);
 static int wrapped_mkdir(const char* path, mode_t mode);
 
 
@@ -574,7 +574,18 @@ const char* opensurge_game_name()
  */
 void merge_sort(void *base, int num, size_t size, int (*comparator)(const void*,const void*))
 {
-    merge_sort_recursive(base, size, comparator, 0, num-1);
+    uint8_t stack_mem[4096];
+    uint8_t *heap_mem = NULL;
+    uint8_t *tmp = stack_mem;
+
+    size_t total_size = (size_t)num * size;
+    if(total_size > sizeof(stack_mem))
+        tmp = heap_mem = mallocx(total_size);
+
+    merge_sort_recursive(base, size, comparator, 0, num-1, tmp, total_size);
+
+    if(heap_mem != NULL)
+        free(heap_mem);
 }
 
 
@@ -587,28 +598,25 @@ void merge_sort(void *base, int num, size_t size, int (*comparator)(const void*,
  *
  */
 
-void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q)
+void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, uint8_t *tmp, size_t tmp_size)
 {
     if(q > p) {
         int m = (p+q) / 2;
 
-        merge_sort_recursive(base, size, comparator, p, m);
-        merge_sort_recursive(base, size, comparator, m+1, q);
-        merge_sort_mix(base, size, comparator, p, q, m);
+        merge_sort_recursive(base, size, comparator, p, m, tmp, tmp_size);
+        merge_sort_recursive(base, size, comparator, m+1, q, tmp, tmp_size);
+        merge_sort_mix(base, size, comparator, p, q, m, tmp, tmp_size);
     }
 }
 
-void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m)
+void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m, uint8_t *tmp, size_t tmp_size)
 {
-    /* due to the static array declared as an optimization below,
-       merge_sort() isn't thread-safe */
-    static uint8_t tmp[65536];
-    size_t bytes = (q-p+1) * size;
-    uint8_t *arr = bytes > sizeof(tmp) ? mallocx(bytes) : tmp;
+    uint8_t *arr = tmp;
     uint8_t *i = arr;
     uint8_t *j = arr + (m+1-p) * size;
     int k = p;
 
+    assertx(tmp_size >= (q-p+1) * size);
     memcpy(arr, (uint8_t*)base + p * size, (q-p+1) * size);
 
     while(i < arr + (m+1-p) * size && j <= arr + (q-p) * size) {
@@ -631,9 +639,6 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
         memcpy((uint8_t*)base + (k++) * size, j, size);
         j += size;
     }
-
-    if(arr != tmp)
-        free(arr);
 }
 
 int wrapped_mkdir(const char* path, mode_t mode)
