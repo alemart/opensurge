@@ -38,6 +38,7 @@
 #include <allegro5/allegro_android.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <android/log.h>
+#include <setjmp.h>
 #else
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
@@ -155,7 +156,8 @@ void fatal_error(const char *fmt, ...)
 
     /* exit */
 #if defined(__ANDROID__)
-    abort(); /* won't call atexit functions */
+    extern jmp_buf main_jump_buffer;
+    longjmp(main_jump_buffer, 1);
 #else
     exit(1);
 #endif
