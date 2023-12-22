@@ -66,7 +66,9 @@ bool confirm(const char* fmt, ...); /* display a message box with Yes/No buttons
 void merge_sort(void *base, int num, size_t size, int (*comparator)(const void*,const void*)); /* similar to stdlib's qsort, but merge_sort is a stable sorting algorithm */
 uint64_t random64(); /* pseudo-random 64-bit number */
 FILE* fopen_utf8(const char* filepath, const char* mode); /* fopen() with UTF-8 filename support */
-bool file_exists(const char* filepath); /* checks if an absolute filepath exists */
+bool file_exists(const char* filepath); /* checks if a regular file exists */
+bool directory_exists(const char* dirpath); /* checks if a directory exists */
+int mkpath(const char* filepath, uint32_t mode); /* mkdir() for paths */
 const char* allegro_version_string(); /* version of the Allegro library */
 const char* surgescript_version_string(); /* version of the SurgeScript runtime */
 const char* physfs_version_string(); /* version of the PhysFS library */

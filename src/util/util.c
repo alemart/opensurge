@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
 #include <surgescript.h>
 #include <physfs.h>
 #include "util.h"
@@ -47,6 +48,9 @@
 #if defined(_WIN32)
 #include <windows.h>
 #include <wchar.h>
+#include <sys/types.h>
+#include <sys/stat.h> /* _stat */
+#include <direct.h> /* _mkdir */
 #else
 #include <sys/stat.h>
 #endif
@@ -249,7 +253,7 @@ uint64_t random64()
 
 /*
  * fopen_utf8()
- * fopen() with UTF-8 support for filenames
+ * fopen() with support for UTF-8 filenames
  */
 FILE* fopen_utf8(const char* filepath, const char* mode)
 {
@@ -282,21 +286,142 @@ FILE* fopen_utf8(const char* filepath, const char* mode)
 
 /*
  * file_exists()
- * Checks if the given absolute filepath exists
+ * Checks if a regular file exists, given its absolute path
  */
 bool file_exists(const char *filepath)
 {
 #if !defined(_WIN32)
+
     struct stat st;
-    return (stat(filepath, &st) == 0);
+    return (stat(filepath, &st) == 0) && S_ISREG(st.st_mode);
+
+#elif 1
+
+    struct _stat st;
+    return (_stat(dirpath, &st) == 0) && ((st.st_mode & _S_IFMT) == _S_IFREG);
+
 #else
+
     FILE* fp = fopen(filepath, "rb");
     bool valid = (fp != NULL);
     if(fp != NULL)
         fclose(fp);
     return valid;
+
 #endif
 }
+
+/*
+ * directory_exists()
+ * Checks if a directory exists, given its absolute path
+ */
+bool directory_exists(const char* dirpath)
+{
+    /* There must not be a trailing directory separator on the path */
+    assertx(dirpath && *dirpath && 0 == strspn(dirpath + (strlen(dirpath) - 1), "/\\"));
+
+#if !defined(_WIN32)
+
+    struct stat st;
+    return (stat(dirpath, &st) == 0) && S_ISDIR(st.st_mode);
+
+#else
+
+    /*
+
+    If path contains the location of a directory, it cannot contain a trailing
+    backslash. If it does, -1 will be returned and errno will be set to ENOENT.
+
+    https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/14h5k7ff(v=vs.120)
+
+    */
+    struct _stat st;
+    return (_stat(dirpath, &st) == 0) && ((st.st_mode & _S_IFMT) == _S_IFDIR);
+
+#endif
+}
+
+/*
+ * mkpath()
+ * A variant of mkdir() that creates a path by creating directories as needed.
+ * filepath is an absolute path. If the path to a directory is specified, then
+ * that path must be terminated with a directory separator '/' (or with a '\\'
+ * on Windows). Any file name is ignored. Returns 0 on success, -1 on failure.
+ */
+int mkpath(const char* filepath, uint32_t mode)
+{
+#if !defined(_WIN32)
+# define _MKDIR mkdir
+# define _SLASH '/'
+#else
+# define _MKDIR(p,m) ((m), _mkdir((p)))
+# define _SLASH '\\'
+#endif
+
+    char path[4096], *p;
+
+    /* sanity check */
+    if(filepath == NULL || *filepath == '\0')
+        return 0;
+
+    /* copy the filepath to a local variable */
+    size_t len = strlen(filepath);
+    if(len+1 > sizeof(path)) {
+        /*errno = ENAMETOOLONG;*/
+        logfile_message("Can't mkpath \"%s\": name too long", filepath);
+        return -1;
+    }
+    memcpy(path, filepath, len+1);
+
+#if defined(_WIN32)
+    /* skip volume; begin as \folder1\folder2\file... */
+    p = strstr(path, ":\\"); /* try a traditional DOS path */
+    if(p == NULL) {
+        if(strncmp(path, "\\\\", 2) == 0 && isalnum(path[2])) { /* try a UNC path */
+            p = strchr(path+2, '\\');
+            if(p == NULL) {
+                logfile_message("Can't mkpath \"%s\": invalid path", path);
+                return -1;
+            }
+        }
+        else {
+            logfile_message("Can't mkpath \"%s\": not an absolute path", path);
+            return -1;
+        }
+    }
+    else
+        p = p+1;
+#else
+    /* ensure we have an absolute filepath */
+    if(path[0] != '/') {
+        logfile_message("Can't mkpath \"%s\": not an absolute path", path);
+        return -1;
+    }
+
+    /* begin as /folder1/folder2/file... */
+    p = path;
+#endif
+
+    /* make path */
+    for(p = strchr(p+1, _SLASH); p != NULL; p = strchr(p+1, _SLASH)) {
+        *p = '\0';
+        if(!directory_exists(path)) {
+            if(_MKDIR(path, (mode_t)mode) != 0) {
+                *p = _SLASH;
+                logfile_message("Can't mkpath \"%s\": %s", path, strerror(errno));
+                return -1;
+            }
+        }
+        *p = _SLASH;
+    }
+
+    /* success */
+    return 0;
+
+#undef _SLASH
+#undef _MKDIR
+}
+
 
 /*
  * allegro_version_string()
