@@ -2521,6 +2521,21 @@ bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
         (at_A != NULL && !obstacle_is_static(at_A))
     );
 
+    /* check if the player is stuck on a wall. One situation in which this may
+       happen is when there is a cloud very near a (solid) ceiling. Once the
+       player climbs the cloud, he/she will be repositioned to the top of it,
+       get stuck on the solid bricks and then get repositioned again and wrap
+       around the ceiling. */
+    is_smashed = is_smashed || (
+        /* only a single obstacle is checked. We do a conservative check
+           because, when the player is being repositioned, false positives
+           may occur and spuriously smash the player. */
+        at_A == at_C &&
+        at_B == at_D &&
+        at_A == at_B &&
+        at_A == at_U
+    );
+
     return is_smashed;
 }
 
