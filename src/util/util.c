@@ -58,7 +58,7 @@
 /* private stuff */
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q);
 static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m);
-
+static int wrapped_mkdir(const char* path, mode_t mode);
 
 
 
@@ -350,14 +350,7 @@ bool directory_exists(const char* dirpath)
  */
 int mkpath(const char* filepath, uint32_t mode)
 {
-#if !defined(_WIN32)
-# define _MKDIR mkdir
-# define _SLASH '/'
-#else
-# define _MKDIR(p,m) ((m), _mkdir((p)))
-# define _SLASH '\\'
-#endif
-
+    const char SLASH = ALLEGRO_NATIVE_PATH_SEP;
     char path[4096], *p;
 
     /* sanity check */
@@ -403,23 +396,20 @@ int mkpath(const char* filepath, uint32_t mode)
 #endif
 
     /* make path */
-    for(p = strchr(p+1, _SLASH); p != NULL; p = strchr(p+1, _SLASH)) {
+    for(p = strchr(p+1, SLASH); p != NULL; p = strchr(p+1, SLASH)) {
         *p = '\0';
         if(!directory_exists(path)) {
-            if(_MKDIR(path, (mode_t)mode) != 0) {
-                *p = _SLASH;
+            if(wrapped_mkdir(path, (mode_t)mode) != 0) {
+                *p = SLASH;
                 logfile_message("Can't mkpath \"%s\": %s", path, strerror(errno));
                 return -1;
             }
         }
-        *p = _SLASH;
+        *p = SLASH;
     }
 
     /* success */
     return 0;
-
-#undef _SLASH
-#undef _MKDIR
 }
 
 
@@ -644,4 +634,49 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
 
     if(arr != tmp)
         free(arr);
+}
+
+int wrapped_mkdir(const char* path, mode_t mode)
+{
+#if defined(_WIN32)
+
+    (void)mode;
+    return _mkdir(path);
+
+#elif defined(__ANDROID__)
+
+    /* got permission denied errors when using standard mkdir() on the
+       application cache on Android, so we resort to the File API on Java */
+    struct stat st;
+    (void)mode;
+
+    if(stat(path, &st) == 0) {
+        errno = EEXIST;
+        return -1;
+    }
+
+    JNIEnv* env = al_android_get_jni_env();
+    jobject activity = al_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "mkdir", "(Ljava/lang/String;)Z");
+
+    jstring jpath = (*env)->NewStringUTF(env, path);
+    jboolean jsuccess = (*env)->CallBooleanMethod(env, activity, method_id, jpath);
+    (*env)->DeleteLocalRef(env, jpath);
+
+    (*env)->DeleteLocalRef(env, class_id);
+
+    if(!jsuccess) {
+        errno = EACCES; /* XXX? */
+        return -1;
+    }
+
+    return 0;
+
+#else
+
+    return mkdir(path, mode);
+
+#endif
 }
