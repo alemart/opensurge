@@ -33,14 +33,6 @@
 #include "../util/stringutil.h"
 #include "../third_party/ignorecase.h"
 
-/* require alloca */
-#if !(defined(__APPLE__) || defined(MACOSX) || defined(macintosh) || defined(Macintosh))
-#include <malloc.h>
-#if defined(__linux__) || defined(__linux) || defined(__EMSCRIPTEN__)
-#include <alloca.h>
-#endif
-#endif
-
 /* The default directory of the game assets provided by upstream (*nix only) */
 #ifndef GAME_DATADIR
 #define GAME_DATADIR                    "/usr/share/games/" GAME_UNIXNAME
@@ -1737,6 +1729,8 @@ bool has_pak_support()
 bool generate_pak_file(const char** vpath, int file_count, const void** file_data, const size_t* file_size, void** out_pak_data, size_t* out_pak_size)
 {
     uint8_t* pack_data = NULL;
+    size_t* accum_file_size = NULL;
+    ALLEGRO_FILE* packf = NULL;
 
     /* validation */
     if(vpath == NULL || file_count == 0) {
@@ -1745,8 +1739,7 @@ bool generate_pak_file(const char** vpath, int file_count, const void** file_dat
     }
 
     /* accumulate file_size[] */
-    size_t* accum_file_size = alloca((1 + file_count) * sizeof(*accum_file_size));
-
+    accum_file_size = mallocx((1 + file_count) * sizeof(*accum_file_size));
     accum_file_size[0] = 0;
     for(int i = 0; i < file_count; i++)
         accum_file_size[i+1] = accum_file_size[i] + file_size[i];
@@ -1762,8 +1755,7 @@ bool generate_pak_file(const char** vpath, int file_count, const void** file_dat
     pack_data = mallocx(pack_size);
 
     /* open the pack file for writing */
-    ALLEGRO_FILE* packf = al_open_memfile(pack_data, pack_size, "wb");
-    if(NULL == packf) {
+    if(NULL == (packf = al_open_memfile(pack_data, pack_size, "wb"))) {
         LOG("Can't open the compatibility pack file for writing!");
         goto error;
     }
@@ -1820,6 +1812,9 @@ bool generate_pak_file(const char** vpath, int file_count, const void** file_dat
     /* close the pack file */
     al_fclose(packf);
 
+    /* release temporary data */
+    free(accum_file_size);
+
     /* done! */
     *out_pak_data = (void*)pack_data;
     *out_pak_size = pack_size;
@@ -1830,6 +1825,12 @@ bool generate_pak_file(const char** vpath, int file_count, const void** file_dat
 
     if(pack_data != NULL)
         free(pack_data);
+
+    if(packf != NULL)
+        al_fclose(packf);
+
+    if(accum_file_size != NULL)
+        free(accum_file_size);
 
     *out_pak_data = NULL;
     *out_pak_size = 0;
