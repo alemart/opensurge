@@ -18,12 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined(__ANDROID__)
-#define ALLEGRO_UNSTABLE
+#define ALLEGRO_UNSTABLE /* al_android_open_fd() */
 #include <allegro5/allegro.h>
-#include <allegro5/allegro_android.h>
-#else
 #include <allegro5/allegro_native_dialog.h>
+
+#if defined(__ANDROID__)
+#include <allegro5/allegro_android.h>
+#include <unistd.h>
+#include <sys/stat.h>
 #endif
 
 #include <stdbool.h>
@@ -123,16 +125,23 @@ static const char* FADE_COLOR = "000000";
 #define EVENT_FILECHOOSER_ASYNC ALLEGRO_GET_EVENT_TYPE('F', 'I', 'L', 'E')
 
 typedef struct {
-    ALLEGRO_EVENT_SOURCE event_source;
-#if !defined(__ANDROID__)
-    ALLEGRO_FILECHOOSER* file_chooser[2];
-#endif
-    ALLEGRO_THREAD* thread;
     bool want_chooser_of_folders;
+    ALLEGRO_EVENT_SOURCE event_source;
+    ALLEGRO_FILECHOOSER* file_chooser[2];
+    ALLEGRO_THREAD* thread;
 } filechooser_data_t;
 
 static void* filechooser_run(ALLEGRO_THREAD* thread, void* arg);
 static void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg);
+
+#if defined(__ANDROID__)
+static const char* find_absolute_filepath(const char* content_uri);
+static bool open_file_at_uri(const char* uri, ALLEGRO_FILE** out_f);
+static const char* url_encoded_basename(const char* url);
+static bool download_to_cache(ALLEGRO_FILE* f, const char* destination_path, void (*on_progress)(double,void*), void* context);
+static bool need_to_download_to_cache(ALLEGRO_FILE* f, const char* destination_path);
+static void show_download_progress(double percentage, void* context);
+#endif
 
 /* helpers */
 #if defined(__ANDROID__)
@@ -248,7 +257,6 @@ static void enter_credits(settings_entry_t* e);
 #define vt_mods (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, display_mods }
 static bool want_compatibility_mode = true;
 static bool want_zipped_mods = false;
-static bool is_valid_gamedir(const char* gamedir);
 static bool display_mods(settings_entry_t* e);
 
 #define vt_playgame (settings_entryvt_t){ nop, enter_playgame, nop, init_playgame, release_playgame, nop, display_mods }
@@ -317,7 +325,7 @@ static const struct
     /* MODs */
     { TYPE_SUBTITLE, "$OPTIONS_MODS", (const char*[]) { NULL }, 0, vt_mods, 8 },
     { TYPE_SETTING, "$OPTIONS_PLAYMOD", (const char*[]) { NULL }, 0, vt_playgame, 8 },
-    { TYPE_SETTING, "$OPTIONS_MODSTORAGE", (const char*[]) { "$OPTIONS_MODSTORAGE_FOLDER", "$OPTIONS_MODSTORAGE_ARCHIVE", NULL }, 0, vt_modstorage, 0 },
+    { TYPE_SETTING, "$OPTIONS_MODSTORAGE", (const char*[]) { "$OPTIONS_MODSTORAGE_ARCHIVE", "$OPTIONS_MODSTORAGE_FOLDER", NULL }, 0, vt_modstorage, 0 },
     { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", NULL }, 1, vt_compatibilitymode, 0 },
 
     /* Engine */
@@ -375,7 +383,7 @@ void settings_init(void* data)
     /* options */
     enable_developermode = false;
     want_compatibility_mode = true;
-    want_zipped_mods = false;
+    want_zipped_mods = true;
 
     /* initialize objects */
     background = background_load(BGFILE);
@@ -1297,9 +1305,9 @@ void enter_playgame(settings_entry_t* e)
     al_join_thread(f->thread, NULL);
 #else
     /* Android: need to handle ALLEGRO_EVENT_DISPLAY_HALT_DRAWING
-       before the blocking call to the file chooser returns */
+       before the blocking call to the file chooser returns
 
-    /* no need to wait for the file chooser with al_join_thread()
+       no need to wait for the file chooser with al_join_thread()
        because the Activity will be paused */
 #endif
 }
@@ -1312,9 +1320,13 @@ void init_playgame(settings_entry_t* e)
     engine_add_event_source(&f->event_source);
     engine_add_event_listener(EVENT_FILECHOOSER_ASYNC, f, filechooser_handle_event);
 
-#if !defined(__ANDROID__)
     f->file_chooser[0] = al_create_native_file_dialog(
-        NULL, "Select a game", "*.zip;*.7z",
+        NULL, "Select a game",
+#if defined(__ANDROID__)
+        "application/zip;application/x-7z-compressed",
+#else
+        "*.zip;*.7z",
+#endif
         ALLEGRO_FILECHOOSER_FILE_MUST_EXIST
     );
 
@@ -1322,7 +1334,6 @@ void init_playgame(settings_entry_t* e)
         NULL, "Select a game", "",
         ALLEGRO_FILECHOOSER_FILE_MUST_EXIST | ALLEGRO_FILECHOOSER_FOLDER
     );
-#endif
 
     f->thread = NULL;
     f->want_chooser_of_folders = false;
@@ -1337,10 +1348,8 @@ void release_playgame(settings_entry_t* e)
     if(f->thread != NULL)
         al_destroy_thread(f->thread); /* blocking */
 
-#if !defined(__ANDROID__)
     al_destroy_native_file_dialog(f->file_chooser[1]);
     al_destroy_native_file_dialog(f->file_chooser[0]);
-#endif
 
     engine_remove_event_listener(EVENT_FILECHOOSER_ASYNC, f, filechooser_handle_event);
     engine_remove_event_source(&f->event_source);
@@ -1351,45 +1360,30 @@ void release_playgame(settings_entry_t* e)
 
 void change_modstorage(settings_entry_t* e)
 {
-    want_zipped_mods = (e->index_of_current_value != 0);
+#if IS_MOBILE_PLATFORM
+    /* unsupported */
+    if(e->index_of_current_value != 0) {
+        e->index_of_current_value = 0;
+        sound_play(SFX_DENY);
+    }
+#endif
+
+    want_zipped_mods = (e->index_of_current_value == 0);
 }
 
 void change_compatibilitymode(settings_entry_t* e)
 {
     want_compatibility_mode = (e->index_of_current_value != 0);
-}
 
-bool is_valid_gamedir(const char* gamedir)
-{
-    const char* file_list[] = {
-        "surge.rocks",
-        "surge.prefs",
-        "surge.cfg",
-        "languages/english.lng",
-        NULL
-    };
-
-    ALLEGRO_PATH* base_path = al_create_path_for_directory(gamedir);
-    bool valid_gamedir = false;
-
-    /* for each file in file_list, check if it exists relative to gamedir (absolute path) */
-    for(const char** vpath = file_list; *vpath != NULL && !valid_gamedir; vpath++) {
-        ALLEGRO_PATH* path = al_clone_path(base_path);
-        ALLEGRO_PATH* tail = al_create_path(*vpath);
-
-        if(al_join_paths(path, tail)) {
-            const char* fullpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
-            if(file_exists(fullpath))
-                valid_gamedir = true;
+    /* warn the user if the compatibility mode is disabled */
+    if(!want_compatibility_mode) {
+        if(!confirm("%s", lang_get("OPTIONS_PLAYMOD_COMPATWARN"))) {
+            want_compatibility_mode = true;
+            e->index_of_current_value = 1;
         }
-
-        al_destroy_path(tail);
-        al_destroy_path(path);
     }
-
-    al_destroy_path(base_path);
-    return valid_gamedir;
 }
+
 
 /*
  * File Chooser
@@ -1399,7 +1393,6 @@ void* filechooser_run(ALLEGRO_THREAD* thread, void* arg)
 {
     filechooser_data_t* f = (filechooser_data_t*)arg;
 
-#if !defined(__ANDROID__)
     /* select the file chooser */
     ALLEGRO_FILECHOOSER* file_chooser = f->file_chooser[f->want_chooser_of_folders ? 1 : 0];
 
@@ -1415,7 +1408,6 @@ void* filechooser_run(ALLEGRO_THREAD* thread, void* arg)
         video_showmessage("Can't show native dialog");
         return NULL;
     }
-#endif
 
     /* emit an event */
     ALLEGRO_EVENT event;
@@ -1436,45 +1428,255 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
     if(event->type != EVENT_FILECHOOSER_ASYNC)
         return;
 
-#if !defined(__ANDROID__)
     /* get the result of the file chooser */
     ALLEGRO_FILECHOOSER* file_chooser = f->file_chooser[f->want_chooser_of_folders ? 1 : 0];
 
     if(file_chooser == NULL) {
         /* error */
+        logfile_message("Play a game: there was an error with the file chooser");
         return;
     }
     else if(0 == al_get_native_file_dialog_count(file_chooser)) {
         /* cancelled */
+        logfile_message("Play a game: the file chooser was cancelled");
         return;
     }
     else {
         /* success */
         path_to_game = al_get_native_file_dialog_path(file_chooser, 0);
+        logfile_message("Play a game: selected \"%s\"", path_to_game);
     }
+
+#if defined(__ANDROID__)
+    /* path_to_game is a content:// URI */
+    if(path_to_game != NULL && *path_to_game != '\0')
+        path_to_game = find_absolute_filepath(path_to_game);
 #endif
 
     /* load the game */
-    if(path_to_game != NULL && path_to_game[0] != '\0') {
+    if(path_to_game != NULL && *path_to_game != '\0') {
+        if(asset_is_gamedir(path_to_game)) {
+            commandline_t cmd = commandline_parse(0, NULL);
+            str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
+            cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
+            cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
 
-        /* pre-validate: is the selected item a valid Open Surge game? */
-        if(want_zipped_mods /* .zip/.7z pre-validation: not implemented */ || is_valid_gamedir(path_to_game)) {
-
-            /* warn the user if the compatibility mode is disabled */
-            if(want_compatibility_mode || confirm("%s", lang_get("OPTIONS_PLAYMOD_WARNING"))) {
-                commandline_t cmd = commandline_parse(0, NULL);
-                str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
-                cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
-                cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
-
-                engine_restart(&cmd);
-            }
-
+            engine_restart(&cmd);
         }
         else {
             sound_play(SFX_DENY);
-            alert("%s", lang_get("OPTIONS_PLAYMOD_ERROR"));
+            alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
         }
 
     }
 }
+
+
+
+
+/*
+ *
+ * Android-specific
+ *
+ */
+
+#if defined(__ANDROID__)
+
+/* find an absolute path equivalent to an openable document URI;
+   returns a statically allocated string on success or NULL on error */
+const char* find_absolute_filepath(const char* content_uri)
+{
+    const char* filename = url_encoded_basename(content_uri);
+    const char* path_to_game = NULL;
+    static char cache_path[1024];
+    ALLEGRO_FILE* f = NULL;
+
+    /* create relative path "games/$filename" */
+    char relative_path[1024] = "games/";
+    size_t len = strlen(relative_path);
+    str_cpy(relative_path + len, filename, sizeof(relative_path) - len);
+    assertx(0 == strcmp(relative_path + len, filename), "filename too long");
+
+    if(!want_zipped_mods) {
+        /* unsupported - this operation shouldn't happen */
+        ;
+    }
+    else if(!open_file_at_uri(content_uri, &f)) {
+        /* can't open the file */
+        sound_play(SFX_DENY);
+        alert("%s", "Can't open the selected file! Make sure you have the necessary permissions.");
+    }
+    else if('\0' == *(asset_cache_path(relative_path, cache_path, sizeof(cache_path)))) {
+        /* this shouldn't happen */
+        alert("%s %s", "Can't find the application cache!", filename);
+    }
+    else {
+        /* download the game to the application cache */
+        logfile_message("Path at the cache: \"%s\"", cache_path);
+
+        if(need_to_download_to_cache(f, cache_path)) {
+            logfile_message("The game is not yet cached. We'll cache it.");
+
+            if(download_to_cache(f, cache_path, show_download_progress, video_display_loading_screen_ex)) {
+                logfile_message("The game is now cached!");
+                path_to_game = cache_path;
+            }
+            else {
+                alert("%s", "Can't open the game! You may clear the application cache to get extra storage space.");
+            }
+        }
+        else {
+            logfile_message("The game is already cached");
+            show_download_progress(1.0, video_display_loading_screen_ex);
+            path_to_game = cache_path;
+        }
+    }
+
+    /* close the file */
+    if(f != NULL)
+        al_fclose(f);
+
+    /* make sure the path points to a valid opensurge game */
+    if(path_to_game != NULL && !asset_is_gamedir(path_to_game)) {
+
+        /* remove the downloaded file from cache */
+        if(0 != remove(path_to_game)) {
+            const char* err = strerror(errno);
+            logfile_message("Error deleting file from cache. %s", err);
+        }
+
+        /* display message */
+        sound_play(SFX_DENY);
+        alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
+        path_to_game = NULL;
+
+    }
+
+    /* done! */
+    return path_to_game;
+}
+
+/* open a file given a Universal Resource Identifier (URI) */
+bool open_file_at_uri(const char* uri, ALLEGRO_FILE** out_f)
+{
+    int fd = al_android_open_fd(uri, "r");
+
+    if(fd < 0) {
+        logfile_message("%s al_android_open_fd failed fd=%d uri=%s", __func__, fd, uri);
+        *out_f = NULL;
+        return false;
+    }
+
+    if(NULL == (*out_f = al_fopen_fd(fd, "rb"))) {
+        logfile_message("%s al_fopen_fd failed", __func__);
+        close(fd);
+        return false;
+    }
+
+    return true;
+}
+
+/* get the basename of a URL-encoded string */
+const char* url_encoded_basename(const char* url)
+{
+    const char* SLASH = "%2F";
+
+    for(const char *p = NULL; NULL != (p = strstr(url, SLASH));)
+        url = p+3;
+
+    return url; /* XXX is (*url == '\0') possible? */
+}
+
+/* copy an open file stream f to the application cache */
+bool download_to_cache(ALLEGRO_FILE* f, const char* destination_path, void (*on_progress)(double,void*), void* context)
+{
+    /* since we're operating on the application cache, we have
+       write permissions to open the destination path for writing */
+    uint8_t buffer[4096];
+    size_t n;
+    bool error;
+    FILE* f_copy;
+    int64_t total_bytes;
+    int64_t bytes_written;
+    const int64_t PROGRESS_CHUNK = sizeof(buffer) * 1024;
+
+    /* open filepath for writing */
+    if(NULL == (f_copy = fopen(destination_path, "wb"))) {
+        const char* err = strerror(errno);
+        alert("%s %s", "Can't write a cached copy!", err);
+        return false;
+    }
+
+    /* copy the file */
+    total_bytes = al_fsize(f);
+    bytes_written = 0;
+    error = false;
+
+    on_progress(0.0, context);
+    while(!error && 0 < (n = al_fread(f, buffer, sizeof(buffer)))) {
+        error = (n != fwrite(buffer, 1, n, f_copy));
+
+        /* show progress */
+        if(0 == ((bytes_written += n) % PROGRESS_CHUNK)) {
+            int64_t fraction = (bytes_written << 10) / total_bytes;
+            double percentage = (double)fraction / 1024.0;
+
+            on_progress(percentage, context);
+        }
+    }
+    on_progress(1.0, context);
+
+    /* error checking */
+    if(error) {
+        alert("%s", "Can't copy the file to the application cache! Make sure there is enough storage space in your device.");
+
+        if(al_ferror(f) != 0)
+            alert("READ ERROR: %s", al_ferrmsg(f));
+
+        if(ferror(f_copy) != 0)
+            alert("WRITE ERROR: %d", ferror(f_copy));
+    }
+
+    /* close the copy */
+    fclose(f_copy);
+
+    /* done! */
+    return !error;
+}
+
+/* do we need to download file f to destination_path at the application cache? */
+bool need_to_download_to_cache(ALLEGRO_FILE* f, const char* destination_path)
+{
+#if 1
+    /* Simple heuristic: compare the size of the files. This is not always
+       correct, but it is probably correct. We want this routine to be fast.
+       Computing a checksum takes time; the file is expected to have a size of
+       hundreds of megabytes. Users can clear the cache to force new downloads. */
+    struct stat buf;
+
+    if(0 != stat(destination_path, &buf)) {
+        const char* err = strerror(errno);
+        logfile_message("can't stat \"%s\": %s", destination_path, err);
+        return true; /* file not found (possibly) */
+    }
+
+    int64_t f_size = al_fsize(f);
+    int64_t d_size = buf.st_size;
+
+    return (f_size != d_size);
+#else
+    /* always download to cache */
+    return true;
+#endif
+}
+
+/* show download progress */
+void show_download_progress(double percentage, void* context)
+{
+    void (*fn)(double) = (void (*)(double))context;
+
+    if(fn != NULL)
+        fn(percentage);
+}
+
+#endif
