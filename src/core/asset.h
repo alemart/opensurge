@@ -40,6 +40,6 @@ bool asset_purge_user_data();
 char* asset_cache_path(const char* relative_path, char* buffer, size_t buffer_size);
 
 const char* asset_gamedir();
-bool asset_is_gamedir(const char* fullpath);
+bool asset_is_valid_gamedir(const char* fullpath);
 
 #endif

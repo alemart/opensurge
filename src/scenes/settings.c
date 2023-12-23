@@ -1455,7 +1455,7 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
 
     /* load the game */
     if(path_to_game != NULL && *path_to_game != '\0') {
-        if(asset_is_gamedir(path_to_game)) {
+        if(asset_is_valid_gamedir(path_to_game)) {
             commandline_t cmd = commandline_parse(0, NULL);
             str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
             cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
@@ -1537,7 +1537,7 @@ const char* find_absolute_filepath(const char* content_uri)
         al_fclose(f);
 
     /* make sure the path points to a valid opensurge game */
-    if(path_to_game != NULL && !asset_is_gamedir(path_to_game)) {
+    if(path_to_game != NULL && !asset_is_valid_gamedir(path_to_game)) {
 
         /* remove the downloaded file from cache */
         if(0 != remove(path_to_game)) {

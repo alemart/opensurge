@@ -613,11 +613,11 @@ const char* asset_gamedir()
 }
 
 /*
- * asset_is_gamedir()
+ * asset_is_valid_gamedir()
  * Checks if a folder or compressed archive stores an opensurge game
  * Both allegro and physfs must be initialized before calling this
  */
-bool asset_is_gamedir(const char* fullpath)
+bool asset_is_valid_gamedir(const char* fullpath)
 {
     bool ret = false;
 
@@ -634,7 +634,7 @@ bool asset_is_gamedir(const char* fullpath)
 #if !defined(__ANDROID__)
         else if(mode & ALLEGRO_FILEMODE_ISFILE)
 #else
-        /* the ISFILE flag doesn't work on Android, why? */
+        /* the ISFILE flag doesn't work on Android. Why? */
         else
 #endif
             ret = is_compressed_gamedir(fullpath);
@@ -1343,7 +1343,6 @@ bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* 
         "surge.rocks",
         "surge.prefs",
         "surge.cfg",
-        "languages/english.lng",
         NULL
     };
 
