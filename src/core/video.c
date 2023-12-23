@@ -700,7 +700,7 @@ void video_display_loading_screen_ex(double progress)
     /* render the progress bar */
     if(!isnan(progress)) {
         double p = clip(progress, 0.0, 1.0);
-        int progress_height = VIDEO_SCREEN_H / 30;
+        int progress_height = VIDEO_SCREEN_H / 60;
         color_t progress_fgcolor = color_rgb(255, 0, 0);
         color_t progress_bgcolor = color_rgba(0, 0, 0, 128);
 
@@ -1424,6 +1424,12 @@ int traverse_game(const parsetree_statement_t* stmt)
         nanoparser_expect_string(p1, "Expected game title");
 
         str_cpy(window_title, nanoparser_get_string(p1), sizeof(window_title));
+    }
+    else if(str_icmp(identifier, "version") == 0) {
+        const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
+        nanoparser_expect_string(p1, "Expected game version");
+
+        ; /* do nothing for now - TODO */
     }
     else
         fatal_error("Unexpected identifier \"%s\" in %s:%d", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
