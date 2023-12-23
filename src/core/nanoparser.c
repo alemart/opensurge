@@ -684,8 +684,9 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
     size_t read_bytes = al_fread(fp, state.buffer, LEXER_BUFFER_SIZE - 1);
     state.buffer[read_bytes] = state.buffer[LEXER_BUFFER_SIZE - 1] = state.buffer[2 * LEXER_BUFFER_SIZE - 1] = 0;
 
-    /* legacy comments (backwards compatibility with nanoparser v1) */
-    bool accept_legacy_comments = (engine_compatibility_version_code() < VERSION_CODE(0,6,1));
+    /* legacy mode for backwards compatibility with nanoparser v1;
+       nanoparser was rewritten on Open Surge 0.6.1 with a stricter syntax */
+    bool legacy_mode = (engine_compatibility_version_code() < VERSION_CODE(0,6,1));
 
     #if 0
     /* debug */
@@ -757,7 +758,7 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
         }
 
         /* legacy comments (backwards compatibility) */
-        else if(accept_legacy_comments && (peek == '#' || peek == ';')) {
+        else if(legacy_mode && (peek == '#' || peek == ';')) {
 
             /* line start? */
             if(darray_length(lexer->token) <= 0 || lexer->token[darray_length(lexer->token)-1].type == TOKEN_LINEBREAK) {
@@ -816,19 +817,19 @@ bool lexer_read(nanolexer_t* lexer, ALLEGRO_FILE* fp)
                         return false;
                     }
                     else if(peek == '\n') {
-                        #if 0
-                        /* crash: syntax error */
-                        symbol_buffer[symbol_length++] = '\0';
-                        crash("Unexpected line break at %s:%d", lexer->filepath, state.line);
-                        return false;
-                        #else
-                        /* nanoparser was rewritten on engine version 0.6.1;
-                           accept the missing quote for backwards compatibility;
-                           consider the newline to be the end of the quote */
-                        peek = quote;
-                        symbol_buffer[symbol_length++] = quote;
-                        break;
-                        #endif
+                        if(!legacy_mode) {
+                            /* crash: syntax error */
+                            symbol_buffer[symbol_length++] = '\0';
+                            crash("Unexpected line break at %s:%d", lexer->filepath, state.line);
+                            return false;
+                        }
+                        else {
+                            /* accept the missing quote for backwards compatibility;
+                               consider the newline to be the end of the quote */
+                            peek = quote;
+                            lexer_ungetc(&state);
+                            break;
+                        }
                     }
                     else if(peek != '\\') {
                         /* any character, except the closing quote and a backslash */
