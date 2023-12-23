@@ -55,6 +55,20 @@
 #include <sys/stat.h>
 #endif
 
+/* require alloca */
+#if !(defined(__APPLE__) || defined(MACOSX) || defined(macintosh) || defined(Macintosh))
+#include <malloc.h>
+#if defined(__linux__) || defined(__linux) || defined(__EMSCRIPTEN__)
+#include <alloca.h>
+#endif
+#endif
+
+#if 1
+#define ALLOCA_THRESHOLD 4096
+#else
+#define ALLOCA_THRESHOLD 1024 /* _ALLOCA_S_THRESHOLD */
+#endif
+
 /* private stuff */
 static void merge_sort_recursive(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, uint8_t *tmp, size_t tmp_size);
 static inline void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const void*), int p, int q, int m, uint8_t *tmp, size_t tmp_size);
@@ -574,13 +588,15 @@ const char* opensurge_game_name()
  */
 void merge_sort(void *base, int num, size_t size, int (*comparator)(const void*,const void*))
 {
-    uint8_t stack_mem[4096];
+    uint8_t* stack_mem = NULL;
     uint8_t *heap_mem = NULL;
-    uint8_t *tmp = stack_mem;
-
+    uint8_t *tmp = NULL;
     size_t total_size = (size_t)num * size;
-    if(total_size > sizeof(stack_mem))
+
+    if(total_size > ALLOCA_THRESHOLD)
         tmp = heap_mem = mallocx(total_size);
+    else if(total_size > 0)
+        tmp = stack_mem = alloca(total_size);
 
     merge_sort_recursive(base, size, comparator, 0, num-1, tmp, total_size);
 
@@ -616,7 +632,7 @@ void merge_sort_mix(void *base, size_t size, int (*comparator)(const void*,const
     uint8_t *j = arr + (m+1-p) * size;
     int k = p;
 
-    assertx(tmp_size >= (q-p+1) * size);
+    assertx(tmp_size >= (q-p+1) * size); /* <-- alloca() */
     memcpy(arr, (uint8_t*)base + p * size, (q-p+1) * size);
 
     while(i < arr + (m+1-p) * size && j <= arr + (q-p) * size) {
