@@ -670,6 +670,16 @@ void video_clearmessages()
  */
 void video_display_loading_screen()
 {
+    video_display_loading_screen_ex(NAN);
+}
+
+/*
+ * video_display_loading_screen_ex()
+ * Displays a loading screen with a progress bar
+ * 0 <= progress <= 1
+ */
+void video_display_loading_screen_ex(double progress)
+{
     const image_t *img = image_load(LOADING_IMAGE);
     v2d_t camera = v2d_multiply(video_get_screen_size(), 0.5f);
 
@@ -682,10 +692,23 @@ void video_display_loading_screen()
     /* make sure we're using the default shader */
     use_default_shader();
 
-    /* render */
+    /* render the loading screen */
     image_clear(color_rgb(0, 0, 0));
     image_draw(img, (VIDEO_SCREEN_W - image_width(img)) / 2, (VIDEO_SCREEN_H - image_height(img)) / 2, IF_NONE);
     font_render(fnt, camera);
+
+    /* render the progress bar */
+    if(!isnan(progress)) {
+        double p = clip(progress, 0.0, 1.0);
+        int progress_height = VIDEO_SCREEN_H / 30;
+        color_t progress_fgcolor = color_rgb(255, 0, 0);
+        color_t progress_bgcolor = color_rgba(0, 0, 0, 128);
+
+        image_rectfill(0, 0, VIDEO_SCREEN_W, progress_height, progress_bgcolor);
+        image_rectfill(0, 0, VIDEO_SCREEN_W * p, progress_height, progress_fgcolor);
+    }
+
+    /* render the backbuffer to the screen */
     video_render(NULL);
 
     /* cleanup */

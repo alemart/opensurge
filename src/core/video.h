@@ -92,6 +92,7 @@ void video_clearmessages();
 
 /* misc */
 void video_display_loading_screen();
+void video_display_loading_screen_ex(double progress);
 const char* video_get_window_title();
 v2d_t video_convert_window_to_screen(v2d_t window_coordinates);
 struct image_t* video_take_snapshot();
