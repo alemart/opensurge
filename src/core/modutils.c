@@ -165,7 +165,7 @@ static bool scan_level_line(const char* vpath, int line, levparser_command_t com
  * Compute the ID of an opensurge game. You may pass NULL to game_dirname,
  * in which case GAME_ID_UNAVAILABLE will be returned
  */
-uint32_t find_game_id(const char* game_title, const char* game_dirname, const char* required_engine_version)
+uint32_t find_game_id(const char* game_title, const char* game_version, const char* game_dirname, const char* required_engine_version)
 {
     /*
 
@@ -196,6 +196,11 @@ uint32_t find_game_id(const char* game_title, const char* game_dirname, const ch
     */
 
    /* TODO */
+   (void)game_title;
+   (void)game_version;
+   (void)game_dirname;
+   (void)required_engine_version;
+
    return GAME_ID_UNAVAILABLE;
 }
 
