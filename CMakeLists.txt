@@ -76,7 +76,7 @@ IF(WANT_BUILD_DATE)
 ENDIF()
 
 # Play a MOD (options screen)
-OPTION(WANT_PLAYMOD "Display the Play a MOD feature in the options screen (experimental)" OFF)
+OPTION(WANT_PLAYMOD "Display the Play a MOD feature in the options screen (experimental)" ON)
 IF(WANT_PLAYMOD)
   LIST(APPEND DEFS "WANT_PLAYMOD=1")
 ENDIF()

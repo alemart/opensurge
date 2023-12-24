@@ -258,17 +258,22 @@ static void enter_credits(settings_entry_t* e);
 static bool want_compatibility_mode = true;
 static bool want_zipped_mods = false;
 static bool display_mods(settings_entry_t* e);
+static bool display_mods_from_base_game(settings_entry_t* e);
+static bool display_mods_from_mod(settings_entry_t* e);
 
-#define vt_playgame (settings_entryvt_t){ nop, enter_playgame, nop, init_playgame, release_playgame, nop, display_mods }
+#define vt_playgame (settings_entryvt_t){ nop, enter_playgame, nop, init_playgame, release_playgame, nop, display_mods_from_base_game }
 static void enter_playgame(settings_entry_t* e);
 static void init_playgame(settings_entry_t* e);
 static void release_playgame(settings_entry_t* e);
 
-#define vt_modstorage (settings_entryvt_t){ change_modstorage, nop, nop, nop, nop, nop, display_mods }
+#define vt_modstorage (settings_entryvt_t){ change_modstorage, nop, nop, nop, nop, nop, display_mods_from_base_game }
 static void change_modstorage(settings_entry_t* e);
 
-#define vt_compatibilitymode (settings_entryvt_t) { change_compatibilitymode, nop, nop, nop, nop, nop, display_mods }
+#define vt_compatibilitymode (settings_entryvt_t) { change_compatibilitymode, nop, nop, nop, nop, nop, display_mods_from_base_game }
 static void change_compatibilitymode(settings_entry_t* e);
+
+#define vt_backtobasegame (settings_entryvt_t){ nop, enter_backtobasegame, nop, nop, nop, nop, display_mods_from_mod }
+static void enter_backtobasegame(settings_entry_t* e);
 
 /* Engine */
 #define vt_engine (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
@@ -327,12 +332,17 @@ static const struct
     { TYPE_SETTING, "$OPTIONS_PLAYMOD", (const char*[]) { NULL }, 0, vt_playgame, 8 },
     { TYPE_SETTING, "$OPTIONS_MODSTORAGE", (const char*[]) { "$OPTIONS_MODSTORAGE_ARCHIVE", "$OPTIONS_MODSTORAGE_FOLDER", NULL }, 0, vt_modstorage, 0 },
     { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", NULL }, 1, vt_compatibilitymode, 0 },
+    { TYPE_SETTING, "$OPTIONS_BACKTOBASEGAME", (const char*[]) { NULL }, 0, vt_backtobasegame, 8 },
 
     /* Engine */
     { TYPE_SUBTITLE, "$OPTIONS_ENGINE", (const char*[]){ NULL }, 0, vt_engine, 8 },
     { TYPE_SETTING, "$OPTIONS_INFO", (const char*[]){ NULL }, 0, vt_info, 8 },
     { TYPE_SETTING, "$OPTIONS_SHARE", (const char*[]){ NULL }, 0, vt_share, 0 },
-    { TYPE_SETTING, "$OPTIONS_DOWNLOAD", (const char*[]){ NULL }, 0, vt_website, 0 },
+#if IS_MOBILE_PLATFORM
+    { TYPE_SETTING, "$OPTIONS_DOWNLOAD_DESKTOP", (const char*[]){ NULL }, 0, vt_website, 0 },
+#else
+    { TYPE_SETTING, "$OPTIONS_DOWNLOAD_MOBILE", (const char*[]){ NULL }, 0, vt_website, 0 },
+#endif
 
     /* Back (last entry) */
     { TYPE_SETTING, "$OPTIONS_BACK", (const char*[]){ NULL }, 0, vt_back, 16 }
@@ -914,8 +924,10 @@ void change_quality(settings_entry_t* e)
     video_set_quality(new_quality[i]);
 
     /* coming soon */
-    if(new_quality[i] == VIDEOQUALITY_HIGH)
+    if(new_quality[i] == VIDEOQUALITY_HIGH) {
         sound_play(SFX_DENY);
+        alert("%s", lang_get("OPTIONS_COMINGSOON"));
+    }
 }
 
 void init_quality(settings_entry_t* e)
@@ -1278,12 +1290,28 @@ void share(settings_entry_t* e)
 
 bool display_mods(settings_entry_t* e)
 {
+    return display_mods_from_base_game(e) || display_mods_from_mod(e);
+}
+
+bool display_mods_from_base_game(settings_entry_t* e)
+{
 #if WANT_PLAYMOD
-    /* only Surge the Rabbit can be reliably expected to have the
+    /* only Surge the Rabbit can reliably be expected to have the
        correct scripts for a proper compatibility experience */
-    return 0 == strcmp(opensurge_game_name(), "Surge the Rabbit");
+    if(0 != strcmp(opensurge_game_name(), "Surge the Rabbit"))
+        return false;
+
+    return asset_gamedir() == NULL;
 #else
-    /* experimental */
+    return false;
+#endif
+}
+
+bool display_mods_from_mod(settings_entry_t* e)
+{
+#if WANT_PLAYMOD
+    return asset_gamedir() != NULL;
+#else
     return false;
 #endif
 }
@@ -1377,11 +1405,24 @@ void change_compatibilitymode(settings_entry_t* e)
 
     /* warn the user if the compatibility mode is disabled */
     if(!want_compatibility_mode) {
+        sound_play(SFX_QUESTION);
         if(!confirm("%s", lang_get("OPTIONS_PLAYMOD_COMPATWARN"))) {
             want_compatibility_mode = true;
             e->index_of_current_value = 1;
+            sound_play(SFX_BACK);
         }
+        else
+            sound_play(SFX_CONFIRM);
     }
+}
+
+void enter_backtobasegame(settings_entry_t* e)
+{
+    commandline_t cmd = commandline_parse(0, NULL);
+    cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
+
+    save_preferences();
+    engine_restart(&cmd);
 }
 
 
@@ -1461,6 +1502,7 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
             cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
             cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
 
+            save_preferences();
             engine_restart(&cmd);
         }
         else {
@@ -1508,6 +1550,7 @@ const char* find_absolute_filepath(const char* content_uri)
     }
     else if('\0' == *(asset_cache_path(relative_path, cache_path, sizeof(cache_path)))) {
         /* this shouldn't happen */
+        sound_play(SFX_DENY);
         alert("%s %s", "Can't find the application cache!", filename);
     }
     else {
@@ -1522,6 +1565,7 @@ const char* find_absolute_filepath(const char* content_uri)
                 path_to_game = cache_path;
             }
             else {
+                sound_play(SFX_DENY);
                 alert("%s", "Can't open the game! You may clear the application cache to get extra storage space.");
             }
         }
@@ -1603,6 +1647,7 @@ bool download_to_cache(ALLEGRO_FILE* f, const char* destination_path, void (*on_
     /* open filepath for writing */
     if(NULL == (f_copy = fopen(destination_path, "wb"))) {
         const char* err = strerror(errno);
+        sound_play(SFX_DENY);
         alert("%s %s", "Can't write a cached copy!", err);
         return false;
     }
@@ -1628,6 +1673,7 @@ bool download_to_cache(ALLEGRO_FILE* f, const char* destination_path, void (*on_
 
     /* error checking */
     if(error) {
+        sound_play(SFX_DENY);
         alert("%s", "Can't copy the file to the application cache! Make sure there is enough storage space in your device.");
 
         if(al_ferror(f) != 0)
