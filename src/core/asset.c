@@ -232,7 +232,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         }
 
         /* find the game ID */
-        game_id = find_game_id(NULL, game_dirname, required_engine_version);
+        game_id = find_game_id(NULL, NULL, game_dirname, required_engine_version);
         LOG("Game ID: %08x", game_id);
 
         /* set the write dir to gamedir if possible;
@@ -324,6 +324,17 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE;
         }
 
+        /* mount the write directory with higher precedence */
+        if(0 != strcmp(writedir, gamedir)) {
+
+            /* TODO mount only the files that we need to read?
+                we need at least surge.prefs */
+
+            if(!PHYSFS_mount(writedir, "/", 0))
+                CRASH("Can't mount the write directory at %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
+            LOG("Mounting write directory [compatibility mode]: %s", writedir);
+        }
+
         /* done */
         if(generated_user_datadir != NULL)
             free(generated_user_datadir);
@@ -340,7 +351,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE;
 
         /* find the game ID */
-        game_id = find_game_id(NULL, NULL, GAME_VERSION_STRING);
+        game_id = find_game_id(NULL, NULL, NULL, GAME_VERSION_STRING);
         LOG("Game ID: %08x", game_id);
 
         /* create the user dir if it doesn't exist */
@@ -631,10 +642,9 @@ bool asset_is_valid_gamedir(const char* fullpath)
     if(mode & ALLEGRO_FILEMODE_READ) {
         if(mode & ALLEGRO_FILEMODE_ISDIR)
             ret = is_uncompressed_gamedir(fullpath);
-#if !defined(__ANDROID__)
-        else if(mode & ALLEGRO_FILEMODE_ISFILE)
+#if 0
+        else if(mode & ALLEGRO_FILEMODE_ISFILE) /* doesn't work properly on Android, Linux?! */
 #else
-        /* the ISFILE flag doesn't work on Android. Why? */
         else
 #endif
             ret = is_compressed_gamedir(fullpath);
@@ -865,7 +875,7 @@ void create_dir(const ALLEGRO_PATH* path)
 {
     const char* path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 
-    if(!al_make_directory(path_str))
+    if(!mkpath(path_str, 0666))
         LOG("Can't create directory %s. %s. errno = %d", path_str, strerror(al_get_errno()), al_get_errno());
 }
 
