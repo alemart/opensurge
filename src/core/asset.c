@@ -808,7 +808,7 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
        If the game runs in place, then that write directory will
        be a subdirectory of the folder of the executable. */
     if(0 != strcmp(dirname, DEFAULT_USER_DATADIRNAME)) {
-        al_append_path_component(path, "__user__");
+        al_append_path_component(path, ".userdata");
         al_append_path_component(path, dirname);
     }
 
