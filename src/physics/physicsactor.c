@@ -150,6 +150,7 @@ static char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c,
 static const obstacle_t* find_ground_with_extended_sensor(const physicsactor_t* pa, const obstaclemap_t* obstaclemap, const sensor_t* sensor, int extended_sensor_length, int* out_ground_position);
 static bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap);
 static bool got_moving_obstacle_at_sensor(const physicsactor_t* pa, const obstaclemap_t* obstaclemap, const sensor_t* s);
+static bool is_on_moving_platform(const physicsactor_t* pa, const obstaclemap_t* obstaclemap);
 static inline int distance_between_angle_sensors(const physicsactor_t* pa);
 static inline int delta_angle(int alpha, int beta);
 static int interpolate_angle(int alpha, int beta, float t);
@@ -2231,13 +2232,13 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
     if(!pa->midair) {
         bool wanna_jump = input_button_pressed(pa->input, IB_FIRE1) && (pa->state != PAS_CHARGING); /* maybe; may be doing some other special move... */
         bool wanna_middle = (pa->angle <= 0x40 || pa->angle >= 0xC0 || pa->angle == 0x80);
+        bool on_moving_platform = false;
         sensor_set_enabled(a, true);
         sensor_set_enabled(b, true);
         sensor_set_enabled(c, wanna_jump);
         sensor_set_enabled(d, wanna_jump);
-        sensor_set_enabled(m, wanna_middle && (pa->gsp <=  pa->movethreshold || (pa->angle == 0x0 && pa->dx <= -1.0) /*|| got_moving_obstacle_at_sensor(pa, obstaclemap, a)*/)); /* gsp <= 0.0 */ /* regular movement & moving platforms */
-        sensor_set_enabled(n, wanna_middle && (pa->gsp >= -pa->movethreshold || (pa->angle == 0x0 && pa->dx >=  1.0) /*|| got_moving_obstacle_at_sensor(pa, obstaclemap, b)*/)); /* gsp >= 0.0 */
-        (void)got_moving_obstacle_at_sensor;
+        sensor_set_enabled(m, wanna_middle && (pa->gsp <=  pa->movethreshold || (pa->angle == 0x0 && pa->dx < -0.0) || (on_moving_platform = on_moving_platform || is_on_moving_platform(pa, obstaclemap)))); /* gsp <= 0.0 */ /* regular movement & moving platforms */
+        sensor_set_enabled(n, wanna_middle && (pa->gsp >= -pa->movethreshold || (pa->angle == 0x0 && pa->dx >  0.0) || (on_moving_platform = on_moving_platform || is_on_moving_platform(pa, obstaclemap)))); /* gsp >= 0.0 */
     }
     else {
 #if 0
@@ -2458,9 +2459,18 @@ bool got_moving_obstacle_at_sensor(const physicsactor_t* pa, const obstaclemap_t
         return false;
 
     v2d_t position = physicsactor_get_position(pa);
-    const obstacle_t* at_S = sensor_check(s, position, pa->movmode, pa->layer, obstaclemap); /* XXX multiple? */
+    const obstacle_t* at_S = sensor_check(s, position, pa->movmode, pa->layer, obstaclemap); /* XXX multiple obstacles? */
 
     return (at_S != NULL) && !obstacle_is_static(at_S);
+}
+
+/* checks if the physics actor is on a moving platform */
+bool is_on_moving_platform(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
+{
+    const sensor_t* a = sensor_A(pa);
+    const sensor_t* b = sensor_B(pa);
+
+    return got_moving_obstacle_at_sensor(pa, obstaclemap, a) || got_moving_obstacle_at_sensor(pa, obstaclemap, b);
 }
 
 /* check if the physics actor is smashed / crushed / squashed */
