@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-12-20"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-12-23"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -82,6 +82,9 @@ OPTIONS_QUALITY_LOW         "Baixa"
 OPTIONS_QUALITY_MEDIUM      "Média"
 OPTIONS_QUALITY_HIGH        "Alta"
 OPTIONS_FPS                 "Mostrar FPS"
+OPTIONS_VSYNC               "Sincronização vertical"
+OPTIONS_PIXELSCALER         "Suavizador de píxeis"
+OPTIONS_COMINGSOON          "Em breve!"
 OPTIONS_VOLUME              "Volume"
 OPTIONS_MUTE                "Mudo"
 OPTIONS_GAMEPADOPACITY      "Opacidade"
@@ -94,7 +97,8 @@ OPTIONS_WEBSITE             "Visite Open Surge na web"
 OPTIONS_DONATE              "Doar para o Open Surge"
 OPTIONS_INFO                "Informações da engine"
 OPTIONS_SHARE               "Compartilhar a engine"
-OPTIONS_DOWNLOAD            "Baixar a engine para PC & mobile"
+OPTIONS_DOWNLOAD_DESKTOP    "Baixar a engine para Desktops"
+OPTIONS_DOWNLOAD_MOBILE     "Baixar a engine para mobile"
 OPTIONS_PLAYMOD             "Jogar um game"
 OPTIONS_PLAYMOD_NOTAGAME    "O item selecionado não é um jogo do Open Surge!"
 OPTIONS_PLAYMOD_COMPATWARN  "O modo de compatibilidade é um recurso projetado para melhorar a sua experiência. Quer mesmo desativá-lo?"
@@ -102,6 +106,7 @@ OPTIONS_MODSTORAGE          "Armazenamento"
 OPTIONS_MODSTORAGE_FOLDER   "Pasta de arquivos"
 OPTIONS_MODSTORAGE_ARCHIVE  "Arquivo .zip"
 OPTIONS_COMPATIBILITYMODE   "Modo de compatibilidade"
+OPTIONS_BACKTOBASEGAME      "Voltar ao jogo base"
 
 // Stage Select
 STAGESELECT_TITLE           "<color=$COLOR_TITLE>SELEÇÃO DE FASES</color>"
