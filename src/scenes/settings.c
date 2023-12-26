@@ -284,8 +284,8 @@ static void show_info(settings_entry_t* e);
 #define vt_share (settings_entryvt_t){ nop, share, nop, nop, nop, nop, visible }
 static void share(settings_entry_t* e);
 
-#define vt_website (settings_entryvt_t){ nop, open_website, nop, nop, nop, nop, visible }
-static void open_website(settings_entry_t* e);
+#define vt_download (settings_entryvt_t){ nop, download, nop, nop, nop, nop, visible }
+static void download(settings_entry_t* e);
 
 
 
@@ -339,9 +339,9 @@ static const struct
     { TYPE_SETTING, "$OPTIONS_INFO", (const char*[]){ NULL }, 0, vt_info, 8 },
     { TYPE_SETTING, "$OPTIONS_SHARE", (const char*[]){ NULL }, 0, vt_share, 0 },
 #if IS_MOBILE_PLATFORM
-    { TYPE_SETTING, "$OPTIONS_DOWNLOAD_DESKTOP", (const char*[]){ NULL }, 0, vt_website, 0 },
+    { TYPE_SETTING, "$OPTIONS_DOWNLOAD_DESKTOP", (const char*[]){ NULL }, 0, vt_download, 0 },
 #else
-    { TYPE_SETTING, "$OPTIONS_DOWNLOAD_MOBILE", (const char*[]){ NULL }, 0, vt_website, 0 },
+    { TYPE_SETTING, "$OPTIONS_DOWNLOAD_MOBILE", (const char*[]){ NULL }, 0, vt_download, 0 },
 #endif
 
     /* Back (last entry) */
@@ -735,8 +735,9 @@ void save_preferences()
 const char* create_url(const char* path)
 {
     static char buffer[256];
+    char sep = (strchr(path, '?') != NULL) ? '&' : '?';
 
-    snprintf(buffer, sizeof(buffer), "%s%s?v=%s", GAME_URL, path, GAME_VERSION_STRING);
+    snprintf(buffer, sizeof(buffer), "%s%s%cv=%s", GAME_URL, path, sep, GAME_VERSION_STRING);
 
     return buffer;
 }
@@ -1246,9 +1247,14 @@ void show_info(settings_entry_t* e)
  * Visit the website of the engine
  */
 
-void open_website(settings_entry_t* e)
+void download(settings_entry_t* e)
 {
-    launch_url(create_url("/"));
+#if IS_MOBILE_PLATFORM
+    launch_url(create_url("/download?type=mobile"));
+#else
+    launch_url(create_url("/download?type=desktop"));
+#endif
+
     (void)e;
 }
 
