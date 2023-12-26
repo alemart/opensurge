@@ -253,12 +253,20 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             ALLEGRO_PATH* user_datadir = find_user_datadir(user_datadirname);
             generated_user_datadir = str_dup(al_path_cstr(user_datadir, ALLEGRO_NATIVE_PATH_SEP));
             create_dir(user_datadir);
-            al_destroy_path(user_datadir);
 
             /* try again */
             writedir = generated_user_datadir;
             if(!PHYSFS_setWriteDir(writedir))
                 CRASH("Can't set the write directory to %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
+
+            /* create writable sub-folders */
+            al_append_path_component(user_datadir, "levels");
+            create_dir(user_datadir);
+            al_replace_path_component(user_datadir, -1, "screenshots");
+            create_dir(user_datadir);
+
+            /* done */
+            al_destroy_path(user_datadir);
         }
         else {
             /* the writable user directory is now gamedir */
@@ -875,7 +883,7 @@ void create_dir(const ALLEGRO_PATH* path)
 {
     const char* path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 
-    if(!mkpath(path_str, 0666))
+    if(!mkpath(path_str, 0777))
         LOG("Can't create directory %s. %s. errno = %d", path_str, strerror(al_get_errno()), al_get_errno());
 }
 
