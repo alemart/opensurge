@@ -185,7 +185,7 @@ IF(ALLEGRO_STATIC)
       vorbis
       freetype
       ogg
-      #physfs
+      physfs
       png16
       z
       #zlibstatic
@@ -289,6 +289,7 @@ SET(GAME_SRCS
   src/core/audio.c
   src/core/color.c
   src/core/commandline.c
+  src/core/config.c
   src/core/engine.c
   src/core/fadefx.c
   src/core/font.c
@@ -431,6 +432,7 @@ SET(GAME_HEADERS
   src/core/audio.h
   src/core/color.h
   src/core/commandline.h
+  src/core/config.h
   src/core/engine.h
   src/core/fadefx.h
   src/core/font.h
