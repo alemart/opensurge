@@ -1987,7 +1987,7 @@ v2d_t level_size()
  */
 int level_height_at(int xpos)
 {
-    const int half_window = VIDEO_SCREEN_W * 1.5f;
+    const int half_window = VIDEO_SCREEN_W * 0.5f;
     int left_xpos = xpos - half_window;
     int right_xpos = xpos + half_window;
 

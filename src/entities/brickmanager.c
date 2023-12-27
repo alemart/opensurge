@@ -112,7 +112,7 @@ struct brickiteratorstate_t
 
 /* Utilities */
 #define GRID_SIZE 256 /* width and height of a cell of the spatial hash; this impacts the number of fasthash queries per frame (quadratically), as well as the number of returned bricks */
-#define SAMPLER_WIDTH 128 /* width of the fixed-size intervals of the sampler */
+#define SAMPLER_WIDTH 64 /* width of the fixed-size intervals of the height sampler */
 #define SAMPLER_MAX_INDEX 16384 /* >= MAX_LEVEL_WIDTH / SAMPLER_WIDTH */
 
 static inline uint64_t position_to_hash(int x, int y);
@@ -845,24 +845,27 @@ void sampler_add(heightsampler_t* sampler, const brick_t* brick)
         index = SAMPLER_MAX_INDEX; /* limit memory usage */
 
     /* ensure index < darray_length(sampler->height_at) */
-    while(index >= darray_length(sampler->height_at))
+    while(index >= darray_length(sampler->height_at)) {
         darray_push(sampler->height_at, 0); /* fill with zeros (meaning: no sampling data) */
+        darray_push(sampler->smooth_height_at, 0);
+    }
 
     /* update height_at[] */
     int bottom = spawn_point.y + size.y;
     if(bottom > sampler->height_at[index])
         sampler->height_at[index] = bottom;
 
-    /* fill smooth_height_at[] */
-    /* assert(darray_length(sampler->smooth_height_at) >= 1); */
-    for(int j = darray_length(sampler->smooth_height_at); j < darray_length(sampler->height_at); j++) {
-        darray_push(sampler->smooth_height_at, 0);
-        sampler->smooth_height_at[j] = sampler->smooth_height_at[j-1]; /* j >= 1 always */
-    }
-
     /* update smooth_height_at[] */
     if(sampler->height_at[index] != 0)
         sampler->smooth_height_at[index] = sampler->height_at[index];
+
+    /* fill smooth_height_at[] */
+    for(int j = index+1; j < darray_length(sampler->smooth_height_at); j++) {
+        if(sampler->height_at[j] == 0)
+            sampler->smooth_height_at[j] = sampler->smooth_height_at[j-1]; /* j >= 1 always */
+        else
+            break;
+    }
 }
 
 int sampler_query(heightsampler_t* sampler, int left, int right)
