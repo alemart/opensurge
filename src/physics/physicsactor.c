@@ -127,8 +127,6 @@ struct physicsactor_t
     double reference_time; /* used in fixed_update */
     double fixed_time;
     bool delayed_jump;
-
-    int compatibility_version; /* used for compatibility with previous versions */
 };
 
 /* observer pattern */
@@ -358,7 +356,6 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->reference_time = 0.0;
     pa->fixed_time = 0.0;
     pa->delayed_jump = false;
-    pa->compatibility_version = engine_compatibility_version_code();
 
     /* initialize the physics model */
     physicsactor_reset_model_parameters(pa);
@@ -474,7 +471,7 @@ void physicsactor_reset_model_parameters(physicsactor_t* pa)
     physicsactor_set_airdrag(pa, pa->airdrag);
 
     /* compatibility settings */
-    if(pa->compatibility_version < VERSION_CODE(0,6,1)) {
+    if(engine_compatibility_version_code() < VERSION_CODE(0,6,1)) {
         pa->topyspeed = 12.0f * fpsmul;
         /*pa->falloffthreshold = 0.625f * fpsmul;*/ /* maybe not a good idea... */
     }
@@ -930,7 +927,7 @@ void physicsactor_bounding_box(const physicsactor_t *pa, int *width, int *height
     w -= 2;
 
     /* compatibility settings */
-    if(pa->compatibility_version < VERSION_CODE(0,6,1)) {
+    if(engine_compatibility_version_code() < VERSION_CODE(0,6,1)) {
         /* older versions had a larger hit box:
            21x45 normal; 23x31 jumproll; 23x45 springing / midair */
         if(pa->state == PAS_JUMPING || pa->state == PAS_ROLLING) {
