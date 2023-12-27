@@ -31,7 +31,7 @@ static surgescript_var_t* fun_fadeout(surgescript_object_t* object, const surges
 
 /*
  * scripting_register_mobilegamepad()
- * Register the Mobile Gameapd object
+ * Register the Mobile Gamepad object
  */
 void scripting_register_mobilegamepad(surgescript_vm_t* vm)
 {
