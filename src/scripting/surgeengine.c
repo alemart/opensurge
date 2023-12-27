@@ -73,6 +73,7 @@ object 'SurgeEngine' \n\
     public readonly Events = spawn('Events'); \n\
     public readonly UI = spawn('UI'); \n\
     public readonly Platform = spawn('Platform'); \n\
+    public readonly Game = spawn('GameSettings'); \n\
 \n\
     fun get_Level() \n\
     { \n\

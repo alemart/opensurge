@@ -363,6 +363,7 @@ SET(GAME_SRCS
   src/scripting/entitymanager.c
   src/scripting/entitytree.c
   src/scripting/events.c
+  src/scripting/game.c
   src/scripting/input.c
   src/scripting/lang.c
   src/scripting/level.c
