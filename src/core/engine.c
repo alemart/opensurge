@@ -441,6 +441,10 @@ void init_basic_stuff(const commandline_t* cmd)
     setlocale(LC_ALL, "en_US.UTF-8"); /* work with UTF-8 */
     setlocale(LC_NUMERIC, "C"); /* use '.' as the decimal separator on atof() */
 
+    /* initialize nanoparser */
+    nanoparser_set_error_function(parser_error, NULL);
+    nanoparser_set_warning_function(parser_warning, NULL);
+
     /* initialize the the asset manager and the logfile module */
     if(commandline_getint(cmd->verbose, FALSE))
         logfile_init(LOGFILE_CONSOLE);
@@ -452,10 +456,8 @@ void init_basic_stuff(const commandline_t* cmd)
     );
     logfile_init(LOGFILE_TXT);
 
-    /* initialize prefs and nanoparser */
+    /* initialize prefs and nanocalc */
     prefs = prefs_create(NULL);
-    nanoparser_set_error_function(parser_error, NULL);
-    nanoparser_set_warning_function(parser_warning, NULL);
     init_nanocalc();
 
     /* logs */

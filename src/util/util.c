@@ -31,6 +31,8 @@
 #include "../core/timer.h"
 #include "../core/video.h"
 #include "../core/logfile.h"
+#include "../core/config.h"
+#include "../core/asset.h"
 #include "../core/resourcemanager.h"
 
 #if defined(__ANDROID__)
@@ -556,21 +558,8 @@ char* stringify_version_number(int version_code, char* buffer, size_t buffer_siz
  */
 const char* opensurge_game_name()
 {
-    static char buffer[48];
-
-    /* FIXME: is the title of the window always equal to the name of the game? */
-    str_cpy(buffer, video_get_window_title(), sizeof(buffer));
-
-    /* get rid of newlines */
-    for(char* p = buffer; *p; p++) {
-        if(*p == '\n' || *p == '\r')
-            *p = ' ';
-    }
-
-    /* done! */
-    return buffer;
+    return config_game_title("Untitled game");
 }
-
 
 /*
  * merge_sort()

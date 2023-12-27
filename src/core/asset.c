@@ -29,6 +29,7 @@
 #include "modutils.h"
 #include "global.h"
 #include "logfile.h"
+#include "config.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../third_party/ignorecase.h"
@@ -76,6 +77,7 @@ static char user_datadirname[256] = DEFAULT_USER_DATADIRNAME;
 /* Utilities */
 #define DEFAULT_COMPATIBILITY_VERSION_CODE VERSION_CODE_EX(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP, GAME_VERSION_FIX)
 static char* gamedir = NULL; /* custom asset folder specified by the user */
+static char* writedir = NULL;
 
 static ALLEGRO_STATE state;
 static ALLEGRO_PATH* find_exedir();
@@ -83,7 +85,7 @@ static ALLEGRO_PATH* find_homedir();
 static ALLEGRO_PATH* find_shared_datadir();
 static ALLEGRO_PATH* find_user_datadir(const char* dirname);
 
-static void create_dir(const ALLEGRO_PATH* path);
+static bool create_dir(const ALLEGRO_PATH* path);
 static uint32_t get_fs_mode(const char* path);
 static const char* find_extension(const char* path);
 static char* find_gamedirname(const char* gamedir, char* buffer, size_t buffer_size);
@@ -92,7 +94,7 @@ static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, in
 static bool clear_dir(ALLEGRO_FS_ENTRY* entry);
 static bool clear_dir_ex(ALLEGRO_FS_ENTRY* entry, int* out_number_of_removed_entries, bool (*predicate)(ALLEGRO_FS_ENTRY*,void*), void* context);
 static bool clear_dir_predicate_true(ALLEGRO_FS_ENTRY* entry, void* context);
-static char* generate_user_datadirname(const char* game_name, uint32_t game_id, char* buffer, size_t buffer_size);
+static char* generate_user_datadirname(const char* game_name, char* buffer, size_t buffer_size);
 static bool is_valid_root_folder();
 static char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size);
 static ALLEGRO_PATH* create_path_at_cache(const char* filename, const char* dirpath);
@@ -164,7 +166,6 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
 
         char game_dirname[256] = "";
         char required_engine_version[16] = "0.5.0";
-        char* generated_user_datadir = NULL;
 #if !defined(__ANDROID__)
         uint32_t mode = get_fs_mode(gamedir);
 #else
@@ -231,13 +232,23 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
                 LOG("Legacy games are unsupported. Detected version: %s", required_engine_version);
         }
 
+        /* read the configuration file */
+        al_set_physfs_file_interface();
+        config_init();
+        al_restore_state(&state);
+
         /* find the game ID */
-        game_id = find_game_id(NULL, NULL, game_dirname, required_engine_version);
+        game_id = find_game_id(
+            config_game_title(NULL),
+            config_game_version(NULL),
+            game_dirname,
+            required_engine_version
+        );
         LOG("Game ID: %08x", game_id);
 
         /* set the write dir to gamedir if possible;
            otherwise set it to a generated directory */
-        const char* writedir = gamedir;
+        writedir = str_dup(gamedir);
         if(!(mode & ALLEGRO_FILEMODE_ISDIR) || !PHYSFS_setWriteDir(writedir)) {
             /* log */
             if(mode & ALLEGRO_FILEMODE_ISDIR)
@@ -247,15 +258,15 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
                could this be flatpak? or a compressed archive?
                let's generate a write folder based on gamedir */
             const char* game_name = game_dirname;
-            generate_user_datadirname(game_name, game_id, user_datadirname, sizeof(user_datadirname));
+            generate_user_datadirname(game_name, user_datadirname, sizeof(user_datadirname));
 
             /* find the path to the writable folder and create it if necessary */
             ALLEGRO_PATH* user_datadir = find_user_datadir(user_datadirname);
-            generated_user_datadir = str_dup(al_path_cstr(user_datadir, ALLEGRO_NATIVE_PATH_SEP));
             create_dir(user_datadir);
 
             /* try again */
-            writedir = generated_user_datadir;
+            free(writedir);
+            writedir = str_dup(al_path_cstr(user_datadir, ALLEGRO_NATIVE_PATH_SEP));
             if(!PHYSFS_setWriteDir(writedir))
                 CRASH("Can't set the write directory to %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
 
@@ -315,6 +326,13 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             setup_compatibility_pack(dirpath, compatibility_version, game_id, game_dirname);
             al_restore_state(&state);
 
+            /* read the configuration file again, just after setting up the compatibility pack */
+            al_set_physfs_file_interface();
+            config_release();
+            if(!config_init())
+                WARN("Can't re-read the config file!");
+            al_restore_state(&state);
+
             /* mount the default shared data directory with lower precedence */
             if(!PHYSFS_mount(dirpath, "/", 1))
                 CRASH("Can't mount the shared data directory at %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
@@ -343,10 +361,6 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             LOG("Mounting write directory [compatibility mode]: %s", writedir);
         }
 
-        /* done */
-        if(generated_user_datadir != NULL)
-            free(generated_user_datadir);
-
     }
 
     /* set the default search paths */
@@ -358,10 +372,6 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         /* not in compatibility mode */
         compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE;
 
-        /* find the game ID */
-        game_id = find_game_id(NULL, NULL, NULL, GAME_VERSION_STRING);
-        LOG("Game ID: %08x", game_id);
-
         /* create the user dir if it doesn't exist */
         create_dir(user_datadir);
 
@@ -370,6 +380,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         if(!PHYSFS_setWriteDir(dirpath))
             CRASH("Can't set the write directory to %s. Error: %s", dirpath, PHYSFSx_getLastErrorMessage());
         LOG("Setting the write directory to %s", dirpath);
+        writedir = str_dup(dirpath);
 
         /* mount the user path to the root (higher precedence) */
         dirpath = al_path_cstr(user_datadir, ALLEGRO_NATIVE_PATH_SEP); /* redundant */
@@ -392,6 +403,20 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         /* validate asset folder */
         if(!is_valid_root_folder())
             CRASH("Not a valid Open Surge installation. Please reinstall the game.");
+
+        /* read the configuration file */
+        al_set_physfs_file_interface();
+        config_init();
+        al_restore_state(&state);
+
+        /* find the game ID */
+        game_id = find_game_id(
+            NULL,
+            NULL,
+            NULL,
+            GAME_VERSION_STRING
+        );
+        LOG("Game ID: %08x", game_id);
 
         /* done! */
         al_destroy_path(user_datadir);
@@ -436,8 +461,17 @@ void asset_release()
         gamedir = NULL;
     }
 
+    /* release the writedir string, if any */
+    if(writedir != NULL) {
+        free(writedir);
+        writedir = NULL;
+    }
+
     /* reset the user_datadirname string, just in case */
     str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
+
+    /* release the settings of the configuration file */
+    config_release();
 
     /* restore the previous I/O backend */
     al_restore_state(&state);
@@ -539,7 +573,7 @@ bool asset_purge_user_data()
         return false;
 
     /* fail if a custom gamedir was specified and it is the write folder */
-    if(gamedir != NULL && user_datadirname[0] == '\0') {
+    if(gamedir != NULL && 0 == strcmp(gamedir, writedir)) {
         WARN("Unsupported operation when a custom gamedir is specified and it is the user-writable folder");
         return false;
     }
@@ -579,7 +613,7 @@ bool asset_purge_user_data()
 char* asset_user_datadir(char* dest, size_t dest_size)
 {
     /* custom gamedir? */
-    if(gamedir != NULL && user_datadirname[0] == '\0')
+    if(gamedir != NULL && 0 == strcmp(gamedir, writedir))
         return str_cpy(dest, gamedir, dest_size);
 
     /* uninitialized Allegro? */
@@ -629,6 +663,15 @@ char* asset_shared_datadir(char* dest, size_t dest_size)
 const char* asset_gamedir()
 {
     return gamedir;
+}
+
+/*
+ * asset_writedir()
+ * The absolute path of the write directory
+ */
+const char* asset_writedir()
+{
+    return writedir;
 }
 
 /*
@@ -832,7 +875,6 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
     (void)find_homedir;
     return path;
 
-
 #elif defined(__APPLE__) && defined(__MACH__)
 
     /*
@@ -879,12 +921,16 @@ ALLEGRO_PATH* find_user_datadir(const char* dirname)
  * create_dir()
  * Create a new directory (and any parent directories as needed)
  */
-void create_dir(const ALLEGRO_PATH* path)
+bool create_dir(const ALLEGRO_PATH* path)
 {
     const char* path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 
-    if(!mkpath(path_str, 0777))
-        LOG("Can't create directory %s. %s. errno = %d", path_str, strerror(al_get_errno()), al_get_errno());
+    if(!mkpath(path_str, 0777)) {
+        LOG("Can't create directory %s. %s. errno = %d", path_str, strerror(errno), errno);
+        return false;
+    }
+
+    return true;
 }
 
 /*
@@ -1128,7 +1174,7 @@ bool is_valid_root_folder()
  * generate_user_datadirname()
  * Generate the name of a write sub-directory
  */
-char* generate_user_datadirname(const char* game_name, uint32_t game_id, char* buffer, size_t buffer_size)
+char* generate_user_datadirname(const char* game_name, char* buffer, size_t buffer_size)
 {
     /* try using the name of the game first */
     str_cpy(buffer, game_name, buffer_size);
@@ -1138,8 +1184,6 @@ char* generate_user_datadirname(const char* game_name, uint32_t game_id, char* b
        using a custom gamedir. If it is, use the game id. This should not happen. */
     if(0 == strcmp(buffer, DEFAULT_USER_DATADIRNAME))
         snprintf(buffer, buffer_size, "%08x", game_id);
-#else
-    (void)game_id;
 #endif
 
     /* done! */
@@ -1206,7 +1250,7 @@ ALLEGRO_PATH* create_path_at_cache(const char* filename, const char* dirpath)
         /* set and create the subfolders (if specified) */
         if(dirpath != NULL && *dirpath != '\0') {
             al_append_path_component(cache, dirpath);
-            if(0 != mkpath(al_path_cstr(cache, SLASH), 0666))
+            if(!create_dir(cache))
                 LOG("Can't mkdir at cache: \"%s\". %s", al_path_cstr(cache, SLASH), strerror(errno));
         }
 
