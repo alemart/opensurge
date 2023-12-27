@@ -6,6 +6,7 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine;
 using SurgeEngine.Web;
+using SurgeEngine.Game;
 using SurgeEngine.Platform;
 
 @Package
@@ -40,6 +41,11 @@ object "SurgeTheRabbit"
         Web.launchURL(url);
     }
 
+    fun isBaseGame()
+    {
+        return (Game.title == "Surge the Rabbit");
+    }
+
     fun isDevelopmentBuild()
     {
         return SurgeEngine.version.indexOf("-dev") >= 0;
@@ -54,6 +60,18 @@ object "SurgeTheRabbit"
     {
         /* adding an external donation page to an Android app published
            in the Google Play Store is a violation of their policy */
-        return !isGooglePlayBuild();
+        if(isGooglePlayBuild())
+            return false;
+
+        return isBaseGame();
+    }
+
+    fun constructor()
+    {
+        // print a reminder
+        if(isBaseGame()) {
+            if(SurgeEngine.version !== Game.version)
+                Console.print("Outdated Game.version " + Game.version);
+        }
     }
 }
