@@ -1250,9 +1250,9 @@ void show_info(settings_entry_t* e)
 void download(settings_entry_t* e)
 {
 #if IS_MOBILE_PLATFORM
-    launch_url(create_url("/download?type=mobile"));
-#else
     launch_url(create_url("/download?type=desktop"));
+#else
+    launch_url(create_url("/download?type=mobile"));
 #endif
 
     (void)e;
