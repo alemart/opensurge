@@ -33,7 +33,7 @@ typedef struct parsetree_program_t parsetree_program_t;
 /* a statement is a line containing an identifier (string) followed by a list of parameters */
 typedef struct parsetree_statement_t parsetree_statement_t;
 
-/* a parameter is either another program (block) or a string followed by another parameter */
+/* a list of parameters is another program (block), a string followed by another list of parameters, or null */
 typedef struct parsetree_parameter_t parsetree_parameter_t;
 
 
@@ -113,10 +113,10 @@ const parsetree_statement_t* nanoparser_get_statement(const parsetree_parameter_
  */
 
 /* Set an error function */
-void nanoparser_set_error_function(void (*fun)(const char*));
+void nanoparser_set_error_function(void (*fun)(const char*, void*), void* context);
 
 /* Set a warning function */
-void nanoparser_set_warning_function(void (*fun)(const char*));
+void nanoparser_set_warning_function(void (*fun)(const char*, void*), void* context);
 
 /* Trigger a crash related to a statement */
 void nanoparser_crash(const parsetree_statement_t* statement, const char* fmt, ...);

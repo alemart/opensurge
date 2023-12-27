@@ -64,12 +64,14 @@
  */
 
 static void crash(const char* fmt, ...);
-static void crash_fun_default(const char* message);
-static void (*crash_fun)(const char*) = crash_fun_default;
+static void crash_fun_default(const char* message, void* context);
+static void (*crash_fun)(const char*,void*) = crash_fun_default;
+static void* crash_context = NULL;
 
 static void warning(const char* fmt, ...);
-static void warning_fun_default(const char* message);
-static void (*warning_fun)(const char*) = warning_fun_default;
+static void warning_fun_default(const char* message, void* context);
+static void (*warning_fun)(const char*,void*) = warning_fun_default;
+static void* warning_context = NULL;
 
 #define nanoassert(expr) do { \
     if(!(expr)) { \
@@ -1256,18 +1258,32 @@ parsetree_parameter_t* parser_parse_parameter(nanoparser_t* parser, const parset
  * nanoparser_set_error_function()
  * Set an error function
  */
-void nanoparser_set_error_function(void (*fun)(const char*))
+void nanoparser_set_error_function(void (*fun)(const char*, void*), void* context)
 {
-    crash_fun = fun != NULL ? fun : crash_fun_default;
+    if(fun != NULL) {
+        crash_fun = fun;
+        crash_context = context;
+    }
+    else {
+        crash_fun = crash_fun_default;
+        crash_context = NULL;
+    }
 }
 
 /*
  * nanoparser_set_warning_function()
  * Set a warning function
  */
-void nanoparser_set_warning_function(void (*fun)(const char*))
+void nanoparser_set_warning_function(void (*fun)(const char*, void*), void* context)
 {
-    warning_fun = fun != NULL ? fun : warning_fun_default;
+    if(fun != NULL) {
+        warning_fun = fun;
+        warning_context = context;
+    }
+    else {
+        warning_fun = warning_fun_default;
+        warning_context = NULL;
+    }
 }
 
 /*
@@ -1323,7 +1339,7 @@ void crash(const char* fmt, ...)
     vsnprintf(buffer + ERROR_PREFIX_LENGTH, sizeof(buffer) - ERROR_PREFIX_LENGTH, fmt, args);
     va_end(args);
 
-    crash_fun(buffer);
+    crash_fun(buffer, crash_context);
     exit(1);
 }
 
@@ -1331,8 +1347,10 @@ void crash(const char* fmt, ...)
  * crash_fun_default()
  * Crash the program with an error message
  */
-void crash_fun_default(const char* message)
+void crash_fun_default(const char* message, void* context)
 {
+    (void)context;
+
     fprintf(stderr, "%s\n", message);
     exit(1);
 }
@@ -1350,14 +1368,16 @@ void warning(const char* fmt, ...)
     vsnprintf(buffer + ERROR_PREFIX_LENGTH, sizeof(buffer) - ERROR_PREFIX_LENGTH, fmt, args);
     va_end(args);
 
-    warning_fun(buffer);
+    warning_fun(buffer, warning_context);
 }
 
 /*
  * warning_fun_default()
  * Report a message
  */
-void warning_fun_default(const char* message)
+void warning_fun_default(const char* message, void* context)
 {
+    (void)context;
+
     fprintf(stderr, "%s\n", message);
 }

@@ -117,8 +117,8 @@ static void release_managers();
 static void release_basic_stuff();
 static void init_nanocalc();
 static void release_nanocalc();
-static void parser_error(const char *msg);
-static void parser_warning(const char *msg);
+static void parser_error(const char *msg, void* context);
+static void parser_warning(const char *msg, void* context);
 static void calc_error(const char *msg);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
@@ -454,8 +454,8 @@ void init_basic_stuff(const commandline_t* cmd)
 
     /* initialize prefs and nanoparser */
     prefs = prefs_create(NULL);
-    nanoparser_set_error_function(parser_error);
-    nanoparser_set_warning_function(parser_warning);
+    nanoparser_set_error_function(parser_error, NULL);
+    nanoparser_set_warning_function(parser_warning, NULL);
     init_nanocalc();
 
     /* logs */
@@ -718,8 +718,10 @@ void release_nanocalc()
  * parser_error()
  * This is called by nanoparser when an error is raised
  */
-void parser_error(const char *msg)
+void parser_error(const char *msg, void* context)
 {
+    (void)context;
+
     fatal_error("%s", msg);
 }
 
@@ -727,8 +729,10 @@ void parser_error(const char *msg)
  * parser_warning()
  * This is called by nanoparser when a warning is raised
  */
-void parser_warning(const char *msg)
+void parser_warning(const char *msg, void* context)
 {
+    (void)context;
+
     logfile_message("%s", msg);
 }
 
