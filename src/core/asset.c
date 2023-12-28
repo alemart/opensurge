@@ -97,6 +97,8 @@ static bool clear_dir_predicate_true(ALLEGRO_FS_ENTRY* entry, void* context);
 static char* generate_user_datadirname(const char* game_name, char* buffer, size_t buffer_size);
 static bool is_valid_root_folder();
 static char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_size);
+static bool is_writable_folder(const char* absolute_path);
+
 static ALLEGRO_PATH* create_path_at_cache(const char* filename, const char* dirpath);
 static bool clear_cached_games();
 static bool clear_cached_files(const char* folder_name, time_t time_to_live);
@@ -249,7 +251,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         /* set the write dir to gamedir if possible;
            otherwise set it to a generated directory */
         writedir = str_dup(gamedir);
-        if(!(mode & ALLEGRO_FILEMODE_ISDIR) || !PHYSFS_setWriteDir(writedir)) {
+        if(!(mode & ALLEGRO_FILEMODE_ISDIR) || !is_writable_folder(writedir) || !PHYSFS_setWriteDir(writedir)) {
             /* log */
             if(mode & ALLEGRO_FILEMODE_ISDIR)
                 LOG("Can't set the write directory to %s. Error: %s", writedir, PHYSFSx_getLastErrorMessage());
@@ -1225,6 +1227,31 @@ char* find_root_directory(const char* mount_point, char* buffer, size_t buffer_s
 
     PHYSFS_freeList(list);
     return buffer;
+}
+
+/*
+ * is_writable_folder()
+ * Checks if a folder is writable given its absolute path
+ * The folder may be in a read-only virtual filesystem (FUSE)
+ */
+bool is_writable_folder(const char* absolute_path)
+{
+    bool is_writable = false;
+
+    /* we try to write to a temporary file instead of just checking mode_t */
+    ALLEGRO_PATH* path = al_create_path_for_directory(absolute_path);
+    al_set_path_filename(path, ".write-test.bin");
+    const char* filepath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+
+    FILE* fp = fopen_utf8(filepath, "wb");
+    if(fp != NULL) {
+        is_writable = (0 == fputc(0, fp));
+        fclose(fp);
+        al_remove_filename(filepath);
+    }
+
+    al_destroy_path(path);
+    return is_writable;
 }
 
 /*
