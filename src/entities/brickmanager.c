@@ -832,12 +832,21 @@ void sampler_clear(heightsampler_t* sampler)
 
 void sampler_add(heightsampler_t* sampler, const brick_t* brick)
 {
+    /* find the bottom-center of the brick */
     v2d_t spawn_point = brick_spawnpoint(brick);
     v2d_t size = brick_size(brick);
 
     int center_x = spawn_point.x + size.x * 0.5f;
     if(center_x < 0)
         center_x = 0;
+
+    int bottom = spawn_point.y + size.y;
+    if(bottom < 0)
+        bottom = 0;
+
+    /* moving bricks are a special case */
+    if(brick_has_movement_path(brick))
+        bottom += 256; /* FIXME the actual amplitude may be higher */
 
     /* find the index corresponding to the brick */
     int index = center_x / SAMPLER_WIDTH;
@@ -851,7 +860,6 @@ void sampler_add(heightsampler_t* sampler, const brick_t* brick)
     }
 
     /* update height_at[] */
-    int bottom = spawn_point.y + size.y;
     if(bottom > sampler->height_at[index])
         sampler->height_at[index] = bottom;
 
