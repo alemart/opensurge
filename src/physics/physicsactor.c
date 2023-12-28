@@ -1130,7 +1130,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
                 y = yb - ya; \
                 if(x != 0 || y != 0) { \
                     int ang = SLOPE(y, x); \
-                    if(ga == gb || delta_angle(ang, guess_angle) <= 0x25) { \
+                    if((ga == gb && abs(y) < 16) || delta_angle(ang, guess_angle) <= 0x25) { \
                         pa->angle = ang; \
                         pa->angle_sensor[0] = v2d_new(xa, ya); \
                         pa->angle_sensor[1] = v2d_new(xb, yb); \
