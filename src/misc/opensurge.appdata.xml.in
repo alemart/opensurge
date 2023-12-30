@@ -1,45 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>org.opensurge2d.OpenSurge</id>
-  <name>Surge Engine</name>
+  <name>Surge the Rabbit</name>
   <developer_name>alemart</developer_name>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <summary>Make your dreams come true with Surge Engine, an open source game engine for retro games!</summary>
+  <summary>A retro platformer game that is lots of fun - with a moddable 2D game engine!</summary>
   <description>
-    <p>Make your dreams come true with Surge Engine, an open source game engine for retro games!</p>
-    <p>Get joyful with Surge the Rabbit, a fun retro platformer full of playfulness!</p>
+    <p>Surge the Rabbit is a fun jump 'n run retro game made in the spirit of classic platformers of the 90s. The levels are filled with challenges, gimmicks and hazards! Exciting adventures are waiting for you! You may also use it as a base to create your own amazing games!</p>
+    <p>Make your dreams come true! Surge Engine is the very flexible game engine that powers Surge the Rabbit. Its capabilities include: level editing, artwork modding, full blown scripting, and much more! It's an open-source, cross-platform retro game engine that runs on Desktops and on mobile devices.</p>
+    <p>The fun is multiplied! Several MODs created by the fans in the community can be played on the engine. For those who get involved, this project is also a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.</p>
   </description>
   <keywords>
-    <keyword>games</keyword>
-    <keyword>engine</keyword>
-    <keyword>allegro</keyword>
-    <keyword>retro</keyword>
+    <keyword>opensurge</keyword>
+    <keyword>gaming</keyword>
+    <keyword>video-game</keyword>
+    <keyword>game-engine</keyword>
+    <keyword>game-creator</keyword>
+    <keyword>game-maker</keyword>
+    <keyword>retro-game</keyword>
+    <keyword>mobile-game</keyword>
+    <keyword>open-source-game</keyword>
+    <keyword>libre-game</keyword>
+    <keyword>free-game</keyword>
+    <keyword>indie-game</keyword>
     <keyword>platformer</keyword>
-    <keyword>platform</keyword>
     <keyword>side-scroller</keyword>
+    <keyword>jump-'n-run</keyword>
     <keyword>action</keyword>
     <keyword>arcade</keyword>
-    <keyword>fun</keyword>
-    <keyword>cool</keyword>
-    <keyword>play</keyword>
-    <keyword>playful</keyword>
-    <keyword>joy</keyword>
-    <keyword>joyful</keyword>
-    <keyword>game</keyword>
-    <keyword>gaming</keyword>
-    <keyword>creativity</keyword>
-    <keyword>create</keyword>
-    <keyword>creator</keyword>
-    <keyword>maker</keyword>
+    <keyword>allegro</keyword>
+    <keyword>allegro5</keyword>
+    <keyword>surgescript</keyword>
+    <keyword>surge</keyword>
+    <keyword>sonic</keyword>
+    <keyword>mods</keyword>
+    <keyword>modding</keyword>
     <keyword>homebrew</keyword>
-    <keyword>programming</keyword>
-    <keyword>art</keyword>
   </keywords>
   <url type="homepage">https://opensurge2d.org</url>
-  <url type="donation">https://opensurge2d.org/contribute</url>
+  <url type="donation">https://github.com/sponsors/alemart</url>
   <url type="help">https://wiki.opensurge2d.org</url>
-  <url type="bugtracker">https://opensurge2d.org/appdata/bugtracker.html</url>
+  <url type="bugtracker">https://github.com/alemart/opensurge/issues</url>
   <url type="translate">https://opensurge2d.org/appdata/translate.html</url>
   <screenshots>
     <screenshot type="default">

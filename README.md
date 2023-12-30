@@ -4,17 +4,29 @@
 [![License](https://img.shields.io/github/license/alemart/opensurge?color=brightgreen)](#license)
 [![GitHub Repo stars](https://img.shields.io/github/stars/alemart/opensurge?logo=github&color=orange)](https://github.com/alemart/opensurge/stargazers)
 [![Discord server](https://img.shields.io/discord/493384707937927178?color=5662f6&logo=discord&logoColor=white)](https://discord.gg/w8JqM7m)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/alemart?label=Sponsor%20me&logo=github%20sponsors&style=social)](https://github.com/sponsors/alemart)
+[![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCqy8swP261RPePNdBdJUdHg?style=flat&logo=youtube&label=YouTube&color=ff0000)](https://youtube.com/alemart88)
 
-Make your dreams come true with **Surge Engine**, an open source game engine for retro games! Get joyful with **Surge the Rabbit**, a fun retro platformer full of playfulness!
+**Surge the Rabbit** is a fun jump 'n run retro game made in the spirit of classic platformers of the 90s. The levels are filled with challenges, gimmicks and hazards! Exciting adventures are waiting for you! You may also use it as a base to create your own amazing games!
 
-[Download now](https://opensurge2d.org) | [Create your games](https://wiki.opensurge2d.org/Introduction_to_Modding) | [Learn scripting](https://docs.opensurge2d.org) | [Watch videos](https://youtube.com/alemart88)
+**Make your dreams come true!** Surge Engine is the very flexible game engine that powers Surge the Rabbit. Its capabilities include: level editing, artwork modding, full blown scripting, and much more! It's an open-source, cross-platform retro game engine that runs on Desktops and on mobile devices.
+
+**The fun is multiplied!** Several MODs created by the fans in the community can be played on the engine. For those who get involved, this project is also a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.
 
 <img src="https://opensurge2d.org/surge-demo.gif" alt="Open Surge demo" width="480">
 
+## Support the project
+
+Please support the development of the project:
+
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/alemart?style=social&logo=github%20sponsors&label=Support%20me%20on%20GitHub%20Sponsors)](https://github.com/sponsors/alemart)
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J41O00K)
 
----
+## Documentation
+
+* [Open Surge Wiki](https://wiki.opensurge2d.org)
+* [Introduction to modding](https://wiki.opensurge2d.org/Introduction_to_Modding)
+* [SurgeScript documentation](https://docs.opensurge2d.org)
 
 ## About
 
@@ -35,11 +47,9 @@ Run `opensurge --help`
 Extract the MOD to your filesystem and run the game.
 
 - Windows: launch the executable.
-- Linux, macOS: run `opensurge --game /path/to/game/` on the command-line.
+- Linux, macOS: run `opensurge --game /path/to/game/` on the command-line or load the game from the options screen.
 
-Use preferably the same engine version as the MOD if a native executable isn't provided (check `logfile.txt`).
-
-Linux users should extract the MOD into their home folder, preferably into `~/Downloads`.
+Linux users should extract MODs preferably to their home folder. Flatpak users may use `~/Downloads`.
 
 [Visit the wiki](https://wiki.opensurge2d.org/User-made_games) for more information on user-made MODs.
 
@@ -82,9 +92,9 @@ The default paths of these locations vary according to the platform:
     * `share`: `Contents/Resources`
     * `user`: `~/Library/Application Support/opensurge/` or `$OPENSURGE_USER_PATH`
 
-If you intend to hack the game, it's easier to have all files in the same place (read-write), because some of the above folders are read-only. [Download the sources](https://github.com/alemart/opensurge/releases), extract them to your filesystem and use the `--game` command-line option as explained in [Running MODs](#running-mods).
+If you intend to hack the game, it's easier to have all files in the same place (read-write), because some of the above folders are read-only. [Download the sources](https://github.com/alemart/opensurge/releases) (use the same engine version), extract them to your filesystem and use the `--game-folder` command-line option.
 
-Tip: since version 0.6.1 you can use the command-line option `--verbose` to see where the files are. The directories will appear at the beginning of the output.
+Tip: since version 0.6.1, check the *Engine information* at the options screen to see where the files are. Alternatively, you can use the command-line option `--verbose`: the directories will appear at the beginning of the output.
 
 ### Compiling the engine
 
