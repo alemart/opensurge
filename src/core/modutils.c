@@ -131,6 +131,8 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/misc/animal.ss",                           ":0.6.1",                   /* animation fix in 0.6.1 */
     "scripts/behaviors/platformer.ss",                  ":0.6.0",                   /* since 0.6.1, animal.ss uses Platformer.gravityMultiplier introduced in 0.6.0 (underwater effect) */
 
+    "scripts/surge_the_rabbit/surge_the_rabbit.ss",     ":0.6.1",                   /* use own script */
+
     "scripts/items/profiler.ss",                        ":",                        /* always use own Profiler */
 #endif
 
