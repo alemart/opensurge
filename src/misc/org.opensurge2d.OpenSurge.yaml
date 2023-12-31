@@ -1,6 +1,6 @@
 app-id: org.opensurge2d.OpenSurge
 runtime: org.freedesktop.Platform
-runtime-version: "21.08"
+runtime-version: "23.08"
 sdk: org.freedesktop.Sdk
 command: opensurge
 rename-icon: opensurge
@@ -31,14 +31,17 @@ modules:
         sha256: 1991500eaeb8d5325e3a8361847ff3bf8e03ec89252b7915e1f25b3f8ab5d560
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DPHYSFS_BUILD_TEST=OFF
+      - -DPHYSFS_BUILD_DOCS=OFF
+      - -DPHYSFS_BUILD_STATIC=OFF
 
   - name: liballegro5
     buildsystem: cmake-ninja
     builddir: true
     sources:
       - type: archive
-        url: https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
-        sha256: c1e3b319d99cb453b39d393572ba2b9f3de42a96de424aee7d4a1abceaaa970c
+        url: https://github.com/liballeg/allegro5/releases/download/5.2.9.0/allegro-5.2.9.0.tar.gz
+        sha256: e006dffe691b6d836fefd3be7a46b91fee5370581c77d66a6ce5eaf30da9ddbc
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - -DWANT_DEMO=OFF
@@ -52,7 +55,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/alemart/surgescript.git
-        tag: v0.5.6.1
+        tag: v0.6.0
         #commit: ""
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
@@ -65,11 +68,11 @@ modules:
     sources:
       - type: git
         url: https://github.com/alemart/opensurge.git
-        tag: v0.6.0.3
+        tag: v0.6.1
         #commit: ""
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
-      - -DBLEEDING_EDGE=OFF
+      - -DGAME_BUILD_VERSION=flatpak
       - -DALLEGRO_MONOLITH=OFF
       - -DCMAKE_LIBRARY_PATH=/app/lib
       - -DCMAKE_INCLUDE_PATH=/app/include

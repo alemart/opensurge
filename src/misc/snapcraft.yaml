@@ -7,12 +7,13 @@ confinement: strict
 
 apps:
   opensurge:
-    command: bin/desktop-launch $SNAP/usr/games/opensurge
+    command: snap/command-chain/desktop-launch $SNAP/usr/games/opensurge
     desktop: usr/share/applications/opensurge.desktop
     common-id: org.opensurge2d.OpenSurge
+    extensions: [gnome-3-38] # core20
     environment:
-      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
-      DISABLE_WAYLAND: 1
+      DISABLE_WAYLAND: '1'
+      GTK_USE_PORTAL: '1'
     plugs:
       - home
       - desktop
@@ -28,14 +29,14 @@ layout:
 
 parts:
   opensurge:
-    after: [desktop-glib-only, liballegro5, surgescript]
+    after: [libphysfs, liballegro5, surgescript]
     source: https://github.com/alemart/opensurge.git
-    source-tag: v0.6.0.3
+    #source-tag: v0.6.1
     plugin: cmake
     parse-info: [usr/share/metainfo/opensurge.appdata.xml]
     cmake-parameters:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DBLEEDING_EDGE=OFF
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DGAME_BUILD_VERSION=snap
       - -DALLEGRO_MONOLITH=OFF
       - -DDESKTOP_INSTALL=ON
       - -DCMAKE_INSTALL_PREFIX=/usr
@@ -44,10 +45,12 @@ parts:
       - -DDESKTOP_ENTRY_PATH=/usr/share/applications
       - -DDESKTOP_ICON_PATH=/usr/share/pixmaps
       - -DDESKTOP_METAINFO_PATH=/usr/share/metainfo
-      - -DSURGESCRIPT_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include
-      - -DSURGESCRIPT_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET
+      - -DPHYSFS_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include
+      - -DPHYSFS_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET
       - -DALLEGRO_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include
       - -DALLEGRO_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/
+      - -DSURGESCRIPT_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include
+      - -DSURGESCRIPT_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET
     build-packages:
       - build-essential
     stage-packages:
@@ -93,31 +96,46 @@ parts:
       - libxinerama1
       - libxrandr2
       - libxrender1
-      - libphysfs1
 
   surgescript:
     source: https://github.com/alemart/surgescript.git
-    source-tag: v0.5.6.1
+    #source-tag: v0.6.0
     plugin: cmake
     cmake-parameters:
-      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DWANT_EXECUTABLE=OFF
       - -DWANT_STATIC=OFF
     build-packages:
       - build-essential
 
-  liballegro5:
-    source: https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
-    source-checksum: sha256/c1e3b319d99cb453b39d393572ba2b9f3de42a96de424aee7d4a1abceaaa970c
+  libphysfs:
+    source: https://github.com/icculus/physfs/archive/refs/tags/release-3.2.0.tar.gz
+    source-checksum: sha256/1991500eaeb8d5325e3a8361847ff3bf8e03ec89252b7915e1f25b3f8ab5d560
     plugin: cmake
     cmake-parameters:
-      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DPHYSFS_BUILD_TEST=OFF
+      - -DPHYSFS_BUILD_DOCS=OFF
+      - -DPHYSFS_BUILD_STATIC=OFF
+    build-packages:
+      - build-essential
+
+  liballegro5:
+    after: [libphysfs]
+    source: https://github.com/liballeg/allegro5/releases/download/5.2.9.0/allegro-5.2.9.0.tar.gz
+    source-checksum: sha256/e006dffe691b6d836fefd3be7a46b91fee5370581c77d66a6ce5eaf30da9ddbc
+    plugin: cmake
+    cmake-parameters:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DWANT_DEMO=OFF
       - -DWANT_DOCS=OFF
       - -DWANT_EXAMPLES=OFF
       - -DWANT_TESTS=OFF
+      - -DPHYSFS_INCLUDE_DIR=$SNAPCRAFT_STAGE/usr/include
+      - -DPHYSFS_LIBRARY=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libphysfs.so
     build-packages: # lean A5
       - build-essential
       - zlib1g-dev
@@ -127,16 +145,58 @@ parts:
       - libpng-dev
       - libjpeg8-dev
       - libfreetype6-dev
-      - libphysfs-dev
       - libgtk-3-dev
       - libglu1-mesa-dev
       - libgl1-mesa-dev
-
-  desktop-glib-only:
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: glib-only
-    plugin: make
-    build-packages:
-      - libglib2.0-dev
     stage-packages:
-      - libglib2.0-bin
+      - libasyncns0
+      - libatk-bridge2.0-0
+      - libatk1.0-0
+      - libatspi2.0-0
+      - libcairo-gobject2
+      - libcairo2
+      - libdatrie1
+      - libepoxy0
+      - libflac8
+      - libfontconfig1
+      - libfreetype6
+      - libfribidi0
+      - libgdk-pixbuf2.0-0
+      - libglvnd0
+      - libglx0
+      - libgraphite2-3
+      - libgtk-3-0
+      - libharfbuzz0b
+      - libjpeg-turbo8
+      - libogg0
+      - libopengl0
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - libpng16-16
+      - libpulse0
+      - libsndfile1
+      - libthai0
+      - libvorbis0a
+      - libvorbisenc2
+      - libvorbisfile3
+      - libwayland-client0
+      - libwayland-cursor0
+      - libwayland-egl1
+      - libx11-6
+      - libxau6
+      - libxcb-render0
+      - libxcb-shm0
+      - libxcb1
+      - libxcomposite1
+      - libxcursor1
+      - libxdamage1
+      - libxdmcp6
+      - libxext6
+      - libxfixes3
+      - libxi6
+      - libxinerama1
+      - libxkbcommon0
+      - libxrandr2
+      - libxrender1
