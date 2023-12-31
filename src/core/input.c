@@ -308,6 +308,12 @@ void input_update()
                 float x = state.stick[stick_id].axis[0];
                 float y = state.stick[stick_id].axis[1];
 
+                /* ignore what is probably the right analog stick (stick_id = 1
+                   with 2 axes), but not a D-Pad that is mapped to a stick
+                   (probably the first stick with stick_id >= 2 and 2 axes). */
+                if(stick_id == 1)
+                    continue;
+
                 /* ignore the dead-zone and normalize the data back to [-1,1] */
                 const float NORMALIZER = 1.0f - DEADZONE_THRESHOLD;
                 if(fabs(x) >= DEADZONE_THRESHOLD)
@@ -315,23 +321,18 @@ void input_update()
                 if(fabs(y) >= DEADZONE_THRESHOLD)
                     joy[j].axis[AXIS_Y] += (y - DEADZONE_THRESHOLD * sign(y)) / NORMALIZER;
 
-                /* read nothing else */
-                break;
-
             }
 
         }
 
-        #if 0
-        /* clamp values to [0,1]; not needed if we read a single stick */
+        /* clamp values to [0,1] */
         joy[j].axis[AXIS_X] = clip(joy[j].axis[AXIS_X], -1.0f, 1.0f);
         joy[j].axis[AXIS_Y] = clip(joy[j].axis[AXIS_Y], -1.0f, 1.0f);
-        #endif
     }
 
     /* remap joystick IDs. The first joystick (if any) must be a valid one!
-       This is especially important on Android, which may report the first
-       joystick as an accelerometer. */
+       This is especially important on Android, which reports the first
+       joystick as an accelerometer (on Allegro 5.2.9). */
     for(int j = 0; j < MAX_JOYS; j++)
         wanted_joy[j] = NULL;
 
