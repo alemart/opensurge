@@ -70,8 +70,14 @@ object "SurgeTheRabbit"
     {
         // print a reminder
         if(isBaseGame()) {
-            if(SurgeEngine.version !== Game.version)
-                Console.print("Outdated Game.version " + Game.version);
+            engineVersion = SurgeEngine.version;
+            if((j = engineVersion.indexOf("-")) >= 0)
+                engineVersion = engineVersion.substr(0, j);
+
+            if(Game.version !== engineVersion) {
+                Console.print("SurgeEngine.version: " + SurgeEngine.version);
+                Console.print("Game.version: " + Game.version);
+            }
         }
     }
 }
