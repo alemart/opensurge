@@ -151,12 +151,12 @@ TITLESCREEN_OPTIONS         "POSTAVKE"
 TITLESCREEN_SHARE           "PODIJELITE"
 TITLESCREEN_DONATE          "DONIRAJTE"
 TITLESCREEN_QUIT            "IZAĐI"
-TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "DEMO 0.6.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "NASTAVI"
-ENDOFDEMO_VERSION           "DEMO 1.1\n"
+ENDOFDEMO_VERSION           "DEMO 0.6.1\n"
 ENDOFDEMO_TEXT              "Hvala vam što ste igrali! Surge the Rabbit je u razvoju.\n\nPosjetite <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> za ažuriranja!\n\nSada da vidimo kako i vi možete praviti vlastite igre!"
 
 // Rate the Game
@@ -167,12 +167,12 @@ FIXME RATEGAME_YES                "Sure!!!"
 FIXME RATEGAME_NO                 "Not now"
 
 // Play classic levels
-FIXME PLAYCLASSIC_MESSAGE         "Play on the classic levels?"
-FIXME PLAYCLASSIC_YES             "$OPTIONS_YES"
-FIXME PLAYCLASSIC_NO              "$OPTIONS_NO"
+FIXME PLAYCLASSICLEVELS_TEXT      "Play on the classic levels?"
+FIXME PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+FIXME PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-FIXME THANKSFORPLAYING_MESSAGE    "Thanks for playing!"
+FIXME THANKSFORPLAYING_TEXT       "Thanks for playing!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENI"

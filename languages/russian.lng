@@ -154,13 +154,13 @@ TITLESCREEN_OPTIONS         "НАСТРОЙКИ"
 TITLESCREEN_SHARE           "ПОДЕЛИТЬСЯ"
 TITLESCREEN_DONATE          "ПОДДЕРЖАТЬ"
 TITLESCREEN_QUIT            "ВЫХОД"
-TITLESCREEN_VERSION         "DEMO 1.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "DEMO 0.6.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 // v5
 ENDOFDEMO_CONTINUE          "ПРОДОЛЖИТЬ"
-ENDOFDEMO_VERSION           "ДЕМО 1.1\n"
+ENDOFDEMO_VERSION           "ДЕМО 0.6.1\n"
 ENDOFDEMO_TEXT              "Спасибо за игру! Surge the Rabbit находится в разработке.\n\nСледите за обновлениями на <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> !\n\nТеперь посмотрим как вы тоже можете создать свою игру!"
 
 // Rate the Game
@@ -171,12 +171,12 @@ FIXME RATEGAME_YES                "Sure!!!"
 FIXME RATEGAME_NO                 "Not now"
 
 // Play classic levels
-FIXME PLAYCLASSIC_MESSAGE         "Play on the classic levels?"
-FIXME PLAYCLASSIC_YES             "$OPTIONS_YES"
-FIXME PLAYCLASSIC_NO              "$OPTIONS_NO"
+FIXME PLAYCLASSICLEVELS_TEXT      "Play on the classic levels?"
+FIXME PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+FIXME PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-FIXME THANKSFORPLAYING_MESSAGE    "Thanks for playing!"
+FIXME THANKSFORPLAYING_TEXT       "Thanks for playing!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "МЕНЮ"
