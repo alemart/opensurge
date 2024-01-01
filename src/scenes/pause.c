@@ -935,8 +935,17 @@ void legacy_update()
 
     /* unpause in mobile mode: accept fire1 */
     if(mobilegamepad_is_visible() && input_button_pressed(input, IB_FIRE1)) {
-        scenestack_pop();
-        return;
+        if(!input_button_down(input, IB_UP)) {
+            /* go back to the game */
+            scenestack_pop();
+            return;
+        }
+        else {
+            /* enter the mobile menu */
+            scenestack_pop();
+            scenestack_push(storyboard_get_scene(SCENE_MOBILEMENU), snapshot);
+            return;
+        }
     }
 }
 
