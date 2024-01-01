@@ -106,6 +106,7 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/core/camera.ss",                           ":0.6.1",                   /* changes to the update cycle in 0.6.1; now using lateUpdate() */
     "scripts/items/walk_on_water.ss",                   "0.6.0:0.6.1",              /* changes to the update cycle in 0.6.1; now using lateUpdate() */
     "scripts/players/lock_angle.ss",                    ":0.6.1",                   /* changes to the update cycle in 0.6.1; now using lateUpdate() */
+    "scripts/friends/skaterbug.ss",                     ":0.6.1",                   /* changes to the update cycle in 0.6.1; now using player.moveBy() */
 
     "scripts/core/water.ss",                            ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/items/bg_xchg.ss",                         ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
