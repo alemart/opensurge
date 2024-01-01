@@ -19,4 +19,5 @@ level           "levels/scenes/end_of_demo.lev"
 level           "levels/demo-1.lev"
 level           "levels/demo-2.lev"
 
+level           "levels/scenes/play_classic_levels.lev"
 quest           "quests/classic.qst"
