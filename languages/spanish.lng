@@ -100,7 +100,7 @@ FIXME OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
 FIXME OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
 FIXME OPTIONS_PLAYMOD             "Play a game"
 FIXME OPTIONS_PLAYMOD_NOTAGAME    "The selected item is not an Open Surge game!"
-FIXME OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your experience. Do you really want to disable it?"
+FIXME OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your gaming experience. Are you sure you want to disable it?"
 FIXME OPTIONS_MODSTORAGE          "Storage"
 FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
 FIXME OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
@@ -164,6 +164,14 @@ FIXME RATEGAME_TITLE              "Enjoying Surge the Rabbit?"
 FIXME RATEGAME_MESSAGE            "We'd love to hear about your experience so far! Your feedback helps to grow this open source game!" // 2 lines max.
 FIXME RATEGAME_YES                "Sure!!!"
 FIXME RATEGAME_NO                 "Not now"
+
+// Play classic levels
+FIXME PLAYCLASSIC_MESSAGE         "Play on the classic levels?"
+FIXME PLAYCLASSIC_YES             "$OPTIONS_YES"
+FIXME PLAYCLASSIC_NO              "$OPTIONS_NO"
+
+// Thanks for playing
+FIXME THANKSFORPLAYING_MESSAGE    "Thanks for playing!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"

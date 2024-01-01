@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-12-23"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-12-31"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -108,7 +108,7 @@ OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
 OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
 OPTIONS_PLAYMOD             "Play a game"
 OPTIONS_PLAYMOD_NOTAGAME    "The selected item is not an Open Surge game!"
-OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your experience. Do you really want to disable it?"
+OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your gaming experience. Are you sure you want to disable it?"
 OPTIONS_MODSTORAGE          "Storage"
 OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
 OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
@@ -172,6 +172,14 @@ RATEGAME_TITLE              "Rate Surge the Rabbit?"
 RATEGAME_MESSAGE            "We'd love to hear about your experience so far! Your feedback helps to grow this open source game!" // 2 lines max.
 RATEGAME_YES                "Sure!!!"
 RATEGAME_NO                 "Not now"
+
+// Play classic levels
+PLAYCLASSIC_MESSAGE         "Play on the classic levels?"
+PLAYCLASSIC_YES             "$OPTIONS_YES"
+PLAYCLASSIC_NO              "$OPTIONS_NO"
+
+// Thanks for playing
+THANKSFORPLAYING_MESSAGE    "Thanks for playing!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
