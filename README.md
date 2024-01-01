@@ -8,7 +8,7 @@
 
 **Surge the Rabbit** is a fun jump 'n run retro game made in the spirit of classic platformers of the 90s. The levels are filled with challenges, gimmicks and hazards! Exciting adventures are waiting for you! You may also use it as a base to create your own amazing games!
 
-**Make your dreams come true!** Surge Engine is the very flexible game engine that powers Surge the Rabbit. Its capabilities include: level editing, artwork modding, full blown scripting, and much more! It's an open-source, cross-platform retro game engine that runs on Desktops and on mobile devices.
+**Make your dreams come true!** Surge Engine is the very flexible game engine that powers Surge the Rabbit. Its capabilities include: level editing, artwork modding, full blown scripting, and much more! It's an open-source, cross-platform retro game engine that runs on Desktop computers and on mobile devices.
 
 **The fun is multiplied!** Several MODs created by the fans in the community can be played on the engine. For those who get involved, this project is also a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.
 
