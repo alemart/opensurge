@@ -47,5 +47,6 @@ struct inputmap_t {
 void inputmap_init();
 void inputmap_release();
 const inputmap_t* inputmap_get(const char* name);
+bool inputmap_exists(const char* name);
 
 #endif

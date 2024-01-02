@@ -263,15 +263,31 @@ const inputmap_t* inputmap_get(const char* name)
     inputmapnode_t* f = hashtable_inputmapnode_t_find(mappings, name);
 
     if(f == NULL) {
+        /* fail silently */
         logfile_message("WARNING: Can't find inputmap '%s'", name);
-        if((f = hashtable_inputmapnode_t_find(mappings, NULL_INPUTMAP)) == NULL) { /* fail silently */
-            fatal_error("Can't find inputmap '%s'", name); /* shouldn't happen */
+
+        if((f = hashtable_inputmapnode_t_find(mappings, NULL_INPUTMAP)) == NULL) {
+            /* this shouldn't happen */
+            fatal_error("Can't find inputmap '%s'", name);
             return NULL;
         }
     }
 
     return f->data;
 }
+
+/*
+ * inputmap_exists()
+ * Checks if an input mapping with the given name exists
+ */
+bool inputmap_exists(const char* name)
+{
+    if(name == NULL)
+        return false;
+
+    return NULL != hashtable_inputmapnode_t_find(mappings, name);
+}
+
 
 
 
@@ -312,6 +328,9 @@ int traverse(const parsetree_statement_t* stmt, void* vpath)
         nanoparser_expect_program(p2, "inputmap: must provide inputmap attributes");
 
         name = nanoparser_get_string(p1);
+        if(*name == '\0')
+            fatal_error("inputmap: empty names are not accepted in %s:%d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
         if(NULL == hashtable_inputmapnode_t_find(mappings, name)) {
             inputmapnode_t* f = inputmapnode_create(name);
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)f, traverse_inputmap);
