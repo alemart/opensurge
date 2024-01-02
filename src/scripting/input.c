@@ -20,8 +20,9 @@
 
 #include <surgescript.h>
 #include <stdint.h>
-#include "../core/input.h"
 #include "../util/djb2.h"
+#include "../core/input.h"
+#include "../core/inputmap.h"
 
 /* input API */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -34,6 +35,7 @@ static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const
 static surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_remap(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* button hashes */
 #define BUTTON_UP       DJB2_CONST('u','p')
@@ -69,6 +71,7 @@ void scripting_register_input(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Input", "get_enabled", fun_getenabled, 0);
     surgescript_vm_bind(vm, "Input", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "Input", "__init", fun_init, 1);
+    surgescript_vm_bind(vm, "Input", "remap", fun_remap, 1);
 }
 
 /* Console routines */
@@ -111,7 +114,7 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
     return NULL;
 }
 
-/* __init(inputMap): set an input map */
+/* __init(inputMapName): set an input map on initialization */
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
@@ -126,6 +129,25 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     }
 
     return NULL;
+}
+
+/* remap(inputMapName): change the input mapping. Returns true on success */
+surgescript_var_t* fun_remap(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_var_t* ret = surgescript_var_create();
+
+    if(surgescript_var_is_null(param[0]))
+        return surgescript_var_set_bool(ret, false);
+
+    const char* inputmap = surgescript_var_fast_get_string(param[0]);
+    if(!inputmap_exists(inputmap)) {
+        video_showmessage("Input map \"%s\" doesn't exist", inputmap);
+        return surgescript_var_set_bool(ret, false);
+    }
+
+    input_t* input = (input_t*)surgescript_object_userdata(object);
+    input_change_mapping((inputuserdefined_t*)input, inputmap);
+    return surgescript_var_set_bool(ret, true);
 }
 
 /* buttonDown(button): is the given button being held down?
