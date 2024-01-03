@@ -111,6 +111,7 @@ player_t *player_create(int id, const char *character_name)
     p->invulnerable = FALSE;
     p->immortal = FALSE;
     p->secondary = FALSE;
+    p->focusable = TRUE;
     p->aggressive = FALSE;
     p->visible = TRUE;
 
@@ -831,7 +832,7 @@ int player_has_focus(const player_t* player)
  */
 void player_focus(player_t* player)
 {
-    if(!player_has_focus(player))
+    if(!player_has_focus(player) && player_is_focusable(player))
         level_change_player(player);
 }
 
@@ -1235,6 +1236,27 @@ int player_is_secondary(const player_t* player)
 void player_set_secondary(player_t* player, int secondary)
 {
     player->secondary = secondary;
+}
+
+/*
+ * player_is_focusable()
+ * Is the player focusable? That is, can this player receive
+ * focus? If only a single player exists in the level, then
+ * that player will have focus regardless of the value of
+ * this flag.
+ */
+int player_is_focusable(const player_t* player)
+{
+    return player->focusable;
+}
+
+/*
+ * player_set_focusable()
+ * Set the focusable flag
+ */
+void player_set_focusable(player_t* player, int focusable)
+{
+    player->focusable = focusable;
 }
 
 /*

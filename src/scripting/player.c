@@ -127,6 +127,8 @@ static surgescript_var_t* fun_getimmortal(surgescript_object_t* object, const su
 static surgescript_var_t* fun_setimmortal(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getsecondary(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setsecondary(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getfocusable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setfocusable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* animation methods */
 static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -275,6 +277,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_immortal", fun_setimmortal, 1);
     surgescript_vm_bind(vm, "Player", "get_secondary", fun_getsecondary, 0);
     surgescript_vm_bind(vm, "Player", "set_secondary", fun_setsecondary, 1);
+    surgescript_vm_bind(vm, "Player", "get_focusable", fun_getfocusable, 0);
+    surgescript_vm_bind(vm, "Player", "set_focusable", fun_setfocusable, 1);
 
     /* player-specific methods */
     surgescript_vm_bind(vm, "Player", "bounce", fun_bounce, 1);
@@ -1348,6 +1352,25 @@ surgescript_var_t* fun_setsecondary(surgescript_object_t* object, const surgescr
     if(player != NULL) {
         bool secondary = surgescript_var_get_bool(param[0]);
         player_set_secondary(player, secondary);
+    }
+    return NULL;
+}
+
+/* is the player focusable? if only a single player exists in the level, then
+   that player will have the focus regardless of the value of this flag. */
+surgescript_var_t* fun_getfocusable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_focusable(player));
+}
+
+/* set the focusable flag */
+surgescript_var_t* fun_setfocusable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        bool focusable = surgescript_var_get_bool(param[0]);
+        player_set_focusable(player, focusable);
     }
     return NULL;
 }

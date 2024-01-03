@@ -71,6 +71,7 @@ struct player_t {
     int immortal;
     int aggressive;
     int secondary;
+    int focusable;
     int got_glasses;
 
     /* shields */
@@ -163,6 +164,8 @@ int player_is_immortal(const player_t* player);
 void player_set_immortal(player_t* player, int immortal);
 int player_is_secondary(const player_t* player);
 void player_set_secondary(player_t* player, int secondary);
+int player_is_focusable(const player_t* player);
+void player_set_focusable(player_t* player, int focusable);
 
 float player_speed(const player_t* player);
 void player_set_speed(player_t* player, float value);

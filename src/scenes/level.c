@@ -1741,9 +1741,14 @@ void level_change(const char* path_to_lev_file)
  */
 void level_change_player(player_t *new_player)
 {
-    int i, player_id = -1;
+    int player_id = -1;
 
-    for(i=0; i<team_size && player_id < 0; i++)
+    if(player != NULL) {
+        if(team_size > 1 && !player_is_focusable(new_player))
+            return;
+    }
+
+    for(int i = 0; i < team_size && player_id < 0; i++)
         player_id = (team[i] == new_player) ? i : player_id;
     
     if(player_id >= 0) {
