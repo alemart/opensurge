@@ -21,6 +21,7 @@
 #include <surgescript.h>
 #include <stdint.h>
 #include "../util/djb2.h"
+#include "../core/video.h"
 #include "../core/input.h"
 #include "../core/inputmap.h"
 
