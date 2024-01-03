@@ -1892,6 +1892,7 @@ void run_dying_logic(player_t* player)
         if(can_resurrect) {
             /* resurrect */
             player->dead_timer = 0.0f;
+            player_reset_underwater_timer(player);
             physicsactor_resurrect(player->pa);
             return;
         }
