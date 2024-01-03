@@ -45,8 +45,6 @@ static surgescript_var_t* fun_spawnplayers(surgescript_object_t* object, const s
 static surgescript_var_t* fun_getactive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcount(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_setmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_exists(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_get(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_call(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -84,8 +82,6 @@ void scripting_register_playermanager(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "PlayerManager", "get_count", fun_getcount, 0);
     surgescript_vm_bind(vm, "PlayerManager", "get_active", fun_getactive, 0);
     surgescript_vm_bind(vm, "PlayerManager", "get_initialLives", fun_getinitiallives, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "get_mode", fun_getmode, 0);
-    surgescript_vm_bind(vm, "PlayerManager", "set_mode", fun_setmode, 1);
     surgescript_vm_bind(vm, "PlayerManager", "exists", fun_exists, 1);
     surgescript_vm_bind(vm, "PlayerManager", "get", fun_get, 1); /* get by ID */
     surgescript_vm_bind(vm, "PlayerManager", "call", fun_call, 1); /* get by name */
@@ -265,39 +261,6 @@ surgescript_var_t* fun_getactive(surgescript_object_t* object, const surgescript
 surgescript_var_t* fun_getinitiallives(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_number(surgescript_var_create(), PLAYER_INITIAL_LIVES);
-}
-
-/* get the current mode of gameplay */
-surgescript_var_t* fun_getmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    const char* mode_name = "";
-
-    switch(player_get_mode()) {
-        case PM_COOPERATIVE:
-            mode_name = "cooperative";
-            break;
-
-        case PM_CLASSIC:
-            mode_name = "classic";
-            break;
-    }
-
-    return surgescript_var_set_string(surgescript_var_create(), mode_name);
-}
-
-/* set the current mode of gameplay */
-surgescript_var_t* fun_setmode(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    const char* mode_name = surgescript_var_fast_get_string(param[0]);
-
-    if(0 == strcmp(mode_name, "cooperative"))
-        player_set_mode(PM_COOPERATIVE);
-    else if(0 == strcmp(mode_name, "classic"))
-        player_set_mode(PM_CLASSIC);
-    else
-        video_showmessage("Invalid mode: \"%s\"", mode_name);
-
-    return NULL;
 }
 
 /* does the given player exist in the scene? */

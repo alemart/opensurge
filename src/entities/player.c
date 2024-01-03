@@ -68,7 +68,6 @@ static const float PLAYER_DEAD_RESTART_TIME = 2.5f;   /* time to restart the lev
 static int collectibles = 0;                /* shared collectibles */
 static int lives = PLAYER_INITIAL_LIVES;    /* shared lives */
 static int score = 0;                       /* shared score */
-static playermode_t mode = PM_COOPERATIVE;  /* mode of gameplay */
 
 /* misc */
 static void update_shield(player_t *player);
@@ -324,32 +323,10 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
             }
         }
 
-        /* modes of gameplay */
-        switch(mode) {
+        /* am I hurt? Gotta have the focus */
+        if(player_is_getting_hit(player) || player_is_dying(player))
+            player_focus(player);
 
-            /* cooperative play */
-            case PM_COOPERATIVE: {
-                /* am I hurt? Gotta have the focus */
-                if(player_is_getting_hit(player) || player_is_dying(player)) {
-                    if(!player_has_focus(player))
-                        player_focus(player);
-                }
-                break;
-            }
-
-            /* classic mode */
-            case PM_CLASSIC: {
-                /* make non-focused players invulnerable, immortal and secondary.
-                   we continuously update the flags (both on and off) because we
-                   take character switching into account. */
-                int has_focus = player_has_focus(player);
-                player_set_invulnerable(player, !has_focus);
-                player_set_immortal(player, !has_focus);
-                player_set_secondary(player, !has_focus);
-                break;
-            }
-
-        }
     }
 #if 0
     else {
@@ -1568,24 +1545,6 @@ int player_get_score()
 void player_set_score(int value)
 {
     score = max(0, value);
-}
-
-/*
- * player_set_mode()
- * Set the mode of gameplay
- */
-void player_set_mode(playermode_t new_mode)
-{
-    mode = new_mode;
-}
-
-/*
- * player_get_mode()
- * Get the current mode of gameplay
- */
-playermode_t player_get_mode()
-{
-    return mode;
 }
 
 

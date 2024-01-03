@@ -38,12 +38,6 @@ typedef enum playershield_t {
     SH_WINDSHIELD       /* wind shield */
 } playershield_t;
 
-/* modes of gameplay */
-typedef enum playermode_t {
-    PM_COOPERATIVE,     /* cooperative play */
-    PM_CLASSIC          /* classic mode */
-} playermode_t;
-
 /* forward declarations */
 struct actor_t;
 struct animation_t;
@@ -217,7 +211,5 @@ int player_get_lives();
 void player_set_lives(int value);
 int player_get_score();
 void player_set_score(int value);
-void player_set_mode(playermode_t new_mode);
-playermode_t player_get_mode();
 
 #endif
