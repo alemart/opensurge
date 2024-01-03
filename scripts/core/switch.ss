@@ -21,6 +21,7 @@ object "Switch Controller"
         player = Player.active;
         input = player.input;
 
+        // switch character by pressing L1 or R1
         if(input.buttonPressed(rightShoulder))
             switchCharacter(-1);
         else if(input.buttonPressed(leftShoulder))
@@ -51,16 +52,36 @@ object "Switch Controller"
             if(player.hasFocus()) {
 
                 if(!(player.midair || player.underwater || player.frozen)) {
-                    next = (i + (n + direction)) % n;
-                    Player[next].focus();
-                    adjustShoulderButtons(Player[next].input);
+                    nextPlayer = findNextFocusablePlayer(i, direction);
+                    if(nextPlayer !== null) {
+                        nextPlayer.focus();
+                        if(nextPlayer.hasFocus())
+                            adjustShoulderButtons(nextPlayer.input);
+                    }
                 }
                 else
                     deny.play();
 
                 break;
+
             }
         }
+    }
+
+    fun findNextFocusablePlayer(playerIndex, direction)
+    {
+        n = Player.count;
+        i = playerIndex;
+
+        for(k = 1; k < n; k++) {
+            next = (i + (n + direction * k)) % n;
+            player = Player[next];
+
+            if(player.focusable)
+                return player;
+        }
+
+        return null;
     }
 
     fun adjustShoulderButtons(input)
