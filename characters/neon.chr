@@ -10,7 +10,7 @@
 character "Neon"
 {
     companions                      "Dash Smoke" "Brake Smoke" "Neon's Jetpack"
-    
+
     multipliers
     {
         acceleration                1.0
@@ -24,7 +24,7 @@ character "Neon"
         airacceleration             1.0
         airdrag                     1.0
     }
-    
+
     animations
     {
         sprite_name                 "Neon"
@@ -55,7 +55,7 @@ character "Neon"
         brake                       TRUE
         charge                      TRUE
     }
-    
+
     samples
     {
         jump                        "samples/jump.wav"

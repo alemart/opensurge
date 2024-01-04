@@ -24,7 +24,7 @@ character "Charge"
         airacceleration             1.0
         airdrag                     1.0
     }
-    
+
     animations
     {
         sprite_name                 "Charge"
@@ -55,7 +55,7 @@ character "Charge"
         brake                       TRUE
         charge                      TRUE
     }
-    
+
     samples
     {
         jump                        "samples/jump.wav"
