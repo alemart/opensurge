@@ -14,5 +14,8 @@ object "None" is "companion"
     {
         // disable physics
         player.frozen = true;
+
+        // make it non-focusable
+        player.focusable = false;
     }
 }
