@@ -116,8 +116,9 @@ player_t *player_create(int id, const char *character_name)
 
     /* auxiliary variables */
     p->on_movable_platform = FALSE;
-    p->got_glasses = FALSE;
     p->thrown_while_rolling = FALSE;
+    p->mirror = IF_NONE;
+    p->got_glasses = FALSE;
 
     /* blink */
     p->blinking = FALSE;
@@ -399,6 +400,17 @@ void player_render(player_t *player, v2d_t camera_position)
     /* invisible player? */
     if(!player->visible)
         return;
+
+    /* mirroring */
+    if(((int)physicsactor_is_facing_right(player->pa)) ^ ((player->mirror & IF_HFLIP) != 0))
+        act->mirror &= ~IF_HFLIP;
+    else
+        act->mirror |= IF_HFLIP;
+
+    if(!(player->mirror & IF_VFLIP))
+        act->mirror &= ~IF_VFLIP;
+    else
+        act->mirror |= IF_VFLIP;
 
     /* hotspot "gambiarra" */
     hotspot_magic(player);
@@ -814,6 +826,62 @@ void player_focus(player_t* player)
 }
 
 /*
+ * player_shield_type()
+ * Returns the current shield type of the player
+ */
+playershield_t player_shield_type(const player_t* player)
+{
+    return player->shield_type;
+}
+
+/*
+ * player_grant_shield()
+ * Grants the player a shield
+ */
+void player_grant_shield(player_t* player, playershield_t shield_type)
+{
+    player->shield_type = shield_type;
+}
+/*
+ * player_layer()
+ * The current layer of the player (loop system)
+ */
+bricklayer_t player_layer(const player_t* player)
+{
+    return player->layer;
+}
+
+/*
+ * player_set_layer()
+ * Sets the current layer of the player (useful for the loop system)
+ */
+void player_set_layer(player_t* player, bricklayer_t layer)
+{
+    player->layer = layer;
+}
+
+/*
+ * player_mirror_flags()
+ * Gets the mirror flags of the player (rendering)
+ */
+int player_mirror_flags(const player_t* player)
+{
+    return player->mirror;
+}
+
+/*
+ * player_set_mirror_flags()
+ * Sets the mirror flags of the player (rendering)
+ */
+void player_set_mirror_flags(player_t* player, int flags)
+{
+    player->mirror = flags;
+}
+
+
+
+
+/*
  * player_is_attacking()
  * Returns TRUE if a given player is attacking;
  * FALSE otherwise
@@ -1063,24 +1131,6 @@ void player_set_invincible(player_t* player, int invincible)
 }
 
 /*
- * player_shield_type()
- * Returns the current shield type of the player
- */
-playershield_t player_shield_type(const player_t* player)
-{
-    return player->shield_type;
-}
-
-/*
- * player_grant_shield()
- * Grants the player a shield
- */
-void player_grant_shield(player_t* player, playershield_t shield_type)
-{
-    player->shield_type = shield_type;
-}
-
-/*
  * player_is_frozen()
  * Is the player frozen (i.e., without movement)?
  */
@@ -1101,24 +1151,6 @@ void player_set_frozen(player_t* player, int frozen)
     }
 
     player->disable_movement = frozen;
-}
-
-/*
- * player_layer()
- * The current layer of the player (loop system)
- */
-bricklayer_t player_layer(const player_t* player)
-{
-    return player->layer;
-}
-
-/*
- * player_set_layer()
- * Sets the current layer of the player (useful for the loop system)
- */
-void player_set_layer(player_t* player, bricklayer_t layer)
-{
-    player->layer = layer;
 }
 
 /*
@@ -1691,12 +1723,6 @@ void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
 
     /* physics update */
     physicsactor_update(pa, obstaclemap);
-
-    /* mirroring */
-    if(physicsactor_is_facing_right(pa))
-        act->mirror &= ~IF_HFLIP;
-    else
-        act->mirror |= IF_HFLIP;
 
     /* update position */
     act->position = physicsactor_get_position(pa);

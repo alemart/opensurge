@@ -66,6 +66,7 @@ struct player_t {
     int aggressive;
     int secondary;
     int focusable;
+    int mirror;
     int got_glasses;
 
     /* shields */
@@ -134,6 +135,13 @@ float player_seconds_remaining_to_drown(const player_t *player);
 void player_set_breath_time(player_t* player, float seconds);
 float player_breath_time(const player_t* player);
 
+playershield_t player_shield_type(const player_t* player);
+void player_grant_shield(player_t* player, playershield_t shield_type);
+bricklayer_t player_layer(const player_t* player);
+void player_set_layer(player_t* player, bricklayer_t layer);
+int player_mirror_flags(const player_t* player);
+void player_set_mirror_flags(player_t* player, int flags);
+
 int player_is_midair(const player_t *player);
 int player_is_attacking(const player_t *player);
 int player_is_blinking(const player_t *player);
@@ -142,12 +150,8 @@ int player_is_turbocharged(const player_t *player);
 void player_set_turbo(player_t* player, int turbo);
 int player_is_invincible(const player_t *player);
 void player_set_invincible(player_t* player, int invincible);
-playershield_t player_shield_type(const player_t* player);
-void player_grant_shield(player_t* player, playershield_t shield_type);
 int player_is_frozen(const player_t* player);
 void player_set_frozen(player_t* player, int frozen);
-bricklayer_t player_layer(const player_t* player);
-void player_set_layer(player_t* player, bricklayer_t layer);
 int player_is_visible(const player_t* player);
 void player_set_visible(player_t* player, int visible);
 int player_is_aggressive(const player_t* player);
