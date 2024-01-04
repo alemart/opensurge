@@ -60,8 +60,6 @@ static surgescript_var_t* fun_getsecondstodrown(surgescript_object_t* object, co
 static surgescript_var_t* fun_gettransform(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcollider(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getdirection(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getcapspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_gethlocktime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -130,7 +128,7 @@ static surgescript_var_t* fun_setsecondary(surgescript_object_t* object, const s
 static surgescript_var_t* fun_getfocusable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setfocusable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
-/* animation methods */
+/* animation */
 static surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setanim(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -138,8 +136,16 @@ static surgescript_var_t* fun_getanchor(surgescript_object_t* object, const surg
 static surgescript_var_t* fun_gethotspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getactionspot(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getactionoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onanimationchange(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_resetanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+
+/* graphics & rendering */
+static surgescript_var_t* fun_gethflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_sethflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getvflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setvflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* methods */
 static surgescript_var_t* fun_bounce(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -211,8 +217,6 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_collider", fun_getcollider, 0);
     surgescript_vm_bind(vm, "Player", "get_direction", fun_getdirection, 0);
     surgescript_vm_bind(vm, "Player", "get_slope", fun_getslope, 0);
-    surgescript_vm_bind(vm, "Player", "get_width", fun_getwidth, 0);
-    surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Player", "get_topspeed", fun_gettopspeed, 0);
     surgescript_vm_bind(vm, "Player", "get_capspeed", fun_getcapspeed, 0);
     surgescript_vm_bind(vm, "Player", "get_hlockTime", fun_gethlocktime, 0);
@@ -304,8 +308,16 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_hotSpot", fun_gethotspot, 0);
     surgescript_vm_bind(vm, "Player", "get_actionSpot", fun_getactionspot, 0);
     surgescript_vm_bind(vm, "Player", "get_actionOffset", fun_getactionoffset, 0);
+    surgescript_vm_bind(vm, "Player", "get_width", fun_getwidth, 0);
+    surgescript_vm_bind(vm, "Player", "get_height", fun_getheight, 0);
     surgescript_vm_bind(vm, "Player", "onAnimationChange", fun_onanimationchange, 1);
     surgescript_vm_bind(vm, "Player", "__resetAnimation", fun_resetanimation, 0);
+
+    /* graphics & rendering */
+    surgescript_vm_bind(vm, "Player", "get_hflip", fun_gethflip, 0);
+    surgescript_vm_bind(vm, "Player", "set_hflip", fun_sethflip, 1);
+    surgescript_vm_bind(vm, "Player", "get_vflip", fun_getvflip, 0);
+    surgescript_vm_bind(vm, "Player", "set_vflip", fun_setvflip, 1);
     
     /* general-purpose methods */
     surgescript_vm_bind(vm, "Player", "state:main", fun_main, 0);
@@ -801,20 +813,6 @@ surgescript_var_t* fun_getdirection(surgescript_object_t* object, const surgescr
     return surgescript_var_set_number(surgescript_var_create(), player == NULL || physicsactor_is_facing_right(player->pa) ? 1.0f : -1.0f);
 }
 
-/* sprite width */
-surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    player_t* player = get_player(object);
-    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? image_width(actor_image(player->actor)) : 0.0f);
-}
-
-/* sprite height */
-surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    player_t* player = get_player(object);
-    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? image_height(actor_image(player->actor)) : 0.0f);
-}
-
 /* top speed, in px/s */
 surgescript_var_t* fun_gettopspeed(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -1007,6 +1005,20 @@ surgescript_var_t* fun_getactionoffset(surgescript_object_t* object, const surge
     return action_offset;
 }
 
+/* sprite width */
+surgescript_var_t* fun_getwidth(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? image_width(actor_image(player->actor)) : 0.0f);
+}
+
+/* sprite height */
+surgescript_var_t* fun_getheight(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_number(surgescript_var_create(), player != NULL ? image_height(actor_image(player->actor)) : 0.0f);
+}
+
 /* get animation object */
 surgescript_var_t* fun_getanimation(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -1035,6 +1047,54 @@ surgescript_var_t* fun_resetanimation(surgescript_object_t* object, const surges
         surgescript_object_t* animation = get_animation(object);
         const char* sprite_name = player_sprite_name(player);
         init_animation(animation, sprite_name);
+    }
+
+    return NULL;
+}
+
+/* get horizontal flip flag relative to player.direction */
+surgescript_var_t* fun_gethflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    bool hflip = player != NULL && (player_mirror_flags(player) & IF_HFLIP) != 0;
+    return surgescript_var_set_number(surgescript_var_create(), hflip);
+}
+
+/* set horizontal flip flag relative to player.direction */
+surgescript_var_t* fun_sethflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    bool hflip = surgescript_var_get_bool(param[0]);
+
+    if(player != NULL) {
+        if(hflip)
+            player_set_mirror_flags(player, player_mirror_flags(player) | IF_HFLIP);
+        else
+            player_set_mirror_flags(player, player_mirror_flags(player) & ~IF_HFLIP);
+    }
+
+    return NULL;
+}
+
+/* get vertical flip flag */
+surgescript_var_t* fun_getvflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    bool vflip = player != NULL && (player_mirror_flags(player) & IF_VFLIP) != 0;
+    return surgescript_var_set_number(surgescript_var_create(), vflip);
+}
+
+/* set vertical flip flag */
+surgescript_var_t* fun_setvflip(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    bool vflip = surgescript_var_get_bool(param[0]);
+
+    if(player != NULL) {
+        if(vflip)
+            player_set_mirror_flags(player, player_mirror_flags(player) | IF_VFLIP);
+        else
+            player_set_mirror_flags(player, player_mirror_flags(player) & ~IF_VFLIP);
     }
 
     return NULL;
