@@ -746,6 +746,22 @@ int player_overlaps(const player_t *player, int x, int y, int width, int height)
 }
 
 /*
+ * player_bounding_box()
+ * Returns a bounding box of the player
+ */
+rect_t player_bounding_box(const player_t* player)
+{
+    /* we only consider the dimensions of the collider;
+       not those of the sprite */
+    v2d_t center;
+    int width, height;
+
+    physicsactor_bounding_box(player->pa, &width, &height, &center);
+
+    return rect_new(center.x - width / 2, center.y - height / 2, width, height);
+}
+
+/*
  * player_senses_layer()
  * Returns TRUE if the player is currently capable of
  * sensing the given layer

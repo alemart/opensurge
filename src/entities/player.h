@@ -25,6 +25,7 @@
 #define _PLAYER_H
 
 #include "../util/v2d.h"
+#include "../util/rect.h"
 #include "brick.h"
 
 /* shield types */
@@ -120,6 +121,7 @@ void player_disable_roll(player_t *player);
 void player_lock_horizontally_for(player_t *player, float seconds);
 int player_collision(const player_t *player, const struct actor_t *actor);
 int player_overlaps(const player_t *player, int x, int y, int width, int height);
+rect_t player_bounding_box(const player_t* player);
 int player_senses_layer(const player_t* player, bricklayer_t layer);
 int player_transform_into(player_t *player, struct surgescript_object_t *player_object, const char *character_name);
 int player_has_focus(const player_t* player);
