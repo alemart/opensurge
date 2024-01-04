@@ -112,7 +112,7 @@ struct brickiteratorstate_t
 
 /* Utilities */
 #define GRID_SIZE 256 /* width and height of a cell of the spatial hash; this impacts the number of fasthash queries per frame (quadratically), as well as the number of returned bricks */
-#define SAMPLER_WIDTH 64 /* width of the fixed-size intervals of the height sampler */
+#define SAMPLER_WIDTH 128 /* width of the fixed-size intervals of the height sampler */
 #define SAMPLER_MAX_INDEX 16384 /* >= MAX_LEVEL_WIDTH / SAMPLER_WIDTH */
 
 static inline uint64_t position_to_hash(int x, int y);
