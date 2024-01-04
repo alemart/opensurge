@@ -46,7 +46,7 @@ object "Checkpoint" is "entity", "basic"
 
     fun checkpoint(player)
     {
-        if(!player.dying) {
+        if(!player.dying && !player.secondary) {
             sfx.play();
             Level.spawnpoint = transform.position.translatedBy(0, -collider.height/2);
             state = "activating";
