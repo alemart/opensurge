@@ -554,11 +554,20 @@ char* stringify_version_number(int version_code, char* buffer, size_t buffer_siz
 
 /*
  * opensurge_game_name()
- * The sanitized name of the game / MOD that is being run in the engine
+ * The name of the game / MOD that is running on the engine
  */
 const char* opensurge_game_name()
 {
     return config_game_title("Untitled game");
+}
+
+/*
+ * opensurge_game_version()
+ * The version of the game / MOD that is running on the engine
+ */
+const char* opensurge_game_version()
+{
+    return config_game_version("0.0.0");
 }
 
 /*
