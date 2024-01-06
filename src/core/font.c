@@ -2072,8 +2072,8 @@ static const char* f_engine_name() { return GAME_TITLE; }
 static const char* f_engine_version() { return GAME_VERSION_STRING; }
 static const char* f_engine_website() { return GAME_WEBSITE; }
 static const char* f_engine_year() { return GAME_YEAR; }
-static const char* f_game_name() { return "Open Surge"; }
-static const char* f_game_version() { return GAME_VERSION_STRING; }
+static const char* f_game_name() { return opensurge_game_name(); }
+static const char* f_game_version() { return opensurge_game_version(); }
 static const char* f_game_website() { return GAME_WEBSITE; }
 static const char* f_game_year() { return GAME_YEAR; }
 
