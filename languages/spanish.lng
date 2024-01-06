@@ -117,7 +117,7 @@ STAGESELECT_ACT             "Zona"
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>CRÉDITOS</color>"
 CREDITS_BACK                "Pulsa <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para volver"
-CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME versión $GAME_VERSION</color>\npotenciado por $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versión $ENGINE_VERSION</color>\npotenciado por $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Gente</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Agradecimientos a</color>"
 CREDITS_ALEXANDRE           "Líder de proyecto y fundador\nDesarrollador de proyecto\nArtista"
@@ -150,13 +150,13 @@ TITLESCREEN_OPTIONS         "OPCIONES"
 TITLESCREEN_SHARE           "COMPARTIR"
 TITLESCREEN_DONATE          "DONAR"
 TITLESCREEN_QUIT            "SALIR"
-TITLESCREEN_VERSION         "DEMO 0.6.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "SurgeEngine $ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "CONTINUAR"
-ENDOFDEMO_VERSION           "DEMO 0.6.1\n"
-ENDOFDEMO_TEXT              "¡Gracias por jugar! Surge the Rabbit está en desarrollo.\n\n¡Visita <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> para ver actualizaciones!\n\nAhora vamos a ver cómo tú también puedes crear tus propios juegos."
+ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "¡Gracias por jugar! Surge the Rabbit está en desarrollo.\n\n¡Visita <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> para ver actualizaciones!\n\nAhora vamos a ver cómo tú también puedes crear tus propios juegos."
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so uncomment ratingTime.forget() in scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
@@ -181,7 +181,7 @@ MAINMENU_SHARE              "COMPARTIR"
 MAINMENU_OPTIONS            "OPCIONES"
 MAINMENU_QUIT               "SALIR"
 MAINMENU_DEVBUILD           "Versión de Desarrollo"
-MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
 
 // (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
@@ -198,7 +198,7 @@ CONGRATULATIONS_TITLE       "GRACIAS POR JUGAR"
 CONGRATULATIONS_SHARE       "COMPARTIR"
 CONGRATULATIONS_DONATE      "DONAR"
 CONGRALUTATIONS_BACK        "VOLVER"
-CONGRATULATIONS_TEXT        "Gracias por jugar a Open Surge versión $GAME_VERSION. ¿Quieres jugar más? ¡Ve a $GAME_WEBSITE para actualizaciones!\n\nOpen Surge te permite jugar y crear tus propios juegos. Está desarrollado por gente como tú. ¡Comparte la alegria! ¡Cuentaselo a tu familia, amigos y mascotas y que corra la voz!"
+CONGRATULATIONS_TEXT        "Gracias por jugar a Open Surge versión $ENGINE_VERSION. ¿Quieres jugar más? ¡Ve a $ENGINE_WEBSITE para actualizaciones!\n\nOpen Surge te permite jugar y crear tus propios juegos. Está desarrollado por gente como tú. ¡Comparte la alegria! ¡Cuentaselo a tu familia, amigos y mascotas y que corra la voz!"
 
 
 
@@ -260,7 +260,7 @@ LOADING_TEXT                "Cargando..."
 LEV_DEMO_1                  "<color=$COLOR_TITLE>¡Crea tus increíbles juegos!</color>\n¡Este juego está creado con <color=$COLOR_HIGHLIGHT>Open Surge</color>, un motor de juegos 2D muy flexible y de código abierto que ahora está en tus manos!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>¿Sabías que...?</color> Todo en Open Surge es personalizable. Puedes hacer niveles, objectos, jefes, personajes y más! Es un completo <color=$COLOR_HIGHLIGHT>sistema de creación de juegos</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>¡Desata tu creatividad!</color>\nUna de las funciones en Open Surge es <color=$COLOR_HIGHLIGHT>SurgeScript</color>. ¡Es scripting para juegos! ¡Úsalo para construir lo que te puedas imaginar!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>¡Guay!</color>\n¿Emocionado todavia? ¡El cielo es el limite! Visita <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> para crear tus propios juegos alucinantes hoy!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>¡Guay!</color>\n¿Emocionado todavia? ¡El cielo es el limite! Visita <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> para crear tus propios juegos alucinantes hoy!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>¡Pruebalo tú mismo!</color> ¡Ahora te toca a tí! <color=$COLOR_HIGHLIGHT>Pulsa F12 para abrir el editor</color>. Después, abre la paleta de objetos y empieza a construir tu nivel! (usa F1 para ayuda)"
 FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
 

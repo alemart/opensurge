@@ -118,7 +118,7 @@ STAGESELECT_ACT             "Zona"
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>KREDITI</color>"
 CREDITS_BACK                "Pritisni <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> da natrag ideš"
-CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME verzija $GAME_VERSION</color>\npokrenuto pomoću $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME verzija $ENGINE_VERSION</color>\npokrenuto pomoću $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Ljudi</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Zahvaljujući</color>"
 CREDITS_ALEXANDRE           "Voditelj i osnivač projekta\nProjekt Developer\nUmjetnik"
@@ -151,13 +151,13 @@ TITLESCREEN_OPTIONS         "POSTAVKE"
 TITLESCREEN_SHARE           "PODIJELITE"
 TITLESCREEN_DONATE          "DONIRAJTE"
 TITLESCREEN_QUIT            "IZAĐI"
-TITLESCREEN_VERSION         "DEMO 0.6.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "SurgeEngine $ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "NASTAVI"
-ENDOFDEMO_VERSION           "DEMO 0.6.1\n"
-ENDOFDEMO_TEXT              "Hvala vam što ste igrali! Surge the Rabbit je u razvoju.\n\nPosjetite <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> za ažuriranja!\n\nSada da vidimo kako i vi možete praviti vlastite igre!"
+ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Hvala vam što ste igrali! Surge the Rabbit je u razvoju.\n\nPosjetite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> za ažuriranja!\n\nSada da vidimo kako i vi možete praviti vlastite igre!"
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so uncomment ratingTime.forget() in scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
@@ -182,7 +182,7 @@ MAINMENU_SHARE              "PODIJELI"
 MAINMENU_OPTIONS            "POSTAVKE"
 MAINMENU_QUIT               "IZAĐI"
 MAINMENU_DEVBUILD           "Razvojna verzija"
-MAINMENU_VERSION            "v. $GAME_VERSION" // skraćeno
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // skraćeno
 
 // (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
@@ -199,7 +199,7 @@ CONGRATULATIONS_TITLE       "HVALA ŠTO STE IGRALI"
 CONGRATULATIONS_SHARE       "PODIJELITE"
 CONGRATULATIONS_DONATE      "DONIRAJTE"
 CONGRATULATIONS_BACK        "NATRAG"
-CONGRATULATIONS_TEXT        "Hvala što ste igrali Open Surge verziju $GAME_VERSION.\nŽelite li igrati više? Idite na $GAME_WEBSITE za ažuriranja!\n\nOpen Surge vam omogućuje igranje i kreiranje vlastitih igara. Razvili su ga ljudi poput vas. Sada podijelite radost! Obavijestite svoju porodicu, prijatelje i kućne ljubimce o tome i proširite riječ!"
+CONGRATULATIONS_TEXT        "Hvala što ste igrali Open Surge verziju $ENGINE_VERSION.\nŽelite li igrati više? Idite na $ENGINE_WEBSITE za ažuriranja!\n\nOpen Surge vam omogućuje igranje i kreiranje vlastitih igara. Razvili su ga ljudi poput vas. Sada podijelite radost! Obavijestite svoju porodicu, prijatelje i kućne ljubimce o tome i proširite riječ!"
 
 
 
@@ -360,7 +360,7 @@ EDITOR_MESSAGE_YELLOWLAYER  "Prebačeno na <color=$1>žuti</color> sloj"
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Kreirajte svoje nevjerovatne igre!</color>\nOva igra je kreirana sa <color=$COLOR_HIGHLIGHT>Open Surge-om</color>, vrlo fleksibilnim i otvorenim kodom za 2D igre koji je sada u vašim rukama!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Jeste znali...?</color>\nSve u Open Surge-u je izmjenivo. Možete praviti nivoe, predmete, šefove, likove i više! Potpun je <color=$COLOR_HIGHLIGHT>sistem za kreaciju igre</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Oslobodite svoju kreativnost!</color>\nJedna od ključnih karakteristika u Open Surge-u je <color=$COLOR_HIGHLIGHT>SurgeScript</color>. To je skriptanje za igre! Koristite ga da napravite bilo šta šta možete zamisliti!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Kul!</color>\nJeste već uzbuđeni? Nebo je granica! Posjetite <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> da napravite svoje nevjerovatne igre danas!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Kul!</color>\nJeste već uzbuđeni? Nebo je granica! Posjetite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> da napravite svoje nevjerovatne igre danas!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Probajte sami!</color>\nSad je vaš red! <color=$COLOR_HIGHLIGHT>Pritisnite F12 da biste otvorili uređivač.</color> Zatim otvorite paletu predmeta i počnite graditi svoj nivo! (za pomoć koristite F1)"
 FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
 

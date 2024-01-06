@@ -118,7 +118,7 @@ STAGESELECT_ACT             "Etap"
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>AUTORZY</color>"
 CREDITS_BACK                "Wciśnij <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color>, by wyjść"
-CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME, wersja $GAME_VERSION</color>\nnapędzana przez $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME, wersja $ENGINE_VERSION</color>\nnapędzana przez $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Ludzie</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Podziękowania dla</color>"
 CREDITS_ALEXANDRE           "Założyciel projektu\nProgramista\nArtysta"
@@ -151,13 +151,13 @@ TITLESCREEN_OPTIONS         "USTAWIENIA"
 TITLESCREEN_SHARE           "PODAJ DALEJ"
 TITLESCREEN_DONATE          "ZRÓB DONATE"
 TITLESCREEN_QUIT            "WYJDŹ"
-TITLESCREEN_VERSION         "DEMO 0.6.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "SurgeEngine $ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "KONTYNUUJ"
-ENDOFDEMO_VERSION           "DEMO 0.6.1\n"
-ENDOFDEMO_TEXT              "Dzięki za grę! Surge the Rabbit jest ciągle rozwijane.\n\nOdwiedź <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>, aby być na bieżąco!\n\nA teraz zobacz, jak Ty też możesz tworzyć własne gry!"
+ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Dzięki za grę! Surge the Rabbit jest ciągle rozwijane.\n\nOdwiedź <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color>, aby być na bieżąco!\n\nA teraz zobacz, jak Ty też możesz tworzyć własne gry!"
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so uncomment ratingTime.forget() in scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
@@ -182,7 +182,7 @@ MAINMENU_SHARE              "PODAJ DALEJ"
 MAINMENU_OPTIONS            "USTAWIENIA"
 MAINMENU_QUIT               "WYJDŹ"
 MAINMENU_DEVBUILD           "Wersja developerska"
-MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
 
 // (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
@@ -199,7 +199,7 @@ CONGRATULATIONS_TITLE       "DZIĘKI ZA GRĘ"
 CONGRATULATIONS_SHARE       "PODAJ DALEJ"
 CONGRATULATIONS_DONATE      "ZRÓB DONATE"
 CONGRATULATIONS_BACK        "WSTECZ"
-CONGRATULATIONS_TEXT        "Dziękujemy Ci za grę w Open Surge, wersję $GAME_VERSION.\nChcesz grać dalej? Odwiedź $GAME_WEBSITE po nowości!\n\nOpen Surge pozwala Ci grać, ale także tworzyć własne gry. Jest tworzone przez ludzi takich, jak Ty! Podziel się radością - opowiedz swoim znajomym i rodzinie!"
+CONGRATULATIONS_TEXT        "Dziękujemy Ci za grę w Open Surge, wersję $ENGINE_VERSION.\nChcesz grać dalej? Odwiedź $ENGINE_WEBSITE po nowości!\n\nOpen Surge pozwala Ci grać, ale także tworzyć własne gry. Jest tworzone przez ludzi takich, jak Ty! Podziel się radością - opowiedz swoim znajomym i rodzinie!"
 
 
 
@@ -261,7 +261,7 @@ LOADING_TEXT                "wczytywanie..."
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Twórz własne, niesamowite gry!</color>\nTa gra została stworzona przy użyciu <color=$COLOR_HIGHLIGHT>Open Surge</color>, otwartoźródłowego silnika 2D, który teraz jest w twoich rękach!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Czy wiesz, że...?</color>\nWszystko w Open Surge jest edytowalne! Możesz tworzyć poziomy, przedmioty, postacie, wrogów - i więcej!\nTo pełny <color=$COLOR_HIGHLIGHT>system tworzenia gier</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uwolnij swoją kreatywność!</color>\nJedną z kluczowych zalet Open Surge jest <color=$COLOR_HIGHLIGHT>SurgeScript</color>. To język skryptowy dla gier - za jego pomocą możesz zbudować co tylko zdołasz sobie wyobrazić!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Czad!</color>\nEkscytujące? Sięgaj ku gwiazd! Odwiedź <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color>, aby już dzisiaj zacząć tworzyć niesamowite gry!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Czad!</color>\nEkscytujące? Sięgaj ku gwiazd! Odwiedź <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color>, aby już dzisiaj zacząć tworzyć niesamowite gry!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Spróbuj!</color>\nTeraz twoja kolej! <color=$COLOR_HIGHLIGHT>Naciśnij F12, by otworzyć edytor.</color> Następnie otwórz paletę przedmiotów i zacznij budować swój poziom! (Naciśnij F1, jeżeli potrzebujesz pomocy.)"
 FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
 

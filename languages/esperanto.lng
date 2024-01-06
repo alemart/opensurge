@@ -118,7 +118,7 @@ STAGESELECT_ACT             "Zono"
 // Credits
 CREDITS_TITLE               "<color=$COLOR_TITLE>ATRIBUOJ</color>"
 CREDITS_BACK                "Premu <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> por iri reen"
-CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME versio $GAME_VERSION</color>\nfunciigita de $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versio $ENGINE_VERSION</color>\nfunciigita de $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Homoj</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Dankon al</color>"
 CREDITS_ALEXANDRE           "Projektestro kaj Fondinto\nProjekta Programisto\nArtisto"
@@ -151,13 +151,13 @@ TITLESCREEN_OPTIONS         "OPCIOJ"
 TITLESCREEN_SHARE           "DISKONIGI"
 TITLESCREEN_DONATE          "DONACI"
 TITLESCREEN_QUIT            "ELIRI"
-FIXME TITLESCREEN_VERSION         "DEMO 0.6.1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+FIXME TITLESCREEN_VERSION         "SurgeEngine $ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "DAŬRIGI"
-FIXME ENDOFDEMO_VERSION           "DEMO 0.6.1\n"
-ENDOFDEMO_TEXT              "Danko pro ludi! Surge the Rabbit disvolviĝas.\n\nVizitu <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> por ĝisdatigoj!\n\nNun ni vidu kiel vi povas krei viajn proprajn ludojn!"
+FIXME ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Danko pro ludi! Surge the Rabbit disvolviĝas.\n\nVizitu <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> por ĝisdatigoj!\n\nNun ni vidu kiel vi povas krei viajn proprajn ludojn!"
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so uncomment ratingTime.forget() in scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
@@ -182,7 +182,7 @@ MAINMENU_SHARE              "DISKONIGI"
 MAINMENU_OPTIONS            "OPCIOJ"
 MAINMENU_QUIT               "ELIRI"
 MAINMENU_DEVBUILD           "Programada versio"
-MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
 
 // (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
@@ -199,7 +199,7 @@ CONGRATULATIONS_TITLE       "DANKE POR LUDI"
 CONGRATULATIONS_SHARE       "DISKONIGI"
 CONGRATULATIONS_DONATE      "DONACI"
 CONGRATULATIONS_BACK        "REEN"
-CONGRATULATIONS_TEXT        "Danke por ludi la version $GAME_VERSION de Open Surge.\nĈu volas ludi pli? Iru al $GAME_WEBSITE por ĝisdatigoj!\nOpen Surge lasas al vi ludi kaj krei viajn proprajn ludojn. Ĝi estas programita de homoj kiel vi. Nun diskonigu la ĝojon! Diru al via familio, amikoj kaj dombestoj kaj disvastigu la informon!"
+CONGRATULATIONS_TEXT        "Danke por ludi la version $ENGINE_VERSION de Open Surge.\nĈu volas ludi pli? Iru al $ENGINE_WEBSITE por ĝisdatigoj!\nOpen Surge lasas al vi ludi kaj krei viajn proprajn ludojn. Ĝi estas programita de homoj kiel vi. Nun diskonigu la ĝojon! Diru al via familio, amikoj kaj dombestoj kaj disvastigu la informon!"
 
 
 
@@ -267,7 +267,7 @@ LOADING_TEXT                "ŝarĝante..."
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Kreu viajn malaĉajn ludojn!</color>\nĈi tiu ludo estis kreita per <color=$COLOR_HIGHLIGHT>Open Surge</color>, tre fleksebla kaj malfermitkoda 2D-a videluda motoro, kiu estas nun en viaj manoj!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Ĉu vi sciis...?</color>\nĈio en Open Surge estas agordebla. Vi povas krei nivelojn, erojn, ĉefojn, rolulojn kaj plu! Ĝi estas plena <color=$COLOR_HIGHLIGHT>sistemo de kreado de ludoj</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uzu vian kreemon!</color>\nUnu el la plej gravaj funkcioj en Open Surge estas <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Ĝi estas skriptado por ludoj! Uzu ĝin por konstrui ĉion, kion vi povas imagi!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Provu ĝin vi!</color>\nNun estas via vico! <color=$COLOR_HIGHLIGHT>Premu F12-n por malfermi la redaktilon.</color> Poste malfermu la paletron de eroj kaj komencu konstrui vian nivelon! (uzu F1-n por helpo)"
 FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
 
