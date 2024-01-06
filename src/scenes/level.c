@@ -163,6 +163,7 @@ static void clear_level_state(levelstate_t* state);
 static rect_t create_roi(v2d_t camera, int margin);
 static const int ROI_MARGIN_UPDATE_ENTITY = 256;
 static const int ROI_MARGIN_UPDATE_BRICK = ROI_MARGIN_UPDATE_ENTITY + 64; /* bricks should use a larger margin than entities */
+static const int ROI_MARGIN_UPDATE_PLAYER = ROI_MARGIN_UPDATE_ENTITY;
 static const int ROI_MARGIN_RENDER_ENTITY = ROI_MARGIN_UPDATE_ENTITY; /* use the same ROI of the update cycle to skip updating the entity tree; we don't want to unnecessarily bubble things up and down in the entity tree, as it takes time */
 static const int ROI_MARGIN_RENDER_BRICK = 128;
 static const int ROI_MARGIN_EDITOR = 128;
@@ -1528,15 +1529,12 @@ void level_update()
     /* update players */
     if(brickmanager_number_of_bricks(brick_manager) > 0) {
         for(i = 0; i < team_size; i++) {
-            const image_t* image = actor_image(team[i]->actor);
             v2d_t position = player_position(team[i]);
-            float x = position.x;
-            float y = position.y;
-            float w = image_width(image);
-            float h = image_height(image);
+            rect_t box = player_bounding_box(team[i]);
+            rect_t roi = create_roi(position, ROI_MARGIN_UPDATE_PLAYER);
 
             /* updating... */
-            if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4) || player_is_dying(team[i]) || y < 0) {
+            if(rect_overlaps(roi, box) || player_is_dying(team[i]) || position.y < 0) {
                 if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
                     player_update(team[i], obstaclemap);
             }
@@ -1925,10 +1923,10 @@ bool level_is_setup_object(const char* object_name)
  * level_obstaclemap()
  * The obstaclemap featuring the bricks and brick-like objects that are
  * placed near the camera of the level.
- * WARNING: will be NULL if the level is not loaded !!!
  */
 const obstaclemap_t* level_obstaclemap()
 {
+    assertx(obstaclemap != NULL); /* will be NULL if the level is not loaded */
     return obstaclemap;
 }
 
