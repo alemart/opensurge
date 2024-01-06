@@ -125,7 +125,7 @@ rect_t player_bounding_box(const player_t* player);
 int player_senses_layer(const player_t* player, bricklayer_t layer);
 int player_transform_into(player_t *player, struct surgescript_object_t *player_object, const char *character_name);
 int player_has_focus(const player_t* player);
-void player_focus(player_t* player);
+bool player_focus(player_t* player);
 
 void player_enter_water(player_t *player);
 void player_leave_water(player_t *player);

@@ -833,12 +833,49 @@ int player_has_focus(const player_t* player)
 
 /*
  * player_focus()
- * Give focus to a player
+ * Give focus to a player. Return true on success
  */
-void player_focus(player_t* player)
+bool player_focus(player_t* player)
 {
-    if(!player_has_focus(player) && player_is_focusable(player))
-        level_change_player(player);
+    player_t* p;
+
+    /* already focused? (note: a single player is always focused) */
+    if(player_has_focus(player))
+        return true;
+
+    /* not focusable? */
+    if(!player_is_focusable(player))
+        return false;
+
+#if 0
+    /* error if the target player is midair - is this desirable? */
+    if(player_is_midair(player) || player->on_movable_platform)
+        return false;
+#endif
+
+#if 0
+    /* error if the target player is frozen - is this desirable? */
+    if(player_is_frozen(player))
+        return false;
+#endif
+
+    /* error if the current player is inside a locked area - is this desirable? */
+    if(camera_is_locked() && camera_clip_test(player_position(level_player())))
+        return false;
+
+    /* is any player dying? */
+    for(int i = 0; (p = level_get_player_by_id(i)) != NULL; i++) {
+        if(player_is_dying(p) && !player_is_immortal(p))
+            return false;
+    }
+
+    /* level cleared? */
+    if(level_has_been_cleared())
+        return false;
+
+    /* change focus */
+    level_change_player(player);
+    return player_has_focus(player);
 }
 
 /*
