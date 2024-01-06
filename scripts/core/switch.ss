@@ -54,8 +54,7 @@ object "Switch Controller"
                 if(!(player.midair || player.underwater || player.frozen)) {
                     nextPlayer = findNextFocusablePlayer(i, direction);
                     if(nextPlayer !== null) {
-                        nextPlayer.focus();
-                        if(nextPlayer.hasFocus())
+                        if(nextPlayer.focus())
                             adjustShoulderButtons(nextPlayer.input);
                     }
                 }

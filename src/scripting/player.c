@@ -1557,34 +1557,9 @@ surgescript_var_t* fun_focus(surgescript_object_t* object, const surgescript_var
 {
     player_t* player = get_player(object);
     if(player != NULL) {
-        player_t* p;
-
-        /* error if a player is dying */
-        for(int i = 0; (p = level_get_player_by_id(i)) != NULL; i++) {
-            if(player_is_dying(p) && !player_is_immortal(p))
-                return surgescript_var_set_bool(surgescript_var_create(), false);
-        }
-
-        #if 0
-        /* error if player is midair, etc. */ /* <-- NO, preventing when midair is undesirable (e.g., Follow the Leader) */
-        if(player_is_midair(player) || player_is_frozen(player) || player->on_movable_platform)
-            return surgescript_var_set_bool(surgescript_var_create(), false);
-        #endif
-
-        /* player inside locked area? */
-        if(camera_is_locked() && camera_clip_test(player_position(player)))
-            return surgescript_var_set_bool(surgescript_var_create(), false);
-
-        /* error if level cleared */
-        if(level_has_been_cleared())
-            return surgescript_var_set_bool(surgescript_var_create(), false);
-
-        /* success */
-        player_focus(player);
-        return surgescript_var_set_bool(surgescript_var_create(), true);
+        bool success = player_focus(player);
+        return surgescript_var_set_bool(surgescript_var_create(), success);
     }
-
-    /* error */
     return surgescript_var_set_bool(surgescript_var_create(), false);
 }
 
