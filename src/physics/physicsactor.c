@@ -2279,6 +2279,20 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         }
     }
 
+    /* A, B: ignore clouds if the tail of the sensor not at a "solid" pixel
+       (otherwise the player may be suspended in the air due to the ground map being y = h-1 at the non-solid bottom) */
+    if(*at_A != NULL && !obstacle_is_solid(*at_A)) {
+        point2d_t tail = sensor_tail(a, position, pa->movmode);
+        if(!obstacle_point_collision(*at_A, tail))
+            *at_A = NULL;
+    }
+
+    if(*at_B != NULL && !obstacle_is_solid(*at_B)) {
+        point2d_t tail = sensor_tail(b, position, pa->movmode);
+        if(!obstacle_point_collision(*at_B, tail))
+            *at_B = NULL;
+    }
+
     /* A, B: cloud height */
     if(pa->midair && pa->angle == 0x0 && pa->ysp / 60.0f < CLOUD_OFFSET * 0.5f) {
 
