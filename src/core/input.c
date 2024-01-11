@@ -812,11 +812,13 @@ void inputuserdefined_update(input_t* in)
     inputuserdefined_t *me = (inputuserdefined_t*)in;
     const inputmap_t *im = me->inputmap;
 
+    /* read keyboard input */
     if(im->keyboard.enabled) {
         for(inputbutton_t button = 0; button < IB_MAX; button++)
             in->state[button] = (im->keyboard.scancode[button] > 0) && a5_key[im->keyboard.scancode[button]];
     }
 
+    /* read joystick input */
     if(im->joystick.enabled && input_is_joystick_enabled()) {
         int joy_id = im->joystick.id;
         if(joy_id < MAX_JOYS && wanted_joy[joy_id] != NULL) {
@@ -842,7 +844,8 @@ void inputuserdefined_update(input_t* in)
         }
     }
 
-    if(im->joystick.enabled) {
+    /* read the mobile gamepad as the first joystick */
+    if(im->joystick.enabled && im->joystick.id == 0) {
         mobilegamepad_state_t mobile;
         mobilegamepad_get_state(&mobile);
 
