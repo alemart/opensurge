@@ -15,14 +15,17 @@ using SurgeEngine.Audio.Sound;
 //
 object "Neon's Jetpack" is "companion"
 {
-    public readonly player = Player("Neon");
-    soundhlp = spawn("Neon's Jetpack Sound Helper");
-    smokehlp = spawn("Neon's Jetpack Smoke Helper");
+    public readonly player = parent;
 
+    soundHelper = spawn("Neon's Jetpack Sound Helper");
+    smokeHelper = spawn("Neon's Jetpack Smoke Helper");
+    repositioningMethodSetup = spawn("Neon's Jetpack Repositioning Method Setup");
+
+    flyingAnim = 20;
+    fallingAnim = 21;
     maxFlyingTime = 8; // seconds
     maxSpeed = 60; // px/s
     acceleration = 60; // px/s^2
-    flyingTime = 0;
 
     state "main"
     {
@@ -37,7 +40,6 @@ object "Neon's Jetpack" is "companion"
         if(player.jumping && !player.underwater) {
             if(player.input.buttonPressed("fire1")) {
                 player.ysp = Math.min(player.ysp, 60);
-                flyingTime = 0;
                 state = "flying";
             }
         }
@@ -49,13 +51,12 @@ object "Neon's Jetpack" is "companion"
     {
         if(canFly(player) && player.input.buttonDown("fire1")) {
             // fly
-            player.anim = 20;
+            player.anim = flyingAnim;
             player.ysp = Math.max(-maxSpeed, player.ysp - (Level.gravity + acceleration) * Time.delta);
             player.springify();
 
             // flying time
-            flyingTime += Time.delta;
-            if(flyingTime >= maxFlyingTime)
+            if(timeout(maxFlyingTime))
                 state = "falling";
         }
         else
@@ -65,7 +66,7 @@ object "Neon's Jetpack" is "companion"
     state "falling"
     {
         if(canFly(player)) {
-            player.anim = 21;
+            player.anim = fallingAnim;
             player.ysp = Math.min(player.ysp, maxSpeed * 1.5);
         }
         else
@@ -79,12 +80,12 @@ object "Neon's Jetpack" is "companion"
 
     fun get_flying()
     {
-        return (state == "flying");
+        return (state == "flying") || repositioningMethodSetup.isRepositioning;
     }
 
     fun get_falling()
     {
-        return (state == "falling");
+        return (state == "falling") && !repositioningMethodSetup.isRepositioning;
     }
 }
 
@@ -133,9 +134,15 @@ object "Neon's Jetpack Smoke Helper"
     state "main"
     {
         if(jetpack.flying) {
-            Level.spawnEntity("Mini Smoke", player.collider.center.translatedBy(
-                player.direction * -8, 8
-            )).setVelocity(Vector2((Math.random() - 0.5) * baseSpeed, 3 * baseSpeed));
+            direction = player.direction * (player.hflip ? -1 : 1);
+            xvel = (Math.random() - 0.5) * baseSpeed;
+            yvel = 3 * baseSpeed;
+
+            Level.spawnEntity(
+                "Mini Smoke",
+                player.collider.center.translatedBy(direction * -8, 8)
+            ).setVelocity(Vector2(xvel, yvel));
+
             state = "wait";
         }
     }
@@ -144,5 +151,68 @@ object "Neon's Jetpack Smoke Helper"
     {
         if(timeout(0.03))
             state = "main";
+    }
+}
+
+
+
+
+/*
+ * The code below is related to repositioning methods that are used when Neon
+ * is chosen as Player 2. They modify and extend the repositioning methods in
+ * ways that are specific to Neon.
+ *
+ * Repositioning methods are used, for example, when Neon is controlled by the
+ * CPU. When he gets offscreen, he'll be repositioned (respawned) automatically.
+ */
+
+object "Neon's Jetpack Repositioning Method Setup"
+{
+    public isRepositioning = false; // will be true while Neon is being repositioned
+
+    jetpack = parent;
+    player = jetpack.player;
+
+    state "main"
+    {
+        // Neon uses the flying repositioning method instead of the default one.
+        // We'll check if Neon has any of the following companions and, if he
+        // does, we'll change the repositioning methods of each one of them.
+        foreach(companionName in ["Follow the Leader AI"]) {
+            companion = player.child(companionName);
+            if(companion !== null) {
+                companion.repositioningMethod = companion.spawn("Flying Repositioning Method");
+                companion.repositioningMethod.flyingAnim = 20;
+                companion.repositioningMethod.onStart = spawn("Neon's Jetpack Repositioning Method Start");
+                companion.repositioningMethod.onFinish = spawn("Neon's Jetpack Repositioning Method Finish");
+            }
+        }
+
+        // we're done with this setup
+        state = "done";
+    }
+
+    state "done"
+    {
+    }
+}
+
+object "Neon's Jetpack Repositioning Method Start" is "event"
+{
+    repositioningMethodSetup = parent;
+
+    fun call()
+    {
+        repositioningMethodSetup.isRepositioning = true;
+    }
+}
+
+object "Neon's Jetpack Repositioning Method Finish" is "event"
+{
+    repositioningMethodSetup = parent;
+
+    fun call()
+    {
+        repositioningMethodSetup.isRepositioning = false;
     }
 }
