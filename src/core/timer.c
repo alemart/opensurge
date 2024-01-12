@@ -28,11 +28,14 @@ static double start_time = 0.0;
 static double current_time = 0.0;
 static double previous_time = 0.0;
 static double delta_time = 0.0;
+static double smooth_delta_time = 0.0;
 static int64_t frames = 0;
 
 static bool is_paused = false;
 static double pause_duration = 0.0;
 static double pause_start_time = 0.0;
+
+static const double SMOOTH_FACTOR = 0.95;
 
 /*
  * timer_init()
@@ -50,11 +53,22 @@ void timer_init()
     current_time = 0.0;
     previous_time = 0.0;
     delta_time = 0.0;
+    smooth_delta_time = 0.0;
     frames = 0;
 
     is_paused = false;
     pause_duration = 0.0;
     pause_start_time = 0.0;
+}
+
+
+/*
+ * timer_release()
+ * Releases the time manager
+ */
+void timer_release()
+{
+    logfile_message("timer_release()");
 }
 
 
@@ -70,6 +84,7 @@ void timer_update()
     /* paused timer? */
     if(is_paused) {
         delta_time = 0.0;
+        smooth_delta_time = 0.0;
         return;
     }
 
@@ -87,18 +102,14 @@ void timer_update()
 
     previous_time = current_time;
 
+    /* compute the smooth delta time */
+    if(smooth_delta_time != 0.0)
+        smooth_delta_time = SMOOTH_FACTOR * delta_time + (1.0 - SMOOTH_FACTOR) * smooth_delta_time;
+    else
+        smooth_delta_time = minimum_delta;
+
     /* increment counter */
     ++frames;
-}
-
-
-/*
- * timer_release()
- * Releases the time manager
- */
-void timer_release()
-{
-    logfile_message("timer_release()");
 }
 
 
@@ -109,6 +120,16 @@ void timer_release()
 float timer_get_delta()
 {
     return (float)delta_time;
+}
+
+
+/*
+ * timer_get_smooth_delta()
+ * An approximation of timer_get_delta() with variations smoothed out
+ */
+float timer_get_smooth_delta()
+{
+    return (float)smooth_delta_time;
 }
 
 
