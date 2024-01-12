@@ -41,6 +41,13 @@ object "SurgeTheRabbit"
         Web.launchURL(url);
     }
 
+    fun download()
+    {
+        t = Platform.isAndroid ? "desktop" : "mobile";
+        url = website + "/download?type=" + t + "&v=" + SurgeEngine.version;
+        Web.launchURL(url);
+    }
+
     fun isBaseGame()
     {
         return (Game.title == "Surge the Rabbit");
