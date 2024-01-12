@@ -420,7 +420,7 @@ bgbehavior_t *bgbehavior_circular_delete(bgbehavior_t *behavior)
 void bgbehavior_circular_update(bgbehavior_t *behavior)
 {
     bgbehavior_circular_t *me = (bgbehavior_circular_t*)behavior;
-    float dt = timer_get_delta();
+    float dt = timer_get_smooth_delta();
     float t, s, c;
 
     t = (me->elapsed_time += dt);
@@ -459,7 +459,7 @@ bgbehavior_t *bgbehavior_linear_delete(bgbehavior_t *behavior)
 void bgbehavior_linear_update(bgbehavior_t *behavior)
 {
     bgbehavior_linear_t *me = (bgbehavior_linear_t*)behavior;
-    float dt = timer_get_delta();
+    float dt = timer_get_smooth_delta();
 
     /* linear movement */
     behavior->offset.x += me->speed.x * dt;
