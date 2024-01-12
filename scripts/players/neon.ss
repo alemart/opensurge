@@ -158,11 +158,11 @@ object "Neon's Jetpack Smoke Helper"
 
 
 /*
- * The code below is related to repositioning methods that are used when Neon
- * is chosen as Player 2. They modify and extend the repositioning methods in
- * ways that are specific to Neon.
+ * The code below is related to a repositioning method that is used when Neon
+ * is chosen as Player 2. It modifies the Flying Repositioning Method in ways
+ * that are specific to Neon.
  *
- * Repositioning methods are used, for example, when Neon is controlled by the
+ * The repositioning method is used, for example, when Neon is controlled by the
  * CPU. When he gets offscreen, he'll be repositioned (respawned) automatically.
  */
 
@@ -175,10 +175,10 @@ object "Neon's Jetpack Repositioning Method Setup"
 
     state "main"
     {
-        // Neon uses the flying repositioning method instead of the default one.
+        // Neon uses the Flying Repositioning Method instead of the default one.
         // We'll check if Neon has any of the following companions and, if he
         // does, we'll change the repositioning methods of each one of them.
-        foreach(companionName in ["Follow the Leader AI"]) {
+        foreach(companionName in ["Player 2", "Follow the Leader AI"]) {
             companion = player.child(companionName);
             if(companion !== null) {
                 companion.repositioningMethod = companion.spawn("Flying Repositioning Method");

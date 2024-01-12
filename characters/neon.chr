@@ -69,7 +69,7 @@ character "Neon"
 
 character "Neon as Player 2"
 {
-    companions                      "Dash Smoke" "Brake Smoke" "Neon's Jetpack" "Follow the Leader AI"
+    companions                      "Player 2" "Follow the Leader AI" "Dash Smoke" "Brake Smoke" "Neon's Jetpack"
 
     multipliers
     {

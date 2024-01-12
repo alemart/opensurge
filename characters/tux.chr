@@ -69,7 +69,7 @@ character "Tux"
 
 character "Tux as Player 2"
 {
-    companions                      "Super Peel Out" "Dash Smoke" "Brake Smoke" "Follow the Leader AI"
+    companions                      "Player 2" "Follow the Leader AI" "Super Peel Out" "Dash Smoke" "Brake Smoke"
 
     multipliers
     {
