@@ -899,21 +899,27 @@ void a5_handle_hotkey(const ALLEGRO_EVENT* event, void* data)
         return;
 
     switch(event->keyboard.keycode) {
-        /* toggle fullscreen */
+        /* F11: toggle fullscreen */
         case ALLEGRO_KEY_F11:
             video_set_fullscreen(!video_is_fullscreen());
             break;
 
-        /* toggle render queue stats report */
+        /* F10: toggle render queue stats report */
         case ALLEGRO_KEY_F10:
             if(!renderqueue_toggle_stats_report())
                 video_showmessage("Can't toggle stats report");
             break;
 
-        /* unmute / mute */
+        /* F8: unmute / mute */
         case ALLEGRO_KEY_F8:
             audio_set_muted(!audio_is_muted());
             video_showmessage("%s", audio_is_muted() ? "Muted" : "Unmuted");
+            break;
+
+        /* F7: reconfigure joysticks */
+        case ALLEGRO_KEY_F7:
+            input_reconfigure_joysticks();
+            input_print_joysticks();
             break;
     }
 
