@@ -66,6 +66,7 @@ bool input_is_joystick_enabled(); /* a joystick is available and enabled (i.e., 
 bool input_is_joystick_ignored();
 void input_ignore_joystick(bool ignore); /* ignores the input received from joysticks (if they're available) */
 int input_number_of_joysticks();
+void input_reconfigure_joysticks();
 
 input_t *input_create_user(const char* inputmap_name); /* user's custom input device (set inputmap_name to NULL to use a default mapping) */
 input_t *input_create_computer(); /* computer-controlled "input": will return an inputcomputer_t*, which is also an input_t* */

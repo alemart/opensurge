@@ -85,14 +85,16 @@ static struct {
 #define MAX_JOYS         8 /* maximum number of joysticks */
 #define MIN_BUTTONS      4 /* minimum number of buttons for a joystick to be considered a gamepad */
 #define REQUIRED_AXES    2 /* required number of axes of a stick */
+enum { AXIS_X = 0, AXIS_Y = 1 }; /* axes of a stick */
 
-/* axes of a stick */
-enum { AXIS_X = 0, AXIS_Y = 1 };
-
-static struct {
+typedef struct joystick_input_t joystick_input_t;
+struct joystick_input_t {
     float axis[REQUIRED_AXES]; /* -1.0 <= axis[i] <= 1.0 */
     uint32_t button; /* bit vector */
-} joy[MAX_JOYS], *wanted_joy[MAX_JOYS];
+};
+
+static joystick_input_t joy[MAX_JOYS];
+static joystick_input_t *wanted_joy[MAX_JOYS];
 
 static bool ignore_joystick = false;
 
@@ -112,6 +114,13 @@ static const float ANALOG_AXIS_THRESHOLD[REQUIRED_AXES] = {
 
 };
 
+/* the joystick pool is used to keep consistent joystick IDs across reconfigurations */
+#define POOL_CAPACITY    MAX_JOYS /* how many different joysticks we can connect */
+static ALLEGRO_JOYSTICK* joystick_pool[POOL_CAPACITY];
+static ALLEGRO_JOYSTICK* query_joystick_pool(int id);
+static void refresh_joystick_pool();
+static void clear_joystick_pool();
+
 /* private data */
 static const char DEFAULT_INPUTMAP_NAME[] = "default";
 static input_list_t* input_list = NULL;
@@ -120,7 +129,7 @@ static input_list_t* input_list = NULL;
 static void input_register(input_t *in);
 static void input_unregister(input_t *in);
 static void input_clear(input_t *in);
-static void remap_joystick_buttons(int joy_id);
+static void remap_joystick_buttons(joystick_input_t* joy);
 static void log_joysticks();
 static void log_joystick(ALLEGRO_JOYSTICK* joystick);
 
@@ -217,6 +226,8 @@ void input_init()
         wanted_joy[j] = NULL;
 
     ignore_joystick = !input_is_joystick_available();
+    clear_joystick_pool();
+    refresh_joystick_pool();
     log_joysticks();
 
     /* loading custom input mappings */
@@ -251,7 +262,7 @@ void input_update()
             joy[j].button |= (state.button[b] != 0) << b;
 
         /* platform-specific remapping */
-        remap_joystick_buttons(j);
+        remap_joystick_buttons(&joy[j]);
 
         /*
 
@@ -332,20 +343,20 @@ void input_update()
 
     /* remap joystick IDs. The first joystick (if any) must be a valid one!
        This is especially important on Android, which reports the first
-       joystick as an accelerometer (on Allegro 5.2.9). */
-    for(int j = 0; j < MAX_JOYS; j++)
+       joystick as an accelerometer. Also, we ensure that joystick IDs
+       remain consistent across reconfigurations. */
+    for(int j = 0; j < MAX_JOYS; j++) {
+        const ALLEGRO_JOYSTICK* target = query_joystick_pool(j);
         wanted_joy[j] = NULL;
 
-    for(int j = 0, counter = 0; j < num_joys; j++) {
-        ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
-        int num_buttons = al_get_joystick_num_buttons(joystick);
-
-        /* filter out undesirable devices such as accelerometers */
-        if(num_buttons < MIN_BUTTONS)
-            continue;
-
-        /* remap joystick */
-        wanted_joy[counter++] = &joy[j];
+        if(target != NULL) {
+            for(int k = 0; k < num_joys; k++) {
+                if(al_get_joystick(k) == target) {
+                    wanted_joy[j] = &joy[k];
+                    break;
+                }
+            }
+        }
     }
 
     /* update the input objects */
@@ -692,6 +703,28 @@ int input_number_of_joysticks()
 }
 
 
+/*
+ * input_reconfigure_joysticks()
+ * Reconfigures the joysticks. Called when hotplugging, but also may be called manually
+ */
+void input_reconfigure_joysticks()
+{
+    logfile_message("Reconfiguring joysticks...");
+
+    al_reconfigure_joysticks();
+    refresh_joystick_pool();
+    log_joysticks();
+
+    if(al_get_num_joysticks() > 0) {
+        /* enable joystick input */
+        input_ignore_joystick(false); /* the user probably wants this (automatic joystick detection) */
+    }
+    else {
+        /* disable joystick input */
+        input_ignore_joystick(true); /* needed? */
+    }
+}
+
 
 /*
  * input_get_xy()
@@ -861,7 +894,7 @@ void inputuserdefined_update(input_t* in)
 
 /* remap joystick buttons according to the underlying platform.
    We want to maintain consistency across platforms */
-void remap_joystick_buttons(int joy_id)
+void remap_joystick_buttons(joystick_input_t* joy)
 {
     /* Allegro's numbers for XINPUT button input
        from: src/win/wjoyxi.c (Allegro's source code) */
@@ -944,16 +977,16 @@ void remap_joystick_buttons(int joy_id)
     const int n = sizeof(remap) / sizeof(int);
 
     /* store the state of the buttons */
-    uint32_t buttons = joy[joy_id].button;
+    uint32_t buttons = joy->button;
 
     /* clear the state of the buttons */
-    joy[joy_id].button = 0;
+    joy->button = 0;
 
     /* remap buttons */
     for(int js = 0; js < n; js++) {
         if((buttons & (1 << js)) != 0) {
             if(remap[js] >= 0)
-                joy[joy_id].button |= (1 << remap[js]);
+                joy->button |= (1 << remap[js]);
         }
     }
 
@@ -982,9 +1015,91 @@ void remap_joystick_buttons(int joy_id)
     (void)XINPUT_DPAD_L;
     (void)XINPUT_DPAD_D;
     (void)XINPUT_DPAD_U;
-    (void)joy_id;
+    (void)joy;
 
 #endif
+}
+
+/* clear the joystick pool */
+void clear_joystick_pool()
+{
+    for(int p = 0; p < POOL_CAPACITY; p++)
+        joystick_pool[p] = NULL;
+}
+
+/* refresh the joystick pool. Call after al_reconfigure_joysticks() */
+void refresh_joystick_pool()
+{
+    /* compute the current size of the pool */
+    int pool_size = 0;
+    while(pool_size < POOL_CAPACITY && joystick_pool[pool_size] != NULL)
+        pool_size++;
+
+    /* the pool is full (really?!). We're not accepting new joysticks */
+    if(pool_size >= POOL_CAPACITY)
+        return;
+
+    /* we'll try to insert new joysticks into the pool */
+    int num_joys = min(al_get_num_joysticks(), MAX_JOYS);
+    for(int j = 0; j < num_joys; j++) {
+        ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
+        bool in_the_pool = false;
+
+        /* filter out devices that are not gamepads
+           (an accelerometer is reported as the first joystick on Android) */
+        if(al_get_joystick_num_buttons(joystick) < MIN_BUTTONS)
+            continue;
+
+        /* check if the joystick is in the pool */
+        for(int p = 0; p < pool_size && !in_the_pool; p++)
+            in_the_pool = (joystick == joystick_pool[p]);
+
+        /* add the joystick to the pool. Give it a new, fixed ID */
+        if(!in_the_pool && pool_size < POOL_CAPACITY) {
+            int new_id = pool_size++;
+            joystick_pool[new_id] = joystick;
+        }
+    }
+
+    /*
+
+    From the Allegro manual:
+    https://liballeg.org/a5docs/trunk/joystick.html#al_reconfigure_joysticks
+
+    After a call to al_reconfigure_joysticks(), "the number returned by
+    al_get_num_joysticks may be different, and the handles returned by
+    al_get_joystick may be different or be ordered differently."
+
+    "All ALLEGRO_JOYSTICK handles remain valid, but handles for disconnected
+    devices become inactive: their states will no longer update, and
+    al_get_joystick will not return the handle. Handles for devices which
+    **remain connected** (emphasis added) will continue to represent the same
+    devices. Previously inactive handles may become active again, being reused
+    to represent newly connected devices."
+
+    */
+}
+
+/* get a joystick from the joystick pool. This ensures consistent IDs after reconfigurations */
+ALLEGRO_JOYSTICK* query_joystick_pool(int id)
+{
+    /* validate ID */
+    if(id < 0 || id >= POOL_CAPACITY)
+        return NULL;
+
+    /* select by ID */
+    ALLEGRO_JOYSTICK* candidate = joystick_pool[id];
+
+    /* no joystick with the given ID exists in the pool */
+    if(candidate == NULL)
+        return NULL;
+
+    /* return the candidate if it's connected */
+    if(al_get_joystick_active(candidate))
+        return candidate;
+
+    /* the candidate was disconnected */
+    return NULL;
 }
 
 /* handle a keyboard event */
@@ -1038,8 +1153,8 @@ void a5_handle_mouse_event(const ALLEGRO_EVENT* event, void* data)
 
     }
 
-    #undef update_mouse_position
     (void)data;
+    #undef update_mouse_position
 }
 
 /* handle a joystick event */
@@ -1066,10 +1181,9 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data)
 
         /* hot plugging */
         case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION: {
-            int num_joysticks;
-            al_reconfigure_joysticks();
+            input_reconfigure_joysticks();
 
-            num_joysticks = al_get_num_joysticks();
+            int num_joysticks = al_get_num_joysticks();
             if(num_joysticks > 0) {
                 /* display message as soon as new joysticks are plugged */
                 video_showmessage("Found %d joystick%s:", num_joysticks, num_joysticks == 1 ? "" : "s");
@@ -1081,17 +1195,10 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data)
                     logfile_message("Found new joystick (%d)", j);
                     log_joystick(joystick);
                 }
-
-                /* activate input */
-                input_ignore_joystick(false); /* the user probably wants this (automatic joystick detection) */
             }
             else {
                 video_showmessage("No joysticks have been detected");
-                input_ignore_joystick(true);
             }
-
-            /* log joysticks */
-            log_joysticks();
 
             /* done! */
             break;
