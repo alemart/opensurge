@@ -148,6 +148,7 @@ CREDITS_RES_SCRIPTS_TEXT    "Gli autori sono identificati all'interno degli stes
 // Title Screen
 TITLESCREEN_PLAY            "AVVIO DEL GIOCO"
 TITLESCREEN_OPTIONS         "OPZIONI"
+FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "CONDIVIDI"
 TITLESCREEN_DONATE          "DONA"
 TITLESCREEN_QUIT            "ESCI"

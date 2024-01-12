@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-12-31"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-01-12"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -148,6 +148,7 @@ CREDITS_RES_SCRIPTS_TEXT    "Os autores são identificados nos próprios scripts
 // Title Screen
 TITLESCREEN_PLAY            "JOGAR"
 TITLESCREEN_OPTIONS         "CONFIGURAR"
+TITLESCREEN_MOBILE          "JOGAR NO MOBILE"
 TITLESCREEN_SHARE           "COMPARTILHAR"
 TITLESCREEN_DONATE          "DOAR"
 TITLESCREEN_QUIT            "SAIR"

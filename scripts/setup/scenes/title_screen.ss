@@ -17,6 +17,7 @@ using SurgeEngine.Audio.Music;
 using SurgeEngine.Camera;
 using SurgeEngine.Behaviors.DirectionalMovement;
 using SurgeEngine.Input.MobileGamepad;
+using SurgeEngine.Platform;
 using SurgeTheRabbit;
 
 // ----------------------------------------------------------------------------
@@ -284,6 +285,12 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
             spawn("Title Screen - Menu Item - Options").setOffset(Vector2.right.scaledBy(offset += spacing))
         );
 
+        if(!Platform.isAndroid) {
+            items.push(
+                spawn("Title Screen - Menu Item - Mobile").setOffset(Vector2.right.scaledBy(offset += spacing))
+            );
+        }
+
         items.push(
             spawn("Title Screen - Menu Item - Share").setOffset(Vector2.right.scaledBy(offset += spacing))
         );
@@ -353,6 +360,39 @@ object "Title Screen - Menu Item - Options" is "private", "detached", "entity"
     {
         Player.active.lives = Player.initialLives;
         Level.load("quests/options.qst");
+    }
+
+    fun onSelect()
+    {
+        parent.onSelect(this);
+    }
+
+    fun onHighlight()
+    {
+    }
+
+    fun setHighlighted(highlighted)
+    {
+        delegate.setHighlighted(highlighted);
+        return this;
+    }
+
+    fun setOffset(offset)
+    {
+        delegate.setOffset(offset);
+        return this;
+    }
+}
+
+object "Title Screen - Menu Item - Mobile" is "private", "detached", "entity"
+{
+    delegate = spawn("Title Screen - Menu Item")
+               .setText("$TITLESCREEN_MOBILE");
+
+    fun onEnter()
+    {
+        SurgeTheRabbit.download();
+        Level.load(Level.file);
     }
 
     fun onSelect()

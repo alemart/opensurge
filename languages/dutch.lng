@@ -147,6 +147,7 @@ CREDITS_RES_SCRIPTS_TEXT    "De auteurs worden geïdentificeerd in de scripts ze
 // Title Screen
 TITLESCREEN_PLAY            "START SPEL"
 TITLESCREEN_OPTIONS         "OPTIES"
+FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "DELEN"
 TITLESCREEN_DONATE          "DONEREN"
 TITLESCREEN_QUIT            "VERLATEN"

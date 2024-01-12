@@ -148,6 +148,7 @@ CREDITS_RES_SCRIPTS_TEXT    "Аутори су препознати у сами�
 // Title Screen
 TITLESCREEN_PLAY            "ЗАПОЧНИ ИГРУ"
 TITLESCREEN_OPTIONS         "ОПЦИЈЕ"
+FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "PODELITE"
 TITLESCREEN_DONATE          "DONIRAJTE"
 TITLESCREEN_QUIT            "НАПУСТИТИ"
