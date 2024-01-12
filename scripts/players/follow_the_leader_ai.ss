@@ -84,7 +84,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
             return; // clear follower flags?
 
         // followers have special flags
-        setFollowerFlags(follower);
+        setPlayer2Flags(follower);
 
         // buffer the state of the leader
         bufferedState.store(leader);
@@ -96,6 +96,14 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         // no need to do anything else if the physics system is disabled
         if(follower.frozen)
             return;
+
+        // modify the jump
+        if(bufferedInput.jump) {
+            if(!follower.midair)
+                jump(); // let's hold the jump button for a little while
+            else
+                follower.input.simulateButton("fire1", false); // cancel
+        }
 
         // the follower is either charging or probably stuck on a ramp
         if(stuckOnARamp() || bufferedState.charging) {
@@ -116,7 +124,8 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         }
 
         // follow the leader horizontally
-        followHorizontally();
+        if(!followHorizontally())
+            return;
 
         // follow the leader vertically
         followVertically();
@@ -251,7 +260,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         return state == "repositioning";
     }
 
-    fun setFollowerFlags(player)
+    fun setPlayer2Flags(player)
     {
         player.immortal = true;
         player.invulnerable = true;
@@ -318,7 +327,11 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         // make it jump if it's going too fast near a ledge
         if(!follower.midair && follower.slope == 0 && !follower.rolling && Math.abs(follower.gsp) >= 120 && follower.transform.position.y >= bufferedState.position.y - 32) {
             dx = follower.collider.right - follower.collider.center.x;
-            if(!platformSensor.hitTest(follower.collider.center.x + dx * follower.direction, follower.collider.bottom + 8, follower.layer))
+            if(!platformSensor.hitTest(
+                follower.collider.center.x + dx * follower.direction,
+                follower.collider.bottom + 8,
+                follower.layer
+            ))
                 jump();
         }
 
@@ -340,7 +353,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
             if(!follower.midair && Math.abs(follower.gsp) < 240) {
                 if(leader.slope < 90 || leader.slope > 270) {
                     // let's make the follower jump
-                    if(Math.random() < 0.025)
+                    if(Math.random() < 0.03)
                         jump();
                 }
             }
@@ -630,7 +643,7 @@ object "Follow the Leader AI - Input Buffer"
         rightBuffer[head] = input.buttonDown("right");
         downBuffer[head] = input.buttonDown("down");
         leftBuffer[head] = input.buttonDown("left");
-        jumpBuffer[head] = input.buttonDown("fire1");
+        jumpBuffer[head] = input.buttonPressed("fire1");
 
         tail = (tail + 1) % maxSamples;
     }
