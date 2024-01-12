@@ -120,6 +120,7 @@ static ALLEGRO_JOYSTICK* joystick_pool[POOL_CAPACITY];
 static ALLEGRO_JOYSTICK* query_joystick_pool(int id);
 static void refresh_joystick_pool();
 static void clear_joystick_pool();
+static int joystick_pool_size();
 
 /* private data */
 static const char DEFAULT_INPUTMAP_NAME[] = "default";
@@ -143,6 +144,16 @@ static struct {
     bool initialized;
     int tracked_touch_id;
 } emulated_mouse = { .initialized = false, .tracked_touch_id = -1 };
+
+
+
+
+
+
+/*
+ * public API
+ */
+
 
 
 /*
@@ -180,9 +191,6 @@ void input_init()
     }
     engine_add_event_source(al_get_joystick_event_source());
     engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_CONFIGURATION, NULL, a5_handle_joystick_event);
-    /*engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_AXIS, NULL, a5_handle_joystick_event);
-    engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN, NULL, a5_handle_joystick_event);
-    engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_BUTTON_UP, NULL, a5_handle_joystick_event);*/
 
     /* initialize touch input */
     if(!al_is_touch_input_installed()) {
@@ -225,10 +233,10 @@ void input_init()
     for(int j = 0; j < MAX_JOYS; j++)
         wanted_joy[j] = NULL;
 
-    ignore_joystick = !input_is_joystick_available();
     clear_joystick_pool();
     refresh_joystick_pool();
     log_joysticks();
+    ignore_joystick = !input_is_joystick_available();
 
     /* loading custom input mappings */
     inputmap_init();
@@ -322,7 +330,8 @@ void input_update()
                 /* ignore what is probably the right analog stick (stick_id = 1
                    with 2 axes), but not a D-Pad that is mapped to a stick
                    (probably the first stick with stick_id >= 2 and 2 axes). */
-                if(stick_id == 1)
+                int flags = al_get_joystick_stick_flags(joystick, stick_id);
+                if(stick_id == 1 && !(flags & ALLEGRO_JOYFLAG_DIGITAL))
                     continue;
 
                 /* ignore the dead-zone and normalize the data back to [-1,1] */
@@ -346,9 +355,9 @@ void input_update()
        joystick as an accelerometer. Also, we ensure that joystick IDs
        remain consistent across reconfigurations. */
     for(int j = 0; j < MAX_JOYS; j++) {
-        const ALLEGRO_JOYSTICK* target = query_joystick_pool(j);
         wanted_joy[j] = NULL;
 
+        const ALLEGRO_JOYSTICK* target = query_joystick_pool(j);
         if(target != NULL) {
             for(int k = 0; k < num_joys; k++) {
                 if(al_get_joystick(k) == target) {
@@ -496,15 +505,6 @@ input_t *input_create_user(const char* inputmap_name)
     /* if there isn't such a inputmap_name, the game will exit beautifully */
     inputmap_name = inputmap_name ? inputmap_name : DEFAULT_INPUTMAP_NAME;
     me->inputmap = inputmap_get(inputmap_name);
-
-    /* check joystick stuff */
-    if(me->inputmap->joystick.enabled && (!input_is_joystick_enabled() || me->inputmap->joystick.id >= input_number_of_joysticks())) {
-        logfile_message(
-            "WARNING: inputmap '%s' accepts a joystick (id: %d, plugged joysticks: %d), but %s.",
-            inputmap_name, me->inputmap->joystick.id, input_number_of_joysticks(),
-            (input_is_joystick_enabled() ? "the joystick id is invalid" : "the user isn't using a joystick")
-        );
-    }
 
     input_register(in);
     return in;
@@ -664,21 +664,17 @@ bool input_is_joystick_available()
  */
 bool input_is_joystick_enabled()
 {
-    return !ignore_joystick && input_is_joystick_available();
+    return !input_is_joystick_ignored() && input_is_joystick_available();
 }
 
 
 /*
  * input_ignore_joystick()
- * Ignores the input received from a joystick (if available)
+ * Ignores the input received from joysticks
  */
 void input_ignore_joystick(bool ignore)
 {
     ignore_joystick = ignore;
-    if(!ignore_joystick && input_number_of_joysticks() == 0) {
-        video_showmessage("No joysticks have been found!");
-        ignore_joystick = true;
-    }
 }
 
 
@@ -694,12 +690,19 @@ bool input_is_joystick_ignored()
 
 /*
  * input_number_of_joysticks()
- * Number of connected joysticks
+ * Number of connected and valid joysticks
  */
 int input_number_of_joysticks()
 {
-    /* Note: this includes devices such as accelerometers */
-    return al_get_num_joysticks();
+    int n = 0;
+
+    for(int p = 0; p < POOL_CAPACITY && joystick_pool[p] != NULL; p++) {
+        ALLEGRO_JOYSTICK* joystick = joystick_pool[p];
+        if(al_get_joystick_active(joystick))
+            n++;
+    }
+
+    return n;
 }
 
 
@@ -714,14 +717,26 @@ void input_reconfigure_joysticks()
     al_reconfigure_joysticks();
     refresh_joystick_pool();
     log_joysticks();
+}
 
-    if(al_get_num_joysticks() > 0) {
-        /* enable joystick input */
-        input_ignore_joystick(false); /* the user probably wants this (automatic joystick detection) */
-    }
-    else {
-        /* disable joystick input */
-        input_ignore_joystick(true); /* needed? */
+
+/*
+ * input_print_joysticks()
+ * Prints the connected & valid joysticks to the screen
+ */
+void input_print_joysticks()
+{
+    int n = input_number_of_joysticks();
+
+    if(n > 0)
+        video_showmessage("Found %d joystick%s", n, n != 1 ? "s" : "");
+    else
+        video_showmessage("No joysticks have been detected");
+
+    for(int j = 0; j < n; j++) {
+        ALLEGRO_JOYSTICK* joystick = query_joystick_pool(j);
+        if(joystick != NULL)
+            video_showmessage("%s", al_get_joystick_name(joystick));
     }
 }
 
@@ -765,7 +780,9 @@ const char* input_get_mapping_name(inputuserdefined_t *in)
 
 
 
-/* private methods */
+/*
+ * private stuff
+ */
 
 
 /* registers an input device */
@@ -877,7 +894,7 @@ void inputuserdefined_update(input_t* in)
         }
     }
 
-    /* read the mobile gamepad as the first joystick */
+    /* read the mobile gamepad as the first joystick (always enabled) */
     if(im->joystick.enabled && im->joystick.id == 0) {
         mobilegamepad_state_t mobile;
         mobilegamepad_get_state(&mobile);
@@ -1027,13 +1044,22 @@ void clear_joystick_pool()
         joystick_pool[p] = NULL;
 }
 
+/* the current size of the joystick pool */
+int joystick_pool_size()
+{
+    int pool_size = 0;
+
+    while(pool_size < POOL_CAPACITY && joystick_pool[pool_size] != NULL)
+        pool_size++;
+
+    return pool_size;
+}
+
 /* refresh the joystick pool. Call after al_reconfigure_joysticks() */
 void refresh_joystick_pool()
 {
     /* compute the current size of the pool */
-    int pool_size = 0;
-    while(pool_size < POOL_CAPACITY && joystick_pool[pool_size] != NULL)
-        pool_size++;
+    int pool_size = joystick_pool_size();
 
     /* the pool is full (really?!). We're not accepting new joysticks */
     if(pool_size >= POOL_CAPACITY)
@@ -1043,11 +1069,14 @@ void refresh_joystick_pool()
     int num_joys = min(al_get_num_joysticks(), MAX_JOYS);
     for(int j = 0; j < num_joys; j++) {
         ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
+        int num_buttons = al_get_joystick_num_buttons(joystick);
+        int num_sticks = al_get_joystick_num_sticks(joystick);
+        int num_axes = num_sticks > 0 ? al_get_joystick_num_axes(joystick, 0) : 0;
         bool in_the_pool = false;
 
         /* filter out devices that are not gamepads
            (an accelerometer is reported as the first joystick on Android) */
-        if(al_get_joystick_num_buttons(joystick) < MIN_BUTTONS)
+        if(num_buttons < MIN_BUTTONS || num_axes < REQUIRED_AXES)
             continue;
 
         /* check if the joystick is in the pool */
@@ -1094,12 +1123,12 @@ ALLEGRO_JOYSTICK* query_joystick_pool(int id)
     if(candidate == NULL)
         return NULL;
 
-    /* return the candidate if it's connected */
-    if(al_get_joystick_active(candidate))
-        return candidate;
-
     /* the candidate was disconnected */
-    return NULL;
+    if(!al_get_joystick_active(candidate))
+        return NULL;
+
+    /* success! return the candidate */
+    return candidate;
 }
 
 /* handle a keyboard event */
@@ -1182,25 +1211,14 @@ void a5_handle_joystick_event(const ALLEGRO_EVENT* event, void* data)
         /* hot plugging */
         case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION: {
             input_reconfigure_joysticks();
+            input_print_joysticks();
 
-            int num_joysticks = al_get_num_joysticks();
-            if(num_joysticks > 0) {
-                /* display message as soon as new joysticks are plugged */
-                video_showmessage("Found %d joystick%s:", num_joysticks, num_joysticks == 1 ? "" : "s");
-                for(int j = 0; j < num_joysticks; j++) {
-                    ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
-                    video_showmessage("%s", al_get_joystick_name(joystick));
-
-                    /* log */
-                    logfile_message("Found new joystick (%d)", j);
-                    log_joystick(joystick);
-                }
-            }
-            else {
-                video_showmessage("No joysticks have been detected");
+            if(input_number_of_joysticks() > 0) {
+                /* the user probably wants the joystick input to be enabled
+                   (automatic joystick detection) */
+                input_ignore_joystick(false);
             }
 
-            /* done! */
             break;
         }
     }
