@@ -409,6 +409,9 @@ void settings_init(void* data)
     /* immersive mode */
     was_immersive = video_is_immersive();
     video_set_immersive(false);
+
+    /* reconfigure joysticks */
+    input_reconfigure_joysticks();
 }
 
 /*
