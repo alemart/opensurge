@@ -146,7 +146,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t transform = scripting_util_require_component(object, "Transform");
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
-    bool is_detached = surgescript_object_has_tag(parent, "detached");
+    bool is_detached = scripting_util_is_effectively_detached_entity(parent);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     actor_t* actor = actor_create();
 

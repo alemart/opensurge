@@ -262,10 +262,40 @@ void scripting_util_set_world_angle(surgescript_object_t* object, float angle)
 }
 
 /* checks if the object is inside the visible part of the screen */
-int scripting_util_is_object_inside_screen(const surgescript_object_t* object)
+bool scripting_util_is_object_inside_screen(const surgescript_object_t* object)
 {
     v2d_t v = scripting_util_world_position(object);
     return level_inside_screen(v.x, v.y, 0, 0);
+}
+
+/* checks if an object is an effectively detached entity */
+bool scripting_util_is_effectively_detached_entity(const surgescript_object_t* object)
+{
+    /* A detached entity is effectively detached. Non-entities are not
+       effectively detached.
+
+       If an entity doesn't have the detached tag, we'll still consider it to
+       be effectively detached if any ascendant is a detached entity.
+       
+       Different instances of the same entity may or may not be effectively
+       detached.
+       
+       Effectively detached entities are rendered just like detached entities. */
+
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
+    surgescript_objecthandle_t handle;
+
+    do {
+        if(!surgescript_object_has_tag(object, "entity"))
+            return false;
+        else if(surgescript_object_has_tag(object, "detached"))
+            return true;
+
+        handle = surgescript_object_parent(object);
+    } while(handle != root && (object = surgescript_objectmanager_get(manager, handle)));
+
+    return false;
 }
 
 /* get the zindex of an object */
