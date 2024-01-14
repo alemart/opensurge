@@ -15,7 +15,6 @@ using SurgeEngine.Actor;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
-using SurgeEngine.Behaviors.CircularMovement;
 using SurgeEngine.Platform;
 using SurgeEngine.Prefs;
 using SurgeTheRabbit;
@@ -258,102 +257,35 @@ object "Rate the Game - Dialog - Tween"
 
 object "Rate the Game - Desktop Menu" is "private", "detached", "entity"
 {
-    indexOfSelectedOption = 0; // 0 (confirm) or 1 (cancel)
+    menu = spawn("Simple Menu")
+           .addOption("yes", "$RATEGAME_YES", Vector2.zero)
+           .addOption("no",  "$RATEGAME_NO",  Vector2.down.scaledBy(38))
+           .setIcon("Rate the Game - Desktop Menu - Cursor")
+           .setFontName("Rate the Game - Text")
+           .setAlignment("center")
+           .setDefaultColor("404040")
+           .setHighlightColor("fb8e24")
+           .setPosition(Vector2(Screen.width / 2, 122));
+
     input = Input("default");
-    cursor = spawn("Rate the Game - Desktop Menu - Cursor");
-    option = [ Text("Rate the Game - Text"), Text("Rate the Game - Text") ];
-    sound = [ Sound("samples/select.wav"), Sound("samples/return.wav"), Sound("samples/choose.wav") ];
-    actionButton = "fire1";
-    startButton = "fire3";
     backButton = "fire4";
 
     state "main"
     {
-        // changed the selected option?
-        if(input.buttonPressed("up") || input.buttonPressed("down")) {
-            indexOfSelectedOption = 1 - indexOfSelectedOption;
-            sound[2].play();
-        }
-
-        // reposition the cursor
-        selectedOption = option[indexOfSelectedOption];
-        cursor.position = Vector2(Screen.width / 2 - selectedOption.size.x / 2 - 16, selectedOption.offset.y + 4);
-
-        // recolor the options
-        if(indexOfSelectedOption == 0) {
-            option[0].text = "<color=fb8e24>$RATEGAME_YES</color>";
-            option[1].text = "<color=404040>$RATEGAME_NO</color>";
-        }
-        else {
-            option[0].text = "<color=404040>$RATEGAME_YES</color>";
-            option[1].text = "<color=fb8e24>$RATEGAME_NO</color>";
-        }
-
-        // picked an option?
-        if(input.buttonPressed(actionButton) || input.buttonPressed(startButton)) {
-            pickOption(indexOfSelectedOption);
-            sound[indexOfSelectedOption].play();
-        }
-        else if(input.buttonPressed(backButton)) {
-            pickOption(1);
-            sound[1].play();
+        if(input.buttonPressed(backButton)) {
+            menu.setHighlightedOption("no");
+            menu.chooseHighlightedOption();
         }
     }
 
-    state "disabled"
+    fun onChooseMenuOption(optionId)
     {
-    }
-
-    fun pickOption(index)
-    {
-        state = "disabled";
-
-        if(index == 0)
+        if(optionId == "yes")
             parent.onChooseYes();
         else
             parent.onChooseNo();
     }
-
-    fun constructor()
-    {
-        option[0].offset = Vector2(Screen.width / 2, 122);
-        option[0].align = "center";
-
-        option[1].offset = Vector2(Screen.width / 2, 160);
-        option[1].align = "center";
-    }
 }
-
-object "Rate the Game - Desktop Menu - Cursor" is "private", "detached", "entity"
-{
-    sprite = spawn("Rate the Game - Desktop Menu - Cursor - Sprite");
-    transform = Transform();
-
-    fun get_position()
-    {
-        return transform.localPosition;
-    }
-
-    fun set_position(position)
-    {
-        transform.localPosition = position;
-    }
-}
-
-object "Rate the Game - Desktop Menu - Cursor - Sprite" is "private", "detached", "entity"
-{
-    actor = Actor("Rate the Game - Desktop Menu - Cursor");
-    movement = CircularMovement();
-
-    fun constructor()
-    {
-        movement.radius = 2;
-        movement.rate = 1.5;
-        movement.scale = Vector2.right;
-    }
-}
-
-
 
 
 

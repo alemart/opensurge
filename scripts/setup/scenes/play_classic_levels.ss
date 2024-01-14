@@ -14,10 +14,6 @@ using SurgeEngine.Audio.Sound;
 
 
 
-// ----------------------------------------------------------------------------
-// PLAY CLASSIC LEVELS SCENE: SETUP OBJECT
-// ----------------------------------------------------------------------------
-
 object "Play Classic Levels" is "setup"
 {
     fader = spawn("Fader");
@@ -26,10 +22,14 @@ object "Play Classic Levels" is "setup"
            .setText("$PLAYCLASSICLEVELS_TEXT")
            .setPosition(Vector2(Screen.width / 2, 128));
 
-    optionGroup = spawn("Play Classic Levels - Option Group")
-                  .add("yes", "$PLAYCLASSICLEVELS_YES", Vector2(0, 0))
-                  .add("no",  "$PLAYCLASSICLEVELS_NO",  Vector2(0, 18))
-                  .setPosition(Vector2(Screen.width / 2 - 12, 160));
+    menu = spawn("Simple Menu")
+           .addOption("yes", "$PLAYCLASSICLEVELS_YES", Vector2.zero)
+           .addOption("no",  "$PLAYCLASSICLEVELS_NO",  Vector2.down.scaledBy(18))
+           .setIcon("End of Demo - Pointer")
+           .setFontName("End of Demo - Text")
+           .setAlignment("center")
+           .setHighlightColor("ffffff")
+           .setPosition(Vector2(Screen.width / 2, 160));
 
     state "main"
     {
@@ -47,7 +47,7 @@ object "Play Classic Levels" is "setup"
             Level.abort();
     }
 
-    fun onChooseOption(optionId)
+    fun onChooseMenuOption(optionId)
     {
         fader.fadeOut();
 
@@ -65,10 +65,6 @@ object "Play Classic Levels" is "setup"
 }
 
 
-
-// ----------------------------------------------------------------------------
-// TEXTS
-// ----------------------------------------------------------------------------
 
 object "Play Classic Levels - Text" is "private", "detached", "entity"
 {
@@ -91,163 +87,5 @@ object "Play Classic Levels - Text" is "private", "detached", "entity"
     {
         label.align = "center";
         label.maxWidth = Screen.width - 16;
-    }
-}
-
-
-
-// ----------------------------------------------------------------------------
-// OPTION
-// ----------------------------------------------------------------------------
-
-object "Play Classic Levels - Option Group" is "private", "detached", "entity"
-{
-    transform = Transform();
-    input = Input("default");
-    highlight = Sound("samples/choose.wav");
-    confirm = Sound("samples/select.wav");
-    options = [];
-    indexOfActiveOption = 0;
-
-    state "main"
-    {
-        n = options.length;
-        if(n == 0)
-            return;
-
-        if(input.buttonPressed("down") || input.buttonPressed("right")) {
-            indexOfActiveOption = (indexOfActiveOption + 1) % n;
-            highlight.play();
-        }
-
-        if(input.buttonPressed("up") || input.buttonPressed("left")) {
-            indexOfActiveOption = (indexOfActiveOption + (n-1)) % n;
-            highlight.play();
-        }
-
-        if(input.buttonPressed("fire1") || input.buttonPressed("fire3")) {
-            confirm.play();
-            options[indexOfActiveOption].choose();
-        }
-
-        for(i = 0; i < n; i++) {
-            if(i != indexOfActiveOption)
-                options[i].setHighlighted(false);
-        }
-        options[indexOfActiveOption].setHighlighted(true);
-    }
-
-    fun onChooseOption(optionId)
-    {
-        parent.onChooseOption(optionId);
-    }
-
-    fun add(id, text, offset)
-    {
-        newOption = spawn("Play Classic Levels - Option")
-                    .setId(id)
-                    .setText(text)
-                    .setOffset(offset);
-
-        options.push(newOption);
-        return this;
-    }
-
-    fun setPosition(position)
-    {
-        transform.position = position;
-        return this;
-    }
-}
-
-object "Play Classic Levels - Option" is "private", "detached", "entity"
-{
-    transform = Transform();
-    label = Text("End of Demo - Text");
-    icon = spawn("Play Classic Levels - Option - Blinking Icon");
-    id = "";
-
-    fun choose()
-    {
-        parent.onChooseOption(id);
-    }
-
-    fun setId(newId)
-    {
-        id = newId;
-        return this;
-    }
-
-    fun setText(text)
-    {
-        label.text = text;
-        return this;
-    }
-
-    fun setOffset(offset)
-    {
-        transform.localPosition = offset;
-        return this;
-    }
-
-    fun setHighlighted(highlighted)
-    {
-        icon.visible = highlighted;
-        return this;
-    }
-
-    fun constructor()
-    {
-        transform.position = Vector2.zero;
-        label.align = "left";
-        label.text = "";
-    }
-}
-
-object "Play Classic Levels - Option - Blinking Icon" is "private", "detached", "entity"
-{
-    transform = Transform();
-    label = Text("End of Demo - Text");
-    visible = false;
-    seconds = 0.25;
-
-    state "main"
-    {
-        label.visible = visible;
-        if(timeout(seconds))
-            state = "alt";
-    }
-
-    state "alt"
-    {
-        label.visible = false;
-        if(timeout(seconds))
-            state = "main";
-    }
-
-    state "changed"
-    {
-        label.visible = visible;
-        state = "main";
-    }
-
-    fun set_visible(value)
-    {
-        if(visible != value) {
-            visible = value;
-            state = "changed";
-        }
-    }
-
-    fun get_visible()
-    {
-        return visible;
-    }
-
-    fun constructor()
-    {
-        transform.localPosition = Vector2(-10, 0);
-        label.align = "left";
-        label.text = ">";
     }
 }

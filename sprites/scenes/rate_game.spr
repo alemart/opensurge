@@ -25,13 +25,35 @@ sprite "Rate the Game - Desktop Menu - Cursor"
     source_file     "images/scenes/rate_game.png"
     source_rect     320 368 32 32
     frame_size      32 32
-    hot_spot        16 16
+    hot_spot        32 12
 
     animation 0
     {
         repeat      TRUE
         fps         8
         data        0
+        play        "horizontal movement"
+    }
+
+    keyframes "horizontal movement"
+    {
+        duration            1.0
+        easing              "ease_in_out"
+
+        keyframe 0%
+        {
+            translation     0 0
+        }
+
+        keyframe 50%
+        {
+            translation     -8 0
+        }
+
+        keyframe 100%
+        {
+            translation     0 0
+        }
     }
 }
 
