@@ -158,6 +158,10 @@ transform_t* proganim_interpolated_transform(const proganim_t* prog_anim, double
     float interpolated_rotation = lerp_angle(keyframe_a->rotation * DEG2RAD, keyframe_b->rotation * DEG2RAD, p);
     v2d_t interpolated_scale = v2d_lerp(keyframe_a->scale, keyframe_b->scale, p);
 
+    /* use integer coordinates */
+    interpolated_translation.x = floorf(interpolated_translation.x);
+    interpolated_translation.y = floorf(interpolated_translation.y);
+
     /* set the transform */
     transform_build(t, interpolated_translation, -interpolated_rotation, interpolated_scale, v2d_new(0.0f, 0.0f));
     return t;
