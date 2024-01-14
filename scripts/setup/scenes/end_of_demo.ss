@@ -136,12 +136,13 @@ object "End of Demo - Text" is "private", "detached", "entity"
 
 object "End of Demo - Button" is "private", "detached", "entity"
 {
-    menu = spawn("Simple Menu")
+    menu = spawn("Simple Menu Builder")
            .addOption("continue", "$ENDOFDEMO_CONTINUE", Vector2.zero)
            .setIcon("End of Demo - Pointer")
            .setFontName("End of Demo - Text")
            .setHighlightColor("ffffff")
-           .setPosition(Vector2(88, 208));
+           .setPosition(Vector2(88, 208))
+           .build();
 
     fun onChooseMenuOption(optionId)
     {

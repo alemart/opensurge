@@ -22,14 +22,15 @@ object "Play Classic Levels" is "setup"
            .setText("$PLAYCLASSICLEVELS_TEXT")
            .setPosition(Vector2(Screen.width / 2, 128));
 
-    menu = spawn("Simple Menu")
+    menu = spawn("Simple Menu Builder")
            .addOption("yes", "$PLAYCLASSICLEVELS_YES", Vector2.zero)
            .addOption("no",  "$PLAYCLASSICLEVELS_NO",  Vector2.down.scaledBy(18))
            .setIcon("End of Demo - Pointer")
            .setFontName("End of Demo - Text")
            .setAlignment("center")
            .setHighlightColor("ffffff")
-           .setPosition(Vector2(Screen.width / 2, 160));
+           .setPosition(Vector2(Screen.width / 2, 160))
+           .build();
 
     state "main"
     {

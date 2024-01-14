@@ -257,7 +257,7 @@ object "Rate the Game - Dialog - Tween"
 
 object "Rate the Game - Desktop Menu" is "private", "detached", "entity"
 {
-    menu = spawn("Simple Menu")
+    menu = spawn("Simple Menu Builder")
            .addOption("yes", "$RATEGAME_YES", Vector2.zero)
            .addOption("no",  "$RATEGAME_NO",  Vector2.down.scaledBy(38))
            .setIcon("Rate the Game - Desktop Menu - Cursor")
@@ -265,7 +265,8 @@ object "Rate the Game - Desktop Menu" is "private", "detached", "entity"
            .setAlignment("center")
            .setDefaultColor("404040")
            .setHighlightColor("fb8e24")
-           .setPosition(Vector2(Screen.width / 2, 122));
+           .setPosition(Vector2(Screen.width / 2, 122))
+           .build();
 
     input = Input("default");
     backButton = "fire4";
