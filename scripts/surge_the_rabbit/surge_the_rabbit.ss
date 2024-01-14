@@ -37,7 +37,8 @@ object "SurgeTheRabbit"
 
     fun rate()
     {
-        url = website + "/rating?v=" + SurgeEngine.version;
+        p = platformName();
+        url = website + "/rating?platform=" + p + "&v=" + SurgeEngine.version;
         Web.launchURL(url);
     }
 
@@ -51,6 +52,20 @@ object "SurgeTheRabbit"
     fun isBaseGame()
     {
         return (Game.title == "Surge the Rabbit");
+    }
+
+    fun platformName()
+    {
+        if(Platform.isWindows)
+            return "windows";
+        else if(Platform.isMacOS)
+            return "macos";
+        else if(Platform.isAndroid)
+            return "android";
+        else if(Platform.isUnix)
+            return "unix";
+        else
+            return "unknown";
     }
 
     fun isDevelopmentBuild()
