@@ -163,10 +163,7 @@ void confirmbox_update()
         ));
         font_set_position(optionfnt[i][1], font_get_position(optionfnt[i][0]));
     }
-    arrow->position = v2d_subtract(
-        v2d_add(font_get_position(optionfnt[current_option][0]), arrow->hot_spot),
-        v2d_new(image_width(actor_image(arrow)) * 1.4f, -image_height(actor_image(arrow)) * 0.5f)
-    );
+    arrow->position = font_get_position(optionfnt[current_option][0]);
 
     /* input */
     if(!fxfade_in && !fxfade_out) {

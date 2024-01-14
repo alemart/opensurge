@@ -175,7 +175,6 @@ void langselect_update()
 
     /* menu option */
     arrow->position = font_get_position(lngfnt[0][option]);
-    arrow->position.x += -20 + 3 * cosf(TWO_PI * scene_time);
     if(!quit && !fadefx_is_fading()) {
         if(input_button_pressed(input, IB_DOWN)) {
             if(option / LANG_MAXPERCOL == (option + 1) / LANG_MAXPERCOL) {

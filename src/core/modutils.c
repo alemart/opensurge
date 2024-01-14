@@ -134,6 +134,8 @@ static const char* const COMPATIBILITY_LIST[] = {
 
     "scripts/surge_the_rabbit/surge_the_rabbit.ss",     ":0.6.1",                   /* use own script */
 
+    "sprites/ui/pointer.spr",                           ":0.6.1",                   /* simplified in 0.6.1 */
+
     "scripts/items/profiler.ss",                        ":",                        /* always use own Profiler */
 #endif
 
