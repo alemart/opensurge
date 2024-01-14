@@ -95,7 +95,7 @@ FIXME OPTIONS_DEVELOPERMODE       "Developer mode"
 OPTIONS_CREDITS             "Open Surge Krediti"
 FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
 OPTIONS_DONATE              "Doniraj Open Surge-u"
-FIXME OPTIONS_INFO                "Engine information"
+FIXME OPTIONS_ABOUT               "About the engine"
 FIXME OPTIONS_SHARE               "Share the engine"
 FIXME OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
 FIXME OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
@@ -161,19 +161,19 @@ ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
 ENDOFDEMO_TEXT              "Hvala vam što ste igrali! Surge the Rabbit je u razvoju.\n\nPosjetite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> za ažuriranja!\n\nSada da vidimo kako i vi možete praviti vlastite igre!"
 
 // Rate the Game
-// Tip: the rating scene isn't displayed often, so uncomment ratingTime.forget() in scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+// Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
 FIXME RATEGAME_TITLE              "Enjoying Surge the Rabbit?"
 FIXME RATEGAME_MESSAGE            "We'd love to hear about your experience so far! Your feedback helps to grow this open source game!" // 2 lines max.
-FIXME RATEGAME_YES                "Sure!!!"
+FIXME RATEGAME_YES                "Sure!"
 FIXME RATEGAME_NO                 "Not now"
 
 // Play classic levels
-FIXME PLAYCLASSICLEVELS_TEXT      "Play on the classic levels?"
+FIXME PLAYCLASSICLEVELS_TEXT      "Play the classic levels?"
 FIXME PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
 FIXME PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-FIXME THANKSFORPLAYING_TEXT       "Thanks for playing!"
+FIXME THANKSFORPLAYING_TITLE      "Thanks for playing!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENI"

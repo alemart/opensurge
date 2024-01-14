@@ -278,7 +278,7 @@ static void enter_backtobasegame(settings_entry_t* e);
 /* Engine */
 #define vt_engine (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
 
-#define vt_info (settings_entryvt_t){ nop, show_info, nop, nop, nop, nop, visible }
+#define vt_about (settings_entryvt_t){ nop, show_info, nop, nop, nop, nop, visible }
 static void show_info(settings_entry_t* e);
 
 #define vt_share (settings_entryvt_t){ nop, share, nop, nop, nop, nop, visible }
@@ -336,7 +336,7 @@ static const struct
 
     /* Engine */
     { TYPE_SUBTITLE, "$OPTIONS_ENGINE", (const char*[]){ NULL }, 0, vt_engine, 8 },
-    { TYPE_SETTING, "$OPTIONS_INFO", (const char*[]){ NULL }, 0, vt_info, 8 },
+    { TYPE_SETTING, "$OPTIONS_ABOUT", (const char*[]){ NULL }, 0, vt_about, 8 },
     { TYPE_SETTING, "$OPTIONS_SHARE", (const char*[]){ NULL }, 0, vt_share, 0 },
 #if IS_MOBILE_PLATFORM
     { TYPE_SETTING, "$OPTIONS_DOWNLOAD_DESKTOP", (const char*[]){ NULL }, 0, vt_download, 0 },

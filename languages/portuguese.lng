@@ -95,7 +95,7 @@ OPTIONS_DEVELOPERMODE       "Modo do desenvolvedor"
 OPTIONS_CREDITS             "Créditos do Open Surge"
 OPTIONS_WEBSITE             "Visite Open Surge na web"
 OPTIONS_DONATE              "Doar para o Open Surge"
-OPTIONS_INFO                "Informações da engine"
+OPTIONS_ABOUT               "Sobre a engine"
 OPTIONS_SHARE               "Compartilhar a engine"
 OPTIONS_DOWNLOAD_DESKTOP    "Baixar a engine para Desktops"
 OPTIONS_DOWNLOAD_MOBILE     "Baixar a engine para mobile"
@@ -161,10 +161,10 @@ ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
 ENDOFDEMO_TEXT              "Valeu por jogar! Surge the Rabbit está em desenvolvimento.\n\nVisite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> para conferir as atualizações!\n\nAgora saca só como você também pode criar seus games!"
 
 // Rate the Game
-// Tip: the rating scene isn't displayed often, so uncomment ratingTime.forget() in scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+// Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
 RATEGAME_TITLE              "Avaliar Surge the Rabbit?"
 RATEGAME_MESSAGE            "Nós adoraríamos saber o que você está achando do jogo! Seu feedback vai ajudar este jogo open source a crescer!" // 2 lines max.
-RATEGAME_YES                "Beleza!!!"
+RATEGAME_YES                "Beleza!"
 RATEGAME_NO                 "Agora não"
 
 // Play classic levels
@@ -173,7 +173,7 @@ PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
 PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-THANKSFORPLAYING_TEXT       "Valeu por jogar!"
+THANKSFORPLAYING_TITLE      "Valeu por jogar!"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
