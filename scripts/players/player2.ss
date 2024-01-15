@@ -192,7 +192,7 @@ object "Player 2" is "companion"
     {
         player.immortal = true;
         player.invulnerable = true;
-        player.secondary = true;
+        player.secondary = false; // unlike an AI-controlled Player 2
         player.focusable = false;
     }
 
