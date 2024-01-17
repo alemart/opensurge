@@ -9,7 +9,6 @@ using SurgeEngine.Actor;
 using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
-using SurgeEngine.Collisions.CollisionBall;
 
 // these Bubbles help the player breathe (useful when underwater)
 object "Water Bubbles" is "entity", "basic"
@@ -54,7 +53,7 @@ object "Water Bubbles" is "entity", "basic"
             Level.spawnEntity(
                 "Water Bubble",
                 position.translatedBy(0, -4)
-            ).setSize("lg").addComponent("BreathableBubble");
+            ).setSize("lg").makeBreathable();
             counter = 0;
         }
 
@@ -89,25 +88,7 @@ object "Water Bubbles" is "entity", "basic"
     }
 }
 
-// breathable behavior: bubble that the player can use to breathe
-object "BreathableBubble"
-{
-    collider = CollisionBall(10);
-    bubble = parent;
-
-    state "main"
-    {
-        player = Player.active;
-        if(player.shield != "water" && timeout(2)) {
-            if(collider.collidesWith(player.collider)) {
-                player.breathe();
-                bubble.burst();
-            }
-        }
-    }
-}
-
-// this is for retro compatibility
+// this is for retro compatibility with Legacy Open Surge
 object "water.air_source" is "entity", "private"
 {
     bubbles = spawn("Water Bubbles");
