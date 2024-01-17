@@ -46,13 +46,13 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
      */
     public repositioningMethod = spawn("Default Repositioning Method");
 
+    chardist = 32;
     xfarmargin = 64;
     xnearmargin = 4;
     xmargin = 48;
     ymargin = 32;
-    chardist = 32;
+    xpullmargin = 64;
     pullSpeed = 60.0; // px/s
-    pullXThreshold = xfarmargin;
 
     follower = parent;
     leader = parent;
@@ -393,7 +393,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         // pull the follower towards the leader in order to make the movement
         // more robust when it comes to small platforms (and generally also)
         dx = bufferedState.position.x - follower.transform.position.x;
-        if((follower.jumping || Math.abs(dx) > pullXThreshold) && follower.direction > 0 && follower.xsp > 15 && !follower.pushing)
+        if((follower.jumping || Math.abs(dx) > xpullmargin) && follower.direction > 0 && follower.xsp > 15 && !follower.pushing)
             follower.transform.translateBy(pullSpeed * Time.delta, 0);
     }
 
@@ -406,7 +406,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         // pull the follower towards the leader in order to make the movement
         // more robust when it comes to small platforms (and generally also)
         dx = bufferedState.position.x - follower.transform.position.x;
-        if((follower.jumping || Math.abs(dx) > pullXThreshold) && follower.direction < 0 && follower.xsp < -15 && !follower.pushing)
+        if((follower.jumping || Math.abs(dx) > xpullmargin) && follower.direction < 0 && follower.xsp < -15 && !follower.pushing)
             follower.transform.translateBy(-pullSpeed * Time.delta, 0);
     }
 
