@@ -24,6 +24,11 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
     public enabled = true;
 
     /*
+     * Whether or not the follower should be focusable. Defaults to false.
+     */
+    public focusable = false;
+
+    /*
      * When the follower stays away from the leader for a while, it is repositioned.
      * Repositioning may be done in many ways: flying, jumping, teleporting, and
      * whatever else you can imagine. I call each of these a repositioning method.
@@ -47,7 +52,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
     ymargin = 32;
     chardist = 32;
     pullSpeed = 60.0; // px/s
-    pullXThreshold = xmargin;
+    pullXThreshold = xfarmargin;
 
     follower = parent;
     leader = parent;
@@ -57,6 +62,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
     offscreenTime = 0.0;
     roiMargin = 256;
     lockedPosition = null;
+    canLock = true;
 
     bufferedInput = spawn("Follow the Leader AI - Input Buffer");
     bufferedState = spawn("Follow the Leader AI - State Buffer");
@@ -80,8 +86,10 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         }
 
         // no need to do anything if I am the leader
-        if(leader == follower)
-            return; // clear follower flags?
+        if(leader == follower) {
+            setPlayer1Flags(follower);
+            return;
+        }
 
         // followers have special flags
         setPlayer2Flags(follower);
@@ -265,7 +273,15 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         player.immortal = true;
         player.invulnerable = true;
         player.secondary = true;
-        player.focusable = false;
+        player.focusable = focusable;
+    }
+
+    fun setPlayer1Flags(player)
+    {
+        player.immortal = false;
+        player.invulnerable = false;
+        player.secondary = false;
+        player.focusable = true;
     }
 
     fun followHorizontally()
@@ -325,7 +341,12 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         }
 
         // make it jump if it's going too fast near a ledge
-        if(!follower.midair && follower.slope == 0 && !follower.rolling && Math.abs(follower.gsp) >= 120 && follower.transform.position.y >= bufferedState.position.y - 32) {
+        if(
+            !follower.midair && !follower.rolling &&
+            follower.slope == 0 && Math.abs(follower.gsp) >= 120 &&
+            follower.transform.position.y >= bufferedState.position.y - 32 &&
+            leader.transform.position.y <= follower.transform.position.y + 16
+        ) {
             dx = follower.collider.right - follower.collider.center.x;
             if(!platformSensor.hitTest(
                 follower.collider.center.x + dx * follower.direction,
@@ -370,7 +391,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         follower.input.simulateButton("left", false);
 
         // pull the follower towards the leader in order to make the movement
-        // more robust when it comes to small platforms (and generally)
+        // more robust when it comes to small platforms (and generally also)
         dx = bufferedState.position.x - follower.transform.position.x;
         if((follower.jumping || Math.abs(dx) > pullXThreshold) && follower.direction > 0 && follower.xsp > 15 && !follower.pushing)
             follower.transform.translateBy(pullSpeed * Time.delta, 0);
@@ -383,7 +404,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         follower.input.simulateButton("right", false);
 
         // pull the follower towards the leader in order to make the movement
-        // more robust when it comes to small platforms (and generally)
+        // more robust when it comes to small platforms (and generally also)
         dx = bufferedState.position.x - follower.transform.position.x;
         if((follower.jumping || Math.abs(dx) > pullXThreshold) && follower.direction < 0 && follower.xsp < -15 && !follower.pushing)
             follower.transform.translateBy(-pullSpeed * Time.delta, 0);
@@ -392,6 +413,30 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
     fun jump()
     {
         jumper.jump();
+    }
+
+    fun needToReposition()
+    {
+        // no need to do anything if the follower is being repositioned
+        if(state == "repositioning")
+            return false;
+
+        // is the follower offscreen? for how long?
+        if(isOffscreen(follower, 0))
+            offscreenTime += Time.delta;
+        else
+            offscreenTime = 0.0;
+
+        // reposition if offscreen for too long
+        if(offscreenTime >= maxOffscreenTime) {
+            if(!follower.dying && !follower.frozen) {
+                offscreenTime = 0.0;
+                return true;
+            }
+        }
+
+        // no need to reposition
+        return false;
     }
 
     fun startRepositioning()
@@ -403,6 +448,8 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         // change the state
         state = "repositioning";
         follower.restore(); // undo charging, etc.
+        lockedPosition = null;
+        canLock = false;
 
         // give up control to the repositioning method
         finish = spawn("Follow the Leader AI - Finish Repositioning Functor");
@@ -427,6 +474,29 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
 
         // run the AI
         state = "main";
+    }
+
+    fun lockIfOffscreen()
+    {
+        // if the follower is too offscreen, we'll lock it to its position,
+        // so that it doesn't die unexpectedly
+        if(state == "repositioning")
+            return;
+
+        if(!canLock) {
+            lockedPosition = null;
+            if(!isOffscreen(follower, 0))
+                canLock = true;
+        }
+        else if(lockedPosition === null) {
+            if(isOffscreen(follower, roiMargin))
+                lockedPosition = follower.transform.position.scaledBy(1);
+        }
+        else {
+            follower.transform.position = lockedPosition;
+            if(!isOffscreen(follower, roiMargin))
+                lockedPosition = null;
+        }
     }
 
     fun stuckOnARamp()
@@ -483,43 +553,23 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         if(!enabled)
             return;
 
+        // do nothing while repositioning
+        if(state == "repositioning")
+            return;
+
         // reposition the follower
-        if(state != "repositioning") {
-
-            // is the follower offscreen? for how long?
-            if(isOffscreen(follower, 0))
-                offscreenTime += Time.delta;
-            else
-                offscreenTime = 0.0;
-
-            // reposition if offscreen for too long
-            if(offscreenTime >= maxOffscreenTime) {
-                if(!follower.dying && !follower.frozen) {
-                    offscreenTime = 0.0;
-                    lockedPosition = null;
-                    startRepositioning();
-                    return;
-                }
-            }
-
-            // if the follower is too offscreen, we'll lock it to its position,
-            // so that it doesn't die unexpectedly
-            if(lockedPosition === null) {
-                if(isOffscreen(follower, roiMargin))
-                    lockedPosition = follower.transform.position.scaledBy(1);
-            }
-            else {
-                follower.transform.position = lockedPosition;
-                if(!isOffscreen(follower, roiMargin))
-                    lockedPosition = null;
-            }
-
+        if(needToReposition()) {
+            startRepositioning();
+            return;
         }
+
+        // lock if offscreen
+        lockIfOffscreen();
     }
 
     fun constructor()
     {
-        assert(parent.hasTag("player"));
+        assert(follower.hasTag("player"));
     }
 }
 

@@ -416,7 +416,7 @@ object "Default Repositioning Method" is "player-repositioning-method", "private
     state "cooldown"
     {
         if(timeout(3.0))
-            state = "preparing";
+            state = "waiting";
     }
 
     state "restore physics"

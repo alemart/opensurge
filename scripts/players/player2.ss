@@ -26,6 +26,11 @@ object "Player 2" is "companion"
     public enabled = true;
 
     /*
+     * Whether or not the player should be focusable. Defaults to false.
+     */
+    public focusable = false;
+
+    /*
      * When the human Player 2 stays offscreen for a while, it is repositioned.
      * Repositioning may be done in many ways: flying, jumping, teleporting, and
      * whatever else you can imagine. I call each of these a repositioning method.
@@ -55,6 +60,7 @@ object "Player 2" is "companion"
     offscreenTime = 0.0;
     roiMargin = 256;
     lockedPosition = null;
+    canLock = true;
 
     state "main"
     {
@@ -68,6 +74,12 @@ object "Player 2" is "companion"
         // do nothing if disabled
         if(!enabled)
             return;
+
+        // do nothing if the player is effectively Player 1 at this time
+        if(player == Player.active) {
+            setPlayer1Flags(player);
+            return;
+        }
 
         // Player 2 has special flags
         setPlayer2Flags(player);
@@ -193,7 +205,15 @@ object "Player 2" is "companion"
         player.immortal = true;
         player.invulnerable = true;
         player.secondary = false; // unlike an AI-controlled Player 2
-        player.focusable = false;
+        player.focusable = focusable;
+    }
+
+    fun setPlayer1Flags(player)
+    {
+        player.immortal = false;
+        player.invulnerable = false;
+        player.secondary = false;
+        player.focusable = true;
     }
 
     fun isOffscreen(player, extraMargin)
@@ -240,21 +260,6 @@ object "Player 2" is "companion"
         return false;
     }
 
-    fun lockIfOffscreen()
-    {
-        // if the player is too offscreen, we'll lock it to its position,
-        // so that it doesn't die unexpectedly
-        if(lockedPosition === null) {
-            if(isOffscreen(player, roiMargin))
-                lockedPosition = player.transform.position.scaledBy(1);
-        }
-        else {
-            player.transform.position = lockedPosition;
-            if(!isOffscreen(player, roiMargin))
-                lockedPosition = null;
-        }
-    }
-
     fun startRepositioning()
     {
         // validate
@@ -265,6 +270,7 @@ object "Player 2" is "companion"
         state = "repositioning";
         player.restore(); // undo charging, etc.
         lockedPosition = null;
+        canLock = false;
 
         // give up control to the repositioning method
         follower = player;
@@ -287,6 +293,34 @@ object "Player 2" is "companion"
 
         // go back to the main loop
         state = "active";
+    }
+
+    fun lockIfOffscreen()
+    {
+        // if the player is too offscreen, we'll lock it to its position,
+        // so that it doesn't die unexpectedly
+        if(state == "repositioning")
+            return;
+
+        if(!canLock) {
+            lockedPosition = null;
+            if(!isOffscreen(player, 0))
+                canLock = true;
+        }
+        else if(lockedPosition === null) {
+            if(isOffscreen(player, roiMargin))
+                lockedPosition = player.transform.position.scaledBy(1);
+        }
+        else {
+            player.transform.position = lockedPosition;
+            if(!isOffscreen(player, roiMargin))
+                lockedPosition = null;
+        }
+    }
+
+    fun constructor()
+    {
+        assert(player.hasTag("player"));
     }
 }
 
