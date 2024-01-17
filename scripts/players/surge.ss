@@ -18,7 +18,7 @@ using SurgeEngine.Behaviors.DirectionalMovement;
 //
 object "Surge's Waiting Animation" is "companion"
 {
-    player = Player("Surge");
+    player = parent;
 
     state "main"
     {
@@ -34,7 +34,7 @@ object "Surge's Waiting Animation" is "companion"
 //
 object "Surge's Falling Animation" is "companion"
 {
-    player = Player("Surge");
+    player = parent;
     falling = 32;
     springing = 13;
 
@@ -81,7 +81,7 @@ object "Surge's Falling Animation" is "companion"
 //
 object "Surge's Shield Abilities" is "companion"
 {
-    player = Player("Surge");
+    player = parent;
     shieldAbilities = player.spawn("Shield Abilities").setup({
         "thunder": "Surge's Lightning Smash"
     });
@@ -92,9 +92,9 @@ object "Surge's Shield Abilities" is "companion"
 //
 object "Surge's Lightning Smash" is "shield ability"
 {
-    player = Player("Surge");
-    sfx = Sound("samples/lightning_smash.wav");
+    player = null;
     abilities = null;
+    sfx = Sound("samples/lightning_smash.wav");
 
     state "main"
     {
@@ -119,6 +119,9 @@ object "Surge's Lightning Smash" is "shield ability"
 
     fun onActivate(shieldAbilities)
     {
+        // get the player
+        player = shieldAbilities.player;
+
         // smash!
         player.ysp = Math.max(player.ysp, 480);
 
@@ -148,7 +151,7 @@ object "Surge's Lightning Smash" is "shield ability"
 //
 object "Surge's Lightning Boom" is "companion"
 {
-    player = Player("Surge");
+    player = parent;
     normalJumpSpeed = -240; // pixels per second
     superJumpSpeed = -330; // if thunder shield
     timeMidAir = 0;
@@ -239,7 +242,7 @@ object "Surge's Lightning Boom" is "companion"
         if(player.rolling)
             player.springify(); // adjust sensors
         xsp = player.xsp;
-        fx = spawn("Surge's Lightning Boom FX");
+        fx = spawn("Surge's Lightning Boom FX").setPlayer(player);
         state = "attacking";
     }
 
@@ -295,7 +298,7 @@ object "Surge's Lightning Boom FX" is "private", "entity"
     actor = Actor("Surge's Lightning Boom");
     sfx = Sound("samples/lightning_boom.wav");
     collider = CollisionBall(40);
-    player = Player("Surge");
+    player = null;
     minRadius = 0;
     maxRadius = 0;
     time = 0;
@@ -349,6 +352,12 @@ object "Surge's Lightning Boom FX" is "private", "entity"
                     enemy.kill(player);
             }
         }
+    }
+
+    fun setPlayer(p)
+    {
+        player = p;
+        return this;
     }
 }
 

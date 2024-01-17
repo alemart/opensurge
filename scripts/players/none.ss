@@ -8,7 +8,7 @@ using SurgeEngine.Player;
 
 object "None" is "companion"
 {
-    player = Player("None");
+    player = parent;
 
     state "main"
     {
