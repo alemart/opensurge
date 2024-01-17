@@ -141,12 +141,13 @@ sprite "Neon"
         data        38 39 40 41 42 43 44 45 46 47 48 49 0 0 0 0 0 0 0
     }
 
-    // ceiling (being carried)
+    // zipline
     animation 16
     {
         repeat      TRUE
         fps         8
         data        26
+        action_spot 21 7
     }
 
     // winning (victory)
