@@ -197,11 +197,12 @@ object "Conveyor Belt Controller"
             player.transform.translateBy(dx, 0);
         }
 
-        // multiplayer fixes
-        if(player.hasFocus())
+        // multiplayer fix
+        if(player.id == players[0].id)
             currentFrame = curr;
-        else if(Math.abs(player.gsp) < 3.75) {
-            // animation fix
+
+        // animation fix
+        if(!player.hasFocus() && Math.abs(player.gsp) < 3.75) {
             if(Math.abs(Player.active.gsp) <= Math.abs(player.gsp))
                 player.anim = Player.active.anim; // stopped animation
         }
