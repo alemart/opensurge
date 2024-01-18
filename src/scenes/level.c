@@ -1529,12 +1529,13 @@ void level_update()
     /* update players */
     if(brickmanager_number_of_bricks(brick_manager) > 0) {
         for(i = 0; i < team_size; i++) {
-            v2d_t position = player_position(team[i]);
+            v2d_t cam = camera_get_position();
+            v2d_t pos = player_position(team[i]);
             rect_t box = player_bounding_box(team[i]);
-            rect_t roi = create_roi(position, ROI_MARGIN_UPDATE_PLAYER);
+            rect_t roi = create_roi(cam, ROI_MARGIN_UPDATE_PLAYER);
 
             /* updating... */
-            if(rect_overlaps(roi, box) || player_is_dying(team[i]) || position.y < 0) {
+            if(rect_overlaps(roi, box) || player_is_dying(team[i]) || pos.y < 0) {
                 if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
                     player_update(team[i], obstaclemap);
             }
