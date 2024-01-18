@@ -86,7 +86,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         }
 
         // no need to do anything if I am the leader
-        if(leader == follower) {
+        if(follower == leader) {
             setPlayer1Flags(follower);
             return;
         }
@@ -555,6 +555,10 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
 
         // do nothing while repositioning
         if(state == "repositioning")
+            return;
+
+        // do nothing if I'm the leader at this time
+        if(follower == leader)
             return;
 
         // reposition the follower
