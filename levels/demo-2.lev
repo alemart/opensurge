@@ -16,7 +16,7 @@ bgtheme "themes/template.bg"
 spawn_point 128 9920
 music "musics/template.ogg"
 setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Title Card" "Default Cleared Animation" "Demo Setup"
-players "Surge" "Neon as Player 2"
+players "Surge"
 
 // bricks
 brick 16 1792 9984
