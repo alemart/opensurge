@@ -195,8 +195,9 @@ int animation_frame_at_time(const animation_t* anim, double seconds)
             }
             else if(anim->repeat_from < anim->frame_count) {
                 /* repeat_from is not often used */
-                frame_number %= anim->frame_count - anim->repeat_from;
-                frame_number += anim->repeat_from;
+                int adjusted_frame_count = anim->frame_count - anim->repeat_from;
+                int adjusted_frame_number = frame_number - anim->frame_count;
+                frame_number = anim->repeat_from + adjusted_frame_number % adjusted_frame_count;
             }
             else {
                 /* this shouldn't happen */
