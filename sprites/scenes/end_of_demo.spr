@@ -8,7 +8,7 @@
 sprite "End of Demo - Pointer"
 {
     source_file     "images/scenes/end_of_demo.png"
-    source_rect     0 240 22 11
+    source_rect     432 0 22 11
     frame_size      11 11
     hot_spot        12 -2
 

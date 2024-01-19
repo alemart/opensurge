@@ -21,7 +21,7 @@ object "Play Classic Levels" is "setup"
     menu = spawn("Simple Menu Builder")
            .addOption("yes", "$PLAYCLASSICLEVELS_YES", Vector2.zero)
            .addOption("no",  "$PLAYCLASSICLEVELS_NO",  Vector2.down.scaledBy(18))
-           .setIcon("End of Demo - Pointer")
+           .setIcon("Play Classic Levels - Pointer")
            .setFontName("End of Demo - Text")
            .setAlignment("center")
            .setHighlightColor("ffffff")
@@ -33,37 +33,47 @@ object "Play Classic Levels" is "setup"
            .setPosition(Vector2(Screen.width / 2, 128));
 
     fader = spawn("Fader");
-    cutscene = spawn("Play Classic Levels - Cutscene");
+    interactiveAnimation = spawn("Play Classic Levels - Interactive Animation");
 
     state "main"
     {
     }
 
-    state "load next level"
+    state "wait before accept"
+    {
+        if(timeout(1.5)) {
+            fader.fadeOut();
+            state = "accept";
+        }
+    }
+
+    state "accept"
+    {
+        if(timeout(fader.fadeTime))
+            Level.load("quests/classic.qst");
+    }
+
+    state "decline"
     {
         if(timeout(fader.fadeTime))
             Level.loadNext();
     }
 
-    state "abort quest"
-    {
-        if(timeout(fader.fadeTime))
-            Level.abort();
-    }
-
     fun onChooseMenuOption(optionId)
     {
-        fader.fadeOut();
-
-        if(optionId == "yes")
-            state = "load next level";
-        else
-            state = "abort quest";
+        if(optionId == "yes") {
+            interactiveAnimation.finish();
+            state = "wait before accept";
+        }
+        else {
+            fader.fadeOut();
+            state = "decline";
+        }
     }
 
     fun onHighlightMenuOption(optionId)
     {
-        cutscene.advance();
+        interactiveAnimation.advance();
     }
 
     fun constructor()
@@ -100,27 +110,34 @@ object "Play Classic Levels - Text" is "private", "detached", "entity"
 
 /*
  *
- * Cutscene
+ * Interactive Animation
  *
  */
 
-object "Play Classic Levels - Cutscene"
+object "Play Classic Levels - Interactive Animation"
 {
-    surge = Level.spawnEntity("Play Classic Levels - Surge", Vector2(295, 215));
-    neon = Level.spawnEntity("Play Classic Levels - Neon", Vector2(320, 215));
+    surge = Level.spawnEntity("Play Classic Levels - Surge", Vector2(275, 215));
+    neon = Level.spawnEntity("Play Classic Levels - Neon", Vector2(300, 215));
     sfx = Sound("samples/secret.wav");
     mustAdvance = false;
+    isFinished = false;
     counter = 0;
     step = 1;
 
     state "main"
     {
+        if(isFinished) {
+            surge.walk();
+            state = "finished";
+            return;
+        }
+
         if(!mustAdvance)
             return;
 
         mustAdvance = false;
 
-        if(++counter % 30 == 0) {
+        if(++counter % 25 == 0) {
             surge.advance();
             neon.advance();
 
@@ -135,17 +152,32 @@ object "Play Classic Levels - Cutscene"
     {
         if(timeout(1.0)) {
             sfx.play();
-            state = "done";
+            state = "cheat ready";
         }
     }
 
-    state "done"
+    state "cheat ready"
+    {
+        if(isFinished) {
+            surge.walk();
+            neon.walk();
+
+            state = "finished";
+        }
+    }
+
+    state "finished"
     {
     }
 
     fun advance()
     {
         mustAdvance = true;
+    }
+
+    fun finish()
+    {
+        isFinished = true;
     }
 }
 
@@ -176,8 +208,10 @@ object "Play Classic Levels - Zzz..." is "private", "detached", "entity"
 object "Play Classic Levels - Neon" is "private", "detached", "entity"
 {
     actor = Actor("Play Classic Levels - Neon");
+    directionalMovement = DirectionalMovement();
     transform = Transform();
     mustAdvance = false;
+    isSleeping = true;
 
     state "main"
     {
@@ -207,15 +241,16 @@ object "Play Classic Levels - Neon" is "private", "detached", "entity"
 
     state "disturbed"
     {
-        actor.anim = 4;
+        actor.anim = 5;
 
         if(timeout(1.0))
             state = "sleeping";
     }
 
-    state "eyes open"
+    state "eyes open" // sort of open ;)
     {
         actor.anim = 1;
+        isSleeping = false;
 
         if(mustAdvance) {
             mustAdvance = false;
@@ -238,6 +273,15 @@ object "Play Classic Levels - Neon" is "private", "detached", "entity"
         actor.anim = 3;
     }
 
+    state "walking"
+    {
+        if(timeout(0.5)) {
+            actor.anim = 4;
+            actor.hflip = false;
+            directionalMovement.enabled = true;
+        }
+    }
+
     fun advance()
     {
         mustAdvance = true;
@@ -249,20 +293,32 @@ object "Play Classic Levels - Neon" is "private", "detached", "entity"
             state = "disturbed";
     }
 
+    fun walk()
+    {
+        if(!isSleeping)
+            state = "walking";
+    }
+
     fun constructor()
     {
         actor.zindex = 0.5;
         actor.hflip = true;
+
+        directionalMovement.enabled = false;
+        directionalMovement.direction = Vector2.right;
+        directionalMovement.speed = 100;
     }
 }
 
 object "Play Classic Levels - Surge" is "private", "detached", "entity"
 {
     actor = Actor("Play Classic Levels - Surge");
+    directionalMovement = DirectionalMovement();
     mustAdvance = false;
 
     state "main"
     {
+        actor.anim = 0;
         state = "waiting";
     }
 
@@ -292,13 +348,19 @@ object "Play Classic Levels - Surge" is "private", "detached", "entity"
 
         if(mustAdvance) {
             mustAdvance = false;
-            state = "end";
+            state = "displeased";
         }
     }
 
-    state "end"
+    state "displeased"
     {
         actor.anim = 3;
+    }
+
+    state "walking"
+    {
+        actor.anim = 4;
+        directionalMovement.enabled = true;
     }
 
     fun advance()
@@ -306,8 +368,17 @@ object "Play Classic Levels - Surge" is "private", "detached", "entity"
         mustAdvance = true;
     }
 
+    fun walk()
+    {
+        state = "walking";
+    }
+
     fun constructor()
     {
         actor.zindex = 0.51;
+
+        directionalMovement.enabled = false;
+        directionalMovement.direction = Vector2.right;
+        directionalMovement.speed = 100;
     }
 }
