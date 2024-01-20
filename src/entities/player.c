@@ -73,6 +73,7 @@ static int score = 0;                       /* shared score */
 static void update_shield(player_t *player);
 static void update_animation(player_t *player);
 static void update_animation_speed(player_t *player);
+static void update_underwater_status(player_t* player);
 static void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap);
 static float smooth_angle(const physicsactor_t* pa, float current_angle);
 static bool require_angle_to_be_zero(physicsactorstate_t state, movmode_t movmode);
@@ -157,6 +158,7 @@ player_t *player_create(int id, const char *character_name)
 
     /* misc */
     p->underwater = FALSE;
+    p->forcibly_underwater = FALSE;
     p->underwater_timer = 0.0f;
     p->breath_time = PLAYER_UNDERWATER_BREATH;
     p->dead_timer = 0.0f;
@@ -213,18 +215,10 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         v2d_t position = player_position(player);
 
         /* enter / leave water */
-        /* FIXME scripting flag */
-        if(position.y >= level_waterlevel()) {
-            if(!player->underwater)
-                player_enter_water(player);
-        }
-        else {
-            if(player->underwater)
-                player_leave_water(player);
-        }
+        update_underwater_status(player);
 
         /* underwater logic */
-        if(player->underwater) {
+        if(player_is_underwater(player)) {
             /* disable turbo */
             player_set_turbo(player, FALSE);
 
@@ -238,8 +232,8 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 
             /* timer countdown */
             if(player->shield_type != SH_WATERSHIELD && !player_is_winning(player) && (
-                position.y < level_waterlevel() || /* forced underwater via scripting OR... */
-                is_head_underwater(player)         /* the head of the player is underwater */
+                player_is_forcibly_underwater(player) || /* forcibly underwater via scripting OR... */
+                is_head_underwater(player)               /* the head of the player is underwater */
             ))
                 player->underwater_timer += dt;
             else
@@ -640,6 +634,26 @@ int player_is_underwater(const player_t *player)
 }
 
 /*
+ * player_is_forcibly_underwater()
+ * Forcibly underwater? (underwater physics regardless of waterlevel)
+ */
+int player_is_forcibly_underwater(const player_t* player)
+{
+    return player->forcibly_underwater;
+}
+
+/*
+ * player_set_forcibly_underwater()
+ * Set forcibly underwater flag (underwater physics regardless of waterlevel)
+ */
+void player_set_forcibly_underwater(player_t* player, int forcibly_underwater)
+{
+    player->forcibly_underwater = forcibly_underwater;
+
+    update_underwater_status(player);
+}
+
+/*
  * player_reset_underwater_timer()
  * Reset underwater timer
  */
@@ -654,7 +668,7 @@ void player_reset_underwater_timer(player_t *player)
  */
 float player_seconds_remaining_to_drown(const player_t *player)
 {
-    if(player->underwater && player->shield_type != SH_WATERSHIELD)
+    if(player_is_underwater(player) && player->shield_type != SH_WATERSHIELD)
         return max(0.0f, player->breath_time - player->underwater_timer);
     else
         return INFINITY;
@@ -793,8 +807,8 @@ int player_transform_into(player_t *player, surgescript_object_t *player_object,
 
     /* let's change the character and update the parameters of the
        physics model */
-    int turbocharged = player->turbo;
-    int underwater = player->underwater;
+    int turbocharged = player_is_turbocharged(player);
+    int underwater = player_is_underwater(player);
 
     player->character = charactersystem_get(character_name);
     set_default_multipliers(player->pa, player->character);
@@ -1754,6 +1768,26 @@ void update_animation_speed(player_t *player)
         float fps_ratio = desired_fps / original_fps;
         float speed_factor = fps_ratio * max(1.0f, fps_multiplier);
         actor_change_animation_speed_factor(player->actor, speed_factor);
+    }
+}
+
+/* update underwater status */
+void update_underwater_status(player_t* player)
+{
+    /* check if the player is forcibly underwater */
+    if(player_is_forcibly_underwater(player)) {
+        if(!player_is_underwater(player))
+            player_enter_water(player);
+    }
+
+    /* if not, adopt the regular logic: check the waterlevel */
+    else if(player_position(player).y >= level_waterlevel()) {
+        if(!player_is_underwater(player))
+            player_enter_water(player);
+    }
+    else {
+        if(player_is_underwater(player))
+            player_leave_water(player);
     }
 }
 

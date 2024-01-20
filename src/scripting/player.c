@@ -92,6 +92,8 @@ static surgescript_var_t* fun_getinvincible(surgescript_object_t* object, const 
 static surgescript_var_t* fun_setinvincible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getforciblyunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setforciblyunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getbreathtime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setbreathtime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getfrozen(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -248,7 +250,9 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "get_turbo", fun_getturbo, 0);
     surgescript_vm_bind(vm, "Player", "set_turbo", fun_setturbo, 1);
     surgescript_vm_bind(vm, "Player", "get_underwater", fun_getunderwater, 0);
-    surgescript_vm_bind(vm, "Player", "set_underwater", fun_setunderwater, 1);
+    surgescript_vm_bind(vm, "Player", "set_underwater", fun_setunderwater, 1); /* deprecated */
+    surgescript_vm_bind(vm, "Player", "get_forciblyUnderwater", fun_getforciblyunderwater, 0);
+    surgescript_vm_bind(vm, "Player", "set_forciblyUnderwater", fun_setforciblyunderwater, 1);
     surgescript_vm_bind(vm, "Player", "get_breathTime", fun_getbreathtime, 0);
     surgescript_vm_bind(vm, "Player", "set_breathTime", fun_setbreathtime, 1);
     surgescript_vm_bind(vm, "Player", "get_frozen", fun_getfrozen, 0);
@@ -1255,16 +1259,40 @@ surgescript_var_t* fun_getunderwater(surgescript_object_t* object, const surgesc
     return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_underwater(player));
 }
 
-/* makes the player enter/leave the water */
+/* (deprecated) makes the player enter/leave the water */
 surgescript_var_t* fun_setunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    /*
+
+    This setter is deprecated since Open Surge 0.6.1.
+
+    It is kept for backwards compatibility with Open Surge 0.5.0 - 0.6.0.3.
+    Back then, this setter was malfunctioning, so we just leave an empty
+    implementation here.
+
+    See player.forciblyUnderwater for a suitable alternative.
+    player.underwater is effectively readonly.
+
+    */
+    return NULL;
+}
+
+/* is the forcibly underwater flag set? */
+surgescript_var_t* fun_getforciblyunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_forcibly_underwater(player));
+}
+
+/* set the forcibly underwater flag. If true, player.underwater will be true
+   regardless of the water level. If false, player.underwater will be true only
+   only if the player is below the water level, as usual. */
+surgescript_var_t* fun_setforciblyunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
     if(player != NULL) {
-        bool underwater = surgescript_var_get_bool(param[0]);
-        if(underwater && !player_is_underwater(player))
-            player_enter_water(player);
-        else if(!underwater && player_is_underwater(player))
-            player_leave_water(player);
+        bool forcibly_underwater = surgescript_var_get_bool(param[0]);
+        player_set_forcibly_underwater(player, forcibly_underwater);
     }
     return NULL;
 }

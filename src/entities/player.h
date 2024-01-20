@@ -89,6 +89,7 @@ struct player_t {
     /* private */
     struct physicsactor_t *pa;
     int underwater;
+    int forcibly_underwater;
     float underwater_timer;
     float breath_time;
     int blinking;
@@ -136,6 +137,8 @@ int player_is_underwater(const player_t *player);
 float player_seconds_remaining_to_drown(const player_t *player);
 void player_set_breath_time(player_t* player, float seconds);
 float player_breath_time(const player_t* player);
+int player_is_forcibly_underwater(const player_t* player);
+void player_set_forcibly_underwater(player_t* player, int forcibly_underwater);
 
 playershield_t player_shield_type(const player_t* player);
 void player_grant_shield(player_t* player, playershield_t shield_type);
