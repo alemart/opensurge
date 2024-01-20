@@ -100,6 +100,7 @@ struct settings_entry_t
 /* constants */
 const char* OPTIONS_MUSICFILE = "musics/options.ogg"; /* public */
 static const char* BGFILE = "themes/scenes/options.bg";
+static const char* CURSOR_ICON_SPRITE_NAME = "UI Pointer";
 static const char* FLAG_ICON_SPRITE_NAME = "Flag Icon";
 static const char* FONT_NAME[] = {
     [TYPE_TITLE] = "MenuTitle",
@@ -177,6 +178,7 @@ static input_t* input = NULL;
 static bgtheme_t* background = NULL;
 static music_t* music = NULL;
 static actor_t* flag_icon = NULL;
+static actor_t* cursor_icon = NULL;
 static bool was_immersive = false;
 static bool fade_in = false, fade_out = false;
 static scene_t* next_scene = NULL;
@@ -400,6 +402,8 @@ void settings_init(void* data)
     input = input_create_user(NULL);
     music = music_load(OPTIONS_MUSICFILE);
     flag_icon = actor_create();
+    cursor_icon = actor_create();
+    actor_change_animation(cursor_icon, sprite_get_animation(CURSOR_ICON_SPRITE_NAME, 0));
 
     /* setup entries */
     index_of_highlighted_setting = 0;
@@ -428,6 +432,7 @@ void settings_release()
     unload_lang_list();
 
     /* release objects */
+    actor_destroy(cursor_icon);
     actor_destroy(flag_icon);
     music_unref(music);
     input_destroy(input);
@@ -462,6 +467,7 @@ void settings_render()
 
     render_entries(camera);
     actor_render(flag_icon, camera);
+    actor_render(cursor_icon, camera);
 
     background_render_fg(background, camera);
 }
@@ -561,6 +567,10 @@ void update_entries()
         }
         else
             font_set_visible(entry[i].value, false);
+
+        /* display the cursor icon */
+        if(is_highlighted)
+            cursor_icon->position = font_get_position(entry[i].key);
     }
 }
 
