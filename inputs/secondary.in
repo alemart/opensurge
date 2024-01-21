@@ -10,7 +10,7 @@
 inputmap "secondary"
 {
     // default mapping for XInput controllers in Allegro
-    // (based on the XBOX 360 controller)
+    // (standard gamepad based on the layout of the Xbox 360 controller)
     joystick 1
     {
         up              BUTTON_14                       // D-pad
