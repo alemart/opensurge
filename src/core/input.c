@@ -870,7 +870,7 @@ void inputuserdefined_update(input_t* in)
 
     /* read joystick input */
     if(im->joystick.enabled && input_is_joystick_enabled()) {
-        int joy_id = im->joystick.id;
+        int joy_id = im->joystick.number - 1;
         if(joy_id < MAX_JOYS && wanted_joy[joy_id] != NULL) {
             v2d_t axis = v2d_new(wanted_joy[joy_id]->axis[AXIS_X], wanted_joy[joy_id]->axis[AXIS_Y]);
             v2d_t abs_axis = v2d_new(fabsf(axis.x), fabsf(axis.y));
@@ -895,7 +895,7 @@ void inputuserdefined_update(input_t* in)
     }
 
     /* read the mobile gamepad as the first joystick (always enabled) */
-    if(im->joystick.enabled && im->joystick.id == 0) {
+    if(im->joystick.enabled && im->joystick.number == 1) {
         mobilegamepad_state_t mobile;
         mobilegamepad_get_state(&mobile);
 
@@ -1314,7 +1314,7 @@ void log_joysticks()
     logfile_message("Found %d joystick%s", num_joysticks, num_joysticks == 1 ? "" : "s");
     for(int j = 0; j < num_joysticks; j++) {
         ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
-        logfile_message("[Joystick %d]", j);
+        logfile_message("[Joystick j=%d]", j);
         log_joystick(joystick);
     }
 }
@@ -1324,7 +1324,7 @@ void log_joystick(ALLEGRO_JOYSTICK* joystick)
 {
     const char* joy_flag[4] = { "", "digital", "analog", "" };
 
-    logfile_message("- Joystick \"%s\"", al_get_joystick_name(joystick));
+    logfile_message("- name: \"%s\"", al_get_joystick_name(joystick));
     logfile_message("-- %d sticks, %d buttons", al_get_joystick_num_sticks(joystick), al_get_joystick_num_buttons(joystick));
 
     for(int s = 0; s < al_get_joystick_num_sticks(joystick); s++) {

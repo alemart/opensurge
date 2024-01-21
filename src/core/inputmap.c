@@ -379,18 +379,18 @@ int traverse_inputmap(const parsetree_statement_t* stmt, void* inputmapnode)
         if(n == 2) {
             p1 = nanoparser_get_nth_parameter(param_list, 1);
             p2 = nanoparser_get_nth_parameter(param_list, 2);
-            nanoparser_expect_string(p1, "inputmap: must provide the joystick id");
+            nanoparser_expect_string(p1, "inputmap: must provide the joystick number");
             nanoparser_expect_program(p2, "inputmap: must provide the joystick mappings");
 
             if(f->data->joystick.enabled)
                 fatal_error("inputmap: can't define multiple joysticks for inputmap '%s' in %s:%d", f->data->name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
             f->data->joystick.enabled = true;
-            f->data->joystick.id = max(0, atoi(nanoparser_get_string(p1)));
+            f->data->joystick.number = max(1, atoi(nanoparser_get_string(p1)));
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), inputmapnode, traverse_inputmap_joystick);
         }
         else
-            fatal_error("inputmap: 'joystick' requires two parameters: joystick_id and a block containing the mappings (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            fatal_error("inputmap: 'joystick' requires two parameters: joystick_number and a block containing the mappings (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
     }
     else
         fatal_error("inputmap: unknown identifier '%s' defined at inputmap block in %s:%d. Valid keywords: 'keyboard', 'joystick'", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
@@ -498,7 +498,7 @@ inputmapnode_t* inputmapnode_create(const char* name)
 
     /* joystick defaults */
     f->data->joystick.enabled = false;
-    f->data->joystick.id = 0;
+    f->data->joystick.number = 1;
     for(button = 0; button < IB_MAX; button++)
         f->data->joystick.button_mask[(int)button] = NO_BUTTONS;
 

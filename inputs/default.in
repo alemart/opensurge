@@ -19,8 +19,8 @@ inputmap <name_of_the_inputmap>
                                      // <key_name>: see the list of valid key names below
     }
 
-    // optional gamepad input. id_joystick may be: 0, 1, 2, ..., where 0 is the first joystick, 1 the second one, and so on.
-    joystick <id_joystick>
+    // optional gamepad input. joystick_number may be: 1, 2, ..., where 1 is the first joystick, 2 is the second joystick, and so on.
+    joystick <joystick_number>
     {
         <button_name>     <joystick_button_name> // a sequence of lines specifying:
                                                  // <button_name>: fire1, fire2, ..., fire7, fire8
@@ -113,7 +113,7 @@ inputmap "default"
 
     // default mapping for XInput controllers in Allegro
     // (standard gamepad based on the layout of the Xbox 360 controller)
-    joystick 0
+    joystick 1
     {
         up              BUTTON_14                       // D-pad
         right           BUTTON_11

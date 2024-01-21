@@ -38,7 +38,7 @@ struct inputmap_t {
 
     struct inputmap_joystick_t {
         bool enabled;
-        int id;
+        int number; /* 1, 2, 3... */
         uint32_t button_mask[IB_MAX]; /* multiple joystick buttons may be mapped to the same inputbutton_t */
     } joystick; /* joystick mapping */
 };
