@@ -1286,7 +1286,7 @@ surgescript_var_t* fun_getforciblyunderwater(surgescript_object_t* object, const
 
 /* set the forcibly underwater flag. If true, player.underwater will be true
    regardless of the water level. If false, player.underwater will be true only
-   only if the player is below the water level, as usual. */
+   if the player is below the water level, as usual. */
 surgescript_var_t* fun_setforciblyunderwater(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
