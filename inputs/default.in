@@ -65,35 +65,34 @@ When configuring the keyboard input, you may use the following key names (based 
      KEY_EQUALS_PAD, KEY_BACKQUOTE, KEY_SEMICOLON, KEY_COMMAND (Mac OS X)
      KEY_NONE (ignore the key)
 
-
-
-We use the following conventions for the button names in the default mapping:
-
-    up:     directional control
-    right:  directional control
-    down:   directional control
-    left:   directional control
-
-    fire1:  primary action button (jump | menus: confirm)
-    fire2:  secondary action button (menus: cancel)
-    fire3:  start, confirm, pause
-    fire4:  back, cancel, quit
-
-    fire5:  left shoulder button
-    fire6:  right shoulder button
-    fire7:  reserved for future use
-    fire8:  reserved for future use
-
 */
-
-
-
 
 
 // This is the default mapping used by the engine.
 // Make a backup before modifying. DO NOT ERASE!
 inputmap "default"
 {
+    /*
+
+    We use the following conventions for the button names in the default mapping:
+
+        up:     directional control
+        right:  directional control
+        down:   directional control
+        left:   directional control
+
+        fire1:  primary action button (jump | menus: confirm)
+        fire2:  secondary action button (menus: cancel)
+        fire3:  start, confirm, pause
+        fire4:  back, cancel, quit
+
+        fire5:  left shoulder button (left bumper)
+        fire6:  right shoulder button (right bumper)
+        fire7:  left thumbstick button
+        fire8:  right thumbstick button
+
+    */
+
     keyboard
     {
         up              KEY_UP
@@ -113,21 +112,22 @@ inputmap "default"
     }
 
     // default mapping for XInput controllers in Allegro
+    // (based on the XBOX 360 controller)
     joystick 0
     {
-        up              BUTTON_14 // d-pad
+        up              BUTTON_14                       // D-pad
         right           BUTTON_11
         down            BUTTON_13
         left            BUTTON_12
 
-        fire1           BUTTON_1 | BUTTON_3 | BUTTON_4
-        fire2           BUTTON_2
-        fire3           BUTTON_10
-        fire4           BUTTON_9
+        fire1           BUTTON_1 | BUTTON_3 | BUTTON_4  // A, X, Y
+        fire2           BUTTON_2                        // B
+        fire3           BUTTON_10                       // START
+        fire4           BUTTON_9                        // BACK / SELECT
 
-        fire5           BUTTON_6
-        fire6           BUTTON_5
-        fire7           BUTTON_NONE
-        fire8           BUTTON_NONE
+        fire5           BUTTON_6                        // L1
+        fire6           BUTTON_5                        // R1
+        fire7           BUTTON_8                        // THUMBL
+        fire8           BUTTON_7                        // THUMBR
     }
 }

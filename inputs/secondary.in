@@ -10,21 +10,22 @@
 inputmap "secondary"
 {
     // default mapping for XInput controllers in Allegro
+    // (based on the XBOX 360 controller)
     joystick 1
     {
-        up              BUTTON_14 // d-pad
+        up              BUTTON_14                       // D-pad
         right           BUTTON_11
         down            BUTTON_13
         left            BUTTON_12
 
-        fire1           BUTTON_1 | BUTTON_3 | BUTTON_4
-        fire2           BUTTON_2
-        fire3           BUTTON_10
-        fire4           BUTTON_9
+        fire1           BUTTON_1 | BUTTON_3 | BUTTON_4  // A, X, Y
+        fire2           BUTTON_2                        // B
+        fire3           BUTTON_10                       // START
+        fire4           BUTTON_9                        // BACK / SELECT
 
-        fire5           BUTTON_6
-        fire6           BUTTON_5
-        fire7           BUTTON_NONE
-        fire8           BUTTON_NONE
+        fire5           BUTTON_6                        // L1
+        fire6           BUTTON_5                        // R1
+        fire7           BUTTON_8                        // THUMBL
+        fire8           BUTTON_7                        // THUMBR
     }
 }
