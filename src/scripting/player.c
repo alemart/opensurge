@@ -121,6 +121,8 @@ static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getinoffensive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setinoffensive(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getinvulnerable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setinvulnerable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getimmortal(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -279,6 +281,8 @@ void scripting_register_player(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Player", "set_score", fun_setscore, 1);
     surgescript_vm_bind(vm, "Player", "get_aggressive", fun_getaggressive, 0);
     surgescript_vm_bind(vm, "Player", "set_aggressive", fun_setaggressive, 1);
+    surgescript_vm_bind(vm, "Player", "get_inoffensive", fun_getinoffensive, 0);
+    surgescript_vm_bind(vm, "Player", "set_inoffensive", fun_setinoffensive, 1);
     surgescript_vm_bind(vm, "Player", "get_invulnerable", fun_getinvulnerable, 0);
     surgescript_vm_bind(vm, "Player", "set_invulnerable", fun_setinvulnerable, 1);
     surgescript_vm_bind(vm, "Player", "get_immortal", fun_getimmortal, 0);
@@ -1369,20 +1373,38 @@ surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_
     return NULL;
 }
 
-/* is the player aggressive? (i.e., able to hit baddies regardless if jumping or not) */
+/* is the player aggressive? */
 surgescript_var_t* fun_getaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
     return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_aggressive(player));
 }
 
-/* if set to true, player.attacking will be true and the player will be able to hit baddies regardless if jumping or not */
+/* aggressive flag: if set to true, the attacking flag will be true regardless of the state of the player */
 surgescript_var_t* fun_setaggressive(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     player_t* player = get_player(object);
     if(player != NULL) {
         bool aggressive = surgescript_var_get_bool(param[0]);
         player_set_aggressive(player, aggressive);
+    }
+    return NULL;
+}
+
+/* is the player inoffensive? */
+surgescript_var_t* fun_getinoffensive(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    return surgescript_var_set_bool(surgescript_var_create(), player != NULL && player_is_inoffensive(player));
+}
+
+/* inoffensive flag: if set to true, the attacking flag will be false regardless of the state of the player, unless it is also aggressive or invincible */
+surgescript_var_t* fun_setinoffensive(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    player_t* player = get_player(object);
+    if(player != NULL) {
+        bool inoffensive = surgescript_var_get_bool(param[0]);
+        player_set_inoffensive(player, inoffensive);
     }
     return NULL;
 }

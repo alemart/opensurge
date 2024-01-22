@@ -65,6 +65,7 @@ struct player_t {
     int invulnerable;
     int immortal;
     int aggressive;
+    int inoffensive;
     int secondary;
     int focusable;
     int mirror;
@@ -161,6 +162,8 @@ int player_is_visible(const player_t* player);
 void player_set_visible(player_t* player, int visible);
 int player_is_aggressive(const player_t* player);
 void player_set_aggressive(player_t* player, int aggressive);
+int player_is_inoffensive(const player_t* player);
+void player_set_inoffensive(player_t* player, int inoffensive);
 int player_is_invulnerable(const player_t* player);
 void player_set_invulnerable(player_t* player, int invulnerable);
 int player_is_immortal(const player_t* player);

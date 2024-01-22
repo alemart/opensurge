@@ -113,6 +113,7 @@ player_t *player_create(int id, const char *character_name)
     p->secondary = FALSE;
     p->focusable = TRUE;
     p->aggressive = FALSE;
+    p->inoffensive = FALSE;
     p->visible = TRUE;
 
     /* auxiliary variables */
@@ -950,17 +951,21 @@ void player_set_mirror_flags(player_t* player, int flags)
 
 /*
  * player_is_attacking()
- * Returns TRUE if a given player is attacking;
- * FALSE otherwise
+ * Returns true if the player is attacking; false otherwise
  */
 int player_is_attacking(const player_t *player)
 {
-    if(!player_is_dying(player)) {
-        physicsactorstate_t state = physicsactor_get_state(player->pa);
-        return player->aggressive || player->invincible || state == PAS_JUMPING || state == PAS_ROLLING || state == PAS_CHARGING;
-    }
+    if(player_is_dying(player))
+        return FALSE;
 
-    return FALSE;
+    if(player->aggressive || player->invincible)
+        return TRUE;
+
+    if(player->inoffensive)
+        return FALSE;
+
+    physicsactorstate_t state = physicsactor_get_state(player->pa);
+    return state == PAS_JUMPING || state == PAS_ROLLING || state == PAS_CHARGING;
 }
 
 
@@ -1240,7 +1245,7 @@ void player_set_visible(player_t* player, int visible)
 
 /*
  * player_is_aggressive()
- * Is the player aggressive? (i.e., it hits baddies regardless if jumping or not)
+ * Is the player aggressive?
  */
 int player_is_aggressive(const player_t* player)
 {
@@ -1249,12 +1254,31 @@ int player_is_aggressive(const player_t* player)
 
 /*
  * player_set_aggressive()
- * If set to true, player_is_attacking() will be true and the player
- *  will be able to hit baddies regardless if jumping or not
+ * If set to true, the attacking flag will be true
+ * regardless of the state of the player
  */
 void player_set_aggressive(player_t* player, int aggressive)
 {
     player->aggressive = aggressive;
+}
+
+/*
+ * player_is_inoffensive()
+ * Is the player inoffensive?
+ */
+int player_is_inoffensive(const player_t* player)
+{
+    return player->inoffensive;
+}
+
+/*
+ * player_set_inoffensive()
+ * If set to true, the attacking flag will be false regardless of the
+ * state of the player, unless it is also aggressive or invincible
+ */
+void player_set_inoffensive(player_t* player, int inoffensive)
+{
+    player->inoffensive = inoffensive;
 }
 
 /*
