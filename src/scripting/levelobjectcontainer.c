@@ -343,6 +343,10 @@ bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, vo
         surgescript_object_t* stored_object = surgescript_objectmanager_get(manager, handle);
         surgescript_object_traverse_tree(stored_object, surgescript_object_update);
 
+        /* nullify this link */
+        if(surgescript_object_is_killed(stored_object))
+            surgescript_var_set_null(handle_var);
+
     }
     else {
 
