@@ -15,8 +15,8 @@ theme "themes/waterworks.brk"
 bgtheme "themes/waterworks.bg"
 spawn_point 192 9728
 music "musics/waterworks.ogg"
-setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Opening Animation" "Default Cleared Animation" "Waterworks Setup"
-players "Surge"
+setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Opening Animation" "Default Cleared Animation" "Waterworks Setup" "Activate Neon as Player 2"
+players "Surge" "None"
 
 // bricks
 brick 2 5248 10368

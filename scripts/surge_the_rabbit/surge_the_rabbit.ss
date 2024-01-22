@@ -12,6 +12,7 @@ using SurgeEngine.Platform;
 @Package
 object "SurgeTheRabbit"
 {
+    public readonly Settings = spawn("SurgeTheRabbitSettings");
     public readonly website = "https://opensurge2d.org";
 
     fun donate()
@@ -102,4 +103,9 @@ object "SurgeTheRabbit"
             }
         }
     }
+}
+
+object "SurgeTheRabbitSettings"
+{
+    public wantNeonAsPlayer2 = false;
 }

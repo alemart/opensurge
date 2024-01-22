@@ -14,6 +14,8 @@ using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Behavior.DirectionalMovement;
 using SurgeEngine.Behavior.CircularMovement;
+using SurgeTheRabbit;
+using SurgeTheRabbit.Settings;
 
 
 object "Play Classic Levels" is "setup"
@@ -80,6 +82,8 @@ object "Play Classic Levels" is "setup"
     {
         fader.fadeTime = 0.5;
         fader.fadeIn();
+
+        Settings.wantNeonAsPlayer2 = false;
     }
 }
 
@@ -151,6 +155,7 @@ object "Play Classic Levels - Interactive Animation"
     state "cheating"
     {
         if(timeout(1.0)) {
+            Settings.wantNeonAsPlayer2 = true;
             sfx.play();
             state = "cheat ready";
         }
@@ -275,11 +280,12 @@ object "Play Classic Levels - Neon" is "private", "detached", "entity"
 
     state "walking"
     {
-        if(timeout(0.5)) {
-            actor.anim = 4;
-            actor.hflip = false;
-            directionalMovement.enabled = true;
-        }
+        if(!timeout(0.5))
+            return;
+
+        actor.anim = 4;
+        actor.hflip = false;
+        directionalMovement.enabled = true;
     }
 
     fun advance()

@@ -17,7 +17,6 @@ using SurgeEngine.Audio.Music;
 using SurgeEngine.Camera;
 using SurgeEngine.Behaviors.DirectionalMovement;
 using SurgeEngine.Input.MobileGamepad;
-using SurgeEngine.Platform;
 using SurgeTheRabbit;
 
 // ----------------------------------------------------------------------------
@@ -40,6 +39,7 @@ object "Title Screen" is "setup"
         fader.fadeIn();
 
         MobileGamepad.fadeIn();
+        SurgeTheRabbit.Settings.wantNeonAsPlayer2 = false;
     }
 }
 
@@ -285,7 +285,7 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
             spawn("Title Screen - Menu Item - Options").setOffset(Vector2.right.scaledBy(offset += spacing))
         );
 
-        if(!Platform.isAndroid) {
+        if(!SurgeEngine.mobile) {
             items.push(
                 spawn("Title Screen - Menu Item - Mobile").setOffset(Vector2.right.scaledBy(offset += spacing))
             );
@@ -392,7 +392,7 @@ object "Title Screen - Menu Item - Mobile" is "private", "detached", "entity"
     fun onEnter()
     {
         SurgeTheRabbit.download();
-        Level.load(Level.file);
+        Level.restart();
     }
 
     fun onSelect()
@@ -425,7 +425,7 @@ object "Title Screen - Menu Item - Share" is "private", "detached", "entity"
     fun onEnter()
     {
         SurgeTheRabbit.share();
-        Level.load(Level.file);
+        Level.restart();
     }
 
     fun onSelect()
@@ -458,7 +458,7 @@ object "Title Screen - Menu Item - Donate" is "private", "detached", "entity"
     fun onEnter()
     {
         SurgeTheRabbit.donate();
-        Level.load(Level.file);
+        Level.restart();
     }
 
     fun onSelect()

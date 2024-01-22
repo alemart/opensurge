@@ -15,8 +15,8 @@ theme "themes/sunshine.brk"
 bgtheme "themes/sunshine.bg"
 spawn_point 192 9920
 music "musics/sunshine.ogg"
-setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Opening Animation" "Default Cleared Animation" "Sunshine Setup"
-players "Surge"
+setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Opening Animation" "Default Cleared Animation" "Sunshine Setup" "Activate Neon as Player 2"
+players "Surge" "None"
 
 // bricks
 brick 16 17280 9920
