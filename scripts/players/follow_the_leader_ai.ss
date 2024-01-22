@@ -501,10 +501,10 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
 
     fun stuckOnARamp()
     {
-        // check if stuck in a ramp or loop
-        return !follower.midair && Math.abs(follower.gsp) < 5 &&
+        // check if stuck on a ramp or loop
+        return !follower.midair && Math.abs(follower.gsp) < 7.5 &&
                (follower.hlockTime > 0.0 || Math.abs(Math.cos(Math.deg2rad(follower.slope)) - 0.707) < 0.16) &&
-               Math.abs(follower.transform.position.x - leader.transform.position.x) > xmargin;
+               Math.abs(follower.transform.position.x - leader.transform.position.x) > xnearmargin;
     }
 
     fun findDeltaIndex()
@@ -640,7 +640,7 @@ object "Follow the Leader AI - Platform Sensor" is "private", "awake", "entity"
 
 object "Follow the Leader AI - Input Buffer"
 {
-    maxSamples = 16;
+    maxSamples = 15; // target fps / 60
     upBuffer = [];
     rightBuffer = [];
     downBuffer = [];
@@ -746,7 +746,7 @@ object "Follow the Leader AI - Input Buffer"
 
 object "Follow the Leader AI - State Buffer"
 {
-    maxSamples = 16;
+    maxSamples = 15; // target fps / 60
     xposBuffer = [];
     yposBuffer = [];
     directionBuffer = [];
