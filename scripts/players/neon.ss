@@ -156,6 +156,96 @@ object "Neon's Jetpack Smoke Helper"
 
 
 
+//
+// Neon's Winning Animation
+// This object modifies Neon's winning animation according to the season of the year
+//
+object "Neon's Winning Animation" is "companion"
+{
+    player = parent;
+    easter = isEasterSeason(Date.year, Date.month, Date.day);
+    xmas = isChristmasSeason(Date.year, Date.month, Date.day);
+    wantChangedAnimation = (Math.random() < 0.5);
+
+    state "main"
+    {
+        if(wantChangedAnimation && player.winning)
+            state = "active";
+    }
+
+    state "active"
+    {
+        if(!player.winning) {
+            player.hflip = false;
+            state = "main";
+        }
+        else if(easter) {
+            player.anim = 34; // Happy Easter!
+            player.hflip = (player.direction < 0);
+        }
+        else if(xmas) {
+            player.anim = 35; // Merry Xmas!
+            player.hflip = (player.direction < 0);
+        }
+    }
+
+    fun isEasterSeason(year, month, day)
+    {
+        d = findDayOfYear(year, month, day);
+        e = easterDay(year);
+
+        return d <= e && d > e - 15;
+    }
+
+    fun isChristmasSeason(year, month, day)
+    {
+        d = findDayOfYear(year, month, day);
+        x = christmasDay(year);
+
+        return d <= x && d > x - 30;
+    }
+
+    fun findDayOfYear(year, month, day)
+    {
+        l = (year % 4) == 0 ? 1 : 0; // leap year offset
+        days = [0, 31, 59+l, 90+l, 120+l, 151+l, 181+l, 212+l, 243+l, 273+l, 304+l, 334+l];
+        previousMonth = month - 1;
+
+        return days[previousMonth] + day;
+    }
+
+    fun christmasDay(year)
+    {
+        return findDayOfYear(year, 12, 25);
+    }
+
+    fun easterDay(year)
+    {
+        // Find the date of Easter (Gregorian calendar)
+        // https://en.wikipedia.org/wiki/Date_of_Easter
+
+        a = year % 19;
+        b = Math.floor(year / 100);
+        c = year % 100;
+        d = Math.floor(b / 4);
+        e = b % 4;
+        g = Math.floor((8 * b + 13) / 25);
+        h = (19 * a + b - d - g + 15) % 30;
+        i = Math.floor(c / 4);
+        k = c % 4;
+        l = (32 + 2 * e + 2 * i - h - k) % 7;
+        m = Math.floor((a + 11 * h + 19 * l) / 433);
+        n = Math.floor((h + l - 7 * m + 90) / 25); // month
+        p = (h + l - 7 * m + 33 * n + 19) % 32; // day
+
+        //Console.print([year, n, p]);
+
+        return findDayOfYear(year, n, p);
+    }
+}
+
+
+
 
 /*
  * The code below is related to a repositioning method that is used when Neon
