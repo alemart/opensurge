@@ -170,7 +170,7 @@ object "Enemy" is "private", "entity", "behavior"
         if(enabled && otherCollider.entity.hasTag("player")) {
             player = otherCollider.entity;
 
-            if(player.frozen) {
+            if(player.frozen && !player.aggressive && !player.inoffensive) {
                 // nothing to do
                 ;
             }
