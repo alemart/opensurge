@@ -303,10 +303,8 @@ surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surges
 
     if(data->mask != NULL && scripting_util_is_object_inside_screen(object)) {
         /* lazy creation of the mask image */
-        if(data->maskimg == NULL) {
-            color_t color = (data->type == BRK_SOLID) ? color_rgb(255, 0, 0) : color_rgb(255, 255, 255);
-            data->maskimg = collisionmask_to_image(data->mask, color);
-        }
+        if(data->maskimg == NULL)
+            data->maskimg = collisionmask_to_image(data->mask, color_rgb(255, 255, 255));
 
         /* compute the position */
         v2d_t world_pos = v2d_subtract(scripting_util_world_position(object), data->hot_spot);
@@ -315,10 +313,9 @@ surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surges
         v2d_t screen_pos = v2d_subtract(world_pos, camera_offset);
 
         /* render mask */
-        if(data->enabled)
-            image_draw(data->maskimg, (int)screen_pos.x, (int)screen_pos.y, IF_NONE);
-        else
-            image_draw_trans(data->maskimg, (int)screen_pos.x, (int)screen_pos.y, 0.5f, IF_NONE);
+        uint8_t alpha = data->enabled ? 255 : 128;
+        color_t color = (data->type == BRK_SOLID) ? color_premul_rgba(255, 0, 0, alpha) : color_premul_rgba(255, 255, 255, alpha);
+        image_draw_tinted(data->maskimg, (int)screen_pos.x, (int)screen_pos.y, color, IF_NONE);
     }
 
     return NULL;
