@@ -1233,7 +1233,7 @@ surgescript_var_t* fun_setturbo(surgescript_object_t* object, const surgescript_
     player_t* player = get_player(object);
     if(player != NULL) {
         bool turbo = surgescript_var_get_bool(param[0]);
-        player_set_turbo(player, turbo);
+        player_set_turbocharged(player, turbo);
     }
     return NULL;
 }

@@ -59,8 +59,8 @@ const int PLAYER_INITIAL_LIVES = 5;    /* initial lives */
 /* private constants */
 static const int PLAYER_MAX_STARS = 16;               /* how many invincibility stars */
 static const float PLAYER_MAX_BLINK = 2.0f;           /* how long does the player blink if he/she gets hurt, in seconds */
-static const float PLAYER_UNDERWATER_BREATH = 30.0f;  /* how long can the player stay underwater before drowning, in seconds */
-static const float PLAYER_TURBO_TIME = 20.0f;         /* super speed time, in seconds */
+static const float PLAYER_UNDERWATER_TIME = 30.0f;    /* how long can the player stay underwater before drowning, in seconds */
+static const float PLAYER_TURBOCHARGE_TIME = 20.0f;   /* turbocharge time, in seconds */
 static const float PLAYER_INVINCIBILITY_TIME = 20.0f; /* invincibility time, in seconds */
 static const float PLAYER_DEAD_RESTART_TIME = 2.5f;   /* time to restart the level when the player is killed */
 
@@ -146,8 +146,8 @@ player_t *player_create(int id, const char *character_name)
     }
 
     /* turbo */
-    p->turbo = FALSE;
-    p->turbo_timer = 0;
+    p->turbocharged = FALSE;
+    p->turbocharged_timer = 0;
 
     /* loop system */
     p->layer = BRL_DEFAULT;
@@ -161,7 +161,7 @@ player_t *player_create(int id, const char *character_name)
     p->underwater = FALSE;
     p->forcibly_underwater = FALSE;
     p->underwater_timer = 0.0f;
-    p->breath_time = PLAYER_UNDERWATER_BREATH;
+    p->breath_time = PLAYER_UNDERWATER_TIME;
     p->dead_timer = 0.0f;
 
     /* success! */
@@ -221,7 +221,7 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         /* underwater logic */
         if(player_is_underwater(player)) {
             /* disable turbo */
-            player_set_turbo(player, FALSE);
+            player_set_turbocharged(player, FALSE);
 
             /* disable some shields */
             if(player->shield_type == SH_FIRESHIELD || player->shield_type == SH_THUNDERSHIELD) {
@@ -267,11 +267,11 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         }
 
         /* turbo speed */
-        if(player->turbo) {
+        if(player->turbocharged) {
             /* update timer & finish */
-            player->turbo_timer += dt;
-            if(player->turbo_timer >= PLAYER_TURBO_TIME)
-                player_set_turbo(player, FALSE);
+            player->turbocharged_timer += dt;
+            if(player->turbocharged_timer >= PLAYER_TURBOCHARGE_TIME)
+                player_set_turbocharged(player, FALSE);
         }
 
         /* pitfalls */
@@ -793,7 +793,7 @@ int player_senses_layer(const player_t* player, bricklayer_t layer)
  */
 int player_transform_into(player_t *player, surgescript_object_t *player_object, const char *character_name)
 {
-    /* if the player must be transformed to itself, then we consider
+    /* if the player is to be transformed into itself, then we consider
        the transformation to be successful, but we do nothing */
     if(0 == str_icmp(player_name(player), character_name))
         return TRUE;
@@ -946,9 +946,6 @@ void player_set_mirror_flags(player_t* player, int flags)
     player->mirror = flags;
 }
 
-
-
-
 /*
  * player_is_attacking()
  * Returns true if the player is attacking; false otherwise
@@ -967,7 +964,6 @@ int player_is_attacking(const player_t *player)
     physicsactorstate_t state = physicsactor_get_state(player->pa);
     return state == PAS_JUMPING || state == PAS_ROLLING || state == PAS_CHARGING;
 }
-
 
 /*
  * player_is_rolling()
@@ -1149,31 +1145,31 @@ int player_is_midair(const player_t *player)
  */
 int player_is_turbocharged(const player_t* player)
 {
-    return player->turbo;
+    return player->turbocharged;
 }
 
 /*
- * player_set_turbo()
+ * player_set_turbocharged()
  * Enable (or disable) turbo mode
  */
-void player_set_turbo(player_t* player, int turbo)
+void player_set_turbocharged(player_t* player, int turbocharged)
 {
     if(player_is_dying(player))
         return;
 
-    if(turbo == player->turbo) {
-        if(turbo)
-            player->turbo_timer = 0.0f;
+    if(turbocharged == player->turbocharged) {
+        if(turbocharged)
+            player->turbocharged_timer = 0.0f;
         return; /* nothing to do */
     }
 
-    if(turbo) {
-        player->turbo = TRUE;
-        player->turbo_timer = 0.0f;
+    if(turbocharged) {
+        player->turbocharged = TRUE;
+        player->turbocharged_timer = 0.0f;
         set_turbocharged_multipliers(player->pa, true);
     }
     else {
-        player->turbo = FALSE;
+        player->turbocharged = FALSE;
         set_turbocharged_multipliers(player->pa, false);
     }
 }
@@ -2265,7 +2261,7 @@ void on_physics_event(physicsactor_t* pa, physicsactorevent_t event, void* conte
 
         case PAE_KILL:
             player_set_invincible(player, FALSE);
-            player_set_turbo(player, FALSE);
+            player_set_turbocharged(player, FALSE);
             player_set_blinking(player, FALSE);
             player_set_aggressive(player, FALSE);
             player_set_invulnerable(player, FALSE);
@@ -2275,7 +2271,7 @@ void on_physics_event(physicsactor_t* pa, physicsactorevent_t event, void* conte
 
         case PAE_DROWN:
             player_set_invincible(player, FALSE);
-            player_set_turbo(player, FALSE);
+            player_set_turbocharged(player, FALSE);
             player_set_blinking(player, FALSE);
             player_set_aggressive(player, FALSE);
             player_set_invulnerable(player, FALSE);

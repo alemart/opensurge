@@ -80,9 +80,9 @@ struct player_t {
     float invincibility_timer;
     struct actor_t** star;
 
-    /* turbo */
-    int turbo;
-    float turbo_timer;
+    /* turbocharged */
+    int turbocharged;
+    float turbocharged_timer;
 
     /* loop system */
     bricklayer_t layer;
@@ -153,7 +153,7 @@ int player_is_attacking(const player_t *player);
 int player_is_blinking(const player_t *player);
 void player_set_blinking(player_t* player, int blink);
 int player_is_turbocharged(const player_t *player);
-void player_set_turbo(player_t* player, int turbo);
+void player_set_turbocharged(player_t* player, int turbocharged);
 int player_is_invincible(const player_t *player);
 void player_set_invincible(player_t* player, int invincible);
 int player_is_frozen(const player_t* player);
