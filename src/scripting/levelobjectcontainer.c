@@ -63,6 +63,7 @@ static int token = 0;
 static bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data);
 static bool find_and_remove_link(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data);
 static bool check_if_link_exists(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data);
+static bool cleanup_destroyed_objects(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data);
 static void recycle_memory(surgescript_object_t* container);
 
 /* iterator */
@@ -174,6 +175,9 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 {
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+
+    /* cleanup destroyed objects from the previous frame at the beginning of this main state loop */
+    surgescript_heap_scan_all(heap, manager, cleanup_destroyed_objects);
 
     /* recycle memory */
     recycle_memory(object);
@@ -322,6 +326,48 @@ void recycle_memory(surgescript_object_t* container)
     surgescript_var_set_rawbits(surgescript_heap_at(heap, IDX_ADDR), idx);
 }
 
+bool cleanup_destroyed_objects(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data)
+{
+    /* skip initial entries */
+    if(ptr < FIRST_STORED_OBJECT_ADDR)
+        return true;
+
+    /* skip if null */
+    if(surgescript_var_is_null(handle_var))
+        return true;
+
+    /* get handle */
+    surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(handle_var);
+    surgescript_objectmanager_t* manager = (surgescript_objectmanager_t*)data;
+
+    /* is it a valid object? */
+    if(surgescript_objectmanager_exists(manager, handle)) {
+
+        surgescript_object_t* stored_object = surgescript_objectmanager_get(manager, handle);
+
+        /* is it a destroyed object? */
+        if(surgescript_object_is_killed(stored_object)) {
+
+            /* release immediately. If we just nullify the link, destructors may not be called
+               (destructors are called in surgescript_object_update() the frame after they're destroyed) */
+            surgescript_objectmanager_delete(manager, handle);
+
+            /* nullify this link */
+            surgescript_var_set_null(handle_var);
+
+        }
+    }
+    else {
+
+        /* nullify this link */
+        surgescript_var_set_null(handle_var);
+
+    }
+
+    /* continue the iteration */
+    return true;
+}
+
 bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, void* data)
 {
     /* skip initial entries */
@@ -331,10 +377,10 @@ bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, vo
     /* skip if null */
     if(surgescript_var_is_null(handle_var))
         return true;
-    
+
     /* get handle */
     surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(handle_var);
-    const surgescript_objectmanager_t* manager = (const surgescript_objectmanager_t*)data;
+    surgescript_objectmanager_t* manager = (surgescript_objectmanager_t*)data;
 
     /* is it a valid object? */
     if(surgescript_objectmanager_exists(manager, handle)) {
@@ -342,16 +388,6 @@ bool traverse_links(surgescript_var_t* handle_var, surgescript_heapptr_t ptr, vo
         /* traverse the sub-tree */
         surgescript_object_t* stored_object = surgescript_objectmanager_get(manager, handle);
         surgescript_object_traverse_tree(stored_object, surgescript_object_update);
-
-        /* nullify this link */
-        if(surgescript_object_is_killed(stored_object))
-            surgescript_var_set_null(handle_var);
-
-    }
-    else {
-
-        /* nullify this link */
-        surgescript_var_set_null(handle_var);
 
     }
 
