@@ -366,12 +366,14 @@ int traverse_keyframes(const parsetree_statement_t* stmt, void* context)
         const parsetree_parameter_t* block = NULL;
         const parsetree_parameter_t* percentage_string = NULL;
 
-        /* syntax: keyframe { ... } or keyframe <percentage> { ... } */
+        /* syntax: keyframe <percentage> { ... } */
         switch(nanoparser_get_number_of_parameters(param_list)) {
+            /*
             case 1:
                 block = nanoparser_get_nth_parameter(param_list, 1);
                 nanoparser_expect_program(block, "Must provide keyframe attributes");
                 break;
+            */
 
             case 2:
                 percentage_string = nanoparser_get_nth_parameter(param_list, 1);
