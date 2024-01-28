@@ -209,9 +209,10 @@ static void init_fullscreen(settings_entry_t* e);
 static void change_fullscreen(settings_entry_t* e);
 static void update_fullscreen(settings_entry_t* e);
 
-#define vt_showfps (settings_entryvt_t){ change_showfps, nop, nop, init_showfps, nop, nop, visible }
+#define vt_showfps (settings_entryvt_t){ change_showfps, nop, nop, init_showfps, nop, update_showfps, visible }
 static void init_showfps(settings_entry_t* e);
 static void change_showfps(settings_entry_t* e);
+static void update_showfps(settings_entry_t* e);
 
 /* Audio */
 #define vt_audio (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
@@ -999,6 +1000,13 @@ void init_showfps(settings_entry_t* e)
 {
     int index = video_is_fps_visible() ? 1 : 0;
     e->index_of_current_value = index;
+}
+
+void update_showfps(settings_entry_t* e)
+{
+    /* the fps counter may be toggled externally */
+    bool is_visible = video_is_fps_visible();
+    e->index_of_current_value = is_visible ? 1 : 0;
 }
 
 

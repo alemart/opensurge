@@ -913,6 +913,11 @@ void a5_handle_hotkey(const ALLEGRO_EVENT* event, void* data)
                 video_showmessage("Can't toggle stats report");
             break;
 
+        /* F9: toggle FPS counter */
+        case ALLEGRO_KEY_F9:
+            video_set_fps_visible(!video_is_fps_visible());
+            break;
+
         /* F8: unmute / mute */
         case ALLEGRO_KEY_F8:
             audio_set_muted(!audio_is_muted());
