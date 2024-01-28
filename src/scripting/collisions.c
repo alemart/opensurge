@@ -470,7 +470,7 @@ surgescript_var_t* fun_notify(surgescript_object_t* object, const surgescript_va
         surgescript_var_t* tmp = surgescript_var_create();
         const surgescript_var_t* p[] = { tmp };
 
-        /* call entity.onCollision() */
+        /* call entity.onCollision(otherCollider) */
         if(collider->flags & COLLIDER_FLAG_NOTIFYONCOLLISION) {
             bool skip = false;
 
@@ -480,7 +480,7 @@ surgescript_var_t* fun_notify(surgescript_object_t* object, const surgescript_va
                     skip = true;
             }
 
-            /* call entity.onCollision() */
+            /* call entity.onCollision(otherCollider) */
             if(!skip) {
                 surgescript_object_t* entity = surgescript_objectmanager_get(manager, collider->entity);
                 surgescript_var_set_objecthandle(tmp, other_collider);
@@ -488,12 +488,15 @@ surgescript_var_t* fun_notify(surgescript_object_t* object, const surgescript_va
             }
         }
 
-        /* call entity.onOverlap() */
+        /* call entity.onOverlap(otherCollider) */
         if(collider->flags & COLLIDER_FLAG_NOTIFYONOVERLAP) {
             surgescript_object_t* entity = surgescript_objectmanager_get(manager, collider->entity);
             surgescript_var_set_objecthandle(tmp, other_collider);
             surgescript_object_call_function(entity, "onOverlap", p, 1, NULL);
         }
+
+        /* TODO call entity.onCollisionEx(otherCollider, thisCollider) */
+        /* TODO call entity.onOverlapEx(otherCollider, thisCollider) */
 
         /* done */
         surgescript_var_destroy(tmp);
