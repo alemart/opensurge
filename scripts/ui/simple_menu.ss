@@ -81,11 +81,11 @@ This is a simple menu system that is easy to use.
                .addOption("battle",  "Battle Mode", Vector2.down.scaledBy(16 * 1))
                .addOption("options", "Options",     Vector2.down.scaledBy(16 * 2))
                .addOption("exit",    "Exit",        Vector2.down.scaledBy(16 * 3))
+               .setPosition(Vector2(Screen.width / 2, 64))
                .setIcon("UI Pointer")
                .setHighlightColor("ffee11")
                .setFontName("GoodNeighbors")
                .setAlignment("center")
-               .setPosition(Vector2(Screen.width / 2, 64))
                .build();
 
         fun onChooseMenuOption(optionId)
