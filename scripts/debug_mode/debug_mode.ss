@@ -30,8 +30,8 @@ object "Debug Mode - My Plugin" is "debug-mode-plugin"
 In order to keep compatibility with the official releases of the engine, do not
 change the scripts of the Debug Mode directly. Create your own plugins instead.
 
-Visible elements should be rendered in screen space. This means that you should
-add the tags "detached", "private", "entity" to the objects you wish to see.
+Visible elements are usually rendered in screen space. Generally, you should
+add the tags "detached", "private" and "entity" to the objects you wish to see.
 Study the plugins of the Debug Mode for practical examples.
 
 Plugins may optionally implement functions onLoad() and onUnload() for
@@ -64,7 +64,7 @@ using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 
 // The Debug Mode object manages its plugins
-object "Debug Mode" is "entity", "awake", "detached", "private"
+object "Debug Mode" is "entity", "awake", "private"
 {
     plugins = [];
     indicesOfPluginsScheduledForRemoval = [];

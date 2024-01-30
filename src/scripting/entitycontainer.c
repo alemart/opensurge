@@ -654,8 +654,11 @@ surgescript_var_t* fun_debug_constructor(surgescript_object_t* object, const sur
 
     surgescript_tagsystem_add_tag(tag_system, DEBUGMODE_OBJECT_NAME, "entity");
     surgescript_tagsystem_add_tag(tag_system, DEBUGMODE_OBJECT_NAME, "awake");
-    surgescript_tagsystem_add_tag(tag_system, DEBUGMODE_OBJECT_NAME, "detached");
     surgescript_tagsystem_add_tag(tag_system, DEBUGMODE_OBJECT_NAME, "private");
+
+    /* tagging "detached" is unwanted because descendant entities become effectively
+       detached and thus cannot be rendered in world space. */
+    /*surgescript_tagsystem_add_tag(tag_system, DEBUGMODE_OBJECT_NAME, "detached");*/
 
     /* done */
     return NULL;
