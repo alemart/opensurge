@@ -654,6 +654,11 @@ void physicsactor_enable_winning_pose(physicsactor_t *pa)
     pa->winning_pose = true;
 }
 
+void physicsactor_disable_winning_pose(physicsactor_t *pa)
+{
+    pa->winning_pose = false;
+}
+
 void physicsactor_detach_from_ground(physicsactor_t *pa)
 {
     pa->want_to_detach_from_ground = true;
@@ -1256,8 +1261,6 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
             input_simulate_button_down(pa->input, IB_LEFT);
         else if(pa->gsp < -threshold)
             input_simulate_button_down(pa->input, IB_RIGHT);
-        else
-            input_disable(pa->input);
     }
 
     /*

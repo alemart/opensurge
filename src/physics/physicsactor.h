@@ -118,6 +118,7 @@ void physicsactor_lock_horizontally_for(physicsactor_t *pa, double seconds); /* 
 double physicsactor_hlock_timer(const physicsactor_t *pa); /* get the horizontal control lock timer (in seconds) */
 bool physicsactor_resurrect(physicsactor_t *pa);
 void physicsactor_enable_winning_pose(physicsactor_t *pa);
+void physicsactor_disable_winning_pose(physicsactor_t *pa);
 void physicsactor_detach_from_ground(physicsactor_t *pa);
 movmode_t physicsactor_get_movmode(const physicsactor_t *pa);
 enum obstaclelayer_t physicsactor_get_layer(const physicsactor_t *pa);
