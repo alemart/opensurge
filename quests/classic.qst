@@ -13,9 +13,10 @@ level           "levels/sunshine-1.lev"
 level           "levels/sunshine-2.lev"
 level           "levels/sunshine-3.lev"
 
+level           "levels/scenes/rate_game.lev"
+
 level           "levels/waterworks-1.lev"
 level           "levels/waterworks-2.lev"
 level           "levels/waterworks-3.lev"
 
 level           "levels/scenes/rate_game.lev"
-level           "levels/scenes/congratulations.lev"
