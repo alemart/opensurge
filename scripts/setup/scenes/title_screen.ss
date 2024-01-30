@@ -490,7 +490,7 @@ object "Title Screen - Menu Item - Quit" is "private", "detached", "entity"
 
     fun onEnter()
     {
-        Level.abort();
+        Level.loadNext();
     }
 
     fun onSelect()
