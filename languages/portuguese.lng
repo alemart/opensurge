@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-01-12"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-01-29"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -173,7 +173,12 @@ PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
 PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-THANKSFORPLAYING_TITLE      "Valeu por jogar!"
+THANKSFORPLAYING_TITLE      "Obrigado por jogar!"
+THANKSFORPLAYING_PARAGRAPH1 "Apóie este trabalho independente baixando a versão mobile da engine."
+THANKSFORPLAYING_PARAGRAPH2 "Jogue Surge the Rabbit - e também seus próprios games - no celular, tablet e Smart TV!"
+THANKSFORPLAYING_PARAGRAPH3 "Torne-se hoje mesmo um apoiador desta engine de código aberto!"
+THANKSFORPLAYING_YES        "Beleza!"
+THANKSFORPLAYING_NO         "Agora não"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"

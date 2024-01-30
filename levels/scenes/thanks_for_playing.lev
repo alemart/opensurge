@@ -11,6 +11,6 @@ act 1
 theme "themes/none.brk"
 bgtheme "themes/scenes/thanks_for_playing.bg"
 spawn_point 0 0
-setup "Thanks for Playing Scene"
+setup "Thanks for Playing"
 players "None"
 readonly
