@@ -47,6 +47,7 @@ static surgescript_var_t* fun_setspawnpoint(surgescript_object_t* object, const 
 static surgescript_var_t* fun_getcleared(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getact(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setact(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getauthor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getlicense(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -140,6 +141,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Level", "get_name", fun_getname, 0);
     surgescript_vm_bind(vm, "Level", "get_act", fun_getact, 0);
+    surgescript_vm_bind(vm, "Level", "set_act", fun_setact, 1);
     surgescript_vm_bind(vm, "Level", "get_version", fun_getversion, 0);
     surgescript_vm_bind(vm, "Level", "get_author", fun_getauthor, 0);
     surgescript_vm_bind(vm, "Level", "get_license", fun_getlicense, 0);
@@ -587,10 +589,19 @@ surgescript_var_t* fun_getname(surgescript_object_t* object, const surgescript_v
     return surgescript_var_set_string(surgescript_var_create(), level_name());
 }
 
-/* the act of the level, like 1, 2, 3... */
+/* the act number of the level. Typically 1, 2 or 3. */
 surgescript_var_t* fun_getact(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_number(surgescript_var_create(), level_act());
+}
+
+/* change the act number of the level */
+surgescript_var_t* fun_setact(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    int new_act_number = surgescript_var_get_number(param[0]);
+
+    level_set_act(new_act_number);
+    return NULL;
 }
 
 /* the version of the level, defined in the .lev file */

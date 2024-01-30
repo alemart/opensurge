@@ -203,6 +203,7 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
     {
         if(state == "main" || state == "disappearing") {
             transform.localPosition = initialPosition;
+            refreshText();
             state = "appearing";
         }
     }
@@ -233,6 +234,14 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
 
         // return itself
         return this;
+    }
+
+    fun refreshText()
+    {
+        // Level.act may have been changed
+        tmp = text.text;
+        text.text = "";
+        text.text = tmp;
     }
 
     fun constructor()
