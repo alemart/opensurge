@@ -157,6 +157,8 @@ font;fonts/tiny.png;CC0;Robey Pointer;opengameart.org;
 font;fonts/Roboto-Medium.ttf;Apache-2.0;Christian Robertson;;
 font;fonts/Roboto-Bold.ttf;Apache-2.0;Christian Robertson;;
 font;fonts/Roboto-Black.ttf;Apache-2.0;Christian Robertson;;
+font;fonts/NotoSans-Black.ttf;OFL-1.1;The Noto Project Authors;github.com/notofonts/adlam;
+font;fonts/NotoSans-Bold.ttf;OFL-1.1;The Noto Project Authors;github.com/notofonts/adlam;
 sound;samples/pause_appear.wav;CC-BY 4.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;
 sound;samples/pause_cancel.wav;CC-BY 4.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;
 sound;samples/pause_confirm.wav;CC-BY 4.0;Alexandre Almeida (M374LX);m374lx.users.sourceforge.net;
