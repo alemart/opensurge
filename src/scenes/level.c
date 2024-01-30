@@ -2039,24 +2039,45 @@ v2d_t level_spawnpoint()
  */
 void level_clear(actor_t *end_sign)
 {
-    int i;
-
     if(level_cleared)
         return;
 
-    /* ignore input and focus the camera on the end sign */
-    for(i=0; i<team_size; i++)
+    /* disable player input */
+    for(int i = 0; i < team_size; i++)
         input_disable(team[i]->actor->input);
 
-    /* set the focus */
+    /* focus the camera on the end sign */
     if(end_sign != NULL)
         level_set_camera_focus(end_sign);
     else
         level_set_camera_focus(player->actor);
 
-    /* success! */
+    /* hide dialog box, if any */
     level_hide_dialogbox();
+
+    /* success! */
     level_cleared = TRUE;
+}
+
+
+/*
+ * level_undo_clear()
+ * Undo a previous call to level_clear()
+ */
+void level_undo_clear()
+{
+    if(!level_cleared)
+        return;
+
+    /* re-enable player input */
+    for(int i = 0; i < team_size; i++)
+        input_enable(team[i]->actor->input);
+
+    /* restore the focus */
+    level_set_camera_focus(player->actor);
+
+    /* done! */
+    level_cleared = FALSE;
 }
 
 

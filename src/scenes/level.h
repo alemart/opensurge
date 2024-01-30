@@ -88,6 +88,7 @@ struct music_t* level_music();
 void level_change(const char* path_to_lev_file); /* change the level */
 int level_persist(); /* save the current level */
 void level_clear(struct actor_t *end_sign);
+void level_undo_clear();
 int level_has_been_cleared();
 void level_jump_to_next_stage();
 void level_ask_to_leave();

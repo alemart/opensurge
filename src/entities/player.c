@@ -281,6 +281,8 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         /* winning pose */
         if(level_has_been_cleared())
             physicsactor_enable_winning_pose(pa);
+        else if(player_is_winning(player))
+            physicsactor_disable_winning_pose(pa); /* level_undo_clear() was called */
 
         /* rolling misc */
         if(!player_is_midair(player))
