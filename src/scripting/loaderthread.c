@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * loaderthread.c - scripting system: SurgeScript loader thread
- * Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
