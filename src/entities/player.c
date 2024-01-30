@@ -613,7 +613,7 @@ void player_enter_water(player_t *player)
 void player_leave_water(player_t *player)
 {
     if(player_is_underwater(player)) {
-        if(!player_is_springing(player) && !player_is_dying(player)) {
+        if(!player_is_springing(player) && !player_is_dying(player) && player_is_midair(player)) {
             float double_ysp = player_ysp(player) * 2.0f;
             player_set_ysp(player, max(double_ysp, -960.0f));
         }
