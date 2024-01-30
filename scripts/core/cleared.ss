@@ -14,9 +14,28 @@ using SurgeEngine.Audio.Music;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Input.MobileGamepad;
+using SurgeEngine.Events.Event;
 
+/*
+
+The default animation that is played when the level is cleared.
+
+Public properties:
+- onStart: event object. Triggered when the animation starts playing.
+- onFinish: event object. Triggered when the animation finishes playing.
+- wantJinglePlus: boolean. Play a different jingle when the number of
+                           collectibles is greater than or equal to 100.
+
+Tip: call Level.undoClear() in a onFinish event to restore normal gameplay
+     after the level cleared animation finishes playing.
+
+*/
 object "Default Cleared Animation" is "entity", "awake", "detached", "private"
 {
+    public onStart = Event();
+    public onFinish = Event();
+    public wantJinglePlus = true;
+
     title = [
         spawn("DefaultClearedAnimation.Title").init(0),
         spawn("DefaultClearedAnimation.Title").init(1)
@@ -31,11 +50,14 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
         Music("musics/winning_plus.ogg")
     ];
     fader = spawn("Fader");
+    previousVolume = 1.0;
 
     state "main"
     {
         if(Level.cleared) {
             //Level.music.stop();
+            previousVolume = Level.music.volume;
+            onStart.call();
             state = "cleared";
         }
     }
@@ -45,7 +67,7 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
         Level.music.volume -= Time.delta;
         if(timeout(1.5)) {
             Level.music.stop();
-            if(Player.active.collectibles >= 100) {
+            if(wantJinglePlus && Player.active.collectibles >= 100) {
                 jingle[1].play();
                 state = "jingle+ warmup";
             }
@@ -99,7 +121,14 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
             counter[0].disappear();
             counter[1].disappear();
             counter[2].disappear();
-            state = "fadeout";
+
+            onFinish.call();
+
+            if(Level.cleared)
+                state = "fadeout";
+            else
+                state = "restore"; // Level.undoClear() was called by some script,
+                                   // possibly during the onFinish event call
         }
     }
 
@@ -120,6 +149,13 @@ object "Default Cleared Animation" is "entity", "awake", "detached", "private"
         }
     }
 
+    state "restore"
+    {
+        Level.music.volume = previousVolume;
+        Level.music.play();
+        state = "main";
+    }
+
     fun finish()
     {
         state = "finish";
@@ -130,6 +166,7 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
 {
     transform = Transform();
     text = Text("HUD Large");
+    initialPosition = Vector2.zero;
     appearSpeed = 3 * Screen.width; // in px/s
 
     state "main"
@@ -164,8 +201,10 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
 
     fun appear()
     {
-        if(state == "main")
+        if(state == "main" || state == "disappearing") {
+            transform.localPosition = initialPosition;
             state = "appearing";
+        }
     }
 
     fun disappear()
@@ -178,16 +217,19 @@ object "DefaultClearedAnimation.Title" is "entity", "awake", "detached", "privat
         // configure the text according to lineId
         if(lineId == 0) {
             text.text = "$CLEARED_LINE1";
-            transform.localPosition = Vector2(3 * Screen.width / 2, 48);
+            initialPosition = Vector2(3 * Screen.width / 2, 48);
             appearSpeed *= -1.0;
         }
         else if(lineId == 1) {
             text.text = "$CLEARED_LINE2";
-            transform.localPosition = Vector2(-Screen.width / 2, 76);
+            initialPosition = Vector2(-Screen.width / 2, 76);
             appearSpeed *= 1.0;
         }
         else
             Application.crash("Invalid parameter for " + this.__name + ".init()");
+
+        // hide
+        transform.localPosition = initialPosition;
 
         // return itself
         return this;
@@ -206,6 +248,7 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
     text = Text("HUD");
     value = Text("HUD");
     input = Input("default");
+    initialPosition = Vector2.zero;
     counter = null;
     appearSpeed = 3 * Screen.width; // in px/s
     isMaster = false;
@@ -281,7 +324,8 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
 
     fun appear()
     {
-        if(state == "main") {
+        if(state == "main" || state == "disappearing") {
+            transform.localPosition = initialPosition;
             value.text = counter.activate();
             state = "appearing";
         }
@@ -297,7 +341,7 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
         if(counterName == "score") {
             text.text = "<color=ffee11>$CLEARED_SCORE</color>";
             counter = spawn("DefaultClearedAnimation.Counter.Score");
-            transform.localPosition = Vector2(-0.5 * Screen.width, 112);
+            initialPosition = Vector2(-0.5 * Screen.width, 112);
             appearSpeed *= 1.0;
             isMaster = true;
             countfx = Sound("samples/collectible_count.wav");
@@ -306,17 +350,20 @@ object "DefaultClearedAnimation.Counter" is "entity", "awake", "detached", "priv
         else if(counterName == "time") {
             text.text = "<color=ffee11>$CLEARED_TIME</color>";
             counter = spawn("DefaultClearedAnimation.Counter.Time");
-            transform.localPosition = Vector2(-1.0 * Screen.width, 128);
+            initialPosition = Vector2(-1.0 * Screen.width, 128);
             appearSpeed *= 1.25;
         }
         else if(counterName == "power") {
             text.text = "<color=ffee11>$CLEARED_POWER</color>";
             counter = spawn("DefaultClearedAnimation.Counter.Power");
-            transform.localPosition = Vector2(-1.5 * Screen.width, 144);
+            initialPosition = Vector2(-1.5 * Screen.width, 144);
             appearSpeed *= 1.5;
         }
         else
             Application.crash("Invalid parameter for " + this.__name + ".init()");
+
+        // hide
+        transform.localPosition = initialPosition;
 
         // return itself
         return this;

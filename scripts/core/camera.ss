@@ -80,7 +80,7 @@ object "Default Camera" is "entity", "awake", "private"
                 centerCamera(player.transform.position);
 
             // freeze camera
-            if(player.dying || Level.cleared)
+            if(player.dying)
                 state = "frozen";
 
         }

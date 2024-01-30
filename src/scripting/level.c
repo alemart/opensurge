@@ -59,6 +59,7 @@ static surgescript_var_t* fun_getgravity(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_gettime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_settime(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_undo_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_restart(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_quit(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_abort(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -160,6 +161,7 @@ void scripting_register_level(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Level", "set_onUnload", fun_setonunload, 1);
     surgescript_vm_bind(vm, "Level", "get_onUnload", fun_getonunload, 0);
     surgescript_vm_bind(vm, "Level", "clear", fun_clear, 0);
+    surgescript_vm_bind(vm, "Level", "undoClear", fun_undo_clear, 0);
     surgescript_vm_bind(vm, "Level", "restart", fun_restart, 0);
     surgescript_vm_bind(vm, "Level", "quit", fun_quit, 0);
     surgescript_vm_bind(vm, "Level", "abort", fun_abort, 0);
@@ -358,9 +360,12 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     const surgescript_heap_t* heap = surgescript_object_heap(object);
     bool debug_mode = is_in_debug_mode(object);
 
-    /* internal updates */
+    /* update music */
     update_music(object);
-    update_time(object);
+
+    /* update Level.time */
+    if(!level_has_been_cleared())
+        update_time(object);
 
     /* pause the containers when in Debug Mode */
     if(debug_mode) {
@@ -569,7 +574,8 @@ surgescript_var_t* fun_setonunload(surgescript_object_t* object, const surgescri
     return NULL;
 }
 
-/* will be true if the level has been cleared (will show the cleared animation) */
+/* will be true if the level has been cleared (i.e., Level.clear() was called).
+   A Level Cleared animation is typically played when this flag is enabled */
 surgescript_var_t* fun_getcleared(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     return surgescript_var_set_bool(surgescript_var_create(), level_has_been_cleared());
@@ -641,10 +647,17 @@ surgescript_var_t* fun_settime(surgescript_object_t* object, const surgescript_v
     return NULL;
 }
 
-/* clears the level (will show the level cleared animation) */
+/* clear the level: set the Level.cleared flag and disable player input */
 surgescript_var_t* fun_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     level_clear(NULL);
+    return NULL;
+}
+
+/* undo a previous call to Level.clear() */
+surgescript_var_t* fun_undo_clear(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    level_undo_clear();
     return NULL;
 }
 

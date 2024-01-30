@@ -23,7 +23,6 @@ object "Default HUD" is "entity", "detached", "awake", "private"
     lives = spawn("DefaultHUD.Lives");
     powerups = spawn("DefaultHUD.Powerups");
     pause = spawn("DefaultHUD.PauseButton");
-    forcedClear = false;
 
     state "main"
     {
@@ -33,20 +32,27 @@ object "Default HUD" is "entity", "detached", "awake", "private"
 
     state "active"
     {
-        if(Level.cleared || forcedClear) {
-            timer.block();
+        if(Level.cleared) {
+            timer.freeze();
             state = "cleared";
         }
     }
 
     state "cleared"
     {
+        if(!Level.cleared) {
+            timer.unfreeze();
+            state = "main";
+        }
+
         //transform.translateBy(-Screen.width * Time.delta, 0);
     }
 
+    // fake level clear
+    // prefer using Level.clear() instead
     fun clear()
     {
-        forcedClear = true;
+        timer.freeze();
     }
 
     // base zindex for the components of the HUD
@@ -110,7 +116,7 @@ object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
         label.text = "<color=ffee11>$HUD_TIME</color>";
     }
 
-    state "blocked"
+    state "frozen"
     {
         // don't change the labels
     }
@@ -120,12 +126,18 @@ object "DefaultHUD.Time" is "entity", "detached", "awake", "private"
         if(x < 10)
             return "0" + x;
         else
-            return x;
+            return "" + x;
     }
 
-    fun block()
+    fun freeze()
     {
-        state = "blocked";
+        state = "frozen";
+    }
+
+    fun unfreeze()
+    {
+        if(state == "frozen")
+            state = "main";
     }
 }
 
