@@ -366,8 +366,11 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
     update_music(object);
 
     /* update Level.time */
-    if(!level_has_been_cleared())
-        update_time(object);
+    if(!level_has_been_cleared()) {
+        const player_t* player = level_player();
+        if(player != NULL && !player_is_dying(player))
+            update_time(object);
+    }
 
     /* pause the containers when in Debug Mode */
     if(debug_mode) {
