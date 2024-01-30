@@ -106,6 +106,7 @@ int level_waterlevel();
 void level_set_waterlevel(int ycoord);
 color_t level_watercolor();
 void level_set_watercolor(color_t color);
+void level_set_act(int new_act_number);
 void level_change_background(const char* filepath);
 const struct bgtheme_t* level_background();
 

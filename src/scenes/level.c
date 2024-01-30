@@ -120,6 +120,7 @@ static bool is_setup_object(const char* object_name);
 #define DEFAULT_GRAVITY         787.5f
 #define PATH_MAXLEN             1024
 #define LINE_MAXLEN             1024
+#define MAX_ACT_NUMBER          99
 
 /* water */
 #define DEFAULT_WATERLEVEL()    waterfx_default_ypos()
@@ -135,7 +136,7 @@ static char name[128];
 static char author[128];
 static char version[128];
 static char license[128];
-static int act;
+static int act_number;
 static int requires[3]; /* this level requires engine version x.y.z */
 static int readonly; /* we can't activate the level editor */
 static v2d_t spawn_point;
@@ -150,6 +151,7 @@ typedef struct levelstate_t levelstate_t;
 struct levelstate_t { /* stores attributes that can be changed during gameplay */
     bool is_valid;
     v2d_t spawn_point;
+    int act_number;
     int waterlevel;
     color_t watercolor;
     char bgtheme[PATH_MAXLEN];
@@ -483,12 +485,12 @@ void level_load(const char *filepath)
     strcpy(license, "");
     strcpy(grouptheme, "");
     spawn_point = v2d_new(0, 0);
-    dialogregion_size = 0;
-    act = 0;
+    act_number = 0;
     requires[0] = GAME_VERSION_SUP;
     requires[1] = GAME_VERSION_SUB;
     requires[2] = GAME_VERSION_WIP;
     readonly = FALSE;
+    dialogregion_size = 0;
 
     /* clear pointers */
     backgroundtheme = NULL;
@@ -647,7 +649,7 @@ int level_save(const char *filepath)
     "spawn_point %d %d\n",
     str_addslashes(version, NULL, 0),
     GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP,
-    act, theme, bgtheme,
+    act_number, theme, bgtheme,
     (int)spawn_point.x, (int)spawn_point.y);
 
     /* music? */
@@ -830,7 +832,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
 
     case LEVCOMMAND_ACT: {
         if(param_count == 1)
-            act = clip(atoi(param[0]), 0, 65535);
+            level_set_act(atoi(param[0]));
         else
             logfile_message("Level loader - command '%s' expects one parameter: act number", command_name);
 
@@ -1690,7 +1692,7 @@ const char* level_license()
  */
 int level_act()
 {
-    return act;
+    return act_number;
 }
 
 /*
@@ -2009,7 +2011,6 @@ music_t* level_music()
 }
 
 
-
 /*
  * level_set_spawnpoint()
  * Defines a new spawn point
@@ -2029,6 +2030,16 @@ void level_set_spawnpoint(v2d_t newpos)
 v2d_t level_spawnpoint()
 {
     return spawn_point;
+}
+
+
+/*
+ * level_set_act()
+ * Changes the act number
+ */
+void level_set_act(int new_act_number)
+{
+    act_number = clip(new_act_number, 0, MAX_ACT_NUMBER);
 }
 
 
@@ -2696,6 +2707,7 @@ bool is_setup_object(const char* object_name)
 void save_level_state(levelstate_t* state)
 {
     state->spawn_point = spawn_point;
+    state->act_number = act_number;
     state->waterlevel = level_waterlevel();
     state->watercolor = level_watercolor();
     str_cpy(
@@ -2711,6 +2723,7 @@ void restore_level_state(const levelstate_t* state)
 {
     if(state->is_valid) {
         spawn_point = state->spawn_point;
+        act_number = state->act_number;
         level_set_waterlevel(state->waterlevel);
         level_set_watercolor(state->watercolor);
         level_change_background(state->bgtheme);
