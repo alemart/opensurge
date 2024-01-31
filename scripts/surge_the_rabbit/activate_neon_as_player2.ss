@@ -9,17 +9,15 @@ using SurgeTheRabbit.Settings;
 
 object "Activate Neon as Player 2" is "setup"
 {
-    targetName = "Neon as Player 2";
-
     fun constructor()
     {
-        if(!Settings.wantNeonAsPlayer2)
+        if(!wantNeon())
             return;
 
         for(i = 0; i < Player.count; i++) {
             player = Player[i];
             if(player.name == "None") {
-                if(player.transformInto(targetName))
+                if(player.transformInto("Neon as Player 2"))
                     return;
                 else
                     break;
@@ -27,5 +25,12 @@ object "Activate Neon as Player 2" is "setup"
         }
 
         Console.print(this.__name + ": error");
+    }
+
+    fun wantNeon()
+    {
+        // Neon can be activated in-game or with a command-line option
+        return Settings.wantNeonAsPlayer2 ||
+               Application.args.hasOption("--want-neon-as-player-2");
     }
 }
