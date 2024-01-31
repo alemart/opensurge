@@ -111,13 +111,16 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/core/water.ss",                            ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/items/bubbles.ss",                         ":0.6.1",                   /* changes to the Water Bubble entity (at scripts/core/water.ss) in 0.6.1; remove function addComponent() */
     "scripts/items/bg_xchg.ss",                         ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
-    "scripts/items/event_trigger.ss",                   ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/enemies/marmotred.ss",                     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/functions/ui/show_message.ss",             ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/functions/camera/lock_camera.ss",          ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/functions/player/give_extra_lives.ss",     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/misc/lucky_bonus.ss",                      ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/ui/menubuttonlist.ss",                     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+
+    "scripts/items/event_trigger.ss",                   ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings; added Event Triggers 9-16 in 0.6.1 */
+    "sprites/items/event_trigger.spr",                  ":0.6.1",                   /* added Event Triggers 9-16 in 0.6.1 */
+    "images/core.png",                                  ":0.6.1",                   /* added Event Triggers 9-16 in 0.6.1 */
 
     "scripts/items/power_pluggy.ss",                    "0.6.0:0.6.1",              /* changes to the physics and to the entity system in 0.6.1; using lateUpdate(), increased the size of a collider, and more */
     "scripts/items/salamander_bridge.ss",               "0.6.0:0.6.1",              /* changes to the physics system in 0.6.1; prevent soft lock */
