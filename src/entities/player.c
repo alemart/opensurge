@@ -2281,6 +2281,7 @@ void on_physics_event(physicsactor_t* pa, physicsactorevent_t event, void* conte
             break;
 
         case PAE_SMASH:
+            logfile_message("Player \"%s\" was smashed!", player_name(player));
             break;
 
         case PAE_RESURRECT:
