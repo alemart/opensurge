@@ -51,8 +51,10 @@ object "Play Classic Levels" is "setup"
 
     state "accept"
     {
-        if(timeout(fader.fadeTime))
+        if(timeout(fader.fadeTime)) {
+            Level.next += 1;
             Level.load("quests/classic.qst");
+        }
     }
 
     state "decline"
