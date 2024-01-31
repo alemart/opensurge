@@ -109,6 +109,7 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/friends/skaterbug.ss",                     ":0.6.1",                   /* changes to the update cycle in 0.6.1; now using player.moveBy() */
 
     "scripts/core/water.ss",                            ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/items/bubbles.ss",                         ":0.6.1",                   /* changes to the Water Bubble entity (at scripts/core/water.ss) in 0.6.1; remove function addComponent() */
     "scripts/items/bg_xchg.ss",                         ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/items/event_trigger.ss",                   ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/enemies/marmotred.ss",                     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
