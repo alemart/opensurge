@@ -2394,8 +2394,7 @@ void render_level(const item_list_t *major_items, const enemy_list_t *major_enem
             renderqueue_enqueue_water();
 
         /* render foreground */
-        if(!editor_is_enabled())
-            renderqueue_enqueue_foreground(backgroundtheme);
+        renderqueue_enqueue_foreground(backgroundtheme);
 
         /* render legacy items */
         for(const item_list_t* inode=major_items; inode; inode=inode->next)
