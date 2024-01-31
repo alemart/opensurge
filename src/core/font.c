@@ -43,6 +43,7 @@
 #include "../util/point2d.h"
 #include "../util/rect.h"
 #include "../entities/player.h"
+#include "../entities/mobilegamepad.h"
 #include "../scenes/level.h"
 #include "../third_party/utf8.h"
 
@@ -2067,7 +2068,7 @@ static const char* f_level_version() { return level_version(); }
 static const char* f_level_author() { return level_author(); }
 static const char* f_level_act() { return str_from_int(level_act(), NULL, 0); }
 static const char* f_player_name() { return level_player() != NULL ? player_name(level_player()) : "null"; }
-static const char* f_input_type() { return input_is_joystick_enabled() ? "JOY" : "KEYB"; }
+static const char* f_input_type() { return input_is_joystick_enabled() || mobilegamepad_is_available() ? "JOY" : "KEYB"; }
 static const char* f_engine_name() { return GAME_TITLE; }
 static const char* f_engine_version() { return GAME_VERSION_STRING; }
 static const char* f_engine_website() { return GAME_WEBSITE; }
