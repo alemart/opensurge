@@ -751,7 +751,7 @@ const char* create_url(const char* path)
     static char buffer[256];
     char sep = (strchr(path, '?') != NULL) ? '&' : '?';
 
-    snprintf(buffer, sizeof(buffer), "%s%s%cv=%s", GAME_URL, path, sep, GAME_VERSION_STRING);
+    snprintf(buffer, sizeof(buffer), "%s%s%cv=%s&from=options", GAME_URL, path, sep, GAME_VERSION_STRING);
 
     return buffer;
 }

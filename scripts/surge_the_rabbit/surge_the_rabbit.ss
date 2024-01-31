@@ -7,6 +7,7 @@
 using SurgeEngine;
 using SurgeEngine.Web;
 using SurgeEngine.Game;
+using SurgeEngine.Level;
 using SurgeEngine.Platform;
 
 @Package
@@ -45,8 +46,9 @@ object "SurgeTheRabbit"
 
     fun download()
     {
+        f = Level.name; // FIXME encodeURIComponent()
         t = Platform.isAndroid ? "desktop" : "mobile";
-        url = website + "/download?type=" + t + "&v=" + SurgeEngine.version;
+        url = website + "/download?type=" + t + "&v=" + SurgeEngine.version + "&from=" + f;
         Web.launchURL(url);
     }
 
