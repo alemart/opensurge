@@ -152,7 +152,7 @@ FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "PODELITE"
 TITLESCREEN_DONATE          "DONIRAJTE"
 TITLESCREEN_QUIT            "НАПУСТИТИ"
-TITLESCREEN_VERSION         "SurgeEngine $ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
@@ -234,8 +234,8 @@ INPUT_JOY_LEFT              "ЛЕВО ДУГМЕ"
 INPUT_JOY_RIGHT             "ДЕСНО ДУГМЕ"
 INPUT_JOY_UP                "ГОРЊЕ ДУГМЕ"
 INPUT_JOY_DOWN              "ДОЊЕ ДУГМЕ"
-INPUT_JOY_FIRE1             "ШКОЧИ"
-FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
+FIXME INPUT_JOY_FIRE1             "the ACTION BUTTON"
+FIXME INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
 INPUT_JOY_FIRE3             "ПАУЗИРАЈ"
 INPUT_JOY_FIRE4             "НАЗАД"
 FIXME INPUT_JOY_FIRE5             "L1"

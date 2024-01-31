@@ -152,7 +152,7 @@ TITLESCREEN_MOBILE          "JOGAR NO MOBILE"
 TITLESCREEN_SHARE           "COMPARTILHAR"
 TITLESCREEN_DONATE          "DOAR"
 TITLESCREEN_QUIT            "SAIR"
-TITLESCREEN_VERSION         "SurgeEngine $ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
@@ -234,8 +234,8 @@ INPUT_JOY_LEFT              "ESQUERDA"
 INPUT_JOY_RIGHT             "DIREITA"
 INPUT_JOY_UP                "CIMA"
 INPUT_JOY_DOWN              "BAIXO"
-INPUT_JOY_FIRE1             "PULO"
-INPUT_JOY_FIRE2             "a AÇÃO SECUNDÁRIA"
+INPUT_JOY_FIRE1             "o BOTÃO DE AÇÃO"
+INPUT_JOY_FIRE2             "o BOTÃO SECUNDÁRIO DE AÇÃO"
 INPUT_JOY_FIRE3             "PAUSE"
 INPUT_JOY_FIRE4             "VOLTAR"
 INPUT_JOY_FIRE5             "L1"

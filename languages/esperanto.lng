@@ -152,7 +152,7 @@ FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "DISKONIGI"
 TITLESCREEN_DONATE          "DONACI"
 TITLESCREEN_QUIT            "ELIRI"
-TITLESCREEN_VERSION         "SurgeEngine $ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
@@ -237,8 +237,8 @@ INPUT_JOY_LEFT              "the MALDEKSTRA BUTONO"
 INPUT_JOY_RIGHT             "the DEKSTRA BUTONO"
 INPUT_JOY_UP                "the SUPRA BUTONO"
 INPUT_JOY_DOWN              "the MALSUPRA BUTONO"
-INPUT_JOY_FIRE1             "SALTI"
-FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
+FIXME INPUT_JOY_FIRE1             "the ACTION BUTTON"
+FIXME INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
 INPUT_JOY_FIRE2__EO         "ŜANĜI"
 INPUT_JOY_FIRE3             "PAŬZI"
 INPUT_JOY_FIRE4             "REEN"

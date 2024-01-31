@@ -159,7 +159,7 @@ TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "SHARE"
 TITLESCREEN_DONATE          "DONATE"
 TITLESCREEN_QUIT            "QUIT"
-TITLESCREEN_VERSION         "SurgeEngine $ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
@@ -241,8 +241,8 @@ INPUT_JOY_LEFT              "the LEFT BUTTON"
 INPUT_JOY_RIGHT             "the RIGHT BUTTON"
 INPUT_JOY_UP                "the UP BUTTON"
 INPUT_JOY_DOWN              "the DOWN BUTTON"
-INPUT_JOY_FIRE1             "JUMP"
-INPUT_JOY_FIRE2             "SECONDARY ACTION"
+INPUT_JOY_FIRE1             "the ACTION BUTTON"
+INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
 INPUT_JOY_FIRE3             "PAUSE"
 INPUT_JOY_FIRE4             "BACK"
 INPUT_JOY_FIRE5             "L1"

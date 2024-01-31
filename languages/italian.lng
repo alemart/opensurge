@@ -152,7 +152,7 @@ FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "CONDIVIDI"
 TITLESCREEN_DONATE          "DONA"
 TITLESCREEN_QUIT            "ESCI"
-TITLESCREEN_VERSION         "SurgeEngine $ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
@@ -234,8 +234,8 @@ INPUT_JOY_LEFT              "il BOTTONE SINISTRO"
 INPUT_JOY_RIGHT             "il BOTTONE DESTRO"
 INPUT_JOY_UP                "il BOTTONE SU"
 INPUT_JOY_DOWN              "il BOTTONE GIÙ"
-INPUT_JOY_FIRE1             "SALTO"
-FIXME INPUT_JOY_FIRE2             "SECONDARY ACTION"
+FIXME INPUT_JOY_FIRE1             "the ACTION BUTTON"
+FIXME INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
 INPUT_JOY_FIRE3             "PAUSA"
 INPUT_JOY_FIRE4             "INDIETRO"
 FIXME INPUT_JOY_FIRE5             "L1"
