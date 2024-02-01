@@ -275,8 +275,11 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         }
 
         /* pitfalls */
-        if(position.y >= level_height_at(position.x))
+        if(position.y >= level_height_at(position.x)) {
+            if(!player_is_dying(player))
+                logfile_message("Player \"%s\" fell into a pit!", player_name(player));
             player_kill(player);
+        }
 
         /* winning pose */
         if(level_has_been_cleared())
