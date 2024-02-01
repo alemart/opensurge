@@ -1998,9 +1998,9 @@ v2d_t level_size()
  */
 int level_height_at(int xpos)
 {
-    const int half_window = VIDEO_SCREEN_W * 0.5f;
-    int left_xpos = xpos - half_window;
-    int right_xpos = xpos + half_window;
+    const int WINDOW_SIZE = VIDEO_SCREEN_W;
+    int left_xpos = xpos - WINDOW_SIZE;
+    int right_xpos = xpos + WINDOW_SIZE;
 
     return brickmanager_world_height_at_interval(brick_manager, left_xpos, right_xpos);
 }
