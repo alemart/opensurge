@@ -74,11 +74,14 @@ extern struct music_t* scripting_music_ptr(const surgescript_object_t* object);
 extern const struct animation_t* scripting_animation_ptr(const surgescript_object_t* object);
 extern void scripting_animation_overwrite_ptr(surgescript_object_t* object, const struct animation_t* animation);
 
+extern bool scripting_brick_is_valid(const surgescript_object_t* object);
 extern bricktype_t scripting_brick_type(const surgescript_object_t* object);
 extern bricklayer_t scripting_brick_layer(const surgescript_object_t* object);
 extern bool scripting_brick_enabled(const surgescript_object_t* object);
 extern v2d_t scripting_brick_hotspot(const surgescript_object_t* object);
 extern struct collisionmask_t* scripting_brick_mask(const surgescript_object_t* object);
+extern v2d_t scripting_brick_size(const surgescript_object_t* object);
+extern v2d_t scripting_brick_position(const surgescript_object_t* object);
 
 extern const struct obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object);
 

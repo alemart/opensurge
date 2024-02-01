@@ -89,6 +89,16 @@ void scripting_register_brick(surgescript_vm_t* vm)
 }
 
 /*
+ * scripting_brick_is_valid()
+ * Checks if a SurgeScript object is a brick-like object
+ */
+bool scripting_brick_is_valid(const surgescript_object_t* object)
+{
+    return 0 == strcmp(surgescript_object_name(object), "Brick") &&
+           !surgescript_object_is_killed(object);
+}
+
+/*
  * scripting_brick_type()
  * Checks the type of a brick-like object
  * WARNING: Be sure that the referenced object is a Brick. This function won't check it.
@@ -96,7 +106,7 @@ void scripting_register_brick(surgescript_vm_t* vm)
 bricktype_t scripting_brick_type(const surgescript_object_t* object)
 {
     const bricklike_data_t* data = get_data(object);
-    return data->type;
+    return data ? data->type : BRK_SOLID;
 }
 
 /*
@@ -107,7 +117,7 @@ bricktype_t scripting_brick_type(const surgescript_object_t* object)
 bricklayer_t scripting_brick_layer(const surgescript_object_t* object)
 {
     const bricklike_data_t* data = get_data(object);
-    return data->layer;
+    return data ? data->layer : BRL_DEFAULT;
 }
 
 /*
@@ -129,7 +139,7 @@ bool scripting_brick_enabled(const surgescript_object_t* object)
 v2d_t scripting_brick_hotspot(const surgescript_object_t* object)
 {
     const bricklike_data_t* data = get_data(object);
-    return data->hot_spot;
+    return data ? data->hot_spot : v2d_new(0, 0);
 }
 
 /*
@@ -142,6 +152,38 @@ collisionmask_t* scripting_brick_mask(const surgescript_object_t* object)
 {
     const bricklike_data_t* data = get_data(object);
     return data ? data->mask : NULL;
+}
+
+/*
+ * scripting_brick_size()
+ * The size, in pixels, of a brick-like object
+ * WARNING: Be sure that the referenced object is a Brick. This function won't check it.
+ */
+v2d_t scripting_brick_size(const surgescript_object_t* object)
+{
+    const bricklike_data_t* data = get_data(object);
+
+    if(data != NULL) {
+        int width = collisionmask_width(data->mask);
+        int height = collisionmask_height(data->mask);
+
+        return v2d_new(width, height);
+    }
+
+    return v2d_new(0, 0);
+}
+
+/*
+ * scripting_brick_position()
+ * The top-left position, in world space, of a brick-like object
+ * WARNING: Be sure that the referenced object is a Brick. This function won't check it.
+ */
+v2d_t scripting_brick_position(const surgescript_object_t* object)
+{
+    const bricklike_data_t* data = get_data(object);
+    v2d_t hot_spot = data ? data->hot_spot : v2d_new(0, 0);
+    v2d_t position = scripting_util_world_position(object);
+    return v2d_subtract(position, hot_spot);
 }
 
 

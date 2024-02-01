@@ -2816,10 +2816,13 @@ void update_obstaclemap(const item_list_t* item_list, const object_list_t* objec
 
         if(surgescript_objectmanager_exists(manager, *bricklike_handle)) {
             surgescript_object_t* bricklike_object = surgescript_objectmanager_get(manager, *bricklike_handle);
-            obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
 
-            darray_push(mock_obstacles, mock_obstacle);
-            obstaclemap_add(obstaclemap, mock_obstacle);
+            if(scripting_brick_is_valid(bricklike_object)) {
+                obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
+
+                darray_push(mock_obstacles, mock_obstacle);
+                obstaclemap_add(obstaclemap, mock_obstacle);
+            }
         }
     }
     iterator_destroy(bricklike_iterator);
