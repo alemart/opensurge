@@ -1060,8 +1060,10 @@ bool level_interpret_body_line(const char* filepath, int fileline, levparser_com
                     else if(param_count > 3 && entity_info_exists(obj))
                         entity_info_set_id(obj, str_to_x64(param[3]));
                 }
-                else
+                else {
                     logfile_message("Level loader - can't spawn \"%s\": entity doesn't exist", name);
+                    video_showmessage("Entity \"%s\" doesn't exist!", name);
+                }
             }
         }
         else
@@ -1085,8 +1087,10 @@ bool level_interpret_body_line(const char* filepath, int fileline, levparser_com
                     enemy_t* e = level_create_legacy_object(name, v2d_new(x, y)); /* old API */
                     e->created_from_editor = TRUE;
                 }
-                else
+                else {
                     logfile_message("Level loader - can't spawn \"%s\": object doesn't exist", name);
+                    video_showmessage("Entity \"%s\" doesn't exist!", name);
+                }
             }
         }
         else
