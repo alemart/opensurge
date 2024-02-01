@@ -91,11 +91,16 @@ static void import_opengl_symbols();
 
 
 /* FPS counter */
-static int fps = 0;
-static int fps_counter = 0;
-static double fps_time = 0.0;
+#define TARGET_FPS 60
+#define FPS_UPDATE_FREQUENCY 1 /* updates per second (ideally) */
+#define NUMBER_OF_FPS_SAMPLES (TARGET_FPS / FPS_UPDATE_FREQUENCY)
+static double fps = 0.0;
+static double fps_sample[NUMBER_OF_FPS_SAMPLES];
+static int index_of_next_fps_sample;
+static void init_fps();
 static void update_fps();
 static void render_fps();
+static int sort_fps_samples(const void* a, const void* b);
 
 
 /* Video settings */
@@ -243,10 +248,8 @@ void video_init()
     game_screen_height = config_video_screen_height(DEFAULT_SCREEN_HEIGHT);
     str_cpy(window_title, config_game_title(DEFAULT_WINDOW_TITLE), sizeof(window_title));
 
-    /* reset the FPS counter */
-    fps = 0;
-    fps_counter = 0;
-    fps_time = 0.0;
+    /* initialize the FPS counter */
+    init_fps();
 
     /* create the display */
     if(!create_display(game_screen_width, game_screen_height))
@@ -328,9 +331,6 @@ void video_render(void (*render_overlay)())
 #endif
     al_use_transform(&identity_transform);
 
-    /* compute the framerate */
-    update_fps();
-
     /* render stuff in window space */
     if(render_overlay != NULL)
         render_overlay();
@@ -338,6 +338,9 @@ void video_render(void (*render_overlay)())
 
     /* flip display */
     al_flip_display();
+
+    /* compute the framerate */
+    update_fps();
 
     /* OpenGL: clear values */
     if(_glClearColor != NULL)
@@ -1255,17 +1258,37 @@ void render_console()
  *
  */
 
+/* initialize the FPS counter */
+void init_fps()
+{
+    fps = 0.0;
+
+    index_of_next_fps_sample = 0;
+    for(int i = 0; i < NUMBER_OF_FPS_SAMPLES; i++)
+        fps_sample[i] = 0.0;
+}
+
+/* sorting function for the framerate samples */
+int sort_fps_samples(const void* a, const void* b)
+{
+    double x = *((double*)a);
+    double y = *((double*)b);
+
+    return (x > y) - (x < y);
+}
+
 /* compute the framerate */
 void update_fps()
 {
-    double now = timer_get_now();
-
-    ++fps_counter;
-    if(now >= fps_time + 1.0) {
-        fps_time = now;
-        fps = fps_counter;
-        fps_counter = 0;
+    /* take the median of the samples */
+    if(index_of_next_fps_sample >= NUMBER_OF_FPS_SAMPLES) {
+        qsort(fps_sample, NUMBER_OF_FPS_SAMPLES, sizeof(*fps_sample), sort_fps_samples);
+        fps = (fps_sample[NUMBER_OF_FPS_SAMPLES / 2] + fps_sample[(NUMBER_OF_FPS_SAMPLES - 1 + NUMBER_OF_FPS_SAMPLES % 2) / 2]) * 0.5;
+        index_of_next_fps_sample = 0;
     }
+
+    /* collect a sample of the framerate */
+    fps_sample[index_of_next_fps_sample++] = 1.0 / timer_get_delta();
 }
 
 /* render the FPS counter */
@@ -1297,7 +1320,7 @@ void render_fps()
     al_translate_transform(&transform, xpos, 0.0f);
 
     al_use_transform(&transform);
-        DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%d", fps);
+        DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%.1lf", fps);
     al_restore_state(&state);
 }
 
@@ -1316,6 +1339,7 @@ void render_texts()
 
     if(settings.is_fps_visible)
         render_fps();
+
     render_console();
 
     al_hold_bitmap_drawing(false);
