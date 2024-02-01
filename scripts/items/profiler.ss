@@ -11,9 +11,9 @@ using SurgeEngine.Level;
 
 object "Profiler" is "entity", "awake", "special"
 {
-    uiStats = spawn("Profiler.UI.Tree");
-    uiDensity = spawn("Profiler.UI.Tree");
     uiTimes = spawn("Profiler.UI.Tree");
+    uiDensity = spawn("Profiler.UI.Tree");
+    uiStats = spawn("Profiler.UI.Tree");
     stats = spawn("Profiler.Stats");
     sortByDesc = spawn("Profiler.UI.Tree.SortByDesc");
     refreshTime = 2.0;
@@ -35,12 +35,21 @@ object "Profiler" is "entity", "awake", "special"
         // recompute stats
         cycle = Math.ceil(alternationTime / refreshTime);
         wantAvg = ((counter++) % (2 * cycle)) < cycle;
+        wantHist = wantAvg;
         stats.refresh(wantAvg);
 
         // display stats
-        uiTimes.updateUI(wantAvg ? "Time (avg)" : "Time (sum)", stats.timespent, sortByDesc.with(stats.timespent));
-        uiDensity.updateUI("Density tree", stats.density, sortByDesc.with(stats.density));
         uiStats.updateUI("General", stats.generic, null);
+
+        if(wantAvg)
+            uiTimes.updateUI("Time (avg)", stats.timespent, sortByDesc.with(stats.timespent));
+        else
+            uiTimes.updateUI("Time (sum)", stats.timespent, sortByDesc.with(stats.timespent));
+
+        if(wantHist)
+            uiDensity.updateUI("Object histogram", stats.histogram, sortByDesc.with(stats.histogram));
+        else
+            uiDensity.updateUI("Density tree", stats.density, sortByDesc.with(stats.density));
 
         // done
         state = "wait";
@@ -57,6 +66,7 @@ object "Profiler.Stats"
 {
     public readonly generic = {};
     public readonly density = {};
+    public readonly histogram = {};
     public readonly timespent = {};
     frames = 0;
     lastRefresh = 0;
@@ -87,7 +97,7 @@ object "Profiler.Stats"
         density.destroy();
         timespent.destroy();
         generic.destroy();
-        computeDensity(root, density = {}, 1, 1);
+        computeDensity(root, density = {}, histogram = {}, 1, 1);
         computeTimespent(root, absTimeSpent = {}, count = {}, 1, 1);
         computeGeneric(generic = {}, timeInterval);
 
@@ -96,9 +106,11 @@ object "Profiler.Stats"
         maxTimeSpent = absTimeSpent[root.__name];
         if(maxTimeSpent > 0) {
             maxAvgTimeSpent = maxTimeSpent / count[root.__name]; // count[root] is usually 1
-            foreach(entry in absTimeSpent) {
-                key = entry.key;
-                val = entry.value;
+            keys = absTimeSpent.keys();
+
+            for(i = 0; i < keys.length; i++) {
+                key = keys[i];
+                val = absTimeSpent[key];
                 cnt = count[key];
 
                 if(wantAverageTimes) {
@@ -137,7 +149,7 @@ object "Profiler.Stats"
         stats["Garbage"] = garbageSize + " (" + formatPercentage(garbageSize / objectCount) + ")";
 
         // fps rate
-        stats["FPS"] = formatDecimal(frames / timeInterval);
+        stats["FPS Avg."] = formatDecimal(frames / timeInterval);
         stats["FPS Inv."] = frames > 0 ? timeInterval / frames : 0;
         frames = 0;
 
@@ -152,36 +164,43 @@ object "Profiler.Stats"
         stats["Awake"] = awakeCount + " (" + formatPercentage(awakeCount / entityCount) + ")";
     }
 
-    fun computeDensity(obj, tree, id, depth)
+    fun computeDensity(obj, tree, histogram, id, depth)
     {
         result = 1;
         key = obj.__name;
         n = obj.__childCount;
+
         for(i = 0; i < n; i++) {
             child = obj.child(i);
-            //if(child.__active)
-                result += computeDensity(child, tree, ++id, 1+depth);
+            result += computeDensity(child, tree, histogram, ++id, 1+depth);
         }
-        if(depth <= maxDepth)
+
+        if(depth <= maxDepth) {
             tree[key] += result;
+            histogram[key] += 1;
+        }
+
         return result;
     }
 
-    fun computeTimespent(obj, tree, countTree, id, depth)
+    fun computeTimespent(obj, tree, count, id, depth)
     {
         totalTime = 0;
         key = obj.__name;
         n = obj.__childCount;
+
         for(i = 0; i < n; i++) {
             child = obj.child(i);
             if(child.__active)
-                totalTime += computeTimespent(child, tree, countTree, ++id, 1+depth);
+                totalTime += computeTimespent(child, tree, count, ++id, 1+depth);
         }
         totalTime += this.__timespent;
+
         if(depth <= maxDepth) {
             tree[key] += totalTime;
-            countTree[key] += 1;
+            count[key] += 1;
         }
+
         return totalTime;
     }
 
