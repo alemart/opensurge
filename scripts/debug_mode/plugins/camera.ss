@@ -152,7 +152,7 @@ object "Debug Mode - Camera - Player Mode" is "debug-mode-camera-strategy"
     scrollSpeed = 400;
     gridSize = 16;
     input = spawn("Debug Mode - Input");
-    turboButton = "secondary-action";
+    turboButton = SurgeEngine.mobile ? "action" : "secondary-action";
 
     fun move(transform, grid)
     {
