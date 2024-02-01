@@ -15,8 +15,8 @@ theme "themes/sunshine.brk"
 bgtheme "themes/template.bg"
 spawn_point 176 9792
 music "musics/template.ogg"
-setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Title Card" "Default Cleared Animation" "Demo Setup"
-players "Surge"
+setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Title Card" "Default Cleared Animation" "Demo Setup" "Activate Neon as Player 2"
+players "Surge" "None"
 
 // bricks
 brick 238 6832 9936
