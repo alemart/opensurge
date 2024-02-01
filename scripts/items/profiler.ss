@@ -124,13 +124,13 @@ object "Profiler.Stats"
         stats["Objects"] = objectCount;
 
         // spawn rate
-        spawnRate = 100 * (objectCount - prevObjectCount) / prevObjectCount;
-        stats["Spawn rate"] = formatDecimal(spawnRate) + "%";
+        spawnRate = (objectCount - prevObjectCount) / prevObjectCount;
+        stats["Spawn rate"] = formatPercentage(spawnRate);
         prevObjectCount = objectCount;
 
         // profiler object overhead
         objectDelta = System.objectCount - objectCount;
-        stats["Overhead"] = objectDelta + " (" + formatDecimal(100 * objectDelta / objectCount) + "%)";
+        stats["Overhead"] = objectDelta + " (" + formatPercentage(objectDelta / objectCount) + ")";
 
         // garbage collection
         stats["Garbage"] = System.gc.objectCount;
@@ -142,6 +142,13 @@ object "Profiler.Stats"
 
         // time
         stats["Time"] = Math.floor(Time.time) + "s";
+
+        // top-level entities
+        entities = Level.childrenWithTag("entity");
+        awakeCount = countAwakeEntities(entities);
+        entityCount = entities.length;
+        stats["Entities top"] = entityCount;
+        stats["Awake"] = awakeCount + " (" + formatPercentage(awakeCount / entityCount) + ")";
     }
 
     fun computeDensity(obj, tree, id, depth)
@@ -177,6 +184,23 @@ object "Profiler.Stats"
         return totalTime;
     }
 
+    fun countAwakeEntities(entities)
+    {
+        count = 0;
+
+        foreach(entity in entities) {
+            if(entity.hasTag("awake"))
+                count++;
+        }
+
+        return count;
+    }
+
+    fun formatPercentage(p)
+    {
+        return formatDecimal(100 * p) + "%";
+    }
+
     fun formatDecimal(num)
     {
         if(typeof(num) !== "number") return num;
@@ -193,7 +217,7 @@ object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
 
     fun constructor()
     {
-        transform.position = Vector2(0, 0);
+        transform.position = Vector2.zero;
         text.zindex = Math.infinity;
         text.maxWidth = 160;
     }
@@ -210,14 +234,6 @@ object "Profiler.UI.Tree" is "entity", "detached", "private", "awake"
         }
         text.text = str;
         keys.destroy();
-    }
-
-    fun formatDecimal(num)
-    {
-        if(typeof(num) !== "number") return num;
-        str = (Math.round(num * 100) * 0.01).toString();
-        j = str.indexOf(".");
-        return j >= 0 ? str.substr(0, j+3) : str;
     }
 }
 
