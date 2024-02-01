@@ -25,6 +25,7 @@
 #include "../util/util.h"
 #include "../util/darray.h"
 #include "../util/iterator.h"
+#include "../scripting/scripting.h"
 
 #define FASTHASH_INLINE
 #include "../util/fasthash.h"
@@ -134,10 +135,17 @@ static bool brickiteratorstate_has_next(void* s);
 static heightsampler_t* sampler_ctor();
 static heightsampler_t* sampler_dtor(heightsampler_t* sampler);
 static void sampler_clear(heightsampler_t* sampler);
-static void sampler_add(heightsampler_t* sampler, const brick_t* brick);
 static int sampler_query(heightsampler_t* sampler, int left, int right);
+static void sampler_add(heightsampler_t* sampler, v2d_t topleft_position, v2d_t size);
+static void sampler_add_brick(heightsampler_t* sampler, const brick_t* brick);
+static void sampler_add_bricklike_object(heightsampler_t* sampler, const surgescript_object_t* bricklike_object);
 
-static void update_world_size(brickmanager_t* manager, const brick_t* brick);
+static void update_world_size(brickmanager_t* manager, v2d_t topleft_position, v2d_t size);
+static void update_world_size_with_brick(brickmanager_t* manager, const brick_t* brick);
+static void update_world_size_with_bricklike_object(brickmanager_t* manager, const surgescript_object_t* bricklike_object);
+
+static void acknowledge_bricklike_objects(brickmanager_t* manager);
+static void acknowledge_bricklike_object(brickmanager_t* manager, const surgescript_object_t* bricklike_object);
 
 static bool is_brick_inside_roi(const brick_t* brick, const brickrect_t* roi);
 static void filter_bricks_inside_roi(brickbucket_t* out_bucket, const brickbucket_t* in_bucket, const brickrect_t* roi);
@@ -232,10 +240,10 @@ void brickmanager_add_brick(brickmanager_t* manager, struct brick_t* brick)
     manager->brick_count++;
 
     /* update the size of the world */
-    update_world_size(manager, brick);
+    update_world_size_with_brick(manager, brick);
 
     /* update the height sampler */
-    sampler_add(manager->sampler, brick);
+    sampler_add_brick(manager->sampler, brick);
 }
 
 /*
@@ -255,6 +263,9 @@ void brickmanager_remove_all_bricks(brickmanager_t* manager)
     manager->brick_count = 0;
     manager->world_width = 1;
     manager->world_height = 1;
+
+    /* acknowledge brick-like objects */
+    /*acknowledge_bricklike_objects(manager);*/
 }
 
 /*
@@ -290,9 +301,13 @@ void brickmanager_update(brickmanager_t* manager)
     /* update the brick count */
     manager->brick_count -= cnt;
 
-    /* we don't update the sampler nor the world size: why bother?
-       doesn't matter much, since dead bricks are very few with special behavior
+    /* we don't update the sampler nor the world size with the bricks: why bother?
+       it doesn't matter much, since dead bricks are very few with special behavior
        we may also remove bricks using the level editor, but we can just recalculate instead */
+    ;
+
+    /* we do update the sampler and the world size when it comes to brick-like objects */
+    acknowledge_bricklike_objects(manager);
 }
 
 /*
@@ -358,10 +373,13 @@ void brickmanager_recalculate_world_size(brickmanager_t* manager)
         for(int i = 0; i < darray_length(bucket->brick); i++) {
             const brick_t* brick = bucket->brick[i];
 
-            update_world_size(manager, brick);
-            sampler_add(manager->sampler, brick);
+            update_world_size_with_brick(manager, brick);
+            sampler_add_brick(manager->sampler, brick);
         }
     }
+
+    /* acknowledge brick-like objects */
+    acknowledge_bricklike_objects(manager);
 }
 
 /*
@@ -830,23 +848,51 @@ void sampler_clear(heightsampler_t* sampler)
     darray_push(sampler->smooth_height_at, 0);
 }
 
-void sampler_add(heightsampler_t* sampler, const brick_t* brick)
+int sampler_query(heightsampler_t* sampler, int left, int right)
+{
+    /* invalid interval? */
+    if(right < left)
+        return 0;
+
+    /* pick indices */
+    int m = darray_length(sampler->smooth_height_at) - 1; /* m >= 0 always */
+    int l = left / SAMPLER_WIDTH;
+    int r = right / SAMPLER_WIDTH;
+
+    if(l < 0)
+        l = 0;
+    if(l > m)
+        l = m;
+
+    if(r < 0)
+        r = 0;
+    if(r > m)
+        r = m;
+
+    /* now we have 0 <= l, r <= m */
+
+    /* query the height at the given interval
+       method: clamp to edge */
+    int max_height = 0;
+    for(int i = l; i <= r; i++) {
+        if(sampler->smooth_height_at[i] > max_height)
+            max_height = sampler->smooth_height_at[i];
+    }
+
+    /* done */
+    return max_height;
+}
+
+void sampler_add(heightsampler_t* sampler, v2d_t topleft_position, v2d_t size)
 {
     /* find the bottom-center of the brick */
-    v2d_t spawn_point = brick_spawnpoint(brick);
-    v2d_t size = brick_size(brick);
-
-    int center_x = spawn_point.x + size.x * 0.5f;
+    int center_x = topleft_position.x + size.x * 0.5f;
     if(center_x < 0)
         center_x = 0;
 
-    int bottom = spawn_point.y + size.y;
+    int bottom = topleft_position.y + size.y;
     if(bottom < 0)
         bottom = 0;
-
-    /* moving bricks are a special case */
-    if(brick_has_movement_path(brick))
-        bottom += 256; /* FIXME the actual amplitude may be higher */
 
     /* find the index corresponding to the brick */
     int index = center_x / SAMPLER_WIDTH;
@@ -876,58 +922,96 @@ void sampler_add(heightsampler_t* sampler, const brick_t* brick)
     }
 }
 
-int sampler_query(heightsampler_t* sampler, int left, int right)
+void sampler_add_brick(heightsampler_t* sampler, const brick_t* brick)
 {
-    /* invalid interval? */
-    if(right < left)
-        return 0;
+    v2d_t spawn_point = brick_spawnpoint(brick);
+    v2d_t size = brick_size(brick);
 
-    /* pick indices */
-    int m = darray_length(sampler->smooth_height_at) - 1; /* m >= 0 always */
-    int l = left / SAMPLER_WIDTH;
-    int r = right / SAMPLER_WIDTH;
+    /* moving bricks are a special case */
+    if(brick_has_movement_path(brick))
+        size.y += 256; /* FIXME the actual amplitude may be higher */
 
-    if(l < 0)
-        l = 0;
-    if(l > m)
-        l = m;
+    return sampler_add(sampler, spawn_point, size);
+}
 
-    if(r < 0)
-        r = 0;
-    if(r > m)
-        r = m;
-    
-    /* now we have 0 <= l, r <= m */
+void sampler_add_bricklike_object(heightsampler_t* sampler, const surgescript_object_t* bricklike_object)
+{
+    v2d_t position = scripting_brick_position(bricklike_object);
+    v2d_t size = scripting_brick_size(bricklike_object);
 
-    /* query the height at the given interval
-       method: clamp to edge */
-    int max_height = 0;
-    for(int i = l; i <= r; i++) {
-        if(sampler->smooth_height_at[i] > max_height)
-            max_height = sampler->smooth_height_at[i];
-    }
-
-    /* done */
-    return max_height;
+    return sampler_add(sampler, position, size);
 }
 
 
 
 /* world size */
 
-void update_world_size(brickmanager_t* manager, const brick_t* brick)
+void update_world_size(brickmanager_t* manager, v2d_t topleft_position, v2d_t size)
+{
+    int right = topleft_position.x + size.x;
+    if(right > manager->world_width)
+        manager->world_width = right;
+
+    int bottom = topleft_position.y + size.y;
+    if(bottom > manager->world_height)
+        manager->world_height = bottom;
+}
+
+void update_world_size_with_brick(brickmanager_t* manager, const brick_t* brick)
 {
     v2d_t spawn_point = brick_spawnpoint(brick);
     v2d_t size = brick_size(brick);
 
-    int right = spawn_point.x + size.x;
-    if(right > manager->world_width)
-        manager->world_width = right;
-
-    int bottom = spawn_point.y + size.y;
-    if(bottom > manager->world_height)
-        manager->world_height = bottom;
+    return update_world_size(manager, spawn_point, size);
 }
+
+void update_world_size_with_bricklike_object(brickmanager_t* manager, const surgescript_object_t* bricklike_object)
+{
+    v2d_t position = scripting_brick_position(bricklike_object);
+    v2d_t size = scripting_brick_size(bricklike_object);
+
+    return update_world_size(manager, position, size);
+}
+
+
+
+
+/* brick-like objects */
+
+/* Acknowledge brick-like objects: update the world size and the sampler */
+void acknowledge_bricklike_objects(brickmanager_t* manager)
+{
+    /* get the Entity Manager and the SurgeScript Object Manager */
+    surgescript_object_t* level = scripting_util_surgeengine_component(surgescript_vm(), "Level");
+    surgescript_object_t* entity_manager = scripting_level_entitymanager(level);
+    surgescript_objectmanager_t* object_manager = surgescript_object_manager(level);
+
+    /* acknowledge each brick-like object */
+    iterator_t* bricklike_iterator = entitymanager_bricklike_iterator(entity_manager);
+    while(iterator_has_next(bricklike_iterator)) {
+        surgescript_objecthandle_t* bricklike_handle = iterator_next(bricklike_iterator);
+
+        if(surgescript_objectmanager_exists(object_manager, *bricklike_handle)) {
+            surgescript_object_t* bricklike_object = surgescript_objectmanager_get(object_manager, *bricklike_handle);
+
+            if(scripting_brick_is_valid(bricklike_object))
+                acknowledge_bricklike_object(manager, bricklike_object);
+        }
+    }
+    iterator_destroy(bricklike_iterator);
+}
+
+/* Acknowledge a brick-like object, so that we take it into account when
+   computing the world size and the variable level height */
+void acknowledge_bricklike_object(brickmanager_t* manager, const surgescript_object_t* bricklike_object)
+{
+    /* update the size of the world */
+    update_world_size_with_bricklike_object(manager, bricklike_object);
+
+    /* update the height sampler */
+    sampler_add_bricklike_object(manager->sampler, bricklike_object);
+}
+
 
 
 
