@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <limits.h>
 #include <string.h>
 #include <ctype.h>
@@ -4366,7 +4367,27 @@ int editor_ssobj_sortfun(const void* a, const void* b)
                     bool x_is_special = surgescript_tagsystem_has_tag(tag_system, x, "special");
                     bool y_is_special = surgescript_tagsystem_has_tag(tag_system, y, "special");
                     if(x_is_special == y_is_special) {
-                        /* then, sort alphabetically */
+                        /* then, sort alphabetically with a caveat:
+
+                           if two entities have almost equal names, differing only by a numeric
+                           suffix preceded by a space, then sort by the suffix.
+
+                           example: "Event Trigger 2" appears before "Event Trigger 10" */
+                        const char *sx, *sy;
+                        if((sx = strrchr(x, ' ')) && (sy = strrchr(y, ' ')) && isdigit(sx[1]) && isdigit(sy[1])) {
+                            ptrdiff_t x_prefix_length = sx - x;
+                            ptrdiff_t y_prefix_length = sy - y;
+                            if(x_prefix_length == y_prefix_length && 0 == strncmp(x, y, x_prefix_length)) {
+                                const char* x_suffix = sx + 1;
+                                const char* y_suffix = sy + 1;
+                                if(0 == strcspn(x_suffix, "0123456789") && 0 == strcspn(y_suffix, "0123456789")) {
+                                    /* sort by the numeric suffix */
+                                    return atoi(x_suffix) - atoi(y_suffix);
+                                }
+                            }
+                        }
+
+                        /* sort alphabetically */
                         return strcmp(x, y);
                     }
                     else
