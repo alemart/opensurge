@@ -83,14 +83,13 @@ object "Profiler.Stats"
     fun refresh(wantAverageTimes)
     {
         timeInterval = Math.max(Time.time - lastRefresh, 0.0001);
-        objectCount = System.objectCount;
 
         density.destroy();
         timespent.destroy();
         generic.destroy();
         computeDensity(root, density = {}, 1, 1);
         computeTimespent(root, absTimeSpent = {}, count = {}, 1, 1);
-        computeGeneric(generic = {}, objectCount, timeInterval);
+        computeGeneric(generic = {}, timeInterval);
 
         // compute relative times
         timespent = {};
@@ -118,9 +117,10 @@ object "Profiler.Stats"
         lastRefresh = Time.time;
     }
 
-    fun computeGeneric(stats, objectCount, timeInterval)
+    fun computeGeneric(stats, timeInterval)
     {
         // object count
+        objectCount = System.objectCount;
         stats["Objects"] = objectCount;
 
         // spawn rate
@@ -133,7 +133,8 @@ object "Profiler.Stats"
         stats["Overhead"] = objectDelta + " (" + formatPercentage(objectDelta / objectCount) + ")";
 
         // garbage collection
-        stats["Garbage"] = System.gc.objectCount;
+        garbageSize = System.gc.objectCount;
+        stats["Garbage"] = garbageSize + " (" + formatPercentage(garbageSize / objectCount) + ")";
 
         // fps rate
         stats["FPS"] = formatDecimal(frames / timeInterval);
