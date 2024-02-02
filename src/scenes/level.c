@@ -4381,7 +4381,7 @@ int editor_ssobj_sortfun(const void* a, const void* b)
 
                            example: "Event Trigger 2" appears before "Event Trigger 10" */
                         const char *sx, *sy;
-                        if((sx = strrchr(x, ' ')) && (sy = strrchr(y, ' ')) && isdigit(sx[1]) && isdigit(sy[1])) {
+                        if((sx = strrchr(x, ' ')) && isdigit(sx[1]) && (sy = strrchr(y, ' ')) && isdigit(sy[1])) {
                             ptrdiff_t x_prefix_length = sx - x;
                             ptrdiff_t y_prefix_length = sy - y;
                             if(x_prefix_length == y_prefix_length && 0 == strncmp(x, y, x_prefix_length)) {
