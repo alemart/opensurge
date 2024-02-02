@@ -314,7 +314,7 @@ bool file_exists(const char *filepath)
 #elif 1
 
     struct _stat st;
-    return (_stat(dirpath, &st) == 0) && ((st.st_mode & _S_IFMT) == _S_IFREG);
+    return (_stat(filepath, &st) == 0) && ((st.st_mode & _S_IFMT) == _S_IFREG);
 
 #else
 

@@ -105,7 +105,7 @@ static bool clear_cached_files(const char* folder_name, time_t time_to_live);
 
 static bool is_uncompressed_gamedir(const char* fullpath);
 static bool is_compressed_gamedir(const char* fullpath);
-static bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context);
+static bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context, char path_separator);
 static bool actual_file_exists(const char* filepath, void* context);
 static bool virtual_file_exists(const char* filepath, void* context);
 
@@ -927,7 +927,7 @@ bool create_dir(const ALLEGRO_PATH* path)
 {
     const char* path_str = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 
-    if(!mkpath(path_str, 0777)) {
+    if(mkpath(path_str, 0777) != 0) {
         LOG("Can't create directory %s. %s. errno = %d", path_str, strerror(errno), errno);
         return false;
     }
@@ -1169,7 +1169,7 @@ char* find_gamedirname(const char* gamedir, char* buffer, size_t buffer_size)
  */
 bool is_valid_root_folder()
 {
-    return is_gamedir("/", virtual_file_exists, NULL);
+    return is_gamedir("/", virtual_file_exists, NULL, '/');
 }
 
 /*
@@ -1385,7 +1385,7 @@ bool clear_cached_files(const char* folder_name, time_t time_to_live)
  */
 bool is_uncompressed_gamedir(const char* fullpath)
 {
-    return is_gamedir(fullpath, actual_file_exists, NULL);
+    return is_gamedir(fullpath, actual_file_exists, NULL, ALLEGRO_NATIVE_PATH_SEP);
 }
 
 /*
@@ -1412,7 +1412,7 @@ bool is_compressed_gamedir(const char* fullpath)
     find_root_directory(PREFIX, root + PREFIX_SIZE, sizeof(root) - PREFIX_SIZE);
     LOG("%s: testing %s", __func__, root + PREFIX_SIZE);
 
-    ret = is_gamedir(root, virtual_file_exists, NULL);
+    ret = is_gamedir(root, virtual_file_exists, NULL, '/');
 
     if(!PHYSFS_unmount(fullpath)) {
         const char* err = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
@@ -1426,7 +1426,7 @@ bool is_compressed_gamedir(const char* fullpath)
  * is_gamedir()
  * A helper to check if a generic root folder stores an opensurge game
  */
-bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context)
+bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context, char path_separator)
 {
     const char* file_list[] = {
         "surge.rocks",
@@ -1444,7 +1444,7 @@ bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* 
         ALLEGRO_PATH* tail = al_create_path(*vpath);
 
         if(al_join_paths(path, tail)) {
-            const char* fullpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+            const char* fullpath = al_path_cstr(path, path_separator);
             if(file_exists(fullpath, context))
                 valid_gamedir = true;
         }
