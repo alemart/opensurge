@@ -95,8 +95,12 @@ static void import_opengl_symbols();
 #define FPS_UPDATE_FREQUENCY 1 /* updates per second (ideally) */
 #define NUMBER_OF_FPS_SAMPLES (TARGET_FPS / FPS_UPDATE_FREQUENCY)
 static double fps = 0.0;
+static double fps_median = 0.0;
 static double fps_sample[NUMBER_OF_FPS_SAMPLES];
-static int index_of_next_fps_sample;
+static int index_of_next_fps_sample = 0;
+static int fps_frames = 0;
+static double fps_counted = 0.0;
+static double fps_last_update = 0.0;
 static void init_fps();
 static void update_fps();
 static void render_fps();
@@ -1263,6 +1267,11 @@ void init_fps()
 {
     fps = 0.0;
 
+    fps_frames = 0;
+    fps_counted = 0.0;
+    fps_last_update = 0.0;
+
+    fps_median = 0.0;
     index_of_next_fps_sample = 0;
     for(int i = 0; i < NUMBER_OF_FPS_SAMPLES; i++)
         fps_sample[i] = 0.0;
@@ -1280,15 +1289,36 @@ int sort_fps_samples(const void* a, const void* b)
 /* compute the framerate */
 void update_fps()
 {
-    /* take the median of the samples */
+    double delta_time = timer_get_delta();
+    double elapsed_time = timer_get_elapsed();
+
+    /* method 1: count the number of frames */
+    ++fps_frames;
+    if(elapsed_time >= fps_last_update + 1.0 / FPS_UPDATE_FREQUENCY) {
+        fps_last_update = elapsed_time;
+        fps_counted = fps_frames * FPS_UPDATE_FREQUENCY;
+        fps_frames = 0;
+    }
+
+    /* method 2: take the median of the samples of the framerate */
     if(index_of_next_fps_sample >= NUMBER_OF_FPS_SAMPLES) {
         qsort(fps_sample, NUMBER_OF_FPS_SAMPLES, sizeof(*fps_sample), sort_fps_samples);
-        fps = (fps_sample[NUMBER_OF_FPS_SAMPLES / 2] + fps_sample[(NUMBER_OF_FPS_SAMPLES - 1 + NUMBER_OF_FPS_SAMPLES % 2) / 2]) * 0.5;
+        double mid_a = fps_sample[NUMBER_OF_FPS_SAMPLES / 2];
+        double mid_b = fps_sample[(NUMBER_OF_FPS_SAMPLES - 1 + NUMBER_OF_FPS_SAMPLES % 2) / 2];
+        fps_median = (mid_a + mid_b) / 2.0;
         index_of_next_fps_sample = 0;
     }
 
     /* collect a sample of the framerate */
-    fps_sample[index_of_next_fps_sample++] = 1.0 / timer_get_delta();
+    fps_sample[index_of_next_fps_sample++] = 1.0 / delta_time;
+
+    /* Compare the two methods of determining the framerate. If their results
+       are very similar, take the median of the samples. If they are not, the
+       dataset has outliers. Let's take the counted method in this case. */
+    if(fabs(fps_median - fps_counted) < 2)
+        fps = fps_median; /* usually ~60 */
+    else
+        fps = fps_counted; /* usually 59, 60, 61 */
 }
 
 /* render the FPS counter */
