@@ -137,6 +137,8 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/behaviors/platformer.ss",                  ":0.6.0",                   /* since 0.6.1, animal.ss uses Platformer.gravityMultiplier introduced in 0.6.0 (underwater effect) */
 
     "scripts/surge_the_rabbit/surge_the_rabbit.ss",     ":0.6.1",                   /* use own script */
+    "scripts/setup/scenes/contribute.ss",               ":0.6.1",                   /* uses the SurgeTheRabbit object in 0.6.1 */
+    "levels/scenes/contribute.lev",                     ":0.6.1",                   /* introduced in 0.6.0.3; uses contribute.ss */
 
     "sprites/ui/pointer.spr",                           ":0.6.1",                   /* simplified in 0.6.1 */
 
