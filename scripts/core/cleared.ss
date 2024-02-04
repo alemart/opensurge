@@ -27,7 +27,18 @@ Public properties:
                            collectibles is greater than or equal to 100.
 
 Tip: call Level.undoClear() in a onFinish event to restore normal gameplay
-     after the level cleared animation finishes playing.
+     after the level cleared animation finishes playing. Example:
+
+using SurgeEngine.Events.FunctionEvent;
+
+...
+
+// For details on "Undo Clear Level", see
+// scripts/functions/level/undo_clear_level.ss
+
+defaultClearedAnimation.onFinish = FunctionEvent("Undo Clear Level");
+
+...
 
 */
 object "Default Cleared Animation" is "entity", "awake", "detached", "private"
