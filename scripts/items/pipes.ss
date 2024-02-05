@@ -320,7 +320,7 @@ object "Pipe Manager"
     }
 }
 
-object "Pipe Traveler" is "private", "awake", "entity"
+object "Pipe Traveler"
 {
     player = null;
     rollAnimation = 18;
