@@ -1213,13 +1213,20 @@ object 'LevelSetupFunctor' \n\
         entities = { }; \n\
 \n\
         foreach(entry in config) { \n\
-            if(level.entity(entry.key) == null) { \n\
-                objs = level.findEntities(entry.key); \n\
+            if(System.tags.tagsOf(entry.key).indexOf('entity') >= 0) { \n\
+                if(level.entity(entry.key) == null) { \n\
+                    objs = level.findEntities(entry.key); \n\
+                    for(i = 0; i < objs.length; i++) \n\
+                        setup(objs[i], entry.value); \n\
+                } \n\
+                else \n\
+                    entities[entry.key] = entry.value; \n\
+            } \n\
+            else { \n\
+                objs = level.children(entry.key); \n\
                 for(i = 0; i < objs.length; i++) \n\
                     setup(objs[i], entry.value); \n\
             } \n\
-            else \n\
-                entities[entry.key] = entry.value; \n\
         } \n\
  \n\
         foreach(entry in entities) { \n\
