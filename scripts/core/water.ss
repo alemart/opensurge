@@ -97,9 +97,18 @@ object "Water Bubble" is "entity", "private", "disposable"
     fun makeBreathable()
     {
         if(collider !== null)
-            return;
+            return this;
 
         collider = CollisionBall(10);
+        return this;
+    }
+
+    // dynamically add components
+    // (this function is obsolete since v0.6.1. It is kept for backwards compatibility)
+    fun addComponent(componentName)
+    {
+        makeBreathable(); // no components other than "BreathableBubble" were available
+        return this;
     }
 
     // breathe the bubble
