@@ -436,6 +436,7 @@ void setup_surgeengine(surgescript_vm_t* vm)
     scripting_register_mobilegamepad(vm);
     scripting_register_mouse(vm);
     scripting_register_music(vm);
+    scripting_register_object(vm);
     scripting_register_obstaclemap(vm);
     scripting_register_platform(vm);
     scripting_register_player(vm);

@@ -375,6 +375,7 @@ SET(GAME_SRCS
   src/scripting/mobilegamepad.c
   src/scripting/mouse.c
   src/scripting/music.c
+  src/scripting/object.c
   src/scripting/obstaclemap.c
   src/scripting/platform.c
   src/scripting/player.c
