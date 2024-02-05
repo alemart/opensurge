@@ -16,7 +16,7 @@ object "Spikes" is "entity", "basic"
 
     actor = Actor("Spikes");
     brick = Brick("Spikes Mask");
-    collider = CollisionBox(24, 8);
+    collider = CollisionBox(24, 10);
     sfx = Sound("samples/spikes.wav");
     appearSfx = Sound("samples/spikes_appearing.wav");
     disappearSfx = Sound("samples/spikes_disappearing.wav");
@@ -94,7 +94,7 @@ object "Spikes Down" is "entity", "basic"
     actor = Actor("Spikes Down");
     brick = Brick("Spikes Down Mask");
     sfx = Sound("samples/spikes.wav");
-    collider = CollisionBox(24, 8);
+    collider = CollisionBox(24, 10);
     appearSfx = Sound("samples/spikes_appearing.wav");
     disappearSfx = Sound("samples/spikes_disappearing.wav");
     period = 8.0; // period of one appear-disappear cycle, in seconds
