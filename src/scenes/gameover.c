@@ -32,6 +32,7 @@
 #include "../core/timer.h"
 #include "../core/lang.h"
 #include "../entities/mobilegamepad.h"
+#include "../entities/player.h"
 
 
 /* private data */
@@ -105,6 +106,7 @@ void gameover_update()
             quest_abort();
             scenestack_pop();
             mobilegamepad_fadein();
+            player_set_lives(PLAYER_INITIAL_LIVES);
             return;
         }
         fadefx_out(color_rgb(0,0,0), GAMEOVER_FADETIME);
