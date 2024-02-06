@@ -430,32 +430,37 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
         surgescript_object_kill(v2);
         return surgescript_var_set_objecthandle(surgescript_var_create(), child);
     }
+    else {
+        /*
 
-    /* The new object isn't an entity.
-       What if a descendant of that new object is an entity?
+        The new object isn't an entity.
+        What if a descendant of that new object is an entity?
 
-       In this case we don't support it. It will behave just like
-       any other SurgeScript object and it will not be handled by
-       the Entity Manager. */
+        In this case we don't support it. It will behave just like
+        any other SurgeScript object and it will not be handled by
+        the Entity Manager.
 
-    /* spawn the new object */
-    surgescript_objecthandle_t me = surgescript_object_handle(object);
-    surgescript_objecthandle_t child_handle = surgescript_objectmanager_spawn(manager, me, child_name, NULL);
-    surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
+        */
 
-    /* warn the user about spawning entities as descendants of non-entities that are children of Level */
-    /*surgescript_object_find_tagged_descendants(child, "entity", child, warn_entity_descendant);*/ /* potentially expensive; can't take time into account */
-    surgescript_object_tagged_children(child, "entity", child, warn_about_entity_descendant); /* cheap, reasonable approximation */
+        /* spawn the new object */
+        surgescript_objecthandle_t me = surgescript_object_handle(object);
+        surgescript_objecthandle_t child_handle = surgescript_objectmanager_spawn(manager, me, child_name, NULL);
+        surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
 
-    /* add to the LevelObjectContainer */
-    surgescript_object_t* container = get_container(object);
-    surgescript_var_t* arg = surgescript_var_set_objecthandle(surgescript_var_create(), child_handle);
-    const surgescript_var_t* args[] = { arg };
-    surgescript_object_call_function(container, "addObject", args, 1, NULL);
-    surgescript_var_destroy(arg);
+        /* warn the user about spawning entities as descendants of non-entities that are children of Level */
+        /*surgescript_object_find_tagged_descendants(child, "entity", child, warn_entity_descendant);*/ /* potentially expensive; can't take time into account */
+        surgescript_object_tagged_children(child, "entity", child, warn_about_entity_descendant); /* cheap, reasonable approximation */
 
-    /* done! */
-    return surgescript_var_set_objecthandle(surgescript_var_create(), child_handle);
+        /* add to the LevelObjectContainer */
+        surgescript_object_t* container = get_container(object);
+        surgescript_var_t* arg = surgescript_var_set_objecthandle(surgescript_var_create(), child_handle);
+        const surgescript_var_t* args[] = { arg };
+        surgescript_object_call_function(container, "addObject", args, 1, NULL);
+        surgescript_var_destroy(arg);
+
+        /* done! */
+        return surgescript_var_set_objecthandle(surgescript_var_create(), child_handle);
+    }
 }
 
 /* spawn an entity at a certain position in world coordinates */
@@ -1213,22 +1218,25 @@ object 'LevelSetupFunctor' \n\
         entities = { }; \n\
 \n\
         foreach(entry in config) { \n\
-            if(System.tags.tagsOf(entry.key).indexOf('entity') >= 0) { \n\
-                if(level.entity(entry.key) == null) { \n\
-                    objs = level.findEntities(entry.key); \n\
-                    for(i = 0; i < objs.length; i++) \n\
-                        setup(objs[i], entry.value); \n\
-                } \n\
-                else \n\
-                    entities[entry.key] = entry.value; \n\
+            if(level.entity(entry.key) !== null) { \n\
+"               /* select entity by ID */ "\
+                entities[entry.key] = entry.value; \n\
+            } \n\
+            else if(System.tags.hasTag(entry.key, 'entity')) { \n\
+"               /* select entity by name */ "\
+                objs = level.findEntities(entry.key); \n\
+                for(i = 0; i < objs.length; i++) \n\
+                    setup(objs[i], entry.value); \n\
             } \n\
             else { \n\
+"               /* select object by name */ "\
                 objs = level.children(entry.key); \n\
                 for(i = 0; i < objs.length; i++) \n\
                     setup(objs[i], entry.value); \n\
             } \n\
         } \n\
  \n\
+ "      /* entity selected by ID have higher priority */ "\
         foreach(entry in entities) { \n\
             obj = level.entity(entry.key); \n\
             setup(obj, entry.value); \n\
