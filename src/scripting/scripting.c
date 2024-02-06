@@ -66,6 +66,7 @@ extern void scripting_register_levelobjectcontainer(surgescript_vm_t* vm);
 extern void scripting_register_mobilegamepad(surgescript_vm_t* vm);
 extern void scripting_register_mouse(surgescript_vm_t* vm);
 extern void scripting_register_music(surgescript_vm_t* vm);
+extern void scripting_register_object(surgescript_vm_t* vm);
 extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
 extern void scripting_register_platform(surgescript_vm_t* vm);
 extern void scripting_register_player(surgescript_vm_t* vm);
