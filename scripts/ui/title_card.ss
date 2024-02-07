@@ -20,6 +20,18 @@
 // Creating a new title card can be done simply: provide a new spritesheet and
 // override the sprite script. Be mindful of the above phases.
 //
+// The following basic events are available:
+//
+// - onStart: triggered when starting phase 0
+// - onFinish: triggered when finishing phase 4
+//
+// In addition, the following events allow more fine-grained control:
+//
+// - onAppear: triggered when starting phase 1
+// - onSustain: triggered when starting phase 2
+// - onDisappear: triggered when starting phase 3
+// - onComplete: triggered when starting phase 4
+//
 
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
@@ -29,9 +41,17 @@ using SurgeEngine.Player;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Input.MobileGamepad;
+using SurgeEngine.Events.Event;
 
 object "Default Title Card" is "entity", "awake", "detached", "private"
 {
+    public onStart = Event();
+    public onAppear = Event();
+    public onSustain = Event();
+    public onDisappear = Event();
+    public onComplete = Event();
+    public onFinish = Event();
+
     public readonly zindex = 1001.0;
     transform = Transform();
     actor = Actor(this.__name);
@@ -45,6 +65,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     {
         MobileGamepad.fadeOut();
         setAnim(0);
+        onStart();
         state = "warming up";
     }
 
@@ -52,6 +73,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     {
         if(actor.animation.finished) {
             setAnim(1);
+            onAppear();
             state = "appearing";
         }
     }
@@ -60,6 +82,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     {
         if(actor.animation.finished) {
             setAnim(2);
+            onSustain();
             state = "sustaining";
         }
     }
@@ -68,6 +91,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     {
         if(actor.animation.finished) {
             setAnim(3);
+            onDisappear();
             state = "disappearing";
         }
     }
@@ -77,6 +101,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         MobileGamepad.fadeIn();
         if(actor.animation.finished) {
             setAnim(4);
+            onComplete();
             state = "finishing";
         }
     }
@@ -86,6 +111,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         if(actor.animation.finished) {
 
             // we're done with this Title Card!
+            onFinish();
             destroy();
 
         }
