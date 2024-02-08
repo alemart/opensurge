@@ -179,14 +179,12 @@ static void update_movmode(physicsactor_t* pa);
  * the dot '.' represents the position of the character;
  * sensors specified relative to this dot
  *
- *                                     U
  * A (vertical; left bottom)          ---
  * B (vertical; right bottom)       C | | D
  * C (vertical; left top)           M -.- N
  * D (vertical; right top)          A | | B
  * M (horizontal; left middle)      ^^^^^^^
  * N (horizontal; right middle)      ground
- * U (horizontal; up)
  *
  * The position of the sensors change according to the state of the player.
  * Instead of modifying the coordinates of the sensor, we have multiple,
@@ -198,7 +196,6 @@ static sensor_t* sensor_C(const physicsactor_t *pa);
 static sensor_t* sensor_D(const physicsactor_t *pa);
 static sensor_t* sensor_M(const physicsactor_t *pa);
 static sensor_t* sensor_N(const physicsactor_t *pa);
-static sensor_t* sensor_U(const physicsactor_t *pa);
 
 
 /*
@@ -567,7 +564,6 @@ void physicsactor_render_sensors(const physicsactor_t *pa, v2d_t camera_position
     sensor_render(sensor_D(pa), position, pa->movmode, camera_position);
     sensor_render(sensor_M(pa), position, pa->movmode, camera_position);
     sensor_render(sensor_N(pa), position, pa->movmode, camera_position);
-    sensor_render(sensor_U(pa), position, pa->movmode, camera_position);
 }
 
 void physicsactor_subscribe(physicsactor_t* pa, void (*callback)(physicsactor_t*,physicsactorevent_t,void*), void* context)
@@ -2496,71 +2492,146 @@ bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
     if(pa->midair)
         return false;
 
-#if 1
-    /* check if sensor U is overlapping a solid obstacle */
-    const obstacle_t* at_U = sensor_check(sensor_U(pa), position, pa->movmode, pa->layer, obstaclemap);
-    if(!(at_U != NULL && obstacle_is_solid(at_U))) /* sensor U is assumed to be enabled */
-        return false; /* quit if no collision */
-#endif
+    /* quit if ysp is non-zero */
+    if(!nearly_zero(pa->ysp))
+        return false;
 
-    /* next, we check other sensors to make sure */
+    /* let's check some sensors */
     sensor_t* a = sensor_A(pa);
     sensor_t* b = sensor_B(pa);
     sensor_t* c = sensor_C(pa);
     sensor_t* d = sensor_D(pa);
-
-    bool a_enabled = sensor_is_enabled(a);
-    bool b_enabled = sensor_is_enabled(b);
-    bool c_enabled = sensor_is_enabled(c);
-    bool d_enabled = sensor_is_enabled(d);
-
-    sensor_set_enabled(a, true);
-    sensor_set_enabled(b, true);
-    sensor_set_enabled(c, true);
-    sensor_set_enabled(d, true);
 
     const obstacle_t* at_A = sensor_check(a, position, pa->movmode, pa->layer, obstaclemap);
     const obstacle_t* at_B = sensor_check(b, position, pa->movmode, pa->layer, obstaclemap);
     const obstacle_t* at_C = sensor_check(c, position, pa->movmode, pa->layer, obstaclemap);
     const obstacle_t* at_D = sensor_check(d, position, pa->movmode, pa->layer, obstaclemap);
 
-    sensor_set_enabled(d, d_enabled);
-    sensor_set_enabled(c, c_enabled);
-    sensor_set_enabled(b, b_enabled);
-    sensor_set_enabled(a, a_enabled);
-
-    /* possibly_smashed may be true when the player is being repositioned */
-    bool possibly_smashed = (
-        (at_A != NULL && obstacle_is_solid(at_A)) &&
-        (at_B != NULL && obstacle_is_solid(at_B)) &&
-        (at_C != NULL && obstacle_is_solid(at_C)) &&
-        (at_D != NULL && obstacle_is_solid(at_D))
-    );
-
-    /* check also if the player is touching a moving obstacle */
-    bool is_smashed = possibly_smashed && (
-        (at_D != NULL && !obstacle_is_static(at_D)) ||
-        (at_C != NULL && !obstacle_is_static(at_C)) ||
+#if 0
+    /* at least one sensor must be touching a moving platform
+       this helps to prevent false positives */
+    if(!(
+        (at_A != NULL && !obstacle_is_static(at_A)) ||
         (at_B != NULL && !obstacle_is_static(at_B)) ||
-        (at_A != NULL && !obstacle_is_static(at_A))
-    );
+        (at_C != NULL && !obstacle_is_static(at_C)) ||
+        (at_D != NULL && !obstacle_is_static(at_D))
+    )) {
+        video_showmessage("not moving platform");
+        return false;
+    }
+#else
+    /* testing for moving platforms didn't work; the physics
+       actor may wrap around the ceiling after being on top of
+       a moving platform coming from below, and thus miss the
+       moving platform. */
+#endif
 
-    /* check if the player is stuck on a wall. One situation in which this may
-       happen is when there is a cloud very near a (solid) ceiling. Once the
-       player climbs the cloud, he/she will be repositioned to the top of it,
-       get stuck on the solid bricks and then get repositioned again and wrap
-       around the ceiling. */
-    is_smashed = is_smashed || (
-        /* only a single obstacle is checked. We do a conservative check
-           because, when the player is being repositioned, false positives
-           may occur and spuriously smash the player. */
-        at_A == at_C &&
-        at_B == at_D &&
-        at_A == at_B &&
-        at_A == at_U
-    );
+    /* The "getting smashed" logic is susceptible to false positives
+       (meaning: the player gets squashed when it shouldn't) and to
+       false negatives (not getting squashed when it should). False
+       positives are *very* undesirable in terms of user experience,
+       whereas false negatives are acceptable if they are rare. So,
+       let's write a conservative check.
 
-    return is_smashed;
+       We only support a single obstacle at this time. A limitation
+       of this method is that the physics actor won't get smashed
+       when stuck at the intersection of two obstacles placed above
+       it. That's an unusual situation that can be demonstrated with
+       the player at a moving platform, getting stuck when colliding
+       simultaneously with two different bricks at the ceiling. It
+       doesn't happen if the two bricks are at the floor and if the
+       moving platform smashes it from above; the latter works fine. */
+    const obstacle_t* obstacle = NULL;
+
+    /* find an obstacle that collides with all sensors */
+    const obstacle_t* o[4] = { at_A, at_B, at_C, at_D };
+    for(int i = 0; i < 4; i++) {
+        if(
+            /* is it a solid obstacle? */
+            (o[i] != NULL && obstacle_is_solid(o[i])) &&
+
+            /* prioritize obstacles at the top */
+            (obstacle == NULL || obstacle_get_position(o[i]).y < obstacle_get_position(obstacle).y) &&
+
+            /* do all sensors overlap with it? */
+            sensor_overlaps_obstacle(a, position, pa->movmode, pa->layer, o[i]) &&
+            sensor_overlaps_obstacle(b, position, pa->movmode, pa->layer, o[i]) &&
+            sensor_overlaps_obstacle(c, position, pa->movmode, pa->layer, o[i]) &&
+            sensor_overlaps_obstacle(d, position, pa->movmode, pa->layer, o[i])
+        )
+            obstacle = o[i];
+    }
+
+    /* no suitable obstacle has been found */
+    if(obstacle == NULL)
+        return false;
+
+    /* find the boundaries of the obstacle */
+#if 0
+    point2d_t pos = obstacle_get_position(obstacle);
+    int width = obstacle_get_width(obstacle);
+    int height = obstacle_get_height(obstacle);
+    int left = pos.x, right = pos.x + width - 1;
+    int top = pos.y, bottom = pos.y + height - 1;
+    int height = bottom - top;
+#else
+    int left = obstacle_ground_position(obstacle, pa->xpos, pa->ypos, GD_RIGHT);
+    int right = obstacle_ground_position(obstacle, pa->xpos, pa->ypos, GD_LEFT);
+    int top = obstacle_ground_position(obstacle, pa->xpos, pa->ypos, GD_DOWN);
+    int bottom = obstacle_ground_position(obstacle, pa->xpos, pa->ypos, GD_UP);
+    int height = bottom - top;
+#endif
+
+    /* compute the distance of the physics actor to the nearest horizontal and
+       vertical edges of the obstacle */
+    double dl = pa->xpos - left;
+    double dr = pa->xpos - right;
+    double dt = pa->ypos - top;
+    double db = pa->ypos - bottom;
+    double dh = min(fabs(dl), fabs(dr));
+    double dv = min(fabs(dt), fabs(db));
+
+#if 0
+    /*
+
+    debug false positives & negatives
+
+    tested values for (dh, dv, height) include:
+
+    (18.4, 10.5, 31), (18.4, 8.3, 31),
+    (14.6, 10.6, 31), (24.6, 7.3, 31),
+    (18.7, 11.0, 23), (28.9, 0.0, 31),
+    (10.9, 0.0, 29), (41.4, 0.0, 31),
+    (32.4, 0.0, 124), (46.7, 5.0, 124),
+    (11.2, 13.0, -32), (18.1, 13.0, -32),
+    (37.6, 14.0, -33), (35.7, 14.0, -33),
+    ...
+
+    */
+    video_showmessage("dh: %lf", dh);
+    video_showmessage("dv: %lf", dv);
+    video_showmessage("height: %d", height);
+#endif
+
+    /* we may be inside a tube */
+    if(height <= 0)
+        return false;
+
+    /* don't smash it when horizontally getting stuck into a wall */
+    if(dh < dv)
+        return false;
+
+    /* if the physics actor is near an edge, we don't want it smashed
+       this helps to prevent false positives */
+    int safety_margin = max(16, (int)(pa->capspeed / 60.0));
+    if(dh < safety_margin)
+        return false;
+
+    /* testing dv generates false negatives. dv may be zero when
+       the physics actor is smashed by a moving platform */
+
+    /* smashed! */
+    return true;
 }
 
 /* renders an angle sensor */
