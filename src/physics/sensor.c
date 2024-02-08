@@ -251,11 +251,30 @@ void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, movmode_t mm,
 }
 
 /*
+ * sensor_overlaps_obstacle()
+ * Check if the sensor is overlapping an obstacle
+ */
+bool sensor_overlaps_obstacle(const sensor_t* sensor, v2d_t actor_position, movmode_t mm, obstaclelayer_t layer_filter, const obstacle_t* obstacle)
+{
+    int x1, y1, x2, y2;
+    obstaclelayer_t layer;
+
+    sensor_worldpos(sensor, actor_position, mm, &x1, &y1, &x2, &y2);
+    layer = obstacle_get_layer(obstacle);
+
+    return (
+        layer == OL_DEFAULT ||
+        layer_filter == OL_DEFAULT ||
+        layer_filter == layer
+     ) && obstacle_got_collision(obstacle, min(x1, x2), min(y1, y2), max(x1, x2), max(y1, y2));
+}
+
+/*
  * sensor_head()
  * Read the position of the head of the sensor in world space, performing the
  * appropriate rotations according to the movmode
  */
-point2d_t sensor_head(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm)
+point2d_t sensor_head(const sensor_t* sensor, v2d_t actor_position, movmode_t mm)
 {
     point2d_t p;
     sensor_worldpos(sensor, actor_position, mm, &p.x, &p.y, NULL, NULL);
@@ -267,7 +286,7 @@ point2d_t sensor_head(const sensor_t* sensor, v2d_t actor_position, enum movmode
  * Read the position of the head of the sensor in world space, performing the
  * appropriate rotations according to the movmode
  */
-point2d_t sensor_tail(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm)
+point2d_t sensor_tail(const sensor_t* sensor, v2d_t actor_position, movmode_t mm)
 {
     point2d_t p;
     sensor_worldpos(sensor, actor_position, mm, NULL, NULL, &p.x, &p.y);
@@ -285,7 +304,7 @@ point2d_t sensor_tail(const sensor_t* sensor, v2d_t actor_position, enum movmode
  * If extended_length is negative, the returned segment will grow from the tail
  * of the sensor towards its head and will have length -extended_length
  */
-void sensor_extend(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm, int extended_length, point2d_t* extended_head, point2d_t* extended_tail)
+void sensor_extend(const sensor_t* sensor, v2d_t actor_position, movmode_t mm, int extended_length, point2d_t* extended_head, point2d_t* extended_tail)
 {
     /* read the head and the tail in world space */
     point2d_t head, tail;

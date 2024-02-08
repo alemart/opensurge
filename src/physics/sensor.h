@@ -58,6 +58,7 @@ void sensor_set_enabled(sensor_t* sensor, bool enabled);
 const struct obstacle_t* sensor_check(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, enum obstaclelayer_t layer_filter, const struct obstaclemap_t *obstaclemap); /* returns NULL if no obstacle was found */
 void sensor_render(const sensor_t *sensor, v2d_t actor_position, enum movmode_t mm, v2d_t camera_position);
 void sensor_worldpos(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm, int *x1, int *y1, int *x2, int *y2);
+bool sensor_overlaps_obstacle(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm, enum obstaclelayer_t layer_filter, const struct obstacle_t* obstacle);
 point2d_t sensor_head(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm);
 point2d_t sensor_tail(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm);
 void sensor_extend(const sensor_t* sensor, v2d_t actor_position, enum movmode_t mm, int extended_length, point2d_t* extended_head, point2d_t* extended_tail);
