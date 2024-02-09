@@ -416,8 +416,34 @@ int collisionmask_locate_ground(const collisionmask_t* mask, int x, int y, groun
     if(!mask)
         return 0;
 
-    x = clip(x, 0, mask->width-1);
-    y = clip(y, 0, mask->height-1);
+    /* out of bounds check */
+    if(x < 0 || x >= mask->width) {
+        /* minimum level */
+        if(ground_direction == GD_DOWN)
+            return mask->height - 1;
+        else if(ground_direction == GD_UP)
+            return 0;
+
+        /* clip x */
+        else if(x < 0)
+            x = 0;
+        else
+            x = mask->width - 1;
+    }
+
+    if(y < 0 || y >= mask->height) {
+        /* minimum level */
+        if(ground_direction == GD_RIGHT)
+            return mask->width - 1;
+        else if(ground_direction == GD_LEFT)
+            return 0;
+
+        /* clip y */
+        else if(y < 0)
+            y = 0;
+        else
+            y = mask->height - 1;
+    }
 
     /* this is very fast */
     switch(ground_direction) {
