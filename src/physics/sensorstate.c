@@ -179,7 +179,7 @@ color_t make_inverse_color(color_t color)
 {
     uint8_t r, g, b, a;
     color_unmap(color, &r, &g, &b, &a);
-    return color_rgba(255 - r, 255 - g, 255 - b, a);
+    return color_premul_rgba(255 - r, 255 - g, 255 - b, a);
 }
 
 
