@@ -44,6 +44,10 @@ struct collisionmask_t {
 
 };
 
+/* cloudify */
+static const int CLOUD_HEIGHT = 16;
+static void cloudify_mask(collisionmask_t* mask);
+
 /* ground maps */
 static uint16_t* create_groundmap(const collisionmask_t* mask, grounddir_t ground_direction);
 static inline uint16_t* clone_groundmap(uint16_t* gmap, int width, int height, grounddir_t ground_direction);
@@ -192,7 +196,7 @@ typedef char _mask_assert[ !!(IS_POWER_OF_TWO(MEM_ALIGNMENT)) * 2 - 1 ]; /* is M
  * [ x, x + width - 1 ] x [ y, y + height - 1 ]
  * of the given image, which should be locked
  */
-collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int width, int height)
+collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int width, int height, int flags)
 {
     collisionmask_t *mask = mallocx(sizeof *mask);
 
@@ -225,6 +229,10 @@ collisionmask_t *collisionmask_create(const image_t *image, int x, int y, int wi
                 mask->mask[jp + i] = 1;
         }
     }
+
+    /* "cloudify" mask */
+    if(flags & CMF_CLOUDIFY)
+        cloudify_mask(mask);
 
     /* create the integral mask */
     mask->integral_mask = create_integral_mask(mask);
@@ -498,6 +506,27 @@ image_t* collisionmask_to_image(const collisionmask_t* mask, color_t color)
 }
 
 
+
+
+/*
+ * "cloudify" masks
+ */
+
+/* make the collision mask solid only from the top */
+void cloudify_mask(collisionmask_t* mask)
+{
+    for(int i = 0; i < mask->width; i++) {
+        int l = CLOUD_HEIGHT;
+        for(int j = 0, jp = 0; j < mask->height; j++, jp += mask->pitch) {
+            if(mask->mask[jp + i]) {
+                if(--l < 0)
+                    mask->mask[jp + i] = 0;
+            }
+            else
+                l = CLOUD_HEIGHT;
+        }
+    }
+}
 
 
 

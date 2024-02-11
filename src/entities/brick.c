@@ -1423,7 +1423,7 @@ collisionmask_t *read_collisionmask(const parsetree_program_t *block)
     /* specify a custom collision mask for this particular brick (deprecated) */
     maskimg = image_load(s.source_file);
     image_lock(maskimg, "r");
-    mask = collisionmask_create(maskimg, s.x, s.y, s.w, s.h);
+    mask = collisionmask_create(maskimg, s.x, s.y, s.w, s.h, 0);
     image_unlock(maskimg);
     image_unload(maskimg);
     return mask;
@@ -1444,6 +1444,7 @@ void create_collisionmasks()
             rect_t source_rect = spriteinfo_source_rect(sprite);
             int frame_width = spriteinfo_frame_width(sprite);
             int frame_height = spriteinfo_frame_height(sprite);
+            int flags = (brickdata[i]->type == BRK_CLOUD) ? CMF_CLOUDIFY : 0;
 
             if(mask == NULL || 0 != str_icmp(prev_maskfile, maskfile)) {
                 if(mask != NULL) {
@@ -1460,7 +1461,8 @@ void create_collisionmasks()
                 source_rect.x,
                 source_rect.y,
                 frame_width,
-                frame_height
+                frame_height,
+                flags
             );
         }
     }

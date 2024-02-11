@@ -29,8 +29,13 @@ struct image_t;
 struct collisionmask_t;
 typedef struct collisionmask_t collisionmask_t;
 
+/* collision mask flags */
+enum {
+    CMF_CLOUDIFY = 0x1 /* make the collision mask solid only from the top */
+};
+
 /* create and destroy a collision mask */
-collisionmask_t* collisionmask_create(const struct image_t* image, int x, int y, int width, int height);
+collisionmask_t* collisionmask_create(const struct image_t* image, int x, int y, int width, int height, int flags);
 collisionmask_t* collisionmask_create_box(int width, int height);
 collisionmask_t* collisionmask_destroy(collisionmask_t *mask);
 collisionmask_t* collisionmask_clone(const collisionmask_t* mask);

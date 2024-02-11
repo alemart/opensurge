@@ -397,7 +397,7 @@ collisionmask_t* spriteinfo_to_collisionmask(const spriteinfo_t* info, int frame
     /* apparently, locking doesn't work properly with sub-bitmaps */
     image_t* image = info->frame_data[frame_index];
     image_lock(image, "r");
-    collisionmask_t* mask = collisionmask_create(image, 0, 0, info->frame_w, info->frame_h);
+    collisionmask_t* mask = collisionmask_create(image, 0, 0, info->frame_w, info->frame_h, 0);
     image_unlock(image);
 #else
     /* let's lock the entire spritesheet and recompute the coordinates of the frame */
@@ -407,7 +407,7 @@ collisionmask_t* spriteinfo_to_collisionmask(const spriteinfo_t* info, int frame
     int y = info->rect_y + (frame_index / w) * info->frame_h;
 
     image_lock(spritesheet, "r");
-    collisionmask_t* mask = collisionmask_create(spritesheet, x, y, info->frame_w, info->frame_h);
+    collisionmask_t* mask = collisionmask_create(spritesheet, x, y, info->frame_w, info->frame_h, 0);
     image_unlock(spritesheet);
 #endif
 
