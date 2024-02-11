@@ -166,7 +166,7 @@ static const grounddir_t _MM_TO_GD[4] = {
 #define WANT_DEBUG              0
 #define WANT_JUMP_ATTENUATION   0
 #define AB_SENSOR_OFFSET        1 /* test with 0 and 1; with 0 it misbehaves a bit (unstable pa->midair) */
-#define CLOUD_OFFSET            16
+#define CLOUD_HEIGHT            16
 #define TARGET_FPS              60.0 /* target framerate of the simulation */
 #define HARD_CAPSPEED           (24.0 * TARGET_FPS)
 static void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt);
@@ -1080,10 +1080,10 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
                 ya = y + (hoff) * SIN(guess_angle); \
                 gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode, pa->layer); \
                 found_a = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
-                    (pa->movmode == MM_FLOOR && ya < obstacle_ground_position(gnd, xa, ya, GD_DOWN) + CLOUD_OFFSET) || \
-                    (pa->movmode == MM_CEILING && ya > obstacle_ground_position(gnd, xa, ya, GD_UP) - CLOUD_OFFSET) || \
-                    (pa->movmode == MM_LEFTWALL && xa > obstacle_ground_position(gnd, xa, ya, GD_LEFT) - CLOUD_OFFSET) || \
-                    (pa->movmode == MM_RIGHTWALL && xa < obstacle_ground_position(gnd, xa, ya, GD_RIGHT) + CLOUD_OFFSET) \
+                    (pa->movmode == MM_FLOOR && ya < obstacle_ground_position(gnd, xa, ya, GD_DOWN) + CLOUD_HEIGHT) || \
+                    (pa->movmode == MM_CEILING && ya > obstacle_ground_position(gnd, xa, ya, GD_UP) - CLOUD_HEIGHT) || \
+                    (pa->movmode == MM_LEFTWALL && xa > obstacle_ground_position(gnd, xa, ya, GD_LEFT) - CLOUD_HEIGHT) || \
+                    (pa->movmode == MM_RIGHTWALL && xa < obstacle_ground_position(gnd, xa, ya, GD_RIGHT) + CLOUD_HEIGHT) \
                 ))); \
             } \
             \
@@ -1092,10 +1092,10 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
                 yb = y - (hoff) * SIN(guess_angle); \
                 gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode, pa->layer); \
                 found_b = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
-                    (pa->movmode == MM_FLOOR && yb < obstacle_ground_position(gnd, xb, yb, GD_DOWN) + CLOUD_OFFSET) || \
-                    (pa->movmode == MM_CEILING && yb > obstacle_ground_position(gnd, xb, yb, GD_UP) - CLOUD_OFFSET) || \
-                    (pa->movmode == MM_LEFTWALL && xb > obstacle_ground_position(gnd, xb, yb, GD_LEFT) - CLOUD_OFFSET) || \
-                    (pa->movmode == MM_RIGHTWALL && xb < obstacle_ground_position(gnd, xb, yb, GD_RIGHT) + CLOUD_OFFSET) \
+                    (pa->movmode == MM_FLOOR && yb < obstacle_ground_position(gnd, xb, yb, GD_DOWN) + CLOUD_HEIGHT) || \
+                    (pa->movmode == MM_CEILING && yb > obstacle_ground_position(gnd, xb, yb, GD_UP) - CLOUD_HEIGHT) || \
+                    (pa->movmode == MM_LEFTWALL && xb > obstacle_ground_position(gnd, xb, yb, GD_LEFT) - CLOUD_HEIGHT) || \
+                    (pa->movmode == MM_RIGHTWALL && xb < obstacle_ground_position(gnd, xb, yb, GD_RIGHT) + CLOUD_HEIGHT) \
                 ))); \
             } \
         } \
@@ -1933,21 +1933,25 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
         /* if the player is on the ground or has just left the ground, stick to it! */
         if(!pa->midair || !pa->was_midair || pa->unstable_angle_counter > 0) {
-            int gnd_pos_a, gnd_pos_b, gnd_pos = 0;
-            const obstacle_t *gnd_a, *gnd_b;
+            v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
+            const obstacle_t *gnd_a = NULL, *gnd_b = NULL;
+            int gnd_pos = 0;
 
             /* get the ground sensors */
             const sensor_t* a = sensor_A(pa);
             const sensor_t* b = sensor_B(pa);
 
+            /* the sensor linked to the "best" floor */
+            const sensor_t* a_or_b = a;
+
             /* find the nearest ground that already collide with the sensors */
             gnd_a = at_A;
             gnd_b = at_B;
             if(gnd_a || gnd_b) {
-                char best = pick_the_best_floor(pa, gnd_a, gnd_b, a, b);
-                const obstacle_t* gnd = (best == 'a') ? gnd_a : gnd_b;
-                const sensor_t* a_or_b = (best == 'a') ? a : b;
-                v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
+                char best_floor = pick_the_best_floor(pa, gnd_a, gnd_b, a, b);
+                const obstacle_t* gnd = (best_floor == 'a') ? gnd_a : gnd_b;
+                a_or_b = (best_floor == 'a') ? a : b;
+
                 point2d_t tail = sensor_tail(a_or_b, position, pa->movmode);
                 gnd_pos = obstacle_ground_position(gnd, tail.x, tail.y, MM_TO_GD(pa->movmode));
             }
@@ -1962,9 +1966,44 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
                 int extended_length = clip(max_abs_ds + 4, min_length, max_length) + (tail_depth - 1);
 
                 /* find the nearest ground using both sensors */
-                gnd_a = find_ground_with_extended_sensor(pa, obstaclemap, a, extended_length, &gnd_pos_a);
-                gnd_b = find_ground_with_extended_sensor(pa, obstaclemap, b, extended_length, &gnd_pos_b);
+                int gnd_pos_a, gnd_pos_b;
 
+                if(sensor_is_enabled(a))
+                    gnd_a = find_ground_with_extended_sensor(pa, obstaclemap, a, extended_length, &gnd_pos_a);
+
+                if(sensor_is_enabled(b))
+                    gnd_b = find_ground_with_extended_sensor(pa, obstaclemap, b, extended_length, &gnd_pos_b);
+
+#if 0
+                /* if we find a cloud and the resulting offset is negative
+                   (i.e., the ground is above the tail of the sensor), then
+                   forget about it: there's nothing to extend, as the player
+                   would be teleported upwards instead of sticking to the
+                   ground. */
+                if(gnd_a && !obstacle_is_solid(gnd_a)) {
+                    point2d_t tail = sensor_tail(a, position, pa->movmode);
+                    int offset = gnd_pos_a;
+                    offset -= (pa->movmode == MM_FLOOR || pa->movmode == MM_CEILING) ? tail.y : tail.x;
+                    video_showmessage("offset A: %d", offset);
+
+                    if(offset < 0)
+                        gnd_a = NULL;
+                }
+
+                if(gnd_b && !obstacle_is_solid(gnd_b)) {
+                    point2d_t tail = sensor_tail(b, position, pa->movmode);
+                    int offset = gnd_pos_b;
+                    offset -= (pa->movmode == MM_FLOOR || pa->movmode == MM_CEILING) ? tail.y : tail.x;
+                    video_showmessage("offset B: %d", offset);
+
+                    if(offset < 0)
+                        gnd_b = NULL;
+                }
+#else
+                /* Is this still needed after the introduction of "cloudified" collision masks? */
+#endif
+
+                /* find the position of the nearest ground */
                 if(gnd_a && gnd_b) {
                     switch(pa->movmode) {
                         case MM_FLOOR:      gnd_pos = min(gnd_pos_a, gnd_pos_b); break;
@@ -1972,18 +2011,20 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
                         case MM_CEILING:    gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
                         case MM_LEFTWALL:   gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
                     }
+                    a_or_b = (gnd_pos == gnd_pos_a) ? a : b;
                 }
-                else if(gnd_a)
+                else if(gnd_a) {
                     gnd_pos = gnd_pos_a;
-                else if(gnd_b)
+                    a_or_b = a;
+                }
+                else if(gnd_b) {
                     gnd_pos = gnd_pos_b;
-
+                    a_or_b = b;
+                }
             }
 
             /* reposition the player */
             if(gnd_a || gnd_b) {
-                const sensor_t* a_or_b = (gnd_pos == gnd_pos_a) ? a : b;
-                v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
                 point2d_t tail = sensor_tail(a_or_b, position, pa->movmode);
 
                 /* put the tail of the sensor on the ground */
@@ -2272,50 +2313,70 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
 
     /* A, B: ignore clouds when moving upwards */
     if(pa->ysp < 0.0) {
-        if(pa->ysp < -fabs(pa->xsp) || (pa->was_midair && pa->state != PAS_JUMPING)) {
+        if((pa->midair && pa->ysp < -fabs(pa->xsp)) || (pa->was_midair && pa->state != PAS_JUMPING)) {
             *at_A = (*at_A != NULL && obstacle_is_solid(*at_A)) ? *at_A : NULL;
             *at_B = (*at_B != NULL && obstacle_is_solid(*at_B)) ? *at_B : NULL;
         }
     }
 
-    /* A, B: ignore clouds if the tail of the sensor not at a "solid" pixel
+    /* A, B: ignore clouds if the tail of the sensor is not at a non-transparent pixel
        (otherwise the player may be suspended in the air due to the ground map being y = h-1 at the non-solid bottom) */
-    if(*at_A != NULL && !obstacle_is_solid(*at_A)) {
-        point2d_t tail = sensor_tail(a, position, pa->movmode);
-        if(!obstacle_point_collision(*at_A, tail))
-            *at_A = NULL;
+    if(1) {
+        if(*at_A != NULL && !obstacle_is_solid(*at_A)) {
+            point2d_t tail = sensor_tail(a, position, pa->movmode);
+            if(!obstacle_point_collision(*at_A, tail))
+                *at_A = NULL;
+        }
+
+        if(*at_B != NULL && !obstacle_is_solid(*at_B)) {
+            point2d_t tail = sensor_tail(b, position, pa->movmode);
+            if(!obstacle_point_collision(*at_B, tail))
+                *at_B = NULL;
+        }
     }
 
-    if(*at_B != NULL && !obstacle_is_solid(*at_B)) {
-        point2d_t tail = sensor_tail(b, position, pa->movmode);
-        if(!obstacle_point_collision(*at_B, tail))
-            *at_B = NULL;
-    }
-
+#if 1
     /* A, B: cloud height */
-    if(pa->midair && pa->angle == 0x0 && pa->ysp / 60.0f < CLOUD_OFFSET * 0.5f) {
+    /* this is still useful even after the introduction of "cloudified"
+       collision masks, because the masks of some clouds (e.g., brick-like
+       objects) may not be "cloudified" */
+    /*if(pa->midair && pa->angle == 0x0 && pa->ysp / 60.0f < CLOUD_HEIGHT * 0.5f) {*/
+    if(pa->movmode == MM_FLOOR) {
+
+        int ygnd_a = 0, ygnd_b = 0, clouds = 0;
+        bool ignore_a = false, ignore_b = false;
 
         /* A: ignore if it's a cloud and if the tail of the sensor is too far away from the ground level */
         if(*at_A != NULL && !obstacle_is_solid(*at_A)) {
             point2d_t tail = sensor_tail(a, position, pa->movmode);
-            int ygnd = obstacle_ground_position(*at_A, tail.x, tail.y, GD_DOWN);
-            if(tail.y >= ygnd + CLOUD_OFFSET)
-                *at_A = NULL;
+            ygnd_a = obstacle_ground_position(*at_A, tail.x, tail.y, GD_DOWN);
+            ignore_a = (tail.y >= ygnd_a + CLOUD_HEIGHT);
+            clouds++;
         }
 
         /* B: ignore if it's a cloud and if the tail of the sensor is too far away from the ground level */
         if(*at_B != NULL && !obstacle_is_solid(*at_B)) {
             point2d_t tail = sensor_tail(b, position, pa->movmode);
-            int ygnd = obstacle_ground_position(*at_B, tail.x, tail.y, GD_DOWN);
-            if(tail.y >= ygnd + CLOUD_OFFSET)
-                *at_B = NULL;
+            ygnd_b = obstacle_ground_position(*at_B, tail.x, tail.y, GD_DOWN);
+            ignore_b = (tail.y >= ygnd_b + CLOUD_HEIGHT);
+            clouds++;
+        }
+
+        /* it turns out that the cloud may be a ramp. Ignoring is not be desirable in this case,
+           because the player may get into the ramp */
+        if(clouds == 1 || (clouds == 2 && abs(ygnd_a - ygnd_b) < 16)) {
+            *at_A = !ignore_a ? *at_A : NULL;
+            *at_B = !ignore_b ? *at_B : NULL;
         }
 
     }
+#endif
 
+#if 0
     /* A, B: conflict resolution when A != B */
     if(*at_A != NULL && *at_B != NULL && *at_A != *at_B) {
 
+#if 0
         /* A: if B is a solid and A is a cloud, ignore A */
         if(!obstacle_is_solid(*at_A) && obstacle_is_solid(*at_B))
             *at_A = NULL;
@@ -2323,9 +2384,15 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         /* B: if A is a solid and B is a cloud, ignore B */
         else if(obstacle_is_solid(*at_A) && !obstacle_is_solid(*at_B))
             *at_B = NULL;
+#else
+        /* Undesirable: imagine that you have a plain floor that is a cloud and
+           a solid ramp nearby that goes downhill. As the player moves in the
+           intersection between the ramp and the cloud, it incorrectly enters
+           the floor because the cloud has been ignored. */
+#endif
 
         /* A, B: special logic when both are clouds and one is much taller than the other */
-        else if(!obstacle_is_solid(*at_A) && !obstacle_is_solid(*at_B)) {
+        if(!obstacle_is_solid(*at_A) && !obstacle_is_solid(*at_B)) {
             if(pa->movmode == MM_FLOOR) {
                 point2d_t tail_a = sensor_tail(a, position, pa->movmode);
                 point2d_t tail_b = sensor_tail(b, position, pa->movmode);
@@ -2341,6 +2408,9 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
         }
 
     }
+#else
+    /* Is this still needed after introducing "cloudified" collision masks? */
+#endif
 
     /* set flags */
     pa->midair = (*at_A == NULL) && (*at_B == NULL);
@@ -2567,20 +2637,11 @@ bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
         return false;
 
     /* find the boundaries of the obstacle */
-#if 0
-    point2d_t pos = obstacle_get_position(obstacle);
-    int width = obstacle_get_width(obstacle);
-    int height = obstacle_get_height(obstacle);
-    int left = pos.x, right = pos.x + width - 1;
-    int top = pos.y, bottom = pos.y + height - 1;
-    int height = bottom - top;
-#else
     int left = obstacle_ground_position(obstacle, pa->xpos, pa->ypos, GD_RIGHT);
     int right = obstacle_ground_position(obstacle, pa->xpos, pa->ypos, GD_LEFT);
     int top = obstacle_ground_position(obstacle, pa->xpos, pa->ypos, GD_DOWN);
     int bottom = obstacle_ground_position(obstacle, pa->xpos, pa->ypos, GD_UP);
     int height = bottom - top;
-#endif
 
     /* compute the distance of the physics actor to the nearest horizontal and
        vertical edges of the obstacle */
@@ -2617,18 +2678,18 @@ bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
     if(height <= 0)
         return false;
 
-    /* don't smash it when horizontally getting stuck into a wall */
+    /* don't smash the actor when horizontally getting stuck into a wall */
     if(dh < dv)
         return false;
 
-    /* if the physics actor is near an edge, we don't want it smashed
-       this helps to prevent false positives */
+    /* if the physics actor is near an edge, we don't want it smashed this
+       helps to prevent false positives */
     int safety_margin = max(16, (int)(pa->capspeed / 60.0));
     if(dh < safety_margin)
         return false;
 
-    /* testing dv generates false negatives. dv may be zero when
-       the physics actor is smashed by a moving platform */
+    /* testing dv generates false negatives. dv may be zero when the physics
+       actor is smashed by a moving platform */
 
     /* smashed! */
     return true;
