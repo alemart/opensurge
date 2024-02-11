@@ -2420,18 +2420,22 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
 /* call update_movmode() whenever you update pa->angle */
 void update_movmode(physicsactor_t* pa)
 {
-    /* angles 0x20, 0x60, 0xA0, 0xE0
-       do not change the movmode */
-    if(pa->angle < 0x20 || pa->angle > 0xE0) {
-#if 1
+    /* angles 0x20, 0x60, 0xA0 and 0xE0
+       prioritize the floor and the ceiling modes.
+
+       Imagine the player running downhill on a 45 degree slope and then
+       hitting a plain floor (0 deg). The floor may be momentarily considered
+       to be a wall if the player is in a wall mode and moving in a high speed,
+       making it stop abruptly. We could alternatively disable the wall sensors,
+       but then we would risk getting the player into the floor. */
+    if(pa->angle <= 0x20 || pa->angle >= 0xE0) {
         if(pa->movmode == MM_CEILING)
             pa->gsp = -pa->gsp;
-#endif
         pa->movmode = MM_FLOOR;
     }
     else if(pa->angle > 0x20 && pa->angle < 0x60)
         pa->movmode = MM_LEFTWALL;
-    else if(pa->angle > 0x60 && pa->angle < 0xA0)
+    else if(pa->angle >= 0x60 && pa->angle <= 0xA0)
         pa->movmode = MM_CEILING;
     else if(pa->angle > 0xA0 && pa->angle < 0xE0)
         pa->movmode = MM_RIGHTWALL;
