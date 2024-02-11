@@ -45,7 +45,7 @@ struct collisionmask_t {
 };
 
 /* cloudify */
-static const int CLOUD_HEIGHT = 16;
+static const int CLOUD_HEIGHT = 16 + 8; /* give it some slack for steep slopes & very high speeds */
 static void cloudify_mask(collisionmask_t* mask);
 
 /* ground maps */
