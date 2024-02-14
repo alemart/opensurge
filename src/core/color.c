@@ -21,6 +21,7 @@
 #include <string.h>
 #include "color.h"
 #include "../util/stringutil.h"
+#include "../util/numeric.h"
 
 /*
  * color_rgb()
@@ -57,6 +58,27 @@ color_t color_premul_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     float af = (float)a / 255.0f;
 
     return (color_t){ al_map_rgba_f(rf * af, gf * af, bf * af, af) };
+}
+
+/*
+ * color_mix()
+ * Blend two colors, x and y, linearly in RGBA space with t in [0,1]
+ */
+color_t color_mix(color_t x, color_t y, float t)
+{
+    float r, g, b, a;
+    uint8_t xr, xg, xb, xa;
+    uint8_t yr, yg, yb, ya;
+
+    color_unmap(x, &xr, &xg, &xb, &xa);
+    color_unmap(y, &yr, &yg, &yb, &ya);
+
+    r = lerp((float)xr, (float)yr, t);
+    g = lerp((float)xg, (float)yg, t);
+    b = lerp((float)xb, (float)yb, t);
+    a = lerp((float)xa, (float)ya, t);
+
+    return color_rgba(r, g, b, a);
 }
 
 /*
