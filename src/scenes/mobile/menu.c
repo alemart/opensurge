@@ -79,7 +79,7 @@ static struct {
 } button[BUTTON_COUNT];
 
 static const v2d_t INITIAL_BUTTON_POSITION = (v2d_t){ .x = 0, .y = 0 };
-static v2d_t next_button_position(v2d_t button_position, const image_t* button_image);
+static v2d_t next_button_position(v2d_t button_position, const image_t* button_image, float scale);
 static mobilemenu_button_t button_at(v2d_t position);
 static void animate_button(mobilemenu_button_t b);
 
@@ -177,9 +177,14 @@ void mobilemenu_init(void *game_screenshot)
         button[b].actor->position = button_position;
         animate_button(b);
 
+        int width = image_width(actor_image(button[b].actor));
+        float scale = min(1.0f, (float)(VIDEO_SCREEN_W / 3) / (float)width);
+        button[b].actor->scale = v2d_new(scale, scale);
+
         button_position = next_button_position(
             button_position,
-            actor_image(button[b].actor)
+            actor_image(button[b].actor),
+            button[b].actor->scale.x
         );
     }
 }
@@ -238,11 +243,11 @@ void mobilemenu_release()
 
 /* button logic */
 
-v2d_t next_button_position(v2d_t button_position, const image_t* button_image)
+v2d_t next_button_position(v2d_t button_position, const image_t* button_image, float scale)
 {
     v2d_t screen_size = video_get_screen_size();
-    int button_width = image_width(button_image);
-    int button_height = image_height(button_image);
+    int button_width = image_width(button_image) * scale;
+    int button_height = image_height(button_image) * scale;
 
     button_position.x += button_width;
     if(button_position.x + button_width > screen_size.x) {
