@@ -170,14 +170,17 @@ static const grounddir_t _MM_TO_GD[4] = {
 #define TARGET_FPS              60.0 /* target framerate of the simulation */
 #define HARD_CAPSPEED           (24.0 * TARGET_FPS)
 static void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt);
-static void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N);
 static void update_movmode(physicsactor_t* pa);
+static void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N);
+static void set_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, int new_angle);
+static void handle_right_wall(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N);
+static void handle_left_wall(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N);
 
 
 /*
  * The character has a few sensors:
  * the dot '.' represents the position of the character;
- * sensors specified relative to this dot
+ * the sensors are specified relative to this position
  *
  * A (vertical; left bottom)          ---
  * B (vertical; right bottom)       C | | D
@@ -1144,12 +1147,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
 
 /* auxiliary macro to force the angle to a value */
 #define FORCE_ANGLE(new_angle) \
-    do { \
-        pa->angle = (new_angle); \
-        pa->prev_angle = pa->angle; \
-        UPDATE_MOVMODE(); \
-        UPDATE_SENSORS(); \
-    } while(0)
+    set_angle(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N, (new_angle))
 
 /* auxiliary macro to compute the angle automatically */
 #define SET_AUTO_ANGLE() \
@@ -1162,7 +1160,7 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
 /* physics simulation */
 void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt)
 {
-    const obstacle_t *at_A, *at_B, *at_C, *at_D, *at_M, *at_N;
+    const obstacle_t *at_A = NULL, *at_B = NULL, *at_C = NULL, *at_D = NULL, *at_M = NULL, *at_N = NULL;
     double prev_xpos, prev_ypos;
 
     /*
@@ -1727,126 +1725,18 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     wall_collisions:
 
-    /* right wall */
-    if(at_N != NULL) {
-        const sensor_t* sensor = sensor_N(pa);
-        v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
-        point2d_t tail = sensor_tail(sensor, position, pa->movmode);
-        point2d_t local_tail = point2d_subtract(tail, point2d_from_v2d(position));
-        bool reset_angle = false;
-        int wall;
+    /*
+    if(at_M && at_N)
+        video_showmessage("warp");
+    */
 
-        /* reset gsp */
-        if(pa->gsp > 0.0)
-            pa->gsp = 0.0;
-
-        /* reposition the player */
-        switch(pa->movmode) {
-            case MM_FLOOR:
-                wall = obstacle_ground_position(at_N, tail.x, tail.y, GD_RIGHT);
-                pa->xpos = wall - local_tail.x - 1;
-                pa->xsp = min(pa->xsp, 0.0);
-                reset_angle = false;
-                break;
-
-            case MM_CEILING:
-                wall = obstacle_ground_position(at_N, tail.x, tail.y, GD_LEFT);
-                pa->xpos = wall - local_tail.x + 1;
-                pa->xsp = max(pa->xsp, 0.0);
-                reset_angle = true;
-                break;
-
-            case MM_RIGHTWALL:
-                wall = obstacle_ground_position(at_N, tail.x, tail.y, GD_UP);
-                pa->ypos = wall - local_tail.y - 1;
-                pa->ysp = max(pa->ysp, 0.0);
-                reset_angle = true;
-                break;
-
-            case MM_LEFTWALL:
-                wall = obstacle_ground_position(at_N, tail.x, tail.y, GD_DOWN);
-                pa->ypos = wall - local_tail.y + 1;
-                pa->ysp = min(pa->ysp, 0.0);
-                reset_angle = true;
-                break;
-        }
-
-        /* update sensors */
-        if(!reset_angle) {
-            UPDATE_SENSORS();
-        }
-        else {
-            FORCE_ANGLE(0x0);
-        }
-
-        /* pushing a wall */
-        if(!pa->midair && pa->movmode == MM_FLOOR && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING && pa->state != PAS_GETTINGHIT) {
-            if(input_button_down(pa->input, IB_RIGHT)) {
-                pa->state = PAS_PUSHING;
-                pa->facing_right = true;
-            }
-        }
+    if(pa->xsp >= 0.0) {
+        handle_right_wall(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
+        handle_left_wall(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
     }
-
-    /* left wall */
-    if(at_M != NULL) {
-        const sensor_t* sensor = sensor_M(pa);
-        v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
-        point2d_t tail = sensor_tail(sensor, position, pa->movmode);
-        point2d_t local_tail = point2d_subtract(tail, point2d_from_v2d(position));
-        bool reset_angle = false;
-        int wall;
-
-        /* reset gsp */
-        if(pa->gsp < 0.0)
-            pa->gsp = 0.0;
-
-        /* reposition the player */
-        switch(pa->movmode) {
-            case MM_FLOOR:
-                wall = obstacle_ground_position(at_M, tail.x, tail.y, GD_LEFT);
-                pa->xpos = wall - local_tail.x + 1;
-                pa->xsp = max(pa->xsp, 0.0);
-                reset_angle = false;
-                break;
-
-            case MM_CEILING:
-                wall = obstacle_ground_position(at_M, tail.x, tail.y, GD_RIGHT);
-                pa->xpos = wall - local_tail.x - 1;
-                pa->xsp = min(pa->xsp, 0.0);
-                reset_angle = true;
-                break;
-
-            case MM_RIGHTWALL:
-                wall = obstacle_ground_position(at_M, tail.x, tail.y, GD_DOWN);
-                pa->ypos = wall - local_tail.y - 1;
-                pa->ysp = min(pa->ysp, 0.0);
-                reset_angle = true;
-                break;
-
-            case MM_LEFTWALL:
-                wall = obstacle_ground_position(at_M, tail.x, tail.y, GD_UP);
-                pa->ypos = wall - local_tail.y + 1;
-                pa->ysp = max(pa->ysp, 0.0);
-                reset_angle = true;
-                break;
-        }
-
-        /* update sensors */
-        if(!reset_angle) {
-            UPDATE_SENSORS();
-        }
-        else {
-            FORCE_ANGLE(0x0);
-        }
-
-        /* pushing a wall */
-        if(!pa->midair && pa->movmode == MM_FLOOR && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING && pa->state != PAS_GETTINGHIT) {
-            if(input_button_down(pa->input, IB_LEFT)) {
-                pa->state = PAS_PUSHING;
-                pa->facing_right = false;
-            }
-        }
+    else {
+        handle_left_wall(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
+        handle_right_wall(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
     }
 
     if(delayed_wall_collisions)
@@ -2439,6 +2329,139 @@ void update_movmode(physicsactor_t* pa)
         pa->movmode = MM_CEILING;
     else if(pa->angle > 0xA0 && pa->angle < 0xE0)
         pa->movmode = MM_RIGHTWALL;
+}
+
+/* force a new angle */
+void set_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, int new_angle)
+{
+    pa->angle = pa->prev_angle = new_angle;
+
+    update_movmode(pa);
+    update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+}
+
+/* handle collisions with walls at the right */
+void handle_right_wall(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N)
+{
+    if(*at_N != NULL) {
+        const sensor_t* sensor = sensor_N(pa);
+        v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
+        point2d_t tail = sensor_tail(sensor, position, pa->movmode);
+        point2d_t local_tail = point2d_subtract(tail, point2d_from_v2d(position));
+        bool reset_angle = false;
+        int wall;
+
+        /* reset gsp */
+        if(pa->gsp > 0.0)
+            pa->gsp = 0.0;
+
+        /* reposition the player */
+        switch(pa->movmode) {
+            case MM_FLOOR:
+                wall = obstacle_ground_position(*at_N, tail.x, tail.y, GD_RIGHT);
+                pa->xpos = wall - local_tail.x - 1;
+                pa->xsp = min(pa->xsp, 0.0);
+                reset_angle = false;
+                break;
+
+            case MM_CEILING:
+                wall = obstacle_ground_position(*at_N, tail.x, tail.y, GD_LEFT);
+                pa->xpos = wall - local_tail.x + 1;
+                pa->xsp = max(pa->xsp, 0.0);
+                reset_angle = true;
+                break;
+
+            case MM_RIGHTWALL:
+                wall = obstacle_ground_position(*at_N, tail.x, tail.y, GD_UP);
+                pa->ypos = wall - local_tail.y - 1;
+                pa->ysp = max(pa->ysp, 0.0);
+                reset_angle = true;
+                break;
+
+            case MM_LEFTWALL:
+                wall = obstacle_ground_position(*at_N, tail.x, tail.y, GD_DOWN);
+                pa->ypos = wall - local_tail.y + 1;
+                pa->ysp = min(pa->ysp, 0.0);
+                reset_angle = true;
+                break;
+        }
+
+        /* update sensors */
+        if(!reset_angle)
+            update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+        else
+            set_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
+
+        /* pushing a wall */
+        if(!pa->midair && pa->movmode == MM_FLOOR && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING && pa->state != PAS_GETTINGHIT) {
+            if(input_button_down(pa->input, IB_RIGHT)) {
+                pa->state = PAS_PUSHING;
+                pa->facing_right = true;
+            }
+        }
+    }
+}
+
+/* handle collisions with walls at the left */
+void handle_left_wall(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N)
+{
+    if(*at_M != NULL) {
+        const sensor_t* sensor = sensor_M(pa);
+        v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
+        point2d_t tail = sensor_tail(sensor, position, pa->movmode);
+        point2d_t local_tail = point2d_subtract(tail, point2d_from_v2d(position));
+        bool reset_angle = false;
+        int wall;
+
+        /* reset gsp */
+        if(pa->gsp < 0.0)
+            pa->gsp = 0.0;
+
+        /* reposition the player */
+        switch(pa->movmode) {
+            case MM_FLOOR:
+                wall = obstacle_ground_position(*at_M, tail.x, tail.y, GD_LEFT);
+                pa->xpos = wall - local_tail.x + 1;
+                pa->xsp = max(pa->xsp, 0.0);
+                reset_angle = false;
+                break;
+
+            case MM_CEILING:
+                wall = obstacle_ground_position(*at_M, tail.x, tail.y, GD_RIGHT);
+                pa->xpos = wall - local_tail.x - 1;
+                pa->xsp = min(pa->xsp, 0.0);
+                reset_angle = true;
+                break;
+
+            case MM_RIGHTWALL:
+                wall = obstacle_ground_position(*at_M, tail.x, tail.y, GD_DOWN);
+                pa->ypos = wall - local_tail.y - 1;
+                pa->ysp = min(pa->ysp, 0.0);
+                reset_angle = true;
+                break;
+
+            case MM_LEFTWALL:
+                wall = obstacle_ground_position(*at_M, tail.x, tail.y, GD_UP);
+                pa->ypos = wall - local_tail.y + 1;
+                pa->ysp = max(pa->ysp, 0.0);
+                reset_angle = true;
+                break;
+        }
+
+        /* update sensors */
+        if(!reset_angle)
+            update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+        else
+            set_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
+
+        /* pushing a wall */
+        if(!pa->midair && pa->movmode == MM_FLOOR && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING && pa->state != PAS_GETTINGHIT) {
+            if(input_button_down(pa->input, IB_LEFT)) {
+                pa->state = PAS_PUSHING;
+                pa->facing_right = false;
+            }
+        }
+    }
 }
 
 /* which one is the best floor, a or b? we evaluate the sensors also */
