@@ -30,6 +30,7 @@
 #include "../core/asset.h"
 #include "../core/video.h"
 #include "../core/image.h"
+#include "../core/timer.h"
 #include "../core/font.h"
 #include "../core/input.h"
 #include "../core/fadefx.h"
@@ -40,12 +41,17 @@
 #include "../entities/mobilegamepad.h"
 
 #define FONT_NAME           "BoxyBold"
-#define BACKGROUND_COLOR    "303030" /* rgb hex */
+#define BACKGROUND_COLOR    "303030" /* RGB hex code */
 #define FADE_COLOR          "000000"
 #define FADE_TIME           0.5f
+#define PADDING             4
 
 static int prev_opacity = 0;
 static const int GAMEPAD_OPACITY = 20;
+
+static int max_scroll = 0;
+static float scroll = 0;
+static const float SCROLL_SPEED = 160.0f;
 
 static bool go_back = false;
 static font_t* font = NULL;
@@ -69,9 +75,14 @@ void info_init(void* data)
     /* font */
     font = font_create(FONT_NAME);
     font_set_align(font, FONTALIGN_CENTER);
-    font_set_width(font, VIDEO_SCREEN_W - 8);
-    font_set_position(font, v2d_new(VIDEO_SCREEN_W / 2, 4));
+    font_set_width(font, VIDEO_SCREEN_W - 2 * PADDING);
+    font_set_position(font, v2d_new(VIDEO_SCREEN_W / 2, PADDING));
     set_info_text(font);
+
+    /* scrolling */
+    int text_height = font_get_textsize(font).y + PADDING;
+    max_scroll = max(0, text_height - VIDEO_SCREEN_H);
+    scroll = 0.0f;
 
     /* mobile gamepad */
     prev_opacity = mobilegamepad_opacity();
@@ -107,6 +118,14 @@ void info_update()
         return;
     }
 
+    /* scrolling */
+    float dt = timer_get_delta();
+    if(input_button_down(input, IB_UP))
+        scroll += SCROLL_SPEED * dt;
+    if(input_button_down(input, IB_DOWN))
+        scroll -= SCROLL_SPEED * dt;
+    scroll = clip(scroll, 0, max_scroll);
+
     /* go back */
     if(
         input_button_pressed(input, IB_FIRE1) ||
@@ -127,6 +146,7 @@ void info_update()
 void info_render()
 {
     v2d_t camera_position = v2d_multiply(video_get_screen_size(), 0.5f);
+    camera_position.y += scroll;
 
     image_clear(color_hex(BACKGROUND_COLOR));
     font_render(font, camera_position);
@@ -158,7 +178,6 @@ void set_info_text(font_t* font)
         "is created with an open source game engine:\n"
         "\n"
         "%s\n"
-        "%s\n"
         "\n"
         "%s\n"
         "\n"
@@ -175,7 +194,6 @@ void set_info_text(font_t* font)
 
         opensurge_game_name(),
 
-        GAME_TITLE,
         GAME_COPYRIGHT,
         GAME_LICENSE,
 

@@ -20,9 +20,11 @@
 
 #include <stdio.h>
 #include "info.h"
+#include "../util/touch.h"
 #include "../../../core/video.h"
 #include "../../../core/image.h"
 #include "../../../core/color.h"
+#include "../../../core/input.h"
 #include "../../../core/font.h"
 #include "../../../core/asset.h"
 #include "../../../core/global.h"
@@ -37,6 +39,11 @@ typedef struct mobile_subscene_info_t mobile_subscene_info_t;
 struct mobile_subscene_info_t {
     mobile_subscene_t super;
     font_t* font;
+    input_t* mouse;
+    v2d_t touch_previous;
+    v2d_t smooth_scroll;
+    int max_scroll;
+    float scroll;
 };
 
 static void init(mobile_subscene_t*);
@@ -45,9 +52,17 @@ static void update(mobile_subscene_t*,v2d_t);
 static void render(mobile_subscene_t*,v2d_t);
 static const mobile_subscene_t super = { .init = init, .release = release, .update = update, .render = render };
 
-#define BACKGROUND_COLOR "303030" /* RGB hex code */
-static const char FONT_NAME[] = "BoxyBold";
+#define FONT_NAME           "BoxyBold"
+#define BACKGROUND_COLOR    "303030" /* RGB hex code */
+#define PADDING             4
+
 static void set_info_text(font_t* font);
+
+static float SMOOTH_SCROLL_COEFFICIENT = 0.97f;
+static void on_touch_start(v2d_t touch_start, void* subscene_ptr);
+static void on_touch_move(v2d_t touch_start, v2d_t touch_current, void* subscene_ptr);
+
+
 
 
 
@@ -61,6 +76,7 @@ mobile_subscene_t* mobile_subscene_info()
 
     subscene->super = super;
     subscene->font = NULL;
+    subscene->mouse = NULL;
     
     return (mobile_subscene_t*)subscene;
 }
@@ -78,6 +94,10 @@ void init(mobile_subscene_t* subscene_ptr)
 {
     mobile_subscene_info_t* subscene = (mobile_subscene_info_t*)subscene_ptr;
 
+    /* create a mouse input */
+    input_t* mouse = input_create_mouse();
+    subscene->mouse = mouse;
+
     /* create font */
     font_t* font = font_create(FONT_NAME);
     font_set_position(font, v2d_new(VIDEO_SCREEN_W / 2, 4));
@@ -85,6 +105,15 @@ void init(mobile_subscene_t* subscene_ptr)
     font_set_align(font, FONTALIGN_CENTER);
     set_info_text(font);
     subscene->font = font;
+
+    /* touch scroll */
+    subscene->touch_previous = v2d_new(0.0f, 0.0f);
+    subscene->smooth_scroll = v2d_new(0.0f, 0.0f);
+
+    /* scrolling */
+    int text_height = font_get_textsize(font).y + PADDING;
+    subscene->max_scroll = max(0, text_height - VIDEO_SCREEN_H);
+    subscene->scroll = 0.0f;
 }
 
 /*
@@ -96,6 +125,7 @@ void release(mobile_subscene_t* subscene_ptr)
     mobile_subscene_info_t* subscene = (mobile_subscene_info_t*)subscene_ptr;
 
     font_destroy(subscene->font);
+    input_destroy(subscene->mouse);
 
     free(subscene);
 }
@@ -106,8 +136,32 @@ void release(mobile_subscene_t* subscene_ptr)
  */
 void update(mobile_subscene_t* subscene_ptr, v2d_t subscene_offset)
 {
-    (void)subscene_ptr;
-    (void)subscene_offset;
+    mobile_subscene_info_t* subscene = (mobile_subscene_info_t*)subscene_ptr;
+
+    /* pause the scroll? */
+    bool pause_scroll = (v2d_magnitude(subscene_offset) > 0.0f);
+    if(pause_scroll) {
+        subscene->smooth_scroll = v2d_new(0.0f, 0.0f);
+        return;
+    }
+
+    /* faster scroll? */
+    handle_touch_input_ex(subscene->mouse, subscene, on_touch_start, NULL, on_touch_move);
+
+    v2d_t new_position = v2d_add(
+        font_get_position(subscene->font),
+        subscene->smooth_scroll
+    );
+
+    new_position.y = clip(new_position.y, -subscene->max_scroll, 0.0f);
+
+    font_set_position(subscene->font, new_position);
+
+    subscene->smooth_scroll = v2d_lerp(
+        v2d_new(0.0f, 0.0f),
+        subscene->smooth_scroll,
+        SMOOTH_SCROLL_COEFFICIENT
+    );
 }
 
 /*
@@ -121,11 +175,13 @@ void render(mobile_subscene_t* subscene_ptr, v2d_t subscene_offset)
     /* render background */
     int x = subscene_offset.x;
     int y = subscene_offset.y;
+
     image_rectfill(x, y, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_hex(BACKGROUND_COLOR));
 
     /* render font */
     v2d_t center = v2d_multiply(video_get_screen_size(), 0.5f);
     v2d_t camera = v2d_subtract(center, subscene_offset);
+
     font_render(subscene->font, camera);
 }
 
@@ -154,7 +210,6 @@ void set_info_text(font_t* font)
         "is created with an open source game engine:\n"
         "\n"
         "%s\n"
-        "%s\n"
         "\n"
         "%s\n"
         "\n"
@@ -171,7 +226,6 @@ void set_info_text(font_t* font)
 
         opensurge_game_name(),
 
-        GAME_TITLE,
         GAME_COPYRIGHT,
         GAME_LICENSE,
 
@@ -197,4 +251,23 @@ void set_info_text(font_t* font)
     #undef HIGHLIGHT_COLOR
     #undef NOWRAP_SPACE
     #undef SEPARATOR
+}
+
+/* private */
+
+/* implementation of faster scroll */
+void on_touch_move(v2d_t touch_start, v2d_t touch_current, void* subscene_ptr)
+{
+    mobile_subscene_info_t* subscene = (mobile_subscene_info_t*)subscene_ptr;
+    v2d_t delta = v2d_new(0.0f, touch_current.y - subscene->touch_previous.y);
+
+    subscene->smooth_scroll = delta;
+    subscene->touch_previous = touch_current;
+}
+
+void on_touch_start(v2d_t touch_start, void* subscene_ptr)
+{
+    mobile_subscene_info_t* subscene = (mobile_subscene_info_t*)subscene_ptr;
+
+    subscene->touch_previous = touch_start;
 }
