@@ -134,7 +134,7 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/items/zipline.ss",                         ":0.6.1",                   /* changes to the physics systems in 0.6.1; fix collisions due to a changed player hitbox */
     "sprites/items/zipline.spr",                        ":0.6.1",                   /* add action spot to the zipline */
     "scripts/misc/animal.ss",                           ":0.6.1",                   /* animation fix in 0.6.1 */
-    "scripts/behaviors/platformer.ss",                  ":0.6.0",                   /* since 0.6.1, animal.ss uses Platformer.gravityMultiplier introduced in 0.6.0 (underwater effect) */
+    "scripts/behaviors/platformer.ss",                  ":0.6.1",                   /* since 0.6.1, animal.ss uses Platformer.gravityMultiplier introduced in 0.6.0 (underwater effect) */
 
     "scripts/surge_the_rabbit/surge_the_rabbit.ss",     ":0.6.1",                   /* use own script */
     "scripts/setup/scenes/contribute.ss",               ":0.6.1",                   /* uses the SurgeTheRabbit object in 0.6.1 */
