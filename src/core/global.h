@@ -60,13 +60,9 @@
 
 /* Copyright text */
 #define GAME_COPYRIGHT "" \
-    "Copyright (C) " GAME_YEAR " Alexandre Martins\n" \
-    GAME_URL
-
-/* Header text */
-#define GAME_HEADER "" \
-    GAME_TITLE " version " GAME_VERSION_STRING "\n" \
-    GAME_COPYRIGHT
+    "Open Surge Engine\n" \
+    "Copyright (C) " GAME_YEAR " Alexandre Martins " \
+    "< " GAME_URL " >"
 
 /* License text */
 #define GAME_LICENSE "" \
@@ -78,10 +74,12 @@
     "This program is distributed in the hope that it will be useful, " \
     "but WITHOUT ANY WARRANTY; without even the implied warranty of " \
     "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the " \
-    "GNU General Public License for more details.\n" \
+    "GNU General Public License for more details.  You should have received " \
+    "a copy of the GNU General Public License along with this program.  If " \
+    "not, see < http://www.gnu.org/licenses/ >.\n" \
     "\n" \
-    "You should have received a copy of the GNU General Public License " \
-    "along with this program.  If not, see < http://www.gnu.org/licenses/ >."
+    "Surge the Rabbit, Open Surge Engine and SurgeScript are trademarks of " \
+    "Alexandre Martins."
 
 /* Minimum version of SurgeScript */
 #define SURGESCRIPT_MIN_SUP     0

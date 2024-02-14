@@ -44,21 +44,6 @@ static bool console_ask(const char* fmt, ...);
 static int COMMANDLINE_UNDEFINED = -1;
 static char* DEFAULT_ARGS[1] = { GAME_UNIXNAME };
 
-static const char LICENSE[] = ""
-"This program is free software; you can redistribute it and/or modify\n"
-"it under the terms of the GNU General Public License as published by\n"
-"the Free Software Foundation; either version 3 of the License, or\n"
-"(at your option) any later version.\n"
-"\n"
-"This program is distributed in the hope that it will be useful,\n"
-"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-"GNU General Public License for more details.\n"
-"\n"
-"You should have received a copy of the GNU General Public License\n"
-"along with this program.  If not, see <http://www.gnu.org/licenses/>.";
-
-
 
 
 
@@ -130,8 +115,8 @@ commandline_t commandline_parse(int argc, char **argv)
                 "    --import-wizard                  import an Open Surge game using a wizard\n"
                 "    --mobile                         enable mobile device simulation\n"
                 "    --verbose                        enable verbose logging with debug messages\n"
-                "    -- -arg1 -arg2 -arg3...          user-defined arguments (useful for scripting)",
-                GAME_HEADER, program
+                "    -- -arg1 -arg2 -arg3...          user-defined arguments to be used in the scripting layer",
+                GAME_COPYRIGHT, program
             );
             exit(0);
         }
@@ -147,7 +132,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--license") == 0) {
-            console_print("%s\n\n%s", GAME_HEADER, LICENSE);
+            console_print("%s\n\n%s", GAME_COPYRIGHT, GAME_LICENSE);
             exit(0);
         }
 
@@ -331,7 +316,7 @@ const char* commandline_getstring(const char* value, const char* default_string)
 /* Displays a message to the user (printf format) */
 void console_print(char *fmt, ...)
 {
-    char buffer[8192];
+    char buffer[4096];
     va_list args;
 
     va_start(args, fmt);
