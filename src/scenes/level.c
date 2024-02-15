@@ -1521,9 +1521,6 @@ void level_update()
     }
     iterator_destroy(brick_iterator);
 
-    /* update obstacle map */
-    update_obstaclemap(major_items, major_enemies);
-
     /* early update: players */
     if(brickmanager_number_of_bricks(brick_manager) > 0) {
         for(i = 0; i < team_size; i++)
@@ -1532,6 +1529,9 @@ void level_update()
 
     /* update scripts */
     update_ssobjects();
+
+    /* update the obstacle map after updating the scripts */
+    update_obstaclemap(major_items, major_enemies);
 
     /* update players */
     if(brickmanager_number_of_bricks(brick_manager) > 0) {
@@ -2817,7 +2817,7 @@ void update_obstaclemap(const item_list_t* item_list, const object_list_t* objec
         if(surgescript_objectmanager_exists(manager, *bricklike_handle)) {
             surgescript_object_t* bricklike_object = surgescript_objectmanager_get(manager, *bricklike_handle);
 
-            if(scripting_brick_is_valid(bricklike_object)) {
+            if(scripting_brick_is_valid(bricklike_object) && scripting_brick_enabled(bricklike_object)) {
                 obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
 
                 darray_push(mock_obstacles, mock_obstacle);

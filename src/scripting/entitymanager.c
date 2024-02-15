@@ -667,7 +667,7 @@ surgescript_var_t* fun_addbricklikeobject(surgescript_object_t* object, const su
 
     /* validate the object before adding it to the list */
     const surgescript_object_t* bricklike = surgescript_objectmanager_get(manager, handle);
-    if(scripting_brick_is_valid(bricklike)) {
+    if(scripting_brick_is_valid(bricklike) && scripting_brick_enabled(bricklike)) {
         entitydb_t* db = get_db(object);
         darray_push(db->bricklike_objects, handle);
     }
