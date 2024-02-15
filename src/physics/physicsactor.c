@@ -35,7 +35,7 @@
 
 typedef struct physicsactorobserverlist_t physicsactorobserverlist_t;
 
-/* physicsactor class */
+/* Physics Actor */
 struct physicsactor_t
 {
     physicsactorstate_t state; /* state */
@@ -129,6 +129,7 @@ struct physicsactor_t
     bool delayed_jump;
 };
 
+
 /* observer pattern */
 struct physicsactorobserverlist_t
 {
@@ -141,7 +142,11 @@ static physicsactorobserverlist_t* create_observer(void (*callback)(physicsactor
 static physicsactorobserverlist_t* destroy_observers(physicsactorobserverlist_t* list);
 static void notify_observers(physicsactor_t* pa, physicsactorevent_t event);
 
-/* private stuff ;-) */
+
+/* helpers */
+#define WALKING_OR_RUNNING(pa)      ((fabs((pa)->gsp) >= (pa)->topspeed) ? PAS_RUNNING : PAS_WALKING)
+#define MM_TO_GD(mm)                _MM_TO_GD[(mm) & 3]
+
 static void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_position);
 static char pick_the_best_floor(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor);
 static char pick_the_best_ceiling(const physicsactor_t *pa, const obstacle_t *c, const obstacle_t *d, const sensor_t *c_sensor, const sensor_t *d_sensor);
@@ -154,13 +159,13 @@ static inline int delta_angle(int alpha, int beta);
 static int interpolate_angle(int alpha, int beta, float t);
 static int extrapolate_angle(int curr_angle, int prev_angle, float t);
 
-#define MM_TO_GD(mm) _MM_TO_GD[(mm) & 3]
 static const grounddir_t _MM_TO_GD[4] = {
     [MM_FLOOR] = GD_DOWN,
     [MM_RIGHTWALL] = GD_RIGHT,
     [MM_CEILING] = GD_UP,
     [MM_LEFTWALL] = GD_LEFT
 };
+
 
 /* physics simulation */
 #define WANT_DEBUG              0
@@ -169,12 +174,23 @@ static const grounddir_t _MM_TO_GD[4] = {
 #define CLOUD_HEIGHT            16
 #define TARGET_FPS              60.0 /* target framerate of the simulation */
 #define HARD_CAPSPEED           (24.0 * TARGET_FPS)
+
 static void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt);
 static void update_movmode(physicsactor_t* pa);
 static void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N);
-static void set_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, int new_angle);
+
+static void handle_walls(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N);
 static void handle_right_wall(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N);
 static void handle_left_wall(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N);
+
+static void handle_ground_and_ceiling(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt);
+static void handle_ceiling(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt);
+static void handle_ground(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt);
+static void handle_sticky_ground(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt);
+
+static void force_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, int new_angle);
+static void update_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt);
+static void update_angle_step(physicsactor_t* pa, const obstaclemap_t* obstaclemap, int hoff, int search_base, int guess_angle, v2d_t curr_position, int max_iterations, int* out_dx, int* out_dy);
 
 
 /*
@@ -313,7 +329,15 @@ static const int slp_table[23][23] = {
     { 0x60, 0x5E, 0x5C, 0x5A, 0x57, 0x54, 0x51, 0x4E, 0x4B, 0x47, 0x44, 0x40, 0x3C, 0x39, 0x35, 0x32, 0x2F, 0x2C, 0x29, 0x26, 0x24, 0x22, 0x20 }
 };
 
-/* public methods */
+
+
+
+/*
+ *
+ * Public methods
+ *
+ */
+
 physicsactor_t* physicsactor_create(v2d_t position)
 {
     physicsactor_t *pa = mallocx(sizeof *pa);
@@ -1020,143 +1044,6 @@ bool physicsactor_is_standing_on_platform(const physicsactor_t *pa, const obstac
  * ---------------------------------------
  */
 
-/* utility macros */
-#define WALKING_OR_RUNNING(pa)      ((fabs((pa)->gsp) >= (pa)->topspeed) ? PAS_RUNNING : PAS_WALKING)
-
-/* call UPDATE_SENSORS whenever you update pa->position or pa->angle */
-#define UPDATE_SENSORS()            update_sensors(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N)
-
-/* call UPDATE_MOVMODE whenever you update pa->angle */
-#define UPDATE_MOVMODE()            update_movmode(pa)
-
-/* compute the current pa->angle */
-#define UPDATE_ANGLE() \
-    do { \
-        const sensor_t* sensor = sensor_A(pa); \
-        int sensor_height = sensor_get_y2(sensor) - sensor_get_y1(sensor); \
-        int search_base = sensor_get_y2(sensor) - 1; \
-        int max_iterations = sensor_height * 3; \
-        int half_dist = distance_between_angle_sensors(pa) / 2; \
-        int hoff = half_dist + (1 - half_dist % 2); /* odd number */ \
-        int min_hoff = pa->was_midair ? 3 : 1; \
-        int max_delta = min(hoff * 2, SLOPE_LIMIT); \
-        int angular_tolerance = 0x14; \
-        int current_angle = pa->angle; \
-        int dx = 0, dy = 0; \
-        \
-        double abs_gsp = fabs(pa->gsp); \
-        bool within_default_capspeed = (abs_gsp <= 16.0 * TARGET_FPS); \
-        bool within_increased_capspeed = (abs_gsp <= 20.0 * TARGET_FPS); \
-        \
-        v2d_t position = physicsactor_get_position(pa); \
-        v2d_t velocity = v2d_new(pa->xsp, pa->ysp); \
-        v2d_t ds = v2d_multiply(velocity, dt); \
-        float linear_prediction_factor = within_default_capspeed ? 0.4f : (within_increased_capspeed ? 0.5f : 0.67f); \
-        v2d_t predicted_offset = v2d_multiply(ds, linear_prediction_factor); \
-        v2d_t predicted_position = v2d_add(position, predicted_offset); \
-        \
-        /*float angular_prediction_factor = within_default_capspeed ? 0.0f : (within_increased_capspeed ? 0.0f : 0.2f);*/ \
-        int predicted_angle = current_angle; /*extrapolate_angle(pa->angle, pa->prev_angle, angular_prediction_factor);*/ \
-        (void)interpolate_angle; \
-        (void)extrapolate_angle; \
-        \
-        do { \
-            pa->angle = predicted_angle; /* assume continuity */ \
-            UPDATE_ANGLE_STEP(hoff, search_base, predicted_angle, predicted_position, max_iterations, dx, dy); \
-            hoff -= 2; /* increase precision */ \
-        } while(hoff >= min_hoff && (at_M == NULL && at_N == NULL) && (dx < -max_delta || dx > max_delta || dy < -max_delta || dy > max_delta || delta_angle(pa->angle, current_angle) > angular_tolerance)); \
-    } while(0)
-
-#define UPDATE_ANGLE_STEP(hoff, search_base, guess_angle, curr_position, max_iterations, out_dx, out_dy) \
-    do { \
-        const obstacle_t* gnd = NULL; \
-        bool found_a = false, found_b = false; \
-        int xa, ya, xb, yb; \
-        \
-        for(int i = 0; i < (max_iterations) && !(found_a && found_b); i++) { \
-            float h = (search_base) + i; \
-            float x = floorf(curr_position.x) + h * SIN(guess_angle) + 0.5f; \
-            float y = floorf(curr_position.y) + h * COS(guess_angle) + 0.5f; \
-            \
-            if(!found_a) { \
-                xa = x - (hoff) * COS(guess_angle); \
-                ya = y + (hoff) * SIN(guess_angle); \
-                gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode, pa->layer); \
-                found_a = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
-                    (pa->movmode == MM_FLOOR && ya < obstacle_ground_position(gnd, xa, ya, GD_DOWN) + CLOUD_HEIGHT) || \
-                    (pa->movmode == MM_CEILING && ya > obstacle_ground_position(gnd, xa, ya, GD_UP) - CLOUD_HEIGHT) || \
-                    (pa->movmode == MM_LEFTWALL && xa > obstacle_ground_position(gnd, xa, ya, GD_LEFT) - CLOUD_HEIGHT) || \
-                    (pa->movmode == MM_RIGHTWALL && xa < obstacle_ground_position(gnd, xa, ya, GD_RIGHT) + CLOUD_HEIGHT) \
-                ))); \
-            } \
-            \
-            if(!found_b) { \
-                xb = x + (hoff) * COS(guess_angle); \
-                yb = y - (hoff) * SIN(guess_angle); \
-                gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode, pa->layer); \
-                found_b = (gnd != NULL && (obstacle_is_solid(gnd) || ( \
-                    (pa->movmode == MM_FLOOR && yb < obstacle_ground_position(gnd, xb, yb, GD_DOWN) + CLOUD_HEIGHT) || \
-                    (pa->movmode == MM_CEILING && yb > obstacle_ground_position(gnd, xb, yb, GD_UP) - CLOUD_HEIGHT) || \
-                    (pa->movmode == MM_LEFTWALL && xb > obstacle_ground_position(gnd, xb, yb, GD_LEFT) - CLOUD_HEIGHT) || \
-                    (pa->movmode == MM_RIGHTWALL && xb < obstacle_ground_position(gnd, xb, yb, GD_RIGHT) + CLOUD_HEIGHT) \
-                ))); \
-            } \
-        } \
-        \
-        out_dx = out_dy = 0; \
-        pa->angle_sensor[0] = pa->angle_sensor[1] = curr_position; \
-        if(found_a && found_b) { \
-            int x, y; \
-            const obstacle_t* ga = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode, pa->layer); \
-            const obstacle_t* gb = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode, pa->layer); \
-            \
-            if(ga && gb) { \
-                switch(pa->movmode) { \
-                    case MM_FLOOR: \
-                        ya = obstacle_ground_position(ga, xa, ya, GD_DOWN); \
-                        yb = obstacle_ground_position(gb, xb, yb, GD_DOWN); \
-                        break; \
-                    case MM_LEFTWALL: \
-                        xa = obstacle_ground_position(ga, xa, ya, GD_LEFT); \
-                        xb = obstacle_ground_position(gb, xb, yb, GD_LEFT); \
-                        break; \
-                    case MM_CEILING: \
-                        ya = obstacle_ground_position(ga, xa, ya, GD_UP); \
-                        yb = obstacle_ground_position(gb, xb, yb, GD_UP); \
-                        break; \
-                    case MM_RIGHTWALL: \
-                        xa = obstacle_ground_position(ga, xa, ya, GD_RIGHT); \
-                        xb = obstacle_ground_position(gb, xb, yb, GD_RIGHT); \
-                        break; \
-                } \
-                \
-                x = xb - xa; \
-                y = yb - ya; \
-                if(x != 0 || y != 0) { \
-                    int ang = SLOPE(y, x); \
-                    if((ga == gb && abs(y) < 16) || delta_angle(ang, guess_angle) <= 0x25) { \
-                        pa->angle = ang; \
-                        pa->angle_sensor[0] = v2d_new(xa, ya); \
-                        pa->angle_sensor[1] = v2d_new(xb, yb); \
-                        out_dx = x; out_dy = y; \
-                    } \
-                } \
-            } \
-        } \
-    } while(0)
-
-/* auxiliary macro to force the angle to a value */
-#define FORCE_ANGLE(new_angle) \
-    set_angle(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N, (new_angle))
-
-/* auxiliary macro to compute the angle automatically */
-#define SET_AUTO_ANGLE() \
-    do { \
-        UPDATE_ANGLE(); \
-        UPDATE_MOVMODE(); \
-        UPDATE_SENSORS(); \
-    } while(0)
-
 /* physics simulation */
 void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt)
 {
@@ -1170,11 +1057,11 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
      */
 
     /* save previous state */
-    UPDATE_SENSORS();
+    update_sensors(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
     prev_xpos = pa->xpos;
     prev_ypos = pa->ypos;
     pa->prev_angle = pa->angle;
-    pa->was_midair = pa->midair; /* set after UPDATE_SENSORS() */
+    pa->was_midair = pa->midair; /* set after update_sensors() */
 
     /* disable simultaneous left + right input */
     if(input_button_down(pa->input, IB_LEFT) && input_button_down(pa->input, IB_RIGHT)) {
@@ -1657,7 +1544,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 #endif
                 pa->state = PAS_JUMPING;
                 pa->want_to_detach_from_ground = true;
-                FORCE_ANGLE(0x0);
+                force_angle(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N, 0x0);
 
                 notify_observers(pa, PAE_JUMP);
             }
@@ -1682,7 +1569,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
     /* update the position */
     pa->xpos += pa->xsp * dt;
     pa->ypos += pa->ysp * dt;
-    UPDATE_SENSORS();
+    update_sensors(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
 
     /*
      *
@@ -1698,7 +1585,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /*
      *
-     * wall collisions x ground & ceiling collisions
+     * collisions
      *
      */
 
@@ -1707,296 +1594,20 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
        repositioned when hitting the ground or the ceiling.
 
        delaying wall collision may cause wall bugs. Restrict this a lot. */
-    bool delayed_wall_collisions = (
-        fabs(pa->ysp) >= 900.0 && /* note: default topyspeed is 960 px/s */
-        fabs(pa->xsp) <= 30.0 /* almost a vertical movement */
+    bool delay_wall_collisions = (
+        pa->midair &&               /* don't do it if on the ground */
+        fabs(pa->ysp) >= 900.0 &&   /* note: default topyspeed is 960 px/s */
+        fabs(pa->xsp) <= 30.0       /* almost a vertical movement */
     );
 
-    /* splitting these into function calls would be much nicer... :\
-       TODO reformulate macros UPDATE_SENSORS(), FORCE_ANGLE(), etc. */
-    if(delayed_wall_collisions)
-        goto ceiling_collisions;
-
-    /*
-     *
-     * wall collisions
-     *
-     */
-
-    wall_collisions:
-
-    /*
-    if(at_M && at_N)
-        video_showmessage("warp");
-    */
-
-    if(pa->xsp >= 0.0) {
-        handle_right_wall(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
-        handle_left_wall(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
+    if(!delay_wall_collisions) {
+        handle_walls(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
+        handle_ground_and_ceiling(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N, dt);
     }
     else {
-        handle_left_wall(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
-        handle_right_wall(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
+        handle_ground_and_ceiling(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N, dt);
+        handle_walls(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N);
     }
-
-    if(delayed_wall_collisions)
-        goto end_of_collisions;
-
-    /*
-     *
-     * ceiling collisions
-     *
-     */
-
-    ceiling_collisions:
-
-    if(pa->midair && pa->touching_ceiling) {
-        bool must_reattach = false;
-
-        /* get the ceiling sensors */
-        const sensor_t* c = sensor_C(pa);
-        const sensor_t* d = sensor_D(pa);
-
-        /* picking the ceiling */
-        char best_ceiling = pick_the_best_ceiling(pa, at_C, at_D, c, d);
-        const obstacle_t* ceiling = (best_ceiling == 'c') ? at_C : at_D;
-        const sensor_t* c_or_d = (best_ceiling == 'c') ? c : d;
-
-        /* are we touching the ceiling for the first time? */
-        if(pa->ysp < 0.0) {
-            /* compute the angle */
-            FORCE_ANGLE(0x80);
-            pa->midair = false; /* enable the ground sensors */
-            SET_AUTO_ANGLE();
-
-            /* reattach to the ceiling if steep angle and moving upwards */
-            if((pa->angle >= 0xA0 && pa->angle <= 0xBF) || (pa->angle >= 0x40 && pa->angle <= 0x5F)) {
-                if(-pa->ysp >= fabs(pa->xsp))
-                    must_reattach = !pa->midair;
-            }
-        }
-
-        /* reattach to the ceiling or bump the head */
-        if(must_reattach) {
-            /* adjust speeds */
-            pa->gsp = pa->ysp * -sign(SIN(pa->angle));
-            pa->xsp = pa->ysp = 0.0;
-
-            /* adjust the state */
-            if(pa->state != PAS_ROLLING)
-                pa->state = WALKING_OR_RUNNING(pa);
-
-            /* make sure we stick to the ground */
-            pa->want_to_detach_from_ground = false;
-        }
-        else {
-            /* adjust speed & angle */
-            pa->ysp = max(pa->ysp, 0.0);
-            FORCE_ANGLE(0x0);
-
-            /* find the position of the sensor after setting the angle to 0 */
-            v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
-            point2d_t tail = sensor_tail(c_or_d, position, pa->movmode);
-            point2d_t local_tail = point2d_subtract(tail, point2d_from_v2d(position));
-
-            /* reposition the player */
-            int ceiling_position = obstacle_ground_position(ceiling, tail.x, tail.y, GD_UP);
-            pa->ypos = ceiling_position - local_tail.y + 1;
-
-            /* update the sensors */
-            pa->midair = true; /* enable the ceiling sensors */
-            UPDATE_SENSORS();
-        }
-    }
-
-    /*
-     *
-     * sticky physics
-     *
-     */
-
-    /* skip this section if we intend to leave the ground */
-    if(!pa->want_to_detach_from_ground) {
-        movmode_t prev_movmode = pa->movmode;
-
-        sticky_loop:
-
-        /* if the player is on the ground or has just left the ground, stick to it! */
-        if(!pa->midair || !pa->was_midair || pa->unstable_angle_counter > 0) {
-            v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
-            const obstacle_t *gnd_a = NULL, *gnd_b = NULL;
-            int gnd_pos = 0;
-
-            /* get the ground sensors */
-            const sensor_t* a = sensor_A(pa);
-            const sensor_t* b = sensor_B(pa);
-
-            /* the sensor linked to the "best" floor */
-            const sensor_t* a_or_b = a;
-
-            /* find the nearest ground that already collide with the sensors */
-            gnd_a = at_A;
-            gnd_b = at_B;
-            if(gnd_a || gnd_b) {
-                char best_floor = pick_the_best_floor(pa, gnd_a, gnd_b, a, b);
-                const obstacle_t* gnd = (best_floor == 'a') ? gnd_a : gnd_b;
-                a_or_b = (best_floor == 'a') ? a : b;
-
-                point2d_t tail = sensor_tail(a_or_b, position, pa->movmode);
-                gnd_pos = obstacle_ground_position(gnd, tail.x, tail.y, MM_TO_GD(pa->movmode));
-            }
-            else {
-
-                /* compute an extended length measured from the tail of the sensors */
-                double abs_xsp = fabs(pa->xsp), abs_ysp = fabs(pa->ysp);
-                double max_abs_speed = max(abs_xsp, abs_ysp); /* <= fabs(pa->gsp) */
-                int max_abs_ds = (int)ceil(max_abs_speed * dt);
-                const int min_length = 14, max_length = 32;
-                const int tail_depth = AB_SENSOR_OFFSET + 1; /* the extension starts from the tail (inclusive), and the tail touches the ground */
-                int extended_length = clip(max_abs_ds + 4, min_length, max_length) + (tail_depth - 1);
-
-                /* find the nearest ground using both sensors */
-                int gnd_pos_a, gnd_pos_b;
-
-                if(sensor_is_enabled(a))
-                    gnd_a = find_ground_with_extended_sensor(pa, obstaclemap, a, extended_length, &gnd_pos_a);
-
-                if(sensor_is_enabled(b))
-                    gnd_b = find_ground_with_extended_sensor(pa, obstaclemap, b, extended_length, &gnd_pos_b);
-
-#if 0
-                /* if we find a cloud and the resulting offset is negative
-                   (i.e., the ground is above the tail of the sensor), then
-                   forget about it: there's nothing to extend, as the player
-                   would be teleported upwards instead of sticking to the
-                   ground. */
-                if(gnd_a && !obstacle_is_solid(gnd_a)) {
-                    point2d_t tail = sensor_tail(a, position, pa->movmode);
-                    int offset = gnd_pos_a;
-                    offset -= (pa->movmode == MM_FLOOR || pa->movmode == MM_CEILING) ? tail.y : tail.x;
-                    video_showmessage("offset A: %d", offset);
-
-                    if(offset < 0)
-                        gnd_a = NULL;
-                }
-
-                if(gnd_b && !obstacle_is_solid(gnd_b)) {
-                    point2d_t tail = sensor_tail(b, position, pa->movmode);
-                    int offset = gnd_pos_b;
-                    offset -= (pa->movmode == MM_FLOOR || pa->movmode == MM_CEILING) ? tail.y : tail.x;
-                    video_showmessage("offset B: %d", offset);
-
-                    if(offset < 0)
-                        gnd_b = NULL;
-                }
-#else
-                /* Is this still needed after the introduction of "cloudified" collision masks? */
-#endif
-
-                /* find the position of the nearest ground */
-                if(gnd_a && gnd_b) {
-                    switch(pa->movmode) {
-                        case MM_FLOOR:      gnd_pos = min(gnd_pos_a, gnd_pos_b); break;
-                        case MM_RIGHTWALL:  gnd_pos = min(gnd_pos_a, gnd_pos_b); break;
-                        case MM_CEILING:    gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
-                        case MM_LEFTWALL:   gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
-                    }
-                    a_or_b = (gnd_pos == gnd_pos_a) ? a : b;
-                }
-                else if(gnd_a) {
-                    gnd_pos = gnd_pos_a;
-                    a_or_b = a;
-                }
-                else if(gnd_b) {
-                    gnd_pos = gnd_pos_b;
-                    a_or_b = b;
-                }
-            }
-
-            /* reposition the player */
-            if(gnd_a || gnd_b) {
-                point2d_t tail = sensor_tail(a_or_b, position, pa->movmode);
-
-                /* put the tail of the sensor on the ground */
-                const int offset = AB_SENSOR_OFFSET;
-                switch(pa->movmode) {
-                    case MM_FLOOR:
-                        pa->ypos = (int)position.y + (gnd_pos - tail.y) + offset;
-                        break;
-
-                    case MM_CEILING:
-                        pa->ypos = (int)position.y + (gnd_pos - tail.y) - offset;
-                        break;
-
-                    case MM_RIGHTWALL:
-                        pa->xpos = (int)position.x + (gnd_pos - tail.x) + offset;
-                        break;
-
-                    case MM_LEFTWALL:
-                        pa->xpos = (int)position.x + (gnd_pos - tail.x) - offset;
-                        break;
-                }
-
-                /* update the sensors */
-                pa->midair = false; /* get the correct sensors on this call to UPDATE_SENSORS() */
-                UPDATE_SENSORS();
-            }
-            else {
-                /* the distance is too great; we won't stick to the ground */
-                ;
-            }
-
-        }
-
-        /* if the player is still on the ground, update the angle */
-        if(!pa->midair)
-            SET_AUTO_ANGLE();
-
-        /* repeat once if convenient; maybe we've changed the movmode */
-        if(pa->movmode != prev_movmode && 0 == pa->unstable_angle_counter) {
-            /* unstable_angle_counter:
-               avoid locking the player when moving slowly and getting unstable
-               movmodes in a transition. Unstable angle measurements provoke
-               unstable movmodes, as in: 0x5e, 0x62, 0x5e, 0x62, 0x5e...
-               (left wall, ceiling...) */
-            const double speed_threshold = 300.0; /* not moving slowly */
-
-            if(fabs(pa->gsp) < speed_threshold) {
-                /* we're moving slowly and MAY be getting unstable angles
-                   (probably not... maybe if turbocharged...) */
-                pa->unstable_angle_counter = 2;
-            }
-            else {
-                /* we have enough speed and intend to run this sticky physics
-                   routine on the next frame */
-                pa->unstable_angle_counter = 1;
-            }
-
-            /* repeat */
-            goto sticky_loop;
-        }
-    }
-
-    /* reset the angle if midair */
-    if(pa->midair) {
-        /* if we're balancing on a ledge (of short height), we may be getting a
-          spurious angle, and hence a spurious movmode. pa->midair may be set to
-          true, even though we're on a ledge. That's due to the wall modes. */
-        FORCE_ANGLE(0x0); /* pa->midair may be set to false here */
-    }
-
-    /* reset flag */
-    pa->want_to_detach_from_ground = false;
-
-    /* reset counter */
-    if(pa->unstable_angle_counter > 0)
-        --pa->unstable_angle_counter;
-
-    /* end of collisions */
-    if(delayed_wall_collisions)
-        goto wall_collisions;
-
-    end_of_collisions:
 
     /*
      *
@@ -2041,7 +1652,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
                 pa->hlock_timer = 0.5;
                 if(pa->angle >= 0x40 && pa->angle <= 0xC0) {
                     pa->gsp = 0.0;
-                    FORCE_ANGLE(0x0);
+                    force_angle(pa, obstaclemap, &at_A, &at_B, &at_C, &at_D, &at_M, &at_N, 0x0);
                 }
             }
         }
@@ -2331,13 +1942,26 @@ void update_movmode(physicsactor_t* pa)
         pa->movmode = MM_RIGHTWALL;
 }
 
-/* force a new angle */
-void set_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, int new_angle)
-{
-    pa->angle = pa->prev_angle = new_angle;
 
-    update_movmode(pa);
-    update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+
+
+/*
+ *
+ * Wall collisions
+ *
+ */
+
+/* handle collisions with walls at the right and at the left */
+void handle_walls(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N)
+{
+    if((pa->midair && pa->xsp >= 0.0) || (!pa->midair && pa->gsp >= 0.0)) {
+        handle_right_wall(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+        handle_left_wall(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+    }
+    else {
+        handle_left_wall(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+        handle_right_wall(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+    }
 }
 
 /* handle collisions with walls at the right */
@@ -2390,7 +2014,7 @@ void handle_right_wall(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obs
         if(!reset_angle)
             update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
         else
-            set_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
+            force_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
 
         /* pushing a wall */
         if(!pa->midair && pa->movmode == MM_FLOOR && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING && pa->state != PAS_GETTINGHIT) {
@@ -2452,7 +2076,7 @@ void handle_left_wall(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obst
         if(!reset_angle)
             update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
         else
-            set_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
+            force_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
 
         /* pushing a wall */
         if(!pa->midair && pa->movmode == MM_FLOOR && pa->state != PAS_ROLLING && pa->state != PAS_CHARGING && pa->state != PAS_GETTINGHIT) {
@@ -2463,6 +2087,429 @@ void handle_left_wall(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obst
         }
     }
 }
+
+
+
+
+/*
+ *
+ * Ground & ceiling collisions
+ *
+ */
+
+/* handle ground and ceiling collisions */
+void handle_ground_and_ceiling(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt)
+{
+    if(pa->midair && pa->ysp < 0.0) {
+        handle_ceiling(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+        handle_ground(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+    }
+    else {
+        handle_ground(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+        handle_ceiling(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+    }
+}
+
+/* ceiling collisions */
+void handle_ceiling(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt)
+{
+    if(pa->midair && pa->touching_ceiling) {
+        bool must_reattach = false;
+
+        /* get the ceiling sensors */
+        const sensor_t* c = sensor_C(pa);
+        const sensor_t* d = sensor_D(pa);
+
+        /* picking the ceiling */
+        char best_ceiling = pick_the_best_ceiling(pa, *at_C, *at_D, c, d);
+        const obstacle_t* ceiling = (best_ceiling == 'c') ? *at_C : *at_D;
+        const sensor_t* c_or_d = (best_ceiling == 'c') ? c : d;
+
+        /* are we touching the ceiling for the first time? */
+        if(pa->ysp < 0.0) {
+            /* compute the angle */
+            force_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x80);
+            pa->midair = false; /* enable the ground sensors */
+            update_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+
+            /* reattach to the ceiling if steep angle and moving upwards */
+            if((pa->angle >= 0xA0 && pa->angle <= 0xBF) || (pa->angle >= 0x40 && pa->angle <= 0x5F)) {
+                if(-pa->ysp >= fabs(pa->xsp))
+                    must_reattach = !pa->midair;
+            }
+        }
+
+        /* reattach to the ceiling or bump the head */
+        if(must_reattach) {
+            /* adjust speeds */
+            pa->gsp = pa->ysp * -sign(SIN(pa->angle));
+            pa->xsp = pa->ysp = 0.0;
+
+            /* adjust the state */
+            if(pa->state != PAS_ROLLING)
+                pa->state = WALKING_OR_RUNNING(pa);
+
+            /* make sure we stick to the ground */
+            pa->want_to_detach_from_ground = false;
+        }
+        else {
+            /* adjust speed & angle */
+            pa->ysp = max(pa->ysp, 0.0);
+            force_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
+
+            /* find the position of the sensor after setting the angle to 0 */
+            v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
+            point2d_t tail = sensor_tail(c_or_d, position, pa->movmode);
+            point2d_t local_tail = point2d_subtract(tail, point2d_from_v2d(position));
+
+            /* reposition the player */
+            int ceiling_position = obstacle_ground_position(ceiling, tail.x, tail.y, GD_UP);
+            pa->ypos = ceiling_position - local_tail.y + 1;
+
+            /* update the sensors */
+            pa->midair = true; /* enable the ceiling sensors */
+            update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+        }
+    }
+}
+
+/* ground collisions */
+void handle_ground(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt)
+{
+    /* skip this section if we intend to leave the ground */
+    if(!pa->want_to_detach_from_ground)
+        handle_sticky_ground(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+
+    /* reset flag */
+    pa->want_to_detach_from_ground = false;
+
+    /* reset counter */
+    if(pa->unstable_angle_counter > 0)
+        --pa->unstable_angle_counter;
+
+    /* reset the angle if midair */
+    if(pa->midair) {
+        /* if we're balancing on a ledge (of short height), we may be getting a
+          spurious angle, and hence a spurious movmode. pa->midair may be set to
+          true, even though we're on a ledge. That's due to the wall modes. */
+
+        /* pa->midair may be set to false here */
+        force_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
+    }
+}
+
+/* sticky physics */
+void handle_sticky_ground(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt)
+{
+    movmode_t prev_movmode = pa->movmode;
+
+    sticky_loop:
+
+    /* if the player is on the ground or has just left the ground, stick to it! */
+    if(!pa->midair || !pa->was_midair || pa->unstable_angle_counter > 0) {
+        v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
+        const obstacle_t *gnd_a = NULL, *gnd_b = NULL;
+        int gnd_pos = 0;
+
+        /* get the ground sensors */
+        const sensor_t* a = sensor_A(pa);
+        const sensor_t* b = sensor_B(pa);
+
+        /* the sensor linked to the "best" floor */
+        const sensor_t* a_or_b = a;
+
+        /* find the nearest ground that already collide with the sensors */
+        gnd_a = *at_A;
+        gnd_b = *at_B;
+        if(gnd_a || gnd_b) {
+            char best_floor = pick_the_best_floor(pa, gnd_a, gnd_b, a, b);
+            const obstacle_t* gnd = (best_floor == 'a') ? gnd_a : gnd_b;
+            a_or_b = (best_floor == 'a') ? a : b;
+
+            point2d_t tail = sensor_tail(a_or_b, position, pa->movmode);
+            gnd_pos = obstacle_ground_position(gnd, tail.x, tail.y, MM_TO_GD(pa->movmode));
+        }
+        else {
+
+            /* compute an extended length measured from the tail of the sensors */
+            double abs_xsp = fabs(pa->xsp), abs_ysp = fabs(pa->ysp);
+            double max_abs_speed = max(abs_xsp, abs_ysp); /* <= fabs(pa->gsp) */
+            int max_abs_ds = (int)ceil(max_abs_speed * dt);
+            const int min_length = 14, max_length = 32;
+            const int tail_depth = AB_SENSOR_OFFSET + 1; /* the extension starts from the tail (inclusive), and the tail touches the ground */
+            int extended_length = clip(max_abs_ds + 4, min_length, max_length) + (tail_depth - 1);
+
+            /* find the nearest ground using both sensors */
+            int gnd_pos_a, gnd_pos_b;
+
+            if(sensor_is_enabled(a))
+                gnd_a = find_ground_with_extended_sensor(pa, obstaclemap, a, extended_length, &gnd_pos_a);
+
+            if(sensor_is_enabled(b))
+                gnd_b = find_ground_with_extended_sensor(pa, obstaclemap, b, extended_length, &gnd_pos_b);
+
+#if 0
+            /* if we find a cloud and the resulting offset is negative
+                (i.e., the ground is above the tail of the sensor), then
+                forget about it: there's nothing to extend, as the player
+                would be teleported upwards instead of sticking to the
+                ground. */
+            if(gnd_a && !obstacle_is_solid(gnd_a)) {
+                point2d_t tail = sensor_tail(a, position, pa->movmode);
+                int offset = gnd_pos_a;
+                offset -= (pa->movmode == MM_FLOOR || pa->movmode == MM_CEILING) ? tail.y : tail.x;
+                video_showmessage("offset A: %d", offset);
+
+                if(offset < 0)
+                    gnd_a = NULL;
+            }
+
+            if(gnd_b && !obstacle_is_solid(gnd_b)) {
+                point2d_t tail = sensor_tail(b, position, pa->movmode);
+                int offset = gnd_pos_b;
+                offset -= (pa->movmode == MM_FLOOR || pa->movmode == MM_CEILING) ? tail.y : tail.x;
+                video_showmessage("offset B: %d", offset);
+
+                if(offset < 0)
+                    gnd_b = NULL;
+            }
+#else
+            /* Is this still needed after the introduction of "cloudified" collision masks? */
+#endif
+
+            /* find the position of the nearest ground */
+            if(gnd_a && gnd_b) {
+                switch(pa->movmode) {
+                    case MM_FLOOR:      gnd_pos = min(gnd_pos_a, gnd_pos_b); break;
+                    case MM_RIGHTWALL:  gnd_pos = min(gnd_pos_a, gnd_pos_b); break;
+                    case MM_CEILING:    gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
+                    case MM_LEFTWALL:   gnd_pos = max(gnd_pos_a, gnd_pos_b); break;
+                }
+                a_or_b = (gnd_pos == gnd_pos_a) ? a : b;
+            }
+            else if(gnd_a) {
+                gnd_pos = gnd_pos_a;
+                a_or_b = a;
+            }
+            else if(gnd_b) {
+                gnd_pos = gnd_pos_b;
+                a_or_b = b;
+            }
+        }
+
+        /* reposition the player */
+        if(gnd_a || gnd_b) {
+            point2d_t tail = sensor_tail(a_or_b, position, pa->movmode);
+
+            /* put the tail of the sensor on the ground */
+            const int offset = AB_SENSOR_OFFSET;
+            switch(pa->movmode) {
+                case MM_FLOOR:
+                    pa->ypos = (int)position.y + (gnd_pos - tail.y) + offset;
+                    break;
+
+                case MM_CEILING:
+                    pa->ypos = (int)position.y + (gnd_pos - tail.y) - offset;
+                    break;
+
+                case MM_RIGHTWALL:
+                    pa->xpos = (int)position.x + (gnd_pos - tail.x) + offset;
+                    break;
+
+                case MM_LEFTWALL:
+                    pa->xpos = (int)position.x + (gnd_pos - tail.x) - offset;
+                    break;
+            }
+
+            /* update the sensors */
+            pa->midair = false; /* get the correct sensors on this call to update_sensors() */
+            update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+        }
+        else {
+            /* the distance is too great; we won't stick to the ground */
+            ;
+        }
+
+    }
+
+    /* if the player is still on the ground, update the angle */
+    if(!pa->midair)
+        update_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+
+    /* repeat once if convenient; maybe we've changed the movmode */
+    if(pa->movmode != prev_movmode && 0 == pa->unstable_angle_counter) {
+        /* unstable_angle_counter:
+           avoid locking the player when moving slowly and getting unstable
+           movmodes in a transition. Unstable angle measurements provoke
+           unstable movmodes, as in: 0x5e, 0x62, 0x5e, 0x62, 0x5e...
+           (left wall, ceiling...) */
+        const double speed_threshold = 300.0; /* not moving slowly */
+
+        if(fabs(pa->gsp) < speed_threshold) {
+            /* we're moving slowly and MAY be getting unstable angles
+               (probably not... maybe if turbocharged...) */
+            pa->unstable_angle_counter = 2;
+        }
+        else {
+            /* we have enough speed and intend to run this sticky physics
+               routine on the next frame */
+            pa->unstable_angle_counter = 1;
+        }
+
+        /* repeat */
+        goto sticky_loop;
+    }
+}
+
+
+
+
+/*
+ *
+ * Angle detection
+ * TODO simplify the method?
+ *
+ */
+
+/* force the angle to a value */
+void force_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, int new_angle)
+{
+    pa->angle = pa->prev_angle = new_angle;
+
+    /* update the sensors after changing the angle */
+    update_movmode(pa);
+    update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+}
+
+/* compute the angle automagically */
+void update_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt)
+{
+    const sensor_t* sensor = sensor_A(pa);
+    int sensor_height = sensor_get_y2(sensor) - sensor_get_y1(sensor);
+    int search_base = sensor_get_y2(sensor) - 1;
+    int max_iterations = sensor_height * 3;
+    int half_dist = distance_between_angle_sensors(pa) / 2;
+    int hoff = half_dist + (1 - half_dist % 2); /* odd number */
+    int min_hoff = pa->was_midair ? 3 : 1;
+    int max_delta = min(hoff * 2, SLOPE_LIMIT);
+    int angular_tolerance = 0x14;
+    int current_angle = pa->angle;
+    int dx = 0, dy = 0;
+
+    double abs_gsp = fabs(pa->gsp);
+    bool within_default_capspeed = (abs_gsp <= 16.0 * TARGET_FPS);
+    bool within_increased_capspeed = (abs_gsp <= 20.0 * TARGET_FPS);
+
+    v2d_t position = physicsactor_get_position(pa);
+    v2d_t velocity = v2d_new(pa->xsp, pa->ysp);
+    v2d_t ds = v2d_multiply(velocity, dt);
+    float linear_prediction_factor = within_default_capspeed ? 0.4f : (within_increased_capspeed ? 0.5f : 0.67f);
+    v2d_t predicted_offset = v2d_multiply(ds, linear_prediction_factor);
+    v2d_t predicted_position = v2d_add(position, predicted_offset);
+
+    /*float angular_prediction_factor = within_default_capspeed ? 0.0f : (within_increased_capspeed ? 0.0f : 0.2f);*/
+    int predicted_angle = current_angle; /*extrapolate_angle(pa->angle, pa->prev_angle, angular_prediction_factor);*/
+    (void)interpolate_angle;
+    (void)extrapolate_angle;
+
+    do {
+        pa->angle = predicted_angle; /* assume continuity */
+        update_angle_step(pa, obstaclemap, hoff, search_base, predicted_angle, predicted_position, max_iterations, &dx, &dy);
+        hoff -= 2; /* increase precision */
+    } while(hoff >= min_hoff && (*at_M == NULL && *at_N == NULL) && (dx < -max_delta || dx > max_delta || dy < -max_delta || dy > max_delta || delta_angle(pa->angle, current_angle) > angular_tolerance));
+
+    /* update the sensors after changing the angle */
+    update_movmode(pa);
+    update_sensors(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
+}
+
+/* helper function */
+void update_angle_step(physicsactor_t* pa, const obstaclemap_t* obstaclemap, int hoff, int search_base, int guess_angle, v2d_t curr_position, int max_iterations, int* out_dx, int* out_dy)
+{
+    const obstacle_t* gnd = NULL;
+    bool found_a = false, found_b = false;
+    int xa, ya, xb, yb;
+
+    for(int i = 0; i < max_iterations && !(found_a && found_b); i++) {
+        float h = search_base + i;
+        float x = floorf(curr_position.x) + h * SIN(guess_angle) + 0.5f;
+        float y = floorf(curr_position.y) + h * COS(guess_angle) + 0.5f;
+
+        if(!found_a) {
+            xa = x - hoff * COS(guess_angle);
+            ya = y + hoff * SIN(guess_angle);
+            gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode, pa->layer);
+            found_a = (gnd != NULL && (obstacle_is_solid(gnd) || (
+                (pa->movmode == MM_FLOOR && ya < obstacle_ground_position(gnd, xa, ya, GD_DOWN) + CLOUD_HEIGHT) ||
+                (pa->movmode == MM_CEILING && ya > obstacle_ground_position(gnd, xa, ya, GD_UP) - CLOUD_HEIGHT) ||
+                (pa->movmode == MM_LEFTWALL && xa > obstacle_ground_position(gnd, xa, ya, GD_LEFT) - CLOUD_HEIGHT) ||
+                (pa->movmode == MM_RIGHTWALL && xa < obstacle_ground_position(gnd, xa, ya, GD_RIGHT) + CLOUD_HEIGHT)
+            )));
+        }
+
+        if(!found_b) {
+            xb = x + hoff * COS(guess_angle);
+            yb = y - hoff * SIN(guess_angle);
+            gnd = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode, pa->layer);
+            found_b = (gnd != NULL && (obstacle_is_solid(gnd) || (
+                (pa->movmode == MM_FLOOR && yb < obstacle_ground_position(gnd, xb, yb, GD_DOWN) + CLOUD_HEIGHT) ||
+                (pa->movmode == MM_CEILING && yb > obstacle_ground_position(gnd, xb, yb, GD_UP) - CLOUD_HEIGHT) ||
+                (pa->movmode == MM_LEFTWALL && xb > obstacle_ground_position(gnd, xb, yb, GD_LEFT) - CLOUD_HEIGHT) ||
+                (pa->movmode == MM_RIGHTWALL && xb < obstacle_ground_position(gnd, xb, yb, GD_RIGHT) + CLOUD_HEIGHT)
+            )));
+        }
+    }
+
+    *out_dx = *out_dy = 0;
+    pa->angle_sensor[0] = pa->angle_sensor[1] = curr_position;
+    if(found_a && found_b) {
+        int x, y;
+        const obstacle_t* ga = obstaclemap_get_best_obstacle_at(obstaclemap, xa, ya, xa, ya, pa->movmode, pa->layer);
+        const obstacle_t* gb = obstaclemap_get_best_obstacle_at(obstaclemap, xb, yb, xb, yb, pa->movmode, pa->layer);
+
+        if(ga && gb) {
+            switch(pa->movmode) {
+                case MM_FLOOR:
+                    ya = obstacle_ground_position(ga, xa, ya, GD_DOWN);
+                    yb = obstacle_ground_position(gb, xb, yb, GD_DOWN);
+                    break;
+                case MM_LEFTWALL:
+                    xa = obstacle_ground_position(ga, xa, ya, GD_LEFT);
+                    xb = obstacle_ground_position(gb, xb, yb, GD_LEFT);
+                    break;
+                case MM_CEILING:
+                    ya = obstacle_ground_position(ga, xa, ya, GD_UP);
+                    yb = obstacle_ground_position(gb, xb, yb, GD_UP);
+                    break;
+                case MM_RIGHTWALL:
+                    xa = obstacle_ground_position(ga, xa, ya, GD_RIGHT);
+                    xb = obstacle_ground_position(gb, xb, yb, GD_RIGHT);
+                    break;
+            }
+
+            x = xb - xa;
+            y = yb - ya;
+            if(x != 0 || y != 0) {
+                int ang = SLOPE(y, x);
+                if((ga == gb && abs(y) < 16) || delta_angle(ang, guess_angle) <= 0x25) {
+                    pa->angle = ang;
+                    pa->angle_sensor[0] = v2d_new(xa, ya);
+                    pa->angle_sensor[1] = v2d_new(xb, yb);
+                    *out_dx = x; *out_dy = y;
+                }
+            }
+        }
+    }
+}
+
+
+
+
+/*
+ *
+ * Helpers
+ *
+ */
 
 /* which one is the best floor, a or b? we evaluate the sensors also */
 char pick_the_best_floor(const physicsactor_t *pa, const obstacle_t *a, const obstacle_t *b, const sensor_t *a_sensor, const sensor_t *b_sensor)
@@ -2728,7 +2775,7 @@ void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_
     v2d_t half_screen_size = v2d_multiply(video_get_screen_size(), 0.5f);
     v2d_t topleft = v2d_subtract(camera_position, half_screen_size);
     v2d_t position = v2d_subtract(sensor_position, topleft);
-    color_t border_color = color_rgb(0, 0, 0);
+    color_t border_color = color_mix(color, color_rgb(0, 0, 0), 0.5f);
 
     image_ellipse(position.x, position.y, radius + 1, radius + 1, border_color);
     image_ellipse(position.x, position.y, radius, radius, color);
@@ -2769,6 +2816,15 @@ int extrapolate_angle(int curr_angle, int prev_angle, float t)
     int theta = (curr_angle < prev_angle) ? 0xFF - delta + 1 : delta;
     return (curr_angle + theta) & 0xFF;
 }
+
+
+
+
+/*
+ *
+ * Observers
+ *
+ */
 
 /* notify observers */
 void notify_observers(physicsactor_t* pa, physicsactorevent_t event)
