@@ -237,6 +237,7 @@ sprite "Item Box"
     source_rect     0 32 128 544
     frame_size      32 32
     hot_spot        16 32
+    action_spot     16 16
 
     // empty box
     animation 0

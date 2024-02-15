@@ -461,14 +461,22 @@ object "Item Box" is "entity", "private"
 {
     actor = Actor("Item Box");
     brick = Brick("Item Box Mask");
-    collider = CollisionBox(24, 30).setAnchor(0.5, 1.2);
+    smallerCollider = CollisionBox(33, 33).setAnchor(0.5, 1.0);
+    biggerCollider = CollisionBox(65, 65).setAnchor(0.5, 1.0); // 2 * player capspeed = 2 * player topyspeed = 2 * 16 px/frame
     transform = Transform();
     score = 100;
     crushed = 11;
 
     state "main"
     {
-        brick.enabled = !canCrush(Player.active);
+        for(i = 0; i < Player.count; i++) {
+            player = Player[i];
+
+            if(player.collider.collidesWith(biggerCollider)) {
+                if(canCrush(player))
+                    brick.enabled = false;
+            }
+        }
     }
 
     state "crushed"
@@ -481,43 +489,61 @@ object "Item Box" is "entity", "private"
         actor.animation.sync = true;
     }
 
-    fun onOverlap(otherCollider)
+    fun lateUpdate()
     {
-        if(otherCollider.entity.hasTag("player")) {
-            player = otherCollider.entity;
-            if(canCrush(player)) {
+        if(state == "crushed")
+            return;
+
+        restoreBrick = true;
+
+        for(i = 0; i < Player.count; i++) {
+            player = Player[i];
+
+            if(player.collider.collidesWith(smallerCollider)) {
                 player.bounceBack(actor);
                 crush(player);
+                return;
             }
+
+            if(player.collider.collidesWith(biggerCollider))
+                restoreBrick = false;
         }
+
+        if(restoreBrick)
+            brick.enabled = true;
     }
 
     // crushes the item box
     fun crush(player)
     {
-        if(state != "crushed") {
-            // where should we spawn the sprites?
+        if(state == "crushed")
+            return;
+
+        // where should we spawn the sprites?
+        if(actor.actionSpot.length > 0)
+            actionSpot = transform.position.plus(actor.actionOffset);
+        else
             actionSpot = transform.position.translatedBy(0, -actor.height * 0.7);
 
-            // create explosion & item box icon
-            Level.spawnEntity("Explosion", actionSpot);
-            Level.spawnEntity("Item Box Icon", actionSpot).setIcon(actor.anim);
+        // create explosion & item box icon
+        Level.spawnEntity("Explosion", actionSpot);
+        Level.spawnEntity("Item Box Icon", actionSpot).setIcon(actor.anim);
 
-            // add to score
-            if(score != 0) {
-                player.score += score;
-                Level.spawnEntity("Score Text", actionSpot).setText(score);
-            }
-
-            // crush the item box
-            collider.enabled = false;
-            brick.enabled = false;
-            actor.anim = crushed;
-            state = "crushed";
-
-            // notify the parent
-            parent.onItemBoxCrushed(player);
+        // add to score
+        if(score != 0) {
+            player.score += score;
+            Level.spawnEntity("Score Text", actionSpot).setText(score);
         }
+
+        // crush the item box
+        smallerCollider.enabled = false;
+        biggerCollider.enabled = false;
+        brick.enabled = false;
+        actor.anim = crushed;
+        state = "crushed";
+
+        // notify the parent
+        parent.onItemBoxCrushed(player);
     }
 
     // can the player crush the item box?
@@ -576,6 +602,11 @@ object "Item Box Icon" is "entity", "private", "disposable"
             transform.localScale = Vector2(1, hscale);
         else
             destroy();
+    }
+
+    fun constructor()
+    {
+        actor.zindex = 0.51;
     }
 
     // --- MODIFIERS ---
