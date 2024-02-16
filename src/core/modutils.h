@@ -30,6 +30,6 @@
 uint32_t find_game_id(const char* game_title, const char* game_version, const char* game_dirname, const char* required_engine_version);
 char* guess_engine_version_of_mod(char* buffer, size_t buffer_size);
 const char** select_files_for_compatibility_pack(const char* engine_version, uint32_t game_id);
-bool generate_surge_cfg(const char* game_title, void** out_file_data, size_t* out_file_size);
+bool generate_surge_cfg(const char* game_title, const char* game_version, void** out_file_data, size_t* out_file_size);
 
 #endif

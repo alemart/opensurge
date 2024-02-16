@@ -274,16 +274,18 @@ const char** select_files_for_compatibility_pack(const char* engine_version, uin
  * Generates a surge.cfg file in-memory. You must free() the output void* pointer afterwards.
  * Returns true on success
  */
-bool generate_surge_cfg(const char* game_title, void** out_file_data, size_t* out_file_size)
+bool generate_surge_cfg(const char* game_title, const char* game_version, void** out_file_data, size_t* out_file_size)
 {
-    char buffer[256], title[64], fmt[] = ""
+    char buffer[256], title[64], version[32], fmt[] = ""
         "game {\n"
         "    title \"%.63s\"\n"
+        "    version \"%.31s\"\n"
         "}\n"
     ;
 
     str_addslashes(game_title, title, sizeof(title));
-    snprintf(buffer, sizeof(buffer), fmt, title);
+    str_addslashes(game_version, version, sizeof(version));
+    snprintf(buffer, sizeof(buffer), fmt, title, version);
 
     int text_length = strlen(buffer);
     size_t file_size = text_length * sizeof(uint8_t);

@@ -1620,7 +1620,7 @@ void setup_compatibility_pack(const char* shared_dirpath, const char* engine_ver
         uint8_t* surge_cfg_data = NULL;
         size_t surge_cfg_size = 0;
 
-        if(generate_surge_cfg(guessed_game_title, (void**)&surge_cfg_data, &surge_cfg_size)) {
+        if(generate_surge_cfg(guessed_game_title, "0.0.0.0", (void**)&surge_cfg_data, &surge_cfg_size)) {
             int last = file_count++;
 
             file_vpath = reallocx(file_vpath, file_count * sizeof(*file_vpath));
