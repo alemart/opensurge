@@ -205,10 +205,8 @@ void set_info_text(font_t* font)
 
 #if defined(__ANDROID__)
         al_android_get_os_version(),
-#elif defined(ALLEGRO_PLATFORM_STR)
-        ALLEGRO_PLATFORM_STR,
 #else
-        "Undefined",
+        GAME_PLATFORM_NAME,
 #endif
 
         multiple_datadirs ? "directories" : "directory",

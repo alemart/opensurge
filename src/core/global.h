@@ -58,6 +58,21 @@
 #define VERSION_CODE(x,y,z)     VERSION_CODE_EX((x), (y), (z), 0)
 #define VERSION_CODE_EX(x,y,z,w) ((x) * 1000000 + (y) * 10000 + (z) * 100 + (w))
 
+/* Platform name */
+#if defined(__ANDROID__)
+#define GAME_PLATFORM_NAME      "Android"
+#elif defined(_WIN32)
+#define GAME_PLATFORM_NAME      "Windows"
+#elif defined(__APPLE__) && defined(__MACH__)
+#define GAME_PLATFORM_NAME      "macOS"
+#elif defined(__linux__) || defined(__linux) || defined(linux)
+#define GAME_PLATFORM_NAME      "Linux"
+#elif defined(__unix__) || defined(__unix)
+#define GAME_PLATFORM_NAME      "Unix"
+#else
+#define GAME_PLATFORM_NAME      "Unknown"
+#endif
+
 /* Copyright text */
 #define GAME_COPYRIGHT "" \
     "Open Surge Engine\n" \
