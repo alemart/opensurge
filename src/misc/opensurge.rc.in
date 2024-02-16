@@ -74,8 +74,9 @@ BEGIN
       VALUE "LegalCopyright",   "\xA9 " GAME_YEARS " Alexandre Martins\0"
       VALUE "FileDescription",  "Open source 2D game engine for retro games\0"
       VALUE "FileVersion",      FILE_VERSION_STRING "\0"
-      VALUE "InternalName",     "opensurge\0"
       VALUE "OriginalFilename", "opensurge.exe\0"
+      VALUE "InternalName",     "opensurge\0"
+      VALUE "Comments",         "http://opensurge2d.org\0"
     END
   END
   BLOCK "VarFileInfo"
