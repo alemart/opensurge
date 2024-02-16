@@ -532,6 +532,12 @@ char* stringify_version_number(int version_code, char* buffer, size_t buffer_siz
 {
     const int MAX_VERSION = 99 * 1000000 + 99 * 10000 + 99 * 100 + 99;
     int x, y, z, w;
+    static char _buf[32];
+
+    if(buffer == NULL) {
+        buffer = _buf;
+        buffer_size = sizeof(_buf);
+    }
 
     if(version_code < 0)
         version_code = 0;
