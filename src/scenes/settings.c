@@ -1323,9 +1323,21 @@ bool display_mods(settings_entry_t* e)
 bool display_mods_from_base_game(settings_entry_t* e)
 {
 #if WANT_PLAYMOD
-    /* only Surge the Rabbit can reliably be expected to have the
-       correct scripts for a proper compatibility experience */
+    /* only Surge the Rabbit can reliably be expected to have the correct
+       scripts for a proper compatibility experience.
+
+       please don't change it!
+
+       TODO an additional integrity check would be more robust.
+       maybe embed the original scripts into the executable? */
+    const int version_number = VERSION_CODE_EX(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP, GAME_VERSION_FIX);
+    char version_string[16];
+
     if(0 != strcmp(opensurge_game_name(), "Surge the Rabbit"))
+        return false;
+
+    stringify_version_number(version_number, version_string, sizeof(version_string));
+    if(0 != strcmp(opensurge_game_version(), version_string))
         return false;
 
     return asset_gamedir() == NULL;
