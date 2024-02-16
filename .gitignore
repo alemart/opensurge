@@ -24,14 +24,17 @@ Session.vim
 *~
 
 # opensurge
+!src/**
 build/
 CMakeFiles/
-logfile.txt
+screenshots/*.png
+.userdata/
 opensurge
 opensurge.exe
 surge.prefs
+logfile.txt
+allegro5.cfg
+allegro.log
 *.dll
-!src/**
-screenshots/*.png
-iconwin.res
 *.pdb
+gmon.out
