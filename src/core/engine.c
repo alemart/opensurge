@@ -42,6 +42,7 @@
 #include "commandline.h"
 #include "modutils.h"
 #include "nanoparser.h"
+#include "config.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../entities/legacy/enemy.h"
@@ -120,6 +121,7 @@ static void release_nanocalc();
 static void parser_error(const char *msg, void* context);
 static void parser_warning(const char *msg, void* context);
 static void calc_error(const char *msg);
+static void perform_extra_validation(const commandline_t* cmd);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
 static const double TARGET_FPS = 60.0; /* frames per second */
@@ -163,6 +165,9 @@ void engine_init(const commandline_t* cmd)
 
     /* initialize in immersive mode */
     video_set_immersive(true);
+
+    /* perform extra validation */
+    perform_extra_validation(cmd);
 }
 
 
@@ -466,6 +471,9 @@ void init_basic_stuff(const commandline_t* cmd)
     /* logs */
     if(game_id != GAME_ID_UNAVAILABLE)
         logfile_message("Game ID: %08x", game_id);
+
+    if(compatibility_mode)
+        logfile_message("Running in compatibility mode. Version: %s", stringify_version_number(engine_compatibility_version_code(), NULL, 0));
 }
 
 
@@ -748,6 +756,21 @@ void parser_warning(const char *msg, void* context)
 void calc_error(const char *msg)
 {
     fatal_error("%s", msg);
+}
+
+/*
+ * perform_extra_validation()
+ * Extra validation
+ */
+void perform_extra_validation(const commandline_t* cmd)
+{
+    (void)cmd;
+
+    if(config_game_title(NULL) == NULL)
+        video_showmessage("Unspecified game title at surge.cfg");
+
+    if(config_game_version(NULL) == NULL)
+        video_showmessage("Unspecified game version at surge.cfg");
 }
 
 /*

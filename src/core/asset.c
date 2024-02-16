@@ -247,6 +247,8 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             required_engine_version
         );
         LOG("Game ID: %08x", game_id);
+        LOG("Game title: %s", config_game_title("(null)"));
+        LOG("Game version: %s", config_game_version("(null)"));
 
         /* set the write dir to gamedir if possible;
            otherwise set it to a generated directory */
