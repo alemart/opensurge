@@ -10,4 +10,5 @@ name            "Default quest"
 
 // level list (in order of appearance)
 quest           "quests/surge.qst"
+level           "levels/scenes/play_classic_levels.lev"
 level           "levels/scenes/thanks_for_playing.lev"

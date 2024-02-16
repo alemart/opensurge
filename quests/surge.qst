@@ -15,6 +15,5 @@ level           "levels/waterworks-zone-3.lev"
 
 level           "levels/scenes/rate_game.lev"
 
-level           "levels/scenes/play_classic_levels.lev"
 level           "levels/scenes/end_of_demo.lev"
 quest           "quests/demo.qst"
