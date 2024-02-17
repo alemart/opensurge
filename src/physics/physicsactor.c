@@ -922,7 +922,7 @@ sensor_t* sensor_##x(const physicsactor_t *pa) \
         return pa->x##_##jumping; \
     else if(pa->midair || pa->state == PAS_SPRINGING) \
         return pa->x##_##in_the_air; \
-    else if(!pa->midair && pa->angle % 0x40 == 0) \
+    else if(!pa->midair && !pa->was_midair && pa->angle % 0x40 == 0) \
         return pa->x##_##standing_on_flat_ground; \
     else \
         return pa->x##_##standing; \
