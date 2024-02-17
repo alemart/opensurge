@@ -1595,9 +1595,9 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
        delaying wall collision may cause wall bugs. Restrict this a lot. */
     bool delay_wall_collisions = (
-        pa->midair &&               /* don't do it if on the ground */
-        fabs(pa->ysp) >= 900.0 &&   /* note: default topyspeed is 960 px/s */
-        fabs(pa->xsp) <= 30.0       /* almost a vertical movement */
+        (pa->midair || pa->was_midair) &&   /* don't do it if on the ground */
+        fabs(pa->ysp) >= 900.0 &&           /* note: default topyspeed is 960 px/s */
+        fabs(pa->xsp) <= 30.0               /* almost a vertical movement */
     );
 
     if(!delay_wall_collisions) {
@@ -1758,7 +1758,13 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 /* call update_sensors() whenever you update pa->position or pa->angle */
 void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N)
 {
-    /* get sensors */
+    bool prev_midair = pa->midair;
+    int repetitions = 0;
+
+    do {
+
+    /* get sensors
+       depends on pa->midair */
     sensor_t* a = sensor_A(pa);
     sensor_t* b = sensor_B(pa);
     sensor_t* c = sensor_C(pa);
@@ -1916,6 +1922,8 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
     /* set flags */
     pa->midair = (*at_A == NULL) && (*at_B == NULL);
     pa->touching_ceiling = (*at_C != NULL) || (*at_D != NULL);
+
+    } while(prev_midair != pa->midair && 0 == repetitions++); /* repeat once if convenient; applicable sensors & which sensors are enabled may change */
 }
 
 /* call update_movmode() whenever you update pa->angle */
@@ -1954,7 +1962,17 @@ void update_movmode(physicsactor_t* pa)
 /* handle collisions with walls at the right and at the left */
 void handle_walls(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N)
 {
-    if((pa->midair && pa->xsp >= 0.0) || (!pa->midair && pa->gsp >= 0.0)) {
+    /* pa->was_midair (set in the previous frame, possibly after repositioning the
+       player) seems to work better than pa->midair. The latter may be instantly
+       false - for a single moment - even though the player is not technically
+       not touching the ground (i.e., a ground sensor is touching a wall, not
+       the ground). This can cause the preferable wall check below not happen
+       for a frame, and the player may possibly warp around the wall (rarely,
+       but it happens).  */
+    if(
+        (pa->was_midair && (pa->xsp > 0.0 || (pa->xsp == 0.0 && pa->dx >= 0.0))) ||
+        (!pa->was_midair && pa->gsp >= 0.0)
+    ) {
         handle_right_wall(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
         handle_left_wall(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
     }
