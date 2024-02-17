@@ -1923,7 +1923,10 @@ void update_sensors(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
     pa->midair = (*at_A == NULL) && (*at_B == NULL);
     pa->touching_ceiling = (*at_C != NULL) || (*at_D != NULL);
 
-    } while(prev_midair != pa->midair && 0 == repetitions++); /* repeat once if convenient; applicable sensors & which sensors are enabled may change */
+    } while(pa->movmode == MM_FLOOR && prev_midair != pa->midair && 0 == repetitions++);
+
+    /* repeat once if convenient; applicable sensors & which sensors are enabled may change
+       repeating when rolling inside a tube is undesirable (leads to instability) */
 }
 
 /* call update_movmode() whenever you update pa->angle */
