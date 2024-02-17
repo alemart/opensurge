@@ -440,7 +440,13 @@ surgescript_var_t* fun_getenabled(surgescript_object_t* object, const surgescrip
 surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     bricklike_data_t* data = get_data(object);
-    data->enabled = surgescript_var_get_bool(param[0]);
+    bool enabled = surgescript_var_get_bool(param[0]);
+
+    if(data->enabled != enabled) {
+        data->enabled = enabled;
+        level_set_obstaclemap_dirty();
+    }
+
     return NULL;
 }
 

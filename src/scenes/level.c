@@ -226,6 +226,7 @@ static void reconfigure_players_input_devices();
 
 /* obstacle map */
 static obstaclemap_t* obstaclemap = NULL; /* obstacle map near the camera */
+static bool is_obstaclemap_dirty = false;
 STATIC_DARRAY(obstacle_t*, mock_obstacles); /* dynamically generated obstacles */
 static void create_obstaclemap();
 static void destroy_obstaclemap();
@@ -1527,11 +1528,17 @@ void level_update()
             player_early_update(team[i]);
     }
 
+    /* update the obstacle map */
+    update_obstaclemap(major_items, major_enemies);
+
     /* update scripts */
     update_ssobjects();
 
-    /* update the obstacle map after updating the scripts */
-    update_obstaclemap(major_items, major_enemies);
+    /* update the obstacle map again after updating the scripts */
+    if(is_obstaclemap_dirty) {
+        update_obstaclemap(major_items, major_enemies);
+        is_obstaclemap_dirty = false;
+    }
 
     /* update players */
     if(brickmanager_number_of_bricks(brick_manager) > 0) {
@@ -1929,13 +1936,22 @@ bool level_is_setup_object(const char* object_name)
 
 /*
  * level_obstaclemap()
- * The obstaclemap featuring the bricks and brick-like objects that are
+ * The obstacle map featuring the bricks and brick-like objects that are
  * placed near the camera of the level.
  */
 const obstaclemap_t* level_obstaclemap()
 {
     assertx(obstaclemap != NULL); /* will be NULL if the level is not loaded */
     return obstaclemap;
+}
+
+/*
+ * level_set_obstaclemap_dirty()
+ * Require another update of the obstacle map after updating the scripts
+ */
+void level_set_obstaclemap_dirty()
+{
+    is_obstaclemap_dirty = true;
 }
 
 
@@ -2765,6 +2781,7 @@ rect_t create_roi(v2d_t camera, int margin)
 /* create the obstacle map */
 void create_obstaclemap()
 {
+    is_obstaclemap_dirty = false;
     obstaclemap = obstaclemap_create();
     darray_init(mock_obstacles);
 }
@@ -2778,6 +2795,8 @@ void destroy_obstaclemap()
 
     obstaclemap_destroy(obstaclemap);
     obstaclemap = NULL;
+
+    is_obstaclemap_dirty = false;
 }
 
 /* clear the obstacle map */
