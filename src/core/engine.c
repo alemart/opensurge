@@ -469,11 +469,14 @@ void init_basic_stuff(const commandline_t* cmd)
     init_nanocalc();
 
     /* logs */
+    if(compatibility_mode)
+        logfile_message("Running in compatibility mode - version: %s", stringify_version_number(engine_compatibility_version_code(), NULL, 0));
+
     if(game_id != GAME_ID_UNAVAILABLE)
         logfile_message("Game ID: %08x", game_id);
 
-    if(compatibility_mode)
-        logfile_message("Running in compatibility mode. Version: %s", stringify_version_number(engine_compatibility_version_code(), NULL, 0));
+    logfile_message("Game title: %s", config_game_title("(null)"));
+    logfile_message("Game version: %s", config_game_version("(null)"));
 }
 
 
