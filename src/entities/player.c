@@ -152,20 +152,23 @@ player_t *player_create(int id, const char *character_name)
     /* loop system */
     p->layer = BRL_DEFAULT;
 
+    /* underwater */
+    p->underwater = FALSE;
+    p->forcibly_underwater = FALSE;
+    p->forcibly_out_of_water = FALSE;
+    p->underwater_timer = 0.0f;
+    p->breath_time = PLAYER_UNDERWATER_TIME;
+
     /* physics */
     p->pa = physicsactor_create(p->actor->position);
     set_default_multipliers(p->pa, c);
     physicsactor_subscribe(p->pa, on_physics_event, p);
 
     /* misc */
-    p->underwater = FALSE;
-    p->forcibly_underwater = FALSE;
-    p->underwater_timer = 0.0f;
-    p->breath_time = PLAYER_UNDERWATER_TIME;
     p->dead_timer = 0.0f;
+    collectibles = 0;
 
     /* success! */
-    collectibles = 0;
     logfile_message("Created player \"%s\"", c->name);
     return p;
 }
@@ -655,6 +658,26 @@ int player_is_forcibly_underwater(const player_t* player)
 void player_set_forcibly_underwater(player_t* player, int forcibly_underwater)
 {
     player->forcibly_underwater = forcibly_underwater;
+
+    update_underwater_status(player);
+}
+
+/*
+ * player_is_forcibly_out_of_water()
+ * Forcibly out of water? (disables underwater mechanics at all times)
+ */
+int player_is_forcibly_out_of_water(const player_t* player)
+{
+    return player->forcibly_out_of_water;
+}
+
+/*
+ * player_set_forcibly_out_of_water()
+ * Set forcibly out_of_water flag (disables underwater mechanics at all times)
+ */
+void player_set_forcibly_out_of_water(player_t* player, int forcibly_out_of_water)
+{
+    player->forcibly_out_of_water = forcibly_out_of_water;
 
     update_underwater_status(player);
 }
@@ -1805,7 +1828,13 @@ void update_underwater_status(player_t* player)
             player_enter_water(player);
     }
 
-    /* if not, adopt the regular logic: check the waterlevel */
+    /* check if the player is forcibly out of water (underwater physics is disabled) */
+    else if(player_is_forcibly_out_of_water(player)) {
+        if(player_is_underwater(player))
+            player_leave_water(player);
+    }
+
+    /* adopt the regular logic: check the waterlevel */
     else if(player_position(player).y >= level_waterlevel()) {
         if(!player_is_underwater(player))
             player_enter_water(player);
