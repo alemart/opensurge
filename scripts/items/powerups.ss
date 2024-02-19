@@ -110,17 +110,28 @@ object "Powerup Speed - Music Watcher"
 // 1up
 object "Powerup 1up" is "entity", "basic", "powerup"
 {
-    itemBox = spawn("Item Box").setAnimation(18);
+    sprite = { }; // sprites are indexed by player name (not by player id because players may be transformed)
+    generic1upAnim = 18;
+    itemBox = spawn("Item Box").setAnimation(generic1upAnim);
     extraLife = spawn("Give Extra Life"); // function object stored in the functions/ folder
+    activePlayerName = "";
 
     state "main"
     {
-        /*
-        // the animation changes according
-        // to the active player
-        anim = animId(Player.active.name);
-        itemBox.setAnimation(anim);
-        */
+        // check if the active player has changed or transformed
+        if(activePlayerName != Player.active.name) {
+            activePlayerName = Player.active.name;
+
+            // check if there are custom 1up sprites for the character
+            if(!sprite.has(activePlayerName))
+                sprite[activePlayerName] = findSprites(activePlayerName);
+
+            // change the sprite of the powerup if one is available
+            if(sprite[activePlayerName] !== null)
+                itemBox.setAnimationEx(0, sprite[activePlayerName]["box"], sprite[activePlayerName]["icon"]);
+            else
+                itemBox.setAnimation(generic1upAnim);
+        }
     }
 
     fun onItemBoxCrushed(player)
@@ -129,21 +140,26 @@ object "Powerup 1up" is "entity", "basic", "powerup"
         extraLife.call();
     }
 
-    /*
-    // given a player name, get the corresponding
-    // animation ID of the "Item Box" sprite
-    fun animId(playerName)
+    fun findSprites(playerName)
     {
-        if(playerName == "Surge")
-            return 1;
-        else if(playerName == "Neon")
-            return 2;
-        else if(playerName == "Charge")
-            return 3;
-        else
-            return 18; // generic "1up" icon
+        boxSprite = "Powerup 1up " + playerName;
+        iconSprite = "Powerup 1up Icon " + playerName;
+
+        box = Actor(boxSprite);
+        icon = Actor(iconSprite);
+        success = box.animation.exists && icon.animation.exists;
+        icon.destroy();
+        box.destroy();
+
+        if(success) {
+            return {
+                "box": boxSprite,
+                "icon": iconSprite
+            };
+        }
+
+        return null;
     }
-    */
 }
 
 // Regular shield
@@ -462,10 +478,12 @@ object "Item Box" is "entity", "private"
     actor = Actor("Item Box");
     brick = Brick("Item Box Mask");
     smallerCollider = CollisionBox(33, 33).setAnchor(0.5, 1.0);
-    biggerCollider = CollisionBox(65, 65).setAnchor(0.5, 1.0); // 2 * player capspeed = 2 * player topyspeed = 2 * 16 px/frame
+    biggerCollider = CollisionBox(65, 81).setAnchor(0.5, 0.8); // 2 * player capspeed = 2 * player topyspeed = 2 * 16 px/frame
     transform = Transform();
-    score = 100;
+    iconSpriteName = "Item Box Icon";
     crushed = 11;
+    empty = 0;
+    score = 100;
 
     state "main"
     {
@@ -481,12 +499,12 @@ object "Item Box" is "entity", "private"
 
     state "crushed"
     {
-        actor.anim = crushed; // can't change the animation if the item box is crushed
+        setAnimation(crushed); // can't change the animation if the item box is crushed
     }
 
     fun constructor()
     {
-        actor.animation.sync = true;
+        setAnimation(empty);
     }
 
     fun lateUpdate()
@@ -500,7 +518,7 @@ object "Item Box" is "entity", "private"
             player = Player[i];
 
             if(player.collider.collidesWith(smallerCollider)) {
-                player.bounceBack(actor);
+                player.ysp = -player.ysp; // bounce the player
                 crush(player);
                 return;
             }
@@ -527,7 +545,7 @@ object "Item Box" is "entity", "private"
 
         // create explosion & item box icon
         Level.spawnEntity("Explosion", actionSpot);
-        Level.spawnEntity("Item Box Icon", actionSpot).setIcon(actor.anim);
+        Level.spawnEntity("Item Box Icon", actionSpot).setIconEx(actor.anim, iconSpriteName);
 
         // add to score
         if(score != 0) {
@@ -539,7 +557,7 @@ object "Item Box" is "entity", "private"
         smallerCollider.enabled = false;
         biggerCollider.enabled = false;
         brick.enabled = false;
-        actor.anim = crushed;
+        setAnimation(crushed);
         state = "crushed";
 
         // notify the parent
@@ -558,17 +576,30 @@ object "Item Box" is "entity", "private"
 
     // --- MODIFIERS ---
 
-    // set the animation of the "Item Box" sprite
-    fun setAnimation(anim)
-    {
-        actor.anim = anim;
-        return this;
-    }
-
     // set the score to be added to the player when this item box gets hit
     fun setScore(value)
     {
         score = Math.max(value, 0);
+        return this;
+    }
+
+    // set the animation of the "Item Box" sprite
+    fun setAnimation(anim)
+    {
+        return setAnimationEx(anim, "Item Box", "Item Box Icon");
+    }
+
+    fun setAnimationEx(anim, spriteNameOfBox, spriteNameOfIcon)
+    {
+        if(spriteNameOfBox != actor.animation.sprite) {
+            actor.destroy();
+            actor = Actor(spriteNameOfBox);
+            actor.animation.sync = true;
+        }
+
+        actor.anim = anim;
+        iconSpriteName = spriteNameOfIcon;
+
         return this;
     }
 }
@@ -581,6 +612,8 @@ object "Item Box Icon" is "entity", "private", "disposable"
     speed = 50;
     hscale = 1;
     timeToLive = 2.0;
+    empty = 0;
+    zindex = 0.51;
 
     state "main"
     {
@@ -606,7 +639,7 @@ object "Item Box Icon" is "entity", "private", "disposable"
 
     fun constructor()
     {
-        actor.zindex = 0.51;
+        setIcon(empty);
     }
 
     // --- MODIFIERS ---
@@ -614,6 +647,17 @@ object "Item Box Icon" is "entity", "private", "disposable"
     // set the icon, given as an animation ID
     fun setIcon(anim)
     {
+        return setIconEx(anim, "Item Box Icon");
+    }
+
+    fun setIconEx(anim, spriteName)
+    {
+        if(spriteName != actor.animation.sprite) {
+            actor.destroy();
+            actor = Actor(spriteName);
+            actor.zindex = zindex;
+        }
+
         actor.anim = anim;
         return this;
     }

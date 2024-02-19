@@ -429,7 +429,7 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        0
+        data        5
     }
 
     // (legacy, dropped animation) Neon life icon
@@ -437,7 +437,7 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        0
+        data        5
     }
 
     // (legacy, dropped animation) Charge life icon
@@ -445,7 +445,7 @@ sprite "Item Box Icon"
     {
         repeat      TRUE
         fps         8
-        data        0
+        data        5
     }
 
     // collectible
