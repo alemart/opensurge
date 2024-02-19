@@ -171,6 +171,8 @@ static const char* BLACKLIST[] = {
     EXACT("images/ui/pause_menu_option.png"), /* 0.6.1 => 0.6.1 */
     EXACT("fonts/default_title_card.fnt"), /* 0.6.0 => 0.6.1 */
     EXACT("images/ui/title_card_zone_numbers.png"), /* 0.6.0 => 0.6.1 */
+    EXACT("images/players/surge_goal.png"), /* 0.6.0 => 0.6.1 */
+    EXACT("images/players/surge_life_icon.png"), /* 0.6.0 => 0.6.1 */
 
     /* NULL-terminated list */
     NULL
