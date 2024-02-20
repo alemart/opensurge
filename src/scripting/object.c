@@ -51,8 +51,12 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
     const surgescript_object_t* child = surgescript_objectmanager_get(manager, child_handle);
     if(surgescript_object_has_tag(child, "entity") && !surgescript_object_has_tag(object, "entity")) {
         const char* parent_name = surgescript_object_name(object);
-
+#if 0
         if(0 != strcmp(parent_name, "Level")) {
+#else
+        /* Level implements spawn() */
+        if(1) {
+#endif
             logfile_message("\"%s\" violates entity policy when spawned by non-entity \"%s\"", child_name, parent_name);
             video_showmessage("\"%s\" violates entity policy when spawned by non-entity \"%s\"", child_name, parent_name);
         }
