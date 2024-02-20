@@ -913,7 +913,7 @@ void physicsactor_set_airdrag(physicsactor_t *pa, double value)
 sensor_t* sensor_##x(const physicsactor_t *pa) \
 { \
     if(pa->state == PAS_ROLLING || pa->state == PAS_CHARGING) { \
-        if(!pa->midair && pa->angle % 0x40 == 0) \
+        if(!pa->midair && !pa->was_midair && pa->angle % 0x40 == 0) /* pa->was_midair helps to avoid subtle M, N repositioning bugs when falling and rolling */ \
             return pa->x##_##rolling_on_flat_ground; \
         else \
             return pa->x##_##rolling; \
@@ -2148,15 +2148,27 @@ void handle_ceiling(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
 
         /* are we touching the ceiling for the first time? */
         if(pa->ysp < 0.0) {
-            /* compute the angle */
-            force_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x80);
-            pa->midair = false; /* enable the ground sensors */
-            update_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+            /* not testing pa->was_midair leads to spurious bounces when
+               entering some tubes (more specifically, gsp := -gsp due to
+               update_movmode(), because the angle becomes 180 for a new
+               computation, and then goes back to 0) */
+            if(pa->was_midair) {
+                /* compute the angle */
+                force_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x80);
+                pa->midair = false; /* enable the ground sensors */
+                update_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
 
-            /* reattach to the ceiling if steep angle and moving upwards */
-            if((pa->angle >= 0xA0 && pa->angle <= 0xBF) || (pa->angle >= 0x40 && pa->angle <= 0x5F)) {
-                if(-pa->ysp >= fabs(pa->xsp))
-                    must_reattach = !pa->midair;
+                /* reattach to the ceiling if steep angle and moving upwards */
+                if((pa->angle >= 0xA0 && pa->angle <= 0xBF) || (pa->angle >= 0x40 && pa->angle <= 0x5F)) {
+                    if(-pa->ysp >= fabs(pa->xsp))
+                        must_reattach = !pa->midair;
+                }
+
+                /* restore the midair flag and the angle */
+                if(!must_reattach) {
+                    pa->midair = true; /* enable the ceiling sensors */
+                    force_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
+                }
             }
         }
 
@@ -2174,9 +2186,8 @@ void handle_ceiling(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstac
             pa->want_to_detach_from_ground = false;
         }
         else {
-            /* adjust speed & angle */
+            /* adjust speed */
             pa->ysp = max(pa->ysp, 0.0);
-            force_angle(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, 0x0);
 
             /* find the position of the sensor after setting the angle to 0 */
             v2d_t position = v2d_new(floor(pa->xpos), floor(pa->ypos));
