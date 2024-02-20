@@ -54,7 +54,7 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
 #if 0
         if(0 != strcmp(parent_name, "Level")) {
 #else
-        /* Level implements spawn() */
+        /* Level overrides spawn() */
         if(1) {
 #endif
             logfile_message("\"%s\" violates entity policy when spawned by non-entity \"%s\"", child_name, parent_name);
