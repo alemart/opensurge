@@ -111,15 +111,18 @@ struct physicsactor_t
     sensor_t* D_normal;
     sensor_t* M_normal;
     sensor_t* N_normal;
-    sensor_t* U_normal;
     sensor_t* A_jumproll;
     sensor_t* B_jumproll;
     sensor_t* C_jumproll;
     sensor_t* D_jumproll;
     sensor_t* M_jumproll;
     sensor_t* N_jumproll;
+    sensor_t* A_flatgnd;
+    sensor_t* B_flatgnd;
     sensor_t* M_flatgnd;
     sensor_t* N_flatgnd;
+    sensor_t* A_rollflatgnd;
+    sensor_t* B_rollflatgnd;
     sensor_t* M_rollflatgnd;
     sensor_t* N_rollflatgnd;
     v2d_t angle_sensor[2];
@@ -187,6 +190,7 @@ static void handle_ground_and_ceiling(physicsactor_t* pa, const obstaclemap_t* o
 static void handle_ceiling(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt);
 static void handle_ground(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt);
 static void handle_sticky_ground(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt);
+static void handle_reacquisition_of_the_ground(physicsactor_t* pa);
 
 static void force_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, int new_angle);
 static void update_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle_t const** const at_A, obstacle_t const** const at_B, obstacle_t const** const at_C, obstacle_t const** const at_D, obstacle_t const** const at_M, obstacle_t const** const at_N, double dt);
@@ -407,7 +411,6 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->D_normal = sensor_create_vertical(w, 0, -h, color_rgb(255,255,255));
     pa->M_normal = sensor_create_horizontal(0, 0, -(w+1), color_rgb(255,0,0)); /* use x(sensor A) + 1 */
     pa->N_normal = sensor_create_horizontal(0, 0, w+1, color_rgb(255,64,255));
-    pa->U_normal = sensor_create_horizontal(-4, 0, 0, color_rgb(0,192,255));
 
     pa->A_jumproll = sensor_create_vertical(-rw, ry, ry+rh, sensor_color(pa->A_normal));
     pa->B_jumproll = sensor_create_vertical(rw, ry, ry+rh, sensor_color(pa->B_normal));
@@ -416,8 +419,13 @@ physicsactor_t* physicsactor_create(v2d_t position)
     pa->M_jumproll = sensor_create_horizontal(ry, 0, -(w+1), sensor_color(pa->M_normal));
     pa->N_jumproll = sensor_create_horizontal(ry, 0, w+1, sensor_color(pa->N_normal));
 
+    pa->A_flatgnd = sensor_create_vertical(-w, 8, h, sensor_color(pa->A_normal)); /* avoid spurious repositioning; A, B may collide with moving walls because of the changed M, N */
+    pa->B_flatgnd = sensor_create_vertical(w, 8, h, sensor_color(pa->B_normal));
     pa->M_flatgnd = sensor_create_horizontal(8, 0, -(w+1), sensor_color(pa->M_normal));
     pa->N_flatgnd = sensor_create_horizontal(8, 0, w+1, sensor_color(pa->N_normal));
+
+    pa->A_rollflatgnd = sensor_create_vertical(-w, max(ry,8), h, sensor_color(pa->A_normal));
+    pa->B_rollflatgnd = sensor_create_vertical(w, max(ry,8), h, sensor_color(pa->B_normal));
     pa->M_rollflatgnd = sensor_create_horizontal(max(ry,8), ry, -(w+1), sensor_color(pa->M_normal));
     pa->N_rollflatgnd = sensor_create_horizontal(max(ry,8), ry, w+1, sensor_color(pa->N_normal));
 
@@ -433,7 +441,6 @@ physicsactor_t* physicsactor_destroy(physicsactor_t *pa)
     sensor_destroy(pa->D_normal);
     sensor_destroy(pa->M_normal);
     sensor_destroy(pa->N_normal);
-    sensor_destroy(pa->U_normal);
 
     sensor_destroy(pa->A_jumproll);
     sensor_destroy(pa->B_jumproll);
@@ -442,8 +449,13 @@ physicsactor_t* physicsactor_destroy(physicsactor_t *pa)
     sensor_destroy(pa->M_jumproll);
     sensor_destroy(pa->N_jumproll);
 
+    sensor_destroy(pa->A_flatgnd);
+    sensor_destroy(pa->B_flatgnd);
     sensor_destroy(pa->M_flatgnd);
     sensor_destroy(pa->N_flatgnd);
+
+    sensor_destroy(pa->A_rollflatgnd);
+    sensor_destroy(pa->B_rollflatgnd);
     sensor_destroy(pa->M_rollflatgnd);
     sensor_destroy(pa->N_rollflatgnd);
 
@@ -928,13 +940,12 @@ sensor_t* sensor_##x(const physicsactor_t *pa) \
         return pa->x##_##standing; \
 }
 
-GENERATE_SENSOR_GETTER(A, normal, jumproll, jumproll, normal, normal,  jumproll)
-GENERATE_SENSOR_GETTER(B, normal, jumproll, jumproll, normal, normal,  jumproll)
+GENERATE_SENSOR_GETTER(A, normal, jumproll, jumproll, normal, flatgnd, rollflatgnd)
+GENERATE_SENSOR_GETTER(B, normal, jumproll, jumproll, normal, flatgnd, rollflatgnd)
 GENERATE_SENSOR_GETTER(C, normal, jumproll, jumproll, normal, normal,  jumproll)
 GENERATE_SENSOR_GETTER(D, normal, jumproll, jumproll, normal, normal,  jumproll)
 GENERATE_SENSOR_GETTER(M, normal, jumproll, jumproll, normal, flatgnd, rollflatgnd)
 GENERATE_SENSOR_GETTER(N, normal, jumproll, jumproll, normal, flatgnd, rollflatgnd)
-GENERATE_SENSOR_GETTER(U, normal, normal,   normal,   normal, normal,  normal)
 
 
 /* get bounding box */
@@ -1611,37 +1622,6 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
     /*
      *
-     * reacquisition of the ground
-     *
-     */
-
-    if(!pa->midair && pa->was_midair) {
-
-        /* if the player is moving mostly horizontally, set gsp to xsp */
-        if(fabs(pa->xsp) > pa->ysp)
-            pa->gsp = pa->xsp;
-
-        /* if not, set gsp based on the angle:
-
-           [0x00, 0x0F] U [0xF0, 0xFF]: flat ground
-           [0x10, 0x1F] U [0xE0, 0xEF]: slope
-           [0x20, 0x3F] U [0xC0, 0xDF]: steep slope
-
-           0x40, 0xC0 is +- ninety degrees... */
-        else if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
-            pa->gsp = pa->xsp;
-        else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
-            pa->gsp = pa->ysp * 0.5 * -sign(SIN(pa->angle));
-        else if((pa->angle >= 0xC0 && pa->angle <= 0xDF) || (pa->angle >= 0x20 && pa->angle <= 0x3F))
-            pa->gsp = pa->ysp * -sign(SIN(pa->angle));
-
-        /* reset speeds */
-        pa->xsp = pa->ysp = 0.0;
-
-    }
-
-    /*
-     *
      * falling off walls and ceilings
      *
      */
@@ -1974,7 +1954,7 @@ void handle_walls(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle
        but it happens).  */
     if(
         (pa->was_midair && (pa->xsp > 0.0 || (pa->xsp == 0.0 && pa->dx >= 0.0))) ||
-        (!pa->was_midair && pa->gsp >= 0.0)
+        (!pa->was_midair && (pa->gsp > 0.0 || (pa->gsp == 0.0 && pa->facing_right)))
     ) {
         handle_right_wall(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
         handle_left_wall(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N);
@@ -2123,10 +2103,12 @@ void handle_ground_and_ceiling(physicsactor_t* pa, const obstaclemap_t* obstacle
 {
     if(pa->midair && pa->ysp < 0.0) {
         handle_ceiling(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+        handle_reacquisition_of_the_ground(pa);
         handle_ground(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
     }
     else {
         handle_ground(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
+        handle_reacquisition_of_the_ground(pa);
         handle_ceiling(pa, obstaclemap, at_A, at_B, at_C, at_D, at_M, at_N, dt);
     }
 }
@@ -2393,6 +2375,35 @@ void handle_sticky_ground(physicsactor_t* pa, const obstaclemap_t* obstaclemap, 
     }
 }
 
+/* reacquisition of the ground */
+void handle_reacquisition_of_the_ground(physicsactor_t* pa)
+{
+    if(!pa->midair && pa->was_midair) {
+
+        /* if the player is moving mostly horizontally, set gsp to xsp */
+        if(fabs(pa->xsp) > pa->ysp)
+            pa->gsp = pa->xsp;
+
+        /* if not, set gsp based on the angle:
+
+           [0x00, 0x0F] U [0xF0, 0xFF]: flat ground
+           [0x10, 0x1F] U [0xE0, 0xEF]: slope
+           [0x20, 0x3F] U [0xC0, 0xDF]: steep slope
+
+           0x40, 0xC0 is +- ninety degrees... */
+        else if(pa->angle >= 0xF0 || pa->angle <= 0x0F)
+            pa->gsp = pa->xsp;
+        else if((pa->angle >= 0xE0 && pa->angle <= 0xEF) || (pa->angle >= 0x10 && pa->angle <= 0x1F))
+            pa->gsp = pa->ysp * 0.5 * -sign(SIN(pa->angle));
+        else if((pa->angle >= 0xC0 && pa->angle <= 0xDF) || (pa->angle >= 0x20 && pa->angle <= 0x3F))
+            pa->gsp = pa->ysp * -sign(SIN(pa->angle));
+
+        /* reset speeds */
+        pa->xsp = pa->ysp = 0.0;
+
+    }
+}
+
 
 
 
@@ -2421,8 +2432,8 @@ void update_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle
     int search_base = sensor_get_y2(sensor) - 1;
     int max_iterations = sensor_height * 3;
     int half_dist = distance_between_angle_sensors(pa) / 2;
-    int hoff = half_dist + (1 - half_dist % 2); /* odd number */
-    int min_hoff = pa->was_midair ? 3 : 1;
+    int hoff = half_dist + (1 - half_dist % 2); /* odd number: 7, 6 */
+    int min_hoff = pa->was_midair ? 5 : 1; /* need a proper angle when reattaching to the ground or to the ceiling (3 when pa->was_midair isn't enough) */
     int max_delta = min(hoff * 2, SLOPE_LIMIT);
     int angular_tolerance = 0x14;
     int current_angle = pa->angle;
@@ -2435,7 +2446,7 @@ void update_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle
     v2d_t position = physicsactor_get_position(pa);
     v2d_t velocity = v2d_new(pa->xsp, pa->ysp);
     v2d_t ds = v2d_multiply(velocity, dt);
-    float linear_prediction_factor = within_default_capspeed ? 0.4f : (within_increased_capspeed ? 0.5f : 0.67f);
+    float linear_prediction_factor = pa->was_midair ? 0.0f : (within_default_capspeed ? 0.4f : (within_increased_capspeed ? 0.5f : 0.67f)); /* undesirable when pa->was_midair is true */
     v2d_t predicted_offset = v2d_multiply(ds, linear_prediction_factor);
     v2d_t predicted_position = v2d_add(position, predicted_offset);
 
@@ -2719,7 +2730,7 @@ bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
        moving platform smashes it from above; the latter works fine. */
     const obstacle_t* obstacle = NULL;
 
-    /* find an obstacle that collides with all sensors */
+    /* find an obstacle that collides with sensors A, B, C and D */
     const obstacle_t* o[4] = { at_A, at_B, at_C, at_D };
     for(int i = 0; i < 4; i++) {
         if(
@@ -2788,9 +2799,9 @@ bool is_smashed(const physicsactor_t* pa, const obstaclemap_t* obstaclemap)
     if(dh < dv)
         return false;
 
-    /* if the physics actor is near an edge, we don't want it smashed this
-       helps to prevent false positives */
-    int safety_margin = max(16, (int)(pa->capspeed / 60.0));
+    /* if the physics actor is near an edge, we don't want it smashed
+       this helps to prevent false positives, but the player will be repositioned */
+    int safety_margin = max(16, (int)(pa->capspeed / 60.0)) / 2;
     if(dh < safety_margin)
         return false;
 
