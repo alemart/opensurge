@@ -613,6 +613,12 @@ int level_save(const char *filepath)
         return FALSE;
     }
 
+    /* skip if playing in compatibility mode (it overwrites the version) */
+    if(engine_compatibility_version_code() < VERSION_CODE_EX(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP, GAME_VERSION_FIX)) {
+        logfile_message("Can't save level \"%s\" while playing in compatibility mode!", filepath);
+        return FALSE;
+    }
+
     /* open file for writing */
     logfile_message("level_save(\"%s\")", fullpath);
     if(NULL == (fp = al_fopen(fullpath, "w"))) {
