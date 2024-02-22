@@ -143,7 +143,7 @@ object "Play Classic Levels - Interactive Animation"
 
         mustAdvance = false;
 
-        if(++counter % 25 == 0) {
+        if(++counter % 10 == 0) {
             surge.advance();
             neon.advance();
 
@@ -250,7 +250,11 @@ object "Play Classic Levels - Neon" is "private", "detached", "entity"
     {
         actor.anim = 5;
 
-        if(timeout(1.0))
+        if(mustAdvance) {
+            mustAdvance = false;
+            state = "eyes open";
+        }
+        else if(timeout(1.0))
             state = "sleeping";
     }
 
