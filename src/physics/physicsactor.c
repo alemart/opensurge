@@ -798,7 +798,7 @@ void physicsactor_restore_state(physicsactor_t* pa)
         pa->state = PAS_RUNNING;
     else if(pa->midair || !nearly_zero(pa->gsp))
         pa->state = PAS_WALKING;
-    else if(pa->state != PAS_WAITING && pa->state != PAS_PUSHING && pa->state != PAS_LEDGE && pa->state != PAS_LOOKINGUP && pa->state != PAS_DUCKING && pa->state != PAS_WINNING)
+    else
         pa->state = PAS_STOPPED;
 }
 
