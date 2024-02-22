@@ -53,7 +53,7 @@ object "SurgeTheRabbit"
     fun openWebsite(path, params)
     {
         url = website + path;
-        url += "?v=" + SurgeEngine.version;
+        url += "?v=" + Web.encodeURIComponent(SurgeEngine.version);
         url += "&lang=" + Web.encodeURIComponent(Lang["LANG_ID"]);
         url += "&from=" + Web.encodeURIComponent(Level.name);
         foreach(param in params)
