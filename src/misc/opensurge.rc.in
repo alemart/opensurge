@@ -72,7 +72,7 @@ BEGIN
       VALUE "ProductVersion",   PRODUCT_VERSION_STRING "\0"
       VALUE "CompanyName",      "Alexandre Martins\0"
       VALUE "LegalCopyright",   "\xA9 " GAME_YEARS " Alexandre Martins\0"
-      VALUE "FileDescription",  "Open source 2D game engine for retro games\0"
+      VALUE "FileDescription",  "Open source 2D retro game engine\0"
       VALUE "FileVersion",      FILE_VERSION_STRING "\0"
       VALUE "OriginalFilename", "opensurge.exe\0"
       VALUE "InternalName",     "opensurge\0"
