@@ -750,8 +750,10 @@ const char* create_url(const char* path)
 {
     static char buffer[256];
     char sep = (strchr(path, '?') != NULL) ? '&' : '?';
+    char encoded_lang_id[32];
 
-    snprintf(buffer, sizeof(buffer), "%s%s%cv=%s&from=options", GAME_URL, path, sep, GAME_VERSION_STRING);
+    encode_uri_component(lang_get("LANG_ID"), encoded_lang_id, sizeof(encoded_lang_id));
+    snprintf(buffer, sizeof(buffer), "%s%s%cv=%s&lang=%s&from=options", GAME_URL, path, sep, GAME_VERSION_STRING, encoded_lang_id);
 
     return buffer;
 }
