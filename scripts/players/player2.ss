@@ -84,6 +84,11 @@ object "Player 2" is "companion"
         // Player 2 has special flags
         setPlayer2Flags(player);
 
+        // lose a shield when hit
+        // (doesn't happen by itself when the player is invulnerable)
+        if(player.hit && player.invulnerable)
+            player.shield = null;
+
         // do we need to reposition the player?
         if(needToReposition()) {
             startRepositioning();

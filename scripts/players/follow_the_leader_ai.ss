@@ -105,6 +105,11 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         if(follower.frozen)
             return;
 
+        // lose a shield when hit
+        // (doesn't happen by itself when the player is invulnerable)
+        if(follower.hit && follower.invulnerable)
+            follower.shield = null;
+
         // modify the jump
         if(bufferedInput.jump) {
             if(!follower.midair)
