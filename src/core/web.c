@@ -207,7 +207,7 @@ char* encode_uri(const char* uri)
                 (i >= '0' && i <= '9') || /* locale independent */
                 (i >= 'a' && i <= 'z') ||
                 (i >= 'A' && i <= 'Z') ||
-                (strchr(":/-_.*'!?=&~@#$,;()+", i) != NULL)
+                (strchr(":/-_.*'!?=&~@#$,;()+%", i) != NULL) /* include '%' (encoded URI components) */
             );
         }
         encode_table[0] = 1;
