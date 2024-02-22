@@ -1109,7 +1109,6 @@ brick 277 384 8320
 brick 922 608 8832
 
 // entities
-entity "Goal Capsule" 5120 10336 "aaddc803a2d2a3d7"
 entity "Salamander Bridge" 3008 9968 "41d94eeb7f2d30df"
 entity "Salamander Boss" 3008 9920 "3a4da045be78bd7e"
 entity "Background Restorer" 1728 9248 "04e295a6977e7481"
