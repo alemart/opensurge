@@ -24,5 +24,6 @@
 #include <stdbool.h>
 
 bool launch_url(const char *url); /* launch URL; returns true on success */
+char* encode_uri_component(const char* uri, char* dest, size_t dest_size); /* returns dest */
 
 #endif

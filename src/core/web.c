@@ -47,7 +47,8 @@
 
 /* private stuff */
 static inline char ch2hex(unsigned char code);
-static char *url_encode(const char *url);
+static char *encode_uri(const char *uri);
+static char *encode_uri_ex(const char *uri, const char encode_table[256]);
 
 
 
@@ -62,7 +63,7 @@ static char *url_encode(const char *url);
 bool launch_url(const char *url)
 {
     bool success = true;
-    char *safe_url = url_encode(url); /* encode the URL */
+    char *safe_url = encode_uri(url); /* encode the URL */
 
     logfile_message("Launching URL: \"%s\"...", safe_url);
     if(video_is_fullscreen())
@@ -153,6 +154,37 @@ bool launch_url(const char *url)
     return success;
 }
 
+/*
+ * encode_uri_component()
+ * Encodes a URI component. The destination buffer should be 1 + 3x the length
+ * of uri.
+ */
+char* encode_uri_component(const char* uri, char* dest, size_t dest_size)
+{
+    static char encode_table[256] = { 0 };
+
+    /* create an encoding table */
+    if(!encode_table[0]) {
+        for(int i = 1; i < 256; i++) {
+            encode_table[i] = !(
+                (i >= '0' && i <= '9') || /* locale independent */
+                (i >= 'a' && i <= 'z') ||
+                (i >= 'A' && i <= 'Z') ||
+                (strchr("-_.!~*'()", i) != NULL)
+            );
+        }
+        encode_table[0] = 1;
+    }
+
+    /* encode URI component */
+    char* encoded_uri_component = encode_uri_ex(uri, encode_table);
+    str_cpy(dest, encoded_uri_component, dest_size);
+    free(encoded_uri_component);
+    return dest;
+}
+
+
+
 
 
 /* private methods */
@@ -163,38 +195,46 @@ char ch2hex(unsigned char code) {
     return hex[code & 0xF];
 }
 
-/* returns an encoded version of url */
-char* url_encode(const char* url)
+/* returns an encoded version of a URI */
+char* encode_uri(const char* uri)
 {
-    static char encode[256] = { 0 };
-    char* buf = mallocx((3 * strlen(url) + 1) * sizeof(char));
-    char* p = buf;
+    static char encode_table[256] = { 0 };
 
     /* create an encoding table */
-    if(!encode[0]) {
+    if(!encode_table[0]) {
         for(int i = 1; i < 256; i++) {
-            encode[i] = !(
+            encode_table[i] = !(
                 (i >= '0' && i <= '9') || /* locale independent */
                 (i >= 'a' && i <= 'z') ||
                 (i >= 'A' && i <= 'Z') ||
-                (strchr(":/-_.?=&~@#$,;", i) != NULL)
+                (strchr(":/-_.*'!?=&~@#$,;()+", i) != NULL)
             );
         }
-        encode[0] = 1;
+        encode_table[0] = 1;
     }
 
+    /* encode URI */
+    return encode_uri_ex(uri, encode_table);
+}
+
+/* returns an encoded version of a URI, given an encoding table */
+char* encode_uri_ex(const char* uri, const char encode_table[256])
+{
+    char* buf = mallocx((3 * strlen(uri) + 1) * sizeof(char));
+    char* p = buf;
+
     /* encode string */
-    while(*url) {
-        if(encode[(unsigned char)(*url)]) {
+    while(*uri) {
+        if(encode_table[(unsigned char)(*uri)]) {
             *p++ = '%';
-            *p++ = ch2hex((unsigned char)(*url) / 16);
-            *p++ = ch2hex((unsigned char)(*url) % 16);
-            url++;
+            *p++ = ch2hex((unsigned char)(*uri) / 16);
+            *p++ = ch2hex((unsigned char)(*uri) % 16);
+            uri++;
         }
         else
-            *p++ = *url++;
+            *p++ = *uri++;
     }
-    *p = 0;
+    *p = '\0';
 
     /* done */
     return buf;
