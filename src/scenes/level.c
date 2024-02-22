@@ -591,19 +591,6 @@ void level_unload()
     logfile_message("Unloading the background...");
     backgroundtheme = background_unload(backgroundtheme);
 
-    /* deinit the fields */
-    strcpy(file, "");
-    strcpy(name, ""); /* scripting: Level.name may be accessed on Application.onExit */
-    strcpy(musicfile, "");
-    strcpy(theme, "");
-    strcpy(bgtheme, "");
-    strcpy(author, "");
-    strcpy(version, "");
-    strcpy(license, "");
-    strcpy(grouptheme, "");
-    spawn_point = v2d_new(0, 0);
-    act_number = 0;
-
     /* success! */
     logfile_message("The level has been unloaded.");
 }
@@ -1305,6 +1292,19 @@ void level_release()
 
     /* render queue */
     renderqueue_release();
+
+    /* deinitialize the fields */
+    strcpy(file, "");
+    strcpy(name, ""); /* scripting: Level.name may be accessed on Application.onExit */
+    strcpy(musicfile, "");
+    strcpy(theme, "");
+    strcpy(bgtheme, "");
+    strcpy(author, "");
+    strcpy(version, "");
+    strcpy(license, "");
+    strcpy(grouptheme, "");
+    spawn_point = v2d_new(0, 0);
+    act_number = 0;
 
     /* done! */
     logfile_message("level_release() ok");
