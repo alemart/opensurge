@@ -2479,11 +2479,14 @@ void restart(int preserve_level_state)
     char path[PATH_MAXLEN];
     levelstate_t state = saved_state;
 
+    /* copy the filepath before the level fields are cleared */
+    str_cpy(path, file, sizeof(path));
+
     /* restart the scene */
     scenestack_pop();
     scenestack_push(
         storyboard_get_scene(SCENE_LEVEL),
-        str_cpy(path, file, sizeof(path))
+        path
     );
 
     /* restore the saved state */
