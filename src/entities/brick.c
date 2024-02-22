@@ -278,6 +278,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                     (player_is_rolling(team[i]) /*&& fabs(player_speed(team[i]) >= 240.0f*/)
                 ) {
                     if(
+                        !player_is_frozen(team[i]) &&
                         player_senses_layer(team[i], brk->layer) &&
                         player_overlaps(team[i], brk->x - 16, brk->y - 4, brk_width + 32, brk_height)
                     ) {
@@ -321,7 +322,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
             int collision = FALSE;
 
             for(i = 0; i < team_size && !collision; i++) {
-                if(player_senses_layer(team[i], brk->layer)) {
+                if(!player_is_frozen(team[i]) && player_senses_layer(team[i], brk->layer)) {
                     if(is_player_standing_on_platform(team[i], brk))
                         collision = TRUE;
                 }
@@ -385,7 +386,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
 
             /* move the player(s) */
             for(i = 0; i < team_size; i++) {
-                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
+                if(!player_is_frozen(team[i]) && !player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
                         if(is_player_standing_on_platform(team[i], brk)) {
                             v2d_t position = player_position(team[i]);
@@ -433,7 +434,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
 
             /* move the player(s) */
             for(i = 0; i < team_size; i++) {
-                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
+                if(!player_is_frozen(team[i]) && !player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
                         if(is_player_standing_on_platform(team[i], brk)) {
                             v2d_t position = player_position(team[i]);
@@ -463,8 +464,8 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
             for(i=0; i<team_size; i++) {
                 /* get the y-position of the feet of the player */
                 physicsactor_bounding_box(team[i]->pa, &w, &h, &center);
-                if(player_is_frozen(team[i]))
-                    center = player_position(team[i]);
+                /*if(player_is_frozen(team[i]))
+                    center = player_position(team[i]);*/
                 feet = center.y + h/2 - 2;
 
                 /* check collision */
@@ -474,6 +475,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
                         ((player_is_charging(team[i]) || player_is_rolling(team[i])) &&
                         feet < brk->y)
                     ) &&
+                    !player_is_frozen(team[i]) &&
                     player_senses_layer(team[i], brk->layer) &&
                     player_overlaps(team[i], brk->x, brk->y - 10, brk_width, min(8, brk_height))
                 ) {
@@ -535,7 +537,7 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
 
             /* check for collisions */
             for(i = 0; i < team_size && !player; i++) {
-                if(!player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
+                if(!player_is_frozen(team[i]) && !player_is_dying(team[i]) && !player_is_getting_hit(team[i]) && !player_is_midair(team[i])) {
                     if(player_senses_layer(team[i], brk->layer)) {
                         if(is_player_standing_on_platform(team[i], brk))
                             player = team[i];
