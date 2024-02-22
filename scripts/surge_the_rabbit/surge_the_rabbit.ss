@@ -7,6 +7,7 @@
 using SurgeEngine;
 using SurgeEngine.Web;
 using SurgeEngine.Game;
+using SurgeEngine.Lang;
 using SurgeEngine.Level;
 using SurgeEngine.Platform;
 
@@ -21,8 +22,7 @@ object "SurgeTheRabbit"
         if(!canAcceptDonations())
             return;
 
-        url = website + "/contribute?v=" + SurgeEngine.version;
-        Web.launchURL(url);
+        openWebsite("/contribute", {});
     }
 
     fun share()
@@ -32,23 +32,33 @@ object "SurgeTheRabbit"
             Platform.Android.shareText(text);
         }
         else {
-            url = website + "/share?v=" + SurgeEngine.version;
-            Web.launchURL(url);
+            openWebsite("/share", {});
         }
     }
 
     fun rate()
     {
-        p = platformName();
-        url = website + "/rating?platform=" + p + "&v=" + SurgeEngine.version;
-        Web.launchURL(url);
+        openWebsite("/rating", {
+            "platform": platformName()
+        });
     }
 
     fun download()
     {
-        f = Level.name; // FIXME encodeURIComponent()
-        t = Platform.isAndroid ? "desktop" : "mobile";
-        url = website + "/download?type=" + t + "&v=" + SurgeEngine.version + "&from=" + f;
+        openWebsite("/download", {
+            "type": Platform.isAndroid ? "desktop" : "mobile"
+        });
+    }
+
+    fun openWebsite(path, params)
+    {
+        url = website + path;
+        url += "?v=" + SurgeEngine.version;
+        url += "&lang=" + Web.encodeURIComponent(Lang["LANG_ID"]);
+        url += "&from=" + Web.encodeURIComponent(Level.name);
+        foreach(param in params)
+            url += "&" + param.key + "=" + Web.encodeURIComponent(param.value);
+
         Web.launchURL(url);
     }
 
