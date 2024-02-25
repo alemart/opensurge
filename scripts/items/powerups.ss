@@ -518,9 +518,11 @@ object "Item Box" is "entity", "private"
             player = Player[i];
 
             if(player.collider.collidesWith(smallerCollider)) {
-                player.ysp = -player.ysp; // bounce the player
-                crush(player);
-                return;
+                if(canCrush(player)) {
+                    player.ysp = -player.ysp; // bounce the player
+                    crush(player);
+                    return;
+                }
             }
 
             if(player.collider.collidesWith(biggerCollider))
