@@ -327,7 +327,7 @@ object "Debug Mode - Item Selector - Selection" is "awake", "private", "entity"
     }
 }
 
-object "Debug Mode - Item Selector - Selected Entities"// is "private", "awake", "entity"
+object "Debug Mode - Item Selector - Selected Entities" is "private", "awake", "entity"
 {
     public blocked = false;
     selectedEntities = [];

@@ -929,7 +929,7 @@ void sampler_add_brick(heightsampler_t* sampler, const brick_t* brick)
 
     /* moving bricks are a special case */
     if(brick_has_movement_path(brick))
-        size.y += 256; /* FIXME the actual amplitude may be higher */
+        size.y += 128; /* FIXME the actual amplitude may be higher */
 
     return sampler_add(sampler, spawn_point, size);
 }

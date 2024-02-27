@@ -216,6 +216,10 @@ object "Flying Repositioning Method" is "player-repositioning-method"
         dx = leader.winning ? 16 * deltaIndex * -bufferedState.direction : 0;
         targetPosition = (dx == 0) ? bufferedState.position : bufferedState.position.translatedBy(dx, 0);
 
+        // do nothing if the leader dies while the follower is being repositioned
+        if(leader.dying)
+            return;
+
         // land on the ground
         if(!bufferedState.midair && !leader.dying && !leader.frozen) {
             if(followerPosition.distanceTo(targetPosition) <= landingDistance) {
