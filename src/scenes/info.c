@@ -75,7 +75,7 @@ void info_init(void* data)
     /* font */
     font = font_create(FONT_NAME);
     font_set_align(font, FONTALIGN_CENTER);
-    font_set_width(font, VIDEO_SCREEN_W - 2 * PADDING);
+    font_set_width(font, min(426, VIDEO_SCREEN_W - 2 * PADDING));
     font_set_position(font, v2d_new(VIDEO_SCREEN_W / 2, PADDING));
     set_info_text(font);
 
@@ -163,6 +163,7 @@ void set_info_text(font_t* font)
 {
     char path[2][1024];
     bool multiple_datadirs;
+    extern const char LICENSE_TEXT[];
 
     asset_shared_datadir(path[0], sizeof(path[0]));
     asset_user_datadir(path[1], sizeof(path[1]));
@@ -195,7 +196,7 @@ void set_info_text(font_t* font)
         opensurge_game_name(),
 
         GAME_COPYRIGHT,
-        GAME_LICENSE,
+        LICENSE_TEXT,
 
         GAME_VERSION_STRING,
         surgescript_version_string(),

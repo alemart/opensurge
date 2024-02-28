@@ -88,7 +88,7 @@ object "SurgeTheRabbit"
 
     fun isGooglePlayBuild()
     {
-        return SurgeEngine.version.indexOf("googleplay") >= 0;
+        return Platform.isAndroid && SurgeEngine.version.indexOf("googleplay") >= 0;
     }
 
     fun canAcceptDonations()

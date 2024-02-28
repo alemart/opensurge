@@ -451,6 +451,7 @@ SET(GAME_SRCS
   src/third_party/utf8.c
 
   src/misc/icon.c
+  src/misc/license.c
   ${CMAKE_CURRENT_BINARY_DIR}/src/misc/credits.c
 
   src/main.c

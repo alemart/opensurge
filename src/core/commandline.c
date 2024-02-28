@@ -53,6 +53,9 @@ static char* DEFAULT_ARGS[1] = { GAME_UNIXNAME };
  */
 commandline_t commandline_parse(int argc, char **argv)
 {
+    commandline_t cmd;
+    extern const char LICENSE_TEXT[];
+
     /* accept empty input */
     if(argc == 0) {
         argv = DEFAULT_ARGS;
@@ -60,8 +63,6 @@ commandline_t commandline_parse(int argc, char **argv)
     }
 
     /* initialize values */
-    commandline_t cmd;
-
     cmd.video_resolution = COMMANDLINE_UNDEFINED;
     cmd.video_quality = COMMANDLINE_UNDEFINED;
     cmd.fullscreen = COMMANDLINE_UNDEFINED;
@@ -132,7 +133,7 @@ commandline_t commandline_parse(int argc, char **argv)
         }
 
         else if(strcmp(argv[i], "--license") == 0) {
-            console_print("%s\n\n%s", GAME_COPYRIGHT, GAME_LICENSE);
+            console_print("%s\n\n%s", GAME_COPYRIGHT, LICENSE_TEXT);
             exit(0);
         }
 

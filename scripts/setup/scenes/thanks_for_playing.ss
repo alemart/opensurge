@@ -83,7 +83,7 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     {
         fader.fadeIn();
 
-        if(SurgeEngine.mobile)
+        if(SurgeTheRabbit.isGooglePlayBuild())
             Level.loadNext();
     }
 }
