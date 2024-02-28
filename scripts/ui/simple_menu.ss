@@ -51,6 +51,7 @@ This is a simple menu system that is easy to use.
            .setHighlightedOption("yes")      // the option that is initially highlighted
            .setHighlightSound("samples/pause_highlight.wav") // customize the sound
            .setChooseSound("samples/pause_confirm.wav")      // customize the sound
+           .setBackOption("no")              // select this option when the back button is pressed
            .build();
 
  3. Implement functions onChooseMenuOption() and, optionally,
@@ -107,6 +108,7 @@ object "Simple Menu Builder"
     position = Vector2.zero;
     icon = null;
     highlightedOptionId = null;
+    backOptionId = null;
     defaultColor = "ffffff";
     highlightColor = "ffff00";
     fontName = "GoodNeighbors";
@@ -149,9 +151,15 @@ object "Simple Menu Builder"
         return this;
     }
 
-    fun setHighlightedOptionId(optionId)
+    fun setHighlightedOption(optionId)
     {
         highlightedOptionId = optionId;
+        return this;
+    }
+
+    fun setBackOption(optionId)
+    {
+        backOptionId = optionId;
         return this;
     }
 
@@ -215,6 +223,11 @@ object "Simple Menu Builder"
                 Console.print(this.__name + ": unknown option " + highlightedOptionId);
         }
 
+        if(backOptionId !== null) {
+            if(!menu._setBackOption(backOptionId))
+                Console.print(this.__name + ": unknown option " + backOptionId);
+        }
+
         menu._updateDirection();
         return menu;
     }
@@ -230,6 +243,10 @@ object "Simple Menu" is "private", "entity"
     indexOfHighlightedOption = 0;
     nextButton = "down";
     previousButton = "up";
+    actionButton = "fire1";
+    startButton = "fire3";
+    backButton = "fire4";
+    backOptionId = null;
 
     state "main"
     {
@@ -250,13 +267,20 @@ object "Simple Menu" is "private", "entity"
             }
         }
 
-        if(input.buttonPressed("fire1") || input.buttonPressed("fire3")) {
+        for(i = 0; i < n; i++)
+            options[i].setHighlighted(i == indexOfHighlightedOption);
+
+        if(input.buttonPressed(actionButton) || input.buttonPressed(startButton)) {
             choose.play();
             chooseHighlightedOption();
         }
 
-        for(i = 0; i < n; i++)
-            options[i].setHighlighted(i == indexOfHighlightedOption);
+        if(backOptionId !== null) {
+            if(input.buttonPressed(backButton)) {
+                choose.play();
+                chooseBackOption();
+            }
+        }
     }
 
     state "deactivated"
@@ -293,6 +317,17 @@ object "Simple Menu" is "private", "entity"
         }
     }
 
+    fun chooseBackOption()
+    {
+        if(state == "main" && options.length > 0 && backOptionId !== null) {
+            j = _findOptionIndex(backOptionId);
+            if(j >= 0) {
+                deactivate();
+                options[j].choose();
+            }
+        }
+    }
+
     fun highlight(optionId)
     {
         if(!_setHighlightedOption(optionId)) {
@@ -322,6 +357,12 @@ object "Simple Menu" is "private", "entity"
     {
         foreach(option in options)
             option.setFont(fontName, alignment, highlightColor, defaultColor);
+    }
+
+    fun _setBackOption(optionId)
+    {
+        backOptionId = optionId;
+        return backOptionId === null || _findOptionIndex(backOptionId) >= 0;
     }
 
     fun _setHighlightedOption(optionId)
