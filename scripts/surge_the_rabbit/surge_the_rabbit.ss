@@ -16,6 +16,7 @@ object "SurgeTheRabbit"
 {
     public readonly Settings = spawn("SurgeTheRabbitSettings");
     public readonly website = "https://opensurge2d.org";
+    engineVersion = "";
 
     fun donate()
     {
@@ -64,7 +65,7 @@ object "SurgeTheRabbit"
 
     fun isBaseGame()
     {
-        return (Game.title == "Surge the Rabbit");
+        return Game.title == "Surge the Rabbit" && Game.version == engineVersion;
     }
 
     fun platformName()
@@ -103,16 +104,15 @@ object "SurgeTheRabbit"
 
     fun constructor()
     {
-        // print a reminder
-        if(isBaseGame()) {
-            engineVersion = SurgeEngine.version;
-            if((j = engineVersion.indexOf("-")) >= 0)
-                engineVersion = engineVersion.substr(0, j);
+        // find the engine version x.y.z[.w]
+        engineVersion = SurgeEngine.version;
+        if((j = engineVersion.indexOf("-")) >= 0)
+            engineVersion = engineVersion.substr(0, j);
 
-            if(Game.version !== engineVersion) {
-                Console.print("SurgeEngine.version: " + SurgeEngine.version);
-                Console.print("Game.version: " + Game.version);
-            }
+        // print a reminder
+        if(Game.title == "Surge the Rabbit" && Game.version != engineVersion) {
+            Console.print("SurgeEngine.version: " + SurgeEngine.version);
+            Console.print("Game.version: " + Game.version);
         }
     }
 }

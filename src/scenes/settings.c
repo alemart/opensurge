@@ -1419,8 +1419,11 @@ void release_playgame(settings_entry_t* e)
     if(f->thread != NULL)
         al_destroy_thread(f->thread); /* blocking */
 
-    al_destroy_native_file_dialog(f->file_chooser[1]);
-    al_destroy_native_file_dialog(f->file_chooser[0]);
+    if(f->file_chooser[1] != NULL)
+        al_destroy_native_file_dialog(f->file_chooser[1]);
+
+    if(f->file_chooser[0] != NULL)
+        al_destroy_native_file_dialog(f->file_chooser[0]);
 
     engine_remove_event_listener(EVENT_FILECHOOSER_ASYNC, f, filechooser_handle_event);
     engine_remove_event_source(&f->event_source);
