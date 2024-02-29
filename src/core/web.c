@@ -50,6 +50,11 @@ static inline char ch2hex(unsigned char code);
 static char *encode_uri(const char *uri);
 static char *encode_uri_ex(const char *uri, const char encode_table[256]);
 
+#if defined(__ANDROID__)
+static void open_web_page(const char* safe_url);
+static bool is_tv_device();
+#endif
+
 
 
 /* public functions */
@@ -71,18 +76,14 @@ bool launch_url(const char *url)
 
     if(strncmp(safe_url, "http://", 7) == 0 || strncmp(safe_url, "https://", 8) == 0 || strncmp(safe_url, "mailto:", 7) == 0) {
 #if defined(__ANDROID__)
-        /* See https://liballeg.org/a5docs/trunk/platform.html#al_android_get_jni_env */
-        JNIEnv* env = al_android_get_jni_env();
-        jobject activity = al_android_get_activity();
+        if(!is_tv_device()) {
+            open_web_page(safe_url);
+        }
+        else {
+            video_showmessage("Unsupported operation on TV devices");
+            success = false;
+        }
 
-        jclass class_id = (*env)->GetObjectClass(env, activity);
-        jmethodID method_id = (*env)->GetMethodID(env, class_id, "openWebPage", "(Ljava/lang/String;)V");
-
-        jstring jdata = (*env)->NewStringUTF(env, safe_url);
-        (*env)->CallVoidMethod(env, activity, method_id, jdata);
-        (*env)->DeleteLocalRef(env, jdata);
-
-        (*env)->DeleteLocalRef(env, class_id);
         (void)file_exists;
 #elif defined(_WIN32)
         ShellExecuteA(NULL, "open", safe_url, NULL, NULL, SW_SHOWNORMAL);
@@ -239,3 +240,39 @@ char* encode_uri_ex(const char* uri, const char encode_table[256])
     /* done */
     return buf;
 }
+
+#if defined(__ANDROID__)
+
+/* open a web page on Android */
+void open_web_page(const char* safe_url)
+{
+    /* See https://liballeg.org/a5docs/trunk/platform.html#al_android_get_jni_env */
+    JNIEnv* env = al_android_get_jni_env();
+    jobject activity = al_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "openWebPage", "(Ljava/lang/String;)V");
+
+    jstring jdata = (*env)->NewStringUTF(env, safe_url);
+    (*env)->CallVoidMethod(env, activity, method_id, jdata);
+    (*env)->DeleteLocalRef(env, jdata);
+
+    (*env)->DeleteLocalRef(env, class_id);
+}
+
+/* Are we running on Android TV? */
+bool is_tv_device()
+{
+    JNIEnv* env = al_android_get_jni_env();
+    jobject activity = al_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "isTVDevice", "()Z");
+
+    jboolean result = (*env)->CallBooleanMethod(env, activity, method_id);
+
+    (*env)->DeleteLocalRef(env, class_id);
+    return result;
+}
+
+#endif

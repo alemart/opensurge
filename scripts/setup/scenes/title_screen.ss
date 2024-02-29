@@ -488,6 +488,16 @@ object "Title Screen - Menu Item - Quit" is "private", "detached", "entity"
     delegate = spawn("Title Screen - Menu Item")
                .setText("$TITLESCREEN_QUIT");
 
+    back = "fire4";
+
+    state "main"
+    {
+        // handle the back button (required on Android)
+        input = Player.active.input;
+        if(input.buttonPressed(back))
+            onSelect();
+    }
+
     fun onEnter()
     {
         Level.loadNext();
@@ -521,6 +531,8 @@ object "Title Screen - Menu Item" is "private", "detached", "entity"
     label = Text("Title Screen - Menu Item");
     pointer = spawn("Title Screen - Pointer");
     text = "";
+    action = "fire1";
+    start = "fire3";
     highlighted = false;
 
     state "main"
@@ -529,7 +541,7 @@ object "Title Screen - Menu Item" is "private", "detached", "entity"
             return;
 
         input = Player.active.input;
-        if(input.buttonPressed("fire1") || input.buttonPressed("fire3"))
+        if(input.buttonPressed(action) || input.buttonPressed(start))
             parent.onSelect();
     }
 

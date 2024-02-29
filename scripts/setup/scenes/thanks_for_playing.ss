@@ -37,6 +37,7 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     menu = spawn("Simple Menu Builder")
            .addOption("yes", "$THANKSFORPLAYING_YES",  Vector2.zero)
            .addOption("no",  "$THANKSFORPLAYING_NO", Vector2.down.scaledBy(16 * 1))
+           .setBackOption("no")
            .setPosition(Vector2(250, 184))
            .setIcon("Thanks for Playing - Pointer")
            .setHighlightColor("ffee11")

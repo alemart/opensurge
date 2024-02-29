@@ -624,7 +624,9 @@ void update_waiting()
 
     /* cancel */
     if(input_button_pressed(input, BACK_BUTTON)) {
-        option = OPTION_CONTINUE;
+        /* the back button must not act as a toggle on Android TV
+           https://developer.android.com/training/tv/start/controllers#back-button */
+        option = OPTION_EXIT;
         state = STATE_DISAPPEARING;
         sound_play(sound[SOUND_CANCEL]);
     }

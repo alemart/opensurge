@@ -23,6 +23,7 @@ object "Play Classic Levels" is "setup"
     menu = spawn("Simple Menu Builder")
            .addOption("yes", "$PLAYCLASSICLEVELS_YES", Vector2.zero)
            .addOption("no",  "$PLAYCLASSICLEVELS_NO",  Vector2.down.scaledBy(18))
+           .setBackOption("no")
            .setIcon("Play Classic Levels - Pointer")
            .setFontName("End of Demo - Text")
            .setAlignment("center")

@@ -10,23 +10,23 @@ using SurgeEngine.Input;
 object "Default Pause and Quit"
 {
     input = Input("default");
+    start = "fire3";
+    back = "fire4";
 
     state "main"
     {
         if(!Level.cleared) {
-            if(input.buttonPressed("fire3"))
+            // handle the start and the back buttons
+            if(input.buttonPressed(start) || input.buttonPressed(back))
                 Level.pause();
-            /*
-            // the following is obsolete since Open Surge 0.6.1
-            // (not helpful in terms of user experience)
-            else if(input.buttonPressed("fire4"))
-                Level.quit();
-            */
+
+            // handling the back button is required on Android; we enforce it
+            // in all systems in order to maintain consistency
         }
     }
 }
 
-// an alias kept for retro-compatiblity with Open Surge 0.5.x
+// the following object is kept for backwards compatibility with Open Surge 0.5.x
 object "Pause and Quit"
 {
     obj = spawn("Default Pause and Quit");
