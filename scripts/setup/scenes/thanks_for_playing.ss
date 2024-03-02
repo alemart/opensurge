@@ -9,6 +9,7 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Level;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
+using SurgeEngine.Platform;
 using SurgeEngine;
 using SurgeTheRabbit;
 
@@ -84,8 +85,10 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     {
         fader.fadeIn();
 
-        if(SurgeTheRabbit.isGooglePlayBuild())
-            Level.loadNext();
+        if(Platform.isAndroid) {
+            if(SurgeTheRabbit.isBuild("googleplay"))
+                Level.loadNext();
+        }
     }
 }
 

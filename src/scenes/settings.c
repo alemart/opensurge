@@ -142,6 +142,7 @@ static const char* url_encoded_basename(const char* url);
 static bool download_to_cache(ALLEGRO_FILE* f, const char* destination_path, void (*on_progress)(double,void*), void* context);
 static bool need_to_download_to_cache(ALLEGRO_FILE* f, const char* destination_path);
 static void show_download_progress(double percentage, void* context);
+static char* application_id(char* buffer, size_t buffer_size);
 #endif
 
 /* helpers */
@@ -1344,7 +1345,19 @@ bool display_mods_from_base_game(settings_entry_t* e)
     if(0 != strcmp(opensurge_game_version(), version_string))
         return false;
 
-    return asset_gamedir() == NULL;
+    /* no custom gamedir */
+    if(asset_gamedir() != NULL)
+        return false;
+
+# if defined(__ANDROID__)
+    /* official builds */
+    char app_id[64];
+    application_id(app_id, sizeof(app_id));
+    if(!(0 == strcmp(app_id, "org.opensurge2d.surgeengine") && NULL != strstr(GAME_VERSION_STRING, "googleplay")))
+        return false;
+# endif
+
+    return true;
 #else
     return false;
 #endif
@@ -1771,6 +1784,31 @@ void show_download_progress(double percentage, void* context)
 
     if(fn != NULL)
         fn(percentage);
+}
+
+/* get the application ID */
+char* application_id(char* buffer, size_t buffer_size)
+{
+    JNIEnv* env = al_android_get_jni_env();
+    jobject activity = al_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "getPackageName", "()Ljava/lang/String;");
+
+    jstring jresult = (*env)->CallObjectMethod(env, activity, method_id);
+    jboolean is_null_result = (*env)->IsSameObject(env, jresult, NULL);
+    if(!is_null_result) {
+        const char* str = (*env)->GetStringUTFChars(env, jresult, NULL);
+        str_cpy(buffer, str, buffer_size);
+        (*env)->ReleaseStringUTFChars(env, jresult, str);
+    }
+    else if(buffer_size > 0)
+        buffer[0] = '\0';
+
+    (*env)->DeleteLocalRef(env, jresult);
+    (*env)->DeleteLocalRef(env, class_id);
+
+    return buffer;
 }
 
 #endif

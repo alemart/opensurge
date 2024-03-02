@@ -87,17 +87,19 @@ object "SurgeTheRabbit"
         return SurgeEngine.version.indexOf("-dev") >= 0;
     }
 
-    fun isGooglePlayBuild()
+    fun isBuild(buildName)
     {
-        return Platform.isAndroid && SurgeEngine.version.indexOf("googleplay") >= 0;
+        return SurgeEngine.version.indexOf(buildName) >= 0;
     }
 
     fun canAcceptDonations()
     {
         /* adding an external donation page to an Android app published
            in the Google Play Store is a violation of their policy */
-        if(isGooglePlayBuild())
-            return false;
+        if(Platform.isAndroid) {
+            if(isBuild("googleplay"))
+                return false;
+        }
 
         return isBaseGame();
     }
