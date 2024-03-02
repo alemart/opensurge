@@ -41,6 +41,6 @@ char* asset_cache_path(const char* relative_path, char* buffer, size_t buffer_si
 
 const char* asset_writedir();
 const char* asset_gamedir();
-bool asset_is_valid_gamedir(const char* fullpath);
+bool asset_is_valid_gamedir(const char* fullpath, bool* is_legacy_gamedir);
 
 #endif

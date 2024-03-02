@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-02-28"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-03-01"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -101,6 +101,7 @@ OPTIONS_DOWNLOAD_DESKTOP    "Baixar a engine para Desktops"
 OPTIONS_DOWNLOAD_MOBILE     "Baixar a engine para mobile"
 OPTIONS_PLAYMOD             "Jogar um game"
 OPTIONS_PLAYMOD_NOTAGAME    "O item selecionado não é um jogo do Open Surge!"
+OPTIONS_PLAYMOD_LEGACYERROR "Jogos muito antigos do Open Surge não são suportados."
 OPTIONS_PLAYMOD_COMPATWARN  "O modo de compatibilidade é um recurso projetado para melhorar a sua experiência com os jogos. Quer mesmo desativá-lo?"
 OPTIONS_MODSTORAGE          "Armazenamento"
 OPTIONS_MODSTORAGE_FOLDER   "Pasta de arquivos"

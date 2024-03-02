@@ -103,6 +103,7 @@ FIXME OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
 FIXME OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
 FIXME OPTIONS_PLAYMOD             "Play a game"
 FIXME OPTIONS_PLAYMOD_NOTAGAME    "The selected item is not an Open Surge game!"
+FIXME OPTIONS_PLAYMOD_LEGACYERROR "Legacy Open Surge games are not supported."
 FIXME OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your gaming experience. Are you sure you want to disable it?"
 FIXME OPTIONS_MODSTORAGE          "Storage"
 FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory

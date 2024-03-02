@@ -1555,7 +1555,8 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
 
     /* load the game */
     if(path_to_game != NULL && *path_to_game != '\0') {
-        if(asset_is_valid_gamedir(path_to_game)) {
+        bool is_legacy_gamedir = false;
+        if(asset_is_valid_gamedir(path_to_game, &is_legacy_gamedir)) {
             commandline_t cmd = commandline_parse(0, NULL);
             str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
             cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
@@ -1566,7 +1567,11 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
         }
         else {
             sound_play(SFX_DENY);
-            alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
+
+            if(is_legacy_gamedir)
+                alert("%s", lang_get("OPTIONS_PLAYMOD_LEGACYERROR"));
+            else
+                alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
         }
 
     }
@@ -1640,7 +1645,8 @@ const char* find_absolute_filepath(const char* content_uri)
         al_fclose(f);
 
     /* make sure the path points to a valid opensurge game */
-    if(path_to_game != NULL && !asset_is_valid_gamedir(path_to_game)) {
+    bool is_legacy_gamedir = false;
+    if(path_to_game != NULL && !asset_is_valid_gamedir(path_to_game, &is_legacy_gamedir)) {
 
         /* remove the downloaded file from cache */
         if(0 != remove(path_to_game)) {
@@ -1648,9 +1654,15 @@ const char* find_absolute_filepath(const char* content_uri)
             logfile_message("Error deleting file from cache. %s", err);
         }
 
-        /* display message */
+        /* display an error message */
         sound_play(SFX_DENY);
-        alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
+
+        if(is_legacy_gamedir)
+            alert("%s", lang_get("OPTIONS_PLAYMOD_LEGACYERROR"));
+        else
+            alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
+
+        /* not a valid gamedir */
         path_to_game = NULL;
 
     }

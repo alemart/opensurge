@@ -103,9 +103,9 @@ static ALLEGRO_PATH* create_path_at_cache(const char* filename, const char* dirp
 static bool clear_cached_games();
 static bool clear_cached_files(const char* folder_name, time_t time_to_live);
 
-static bool is_uncompressed_gamedir(const char* fullpath);
-static bool is_compressed_gamedir(const char* fullpath);
-static bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context, char path_separator);
+static bool is_uncompressed_gamedir(const char* fullpath, bool* is_legacy_gamedir);
+static bool is_compressed_gamedir(const char* fullpath, bool* is_legacy_gamedir);
+static bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context, char path_separator, bool* is_legacy_gamedir);
 static bool actual_file_exists(const char* filepath, void* context);
 static bool virtual_file_exists(const char* filepath, void* context);
 
@@ -682,8 +682,9 @@ const char* asset_writedir()
  * asset_is_valid_gamedir()
  * Checks if a folder or compressed archive stores an opensurge game
  * Both allegro and physfs must be initialized before calling this
+ * is_legacy_gamedir may be NULL. Legacy gamedirs are not valid gamedirs
  */
-bool asset_is_valid_gamedir(const char* fullpath)
+bool asset_is_valid_gamedir(const char* fullpath, bool* is_legacy_gamedir)
 {
     bool ret = false;
 
@@ -696,13 +697,13 @@ bool asset_is_valid_gamedir(const char* fullpath)
 
     if(mode & ALLEGRO_FILEMODE_READ) {
         if(mode & ALLEGRO_FILEMODE_ISDIR)
-            ret = is_uncompressed_gamedir(fullpath);
+            ret = is_uncompressed_gamedir(fullpath, is_legacy_gamedir);
 #if 0
         else if(mode & ALLEGRO_FILEMODE_ISFILE) /* doesn't work properly on Android, Linux?! */
 #else
         else
 #endif
-            ret = is_compressed_gamedir(fullpath);
+            ret = is_compressed_gamedir(fullpath, is_legacy_gamedir);
     }
 
     al_destroy_fs_entry(e);
@@ -1171,7 +1172,7 @@ char* find_gamedirname(const char* gamedir, char* buffer, size_t buffer_size)
  */
 bool is_valid_root_folder()
 {
-    return is_gamedir("/", virtual_file_exists, NULL, '/');
+    return is_gamedir("/", virtual_file_exists, NULL, '/', NULL);
 }
 
 /*
@@ -1394,9 +1395,9 @@ bool clear_cached_files(const char* folder_name, time_t time_to_live)
  * is_uncompressed_gamedir()
  * Checks if a folder is a valid opensurge game
  */
-bool is_uncompressed_gamedir(const char* fullpath)
+bool is_uncompressed_gamedir(const char* fullpath, bool* is_legacy_gamedir)
 {
-    return is_gamedir(fullpath, actual_file_exists, NULL, ALLEGRO_NATIVE_PATH_SEP);
+    return is_gamedir(fullpath, actual_file_exists, NULL, ALLEGRO_NATIVE_PATH_SEP, is_legacy_gamedir);
 }
 
 /*
@@ -1404,7 +1405,7 @@ bool is_uncompressed_gamedir(const char* fullpath)
  * Checks if a compressed archive stores a valid opensurge game
  * The compressed archive must be of a type supported by physfs
  */
-bool is_compressed_gamedir(const char* fullpath)
+bool is_compressed_gamedir(const char* fullpath, bool* is_legacy_gamedir)
 {
     const char PREFIX[] = "/__validate__";
     const size_t PREFIX_SIZE = sizeof(PREFIX) - 1;
@@ -1423,7 +1424,7 @@ bool is_compressed_gamedir(const char* fullpath)
     find_root_directory(PREFIX, root + PREFIX_SIZE, sizeof(root) - PREFIX_SIZE);
     LOG("%s: testing %s", __func__, root + PREFIX_SIZE);
 
-    ret = is_gamedir(root, virtual_file_exists, NULL, '/');
+    ret = is_gamedir(root, virtual_file_exists, NULL, '/', is_legacy_gamedir);
 
     if(!PHYSFS_unmount(fullpath)) {
         const char* err = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
@@ -1436,18 +1437,24 @@ bool is_compressed_gamedir(const char* fullpath)
 /*
  * is_gamedir()
  * A helper to check if a generic root folder stores an opensurge game
+ * is_legacy_gamedir may be NULL. Legacy gamedirs are not valid gamedirs
  */
-bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context, char path_separator)
+bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* context, char path_separator, bool* is_legacy_gamedir)
 {
     const char* file_list[] = {
         "surge.rocks",
         "surge.prefs",
         "surge.cfg",
+        "languages/english.lng", /* available in legacy games */
         NULL
     };
 
     ALLEGRO_PATH* base_path = al_create_path_for_directory(root);
     bool valid_gamedir = false;
+
+    /* initialize is_legacy_gamedir */
+    if(is_legacy_gamedir != NULL)
+        *is_legacy_gamedir = false;
 
     /* for each file in file_list, check if it exists relative to the root (absolute path) */
     for(const char** vpath = file_list; *vpath != NULL && !valid_gamedir; vpath++) {
@@ -1456,8 +1463,17 @@ bool is_gamedir(const char* root, bool (*file_exists)(const char*,void*), void* 
 
         if(al_join_paths(path, tail)) {
             const char* fullpath = al_path_cstr(path, path_separator);
-            if(file_exists(fullpath, context))
-                valid_gamedir = true;
+            if(file_exists(fullpath, context)) {
+
+                /* is it a legacy gamedir? */
+                bool legacy_gamedir = (vpath >= file_list + 3);
+                if(is_legacy_gamedir != NULL)
+                    *is_legacy_gamedir = legacy_gamedir;
+
+                /* legacy gamedirs are not valid gamedirs */
+                valid_gamedir = !legacy_gamedir;
+
+            }
         }
 
         al_destroy_path(tail);
