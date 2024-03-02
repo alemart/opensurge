@@ -293,7 +293,7 @@ void mobilegamepad_init(int _flags)
 
     /* make it visible */
     is_visible = true;
-    user_opacity = 100;
+    user_opacity = !is_tv_device() ? 100 : 0;
     alpha = 0.0f; /* make it fade in nicely when initializing */
 
     /* success! */
