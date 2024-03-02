@@ -333,13 +333,21 @@ bool file_exists(const char *filepath)
  */
 bool directory_exists(const char* dirpath)
 {
+    bool exists;
+    char* tmp = NULL;
+
     /* There must not be a trailing directory separator on the path */
-    assertx(dirpath && *dirpath && 0 == strspn(dirpath + (strlen(dirpath) - 1), "/\\"));
+    int len = strlen(dirpath);
+    if(len > 0 && strspn(dirpath + (len - 1), "/\\") > 0) {
+        tmp = str_dup(dirpath);
+        tmp[len-1] = '\0';
+        dirpath = tmp;
+    }
 
 #if !defined(_WIN32)
 
     struct stat st;
-    return (stat(dirpath, &st) == 0) && S_ISDIR(st.st_mode);
+    exists = (stat(dirpath, &st) == 0) && S_ISDIR(st.st_mode);
 
 #else
 
@@ -352,9 +360,15 @@ bool directory_exists(const char* dirpath)
 
     */
     struct _stat st;
-    return (_stat(dirpath, &st) == 0) && ((st.st_mode & _S_IFMT) == _S_IFDIR);
+    exists = (_stat(dirpath, &st) == 0) && ((st.st_mode & _S_IFMT) == _S_IFDIR);
 
 #endif
+
+    if(tmp != NULL)
+        free(tmp);
+
+    /* done! */
+    return exists;
 }
 
 /*

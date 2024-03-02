@@ -1266,13 +1266,19 @@ ALLEGRO_PATH* create_path_at_cache(const char* filename, const char* dirpath)
 {
     const char SLASH = ALLEGRO_NATIVE_PATH_SEP;
     ALLEGRO_PATH* cache = NULL;
+    char* tmp = NULL;
 
 #if !(HAVE_CACHE_DIR)
     assertx(!("Unsupported operation: no cache dir"));
 #endif
 
-    /* There must not be a trailing directory separator on the path */
-    assertx(dirpath && *dirpath && 0 == strspn(dirpath + (strlen(dirpath) - 1), "/\\"));
+    /* There should not be a trailing directory separator on dirpath */
+    int len = strlen(dirpath);
+    if(len > 0 && strspn(dirpath + (len - 1), "/\\") > 0) {
+        tmp = str_dup(dirpath);
+        tmp[len-1] = '\0';
+        dirpath = tmp;
+    }
 
     if(NULL != (cache = al_get_standard_path(ALLEGRO_TEMP_PATH))) {
 
@@ -1288,6 +1294,9 @@ ALLEGRO_PATH* create_path_at_cache(const char* filename, const char* dirpath)
             al_set_path_filename(cache, filename);
 
     }
+
+    if(tmp != NULL)
+        free(tmp);
 
     return cache;
 }
