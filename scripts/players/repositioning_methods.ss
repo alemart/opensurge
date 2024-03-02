@@ -370,6 +370,7 @@ object "Default Repositioning Method" is "player-repositioning-method", "private
         follower.frozen = true;
         follower.input.enabled = false;
         follower.visible = true;
+        follower.angle = 0;
         follower.transform.position = leader.transform.position.translatedBy(0, dy);
 
         grv = Level.gravity;
