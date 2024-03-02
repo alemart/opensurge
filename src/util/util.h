@@ -77,5 +77,6 @@ int parse_version_number_ex(const char* version_string, int* x, int* y, int* z, 
 char* stringify_version_number(int version_code, char* buffer, size_t buffer_size); /* convert a version code to a version string of the form x.y.z[.w] */
 const char* opensurge_game_version(); /* the version of the game / MOD that is being run in the engine */
 const char* opensurge_game_name(); /* the name of the game / MOD that is being run in the engine */
+bool is_tv_device(); /* are we in a Smart TV? */
 
 #endif

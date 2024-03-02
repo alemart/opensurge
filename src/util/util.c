@@ -719,3 +719,26 @@ int wrapped_mkdir(const char* path, mode_t mode)
 
 #endif
 }
+
+/* Are we in a Smart TV? */
+bool is_tv_device()
+{
+#if defined(__ANDROID__)
+
+    JNIEnv* env = al_android_get_jni_env();
+    jobject activity = al_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "isTVDevice", "()Z");
+
+    jboolean result = (*env)->CallBooleanMethod(env, activity, method_id);
+
+    (*env)->DeleteLocalRef(env, class_id);
+    return result;
+
+#else
+
+    return false;
+
+#endif
+}

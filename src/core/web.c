@@ -52,7 +52,6 @@ static char *encode_uri_ex(const char *uri, const char encode_table[256]);
 
 #if defined(__ANDROID__)
 static void open_web_page(const char* safe_url);
-static bool is_tv_device();
 #endif
 
 
@@ -258,21 +257,6 @@ void open_web_page(const char* safe_url)
     (*env)->DeleteLocalRef(env, jdata);
 
     (*env)->DeleteLocalRef(env, class_id);
-}
-
-/* Are we running on Android TV? */
-bool is_tv_device()
-{
-    JNIEnv* env = al_android_get_jni_env();
-    jobject activity = al_android_get_activity();
-
-    jclass class_id = (*env)->GetObjectClass(env, activity);
-    jmethodID method_id = (*env)->GetMethodID(env, class_id, "isTVDevice", "()Z");
-
-    jboolean result = (*env)->CallBooleanMethod(env, activity, method_id);
-
-    (*env)->DeleteLocalRef(env, class_id);
-    return result;
 }
 
 #endif
