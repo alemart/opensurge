@@ -1,13 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Open Surge: a fun 2D retro platformer inspired by Sonic games and a game creation system</title>
-    <meta name="robots" content="index, follow">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Open Surge is a fun 2D retro platformer inspired by Sonic games and a game creation system that lets you unleash your creativity!">
-    <meta property="og:image" content="http://opensurge2d.org/icon.png">
-    <meta name="flattr:id" content="70ykez">
+    <title>Surge Engine: 2D retro game engine</title>
+    <meta name="author" content="Alexandre Martins">
+    <meta name="description" content="Open Surge Engine is the 2D retro game engine that helps you make your dreams come true! Surge the Rabbit is a free and open source fun platformer inspired by 16-bit Sonic classics. SurgeScript is an easy and powerful scripting language for games.">
+    <meta name="keywords" content="surge the rabbit, opensurge, open surge, surgeengine, surge engine, surgescript, surge script, games, gaming, gamedev, game dev, game development, game engine, game creator, game maker, video game, retro game, mobile game, open source game, libre game, free game, indie game, fan game, platform game, platformer, side scroller, jump and run, jump 'n' run, action game, arcade, free and open source, foss, floss, awesome, amazing, epic, cool, fun, joy, joyful, happy, happiness, c, c language, opengl, allegro, allegro5, allegro library, liballegro, liballeg, 16 bit, surge, sonic, mods, modding, homebrew, hobby, hobbyist">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="Surge Engine">
+    <meta property="og:description" content="The 2D retro game engine that helps you make your dreams come true!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://opensurge2d.org/">
+    <meta property="og:image" content="https://opensurge2d.org/img/surge.png">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120511928-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -15,154 +19,517 @@
       gtag('js', new Date());
       gtag('config', 'UA-120511928-1');
     </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css">
     <link rel="shortcut icon" href="favicon.ico">
-    <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy" rel="stylesheet">
-    <link href="/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
-        h2 { font-weight: bold; margin-top: 1.5em; margin-bottom: 0.75em; }
-        h2:before {
-            margin-right: 0.2em;
-            margin-bottom: -0.2em;
-            display: inline-block;
-            content: ' ';
-            background-image: url('thunder.svg');
-            background-size: 32px 32px;
-            height: 32px;
-            width: 32px;
+      /* general */
+      body {
+        background-color: #1e2226;
+        color: #b2bcc7;
+        font-family: 'Noto Sans', sans-serif;
+        font-weight: 300;
+      }
+
+      a:any-link:not(.pure-button,.card) {
+        color: #b2bcc7;
+        text-decoration: underline;
+        text-decoration-color: #a1abb6;
+        text-decoration-color: #909aa5;
+        text-decoration-color: #808994;
+        text-decoration-color: #707883;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .text-note {
+        font-size: 0.8em;
+      }
+
+      .h-padding {
+        padding: 0 1em 0 1em;
+      }
+
+      .v-padding {
+        padding: 1em 0 1em 0;
+      }
+
+      .bound-layout {
+        max-width: 1280px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .pure-button {
+        background-color: #ffee11;
+        font-weight: 400;
+      }
+
+      /* sections */
+      #content {
+        overflow-x: hidden; /* .reveal causes scrollbars to appear */
+      }
+
+      #content section {
+        margin-top: 2em;
+        font-size: 1.2em;
+      }
+
+      #content section h2 {
+        color: #ffee11;
+        font-weight: 300;
+      }
+
+      #content section .picture-container {
+        order: 2;
+      }
+
+      #content section .picture-container img.picture {
+        max-width: 80%;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
+
+      #content section ul > li::marker {
+        content: '\26A1';
+      }
+
+      @media screen and (min-width: 1024px) {
+        #content section .picture-container {
+          order: inherit;
+          padding-top: 3em;
         }
-        @media(min-width:768px) {
-            section p, section ul { margin-left: 1.9em; }
+
+        /* perspective effect */
+        #content section .picture-container {
+          perspective: 512px;
+          perspective-origin: right center;
         }
+
+        #content section .picture-container.picture-reverse {
+          perspective-origin: left center;
+        }
+
+        #content section .picture-container img.picture {
+          max-width: 90%;
+          transform: rotateY(-16.875deg);
+        }
+ 
+        #content section .picture-container.picture-reverse img.picture {
+          transform: rotateY(16.875deg);
+        }
+      }
+
+      /* splash area */
+      #splash {
+        font-size: 1.5em;
+        background-color: #9063ff;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        background-image: url("img/waterworks_1.png");
+      }
+
+      #splash > div {
+        background-color: rgba(144, 99, 255, 0.61);
+      }
+
+      #splash .bound-layout {
+        position: relative;
+        padding-bottom: 2em;
+      }
+
+      #splash h1, #splash h2 {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      #splash h1 {
+        color: #ffee11;
+        font-weight: 900;
+        font-size: 3em;
+        -webkit-text-stroke: 1px #000;
+        text-shadow:
+          3px 3px 0 #000,
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
+      }
+
+      #splash h2 {
+        max-width: 512px;
+        color: #fff;
+        font-weight: 900;
+        font-size: 1em;
+        text-shadow:
+          2px 2px 0 #000,
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
+      }
+
+      #surge-cartoon {
+        display: none;
+      }
+
+      @media screen and (min-width: 1280px) {
+        #surge-cartoon {
+          display: inline-block;
+          position: absolute;
+          right: 3em;
+          bottom: 0;
+          max-width: 100%;
+        }
+      }
+
+      /* download area */
+      #download img.platform {
+        width: auto;
+        height: 64px;
+        padding: 8px;
+      }
+
+      /* learning area */
+      .card {
+        display: block;
+        text-align: center;
+        background-color: #282c31;
+        border-radius: 16px;
+        padding: 1em;
+        margin: 1em;
+        border: 2px solid #1e2226;
+        transition: transform .2s ease-in-out;
+      }
+
+      .card:any-link {
+        color: #b2bcc7;
+        text-decoration: none;
+      }
+
+      .card:hover, .card:active {
+        border: 2px solid #ffee11;
+      }
+
+      @media screen and (min-width: 1024px) {
+        .card {
+          min-height: 224px;
+        }
+
+        .card:hover {
+          transform: scale(1.1);
+        }
+      }
+
+      @media screen and (min-width: 1280px) {
+        .card {
+          min-height: 192px;
+        }
+      }
+
+      .card span.icon {
+        margin-right: 0.25em;
+      }
+
+      .card span.icon.smaller {
+        font-size: 0.85em;
+      }
+
+      .card p {
+        font-size: 0.9em;
+      }
+
+      /* footer */
+      footer {
+        background-color: #282c31;
+        padding: 0 2em 0 2em;
+      }
+
+      footer ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.9em;
+      }
+
+      footer ul > li {
+        margin-bottom: 0.1em;
+      }
+
+      footer p {
+        margin-top: 1.25em;
+      }
+
+      footer h5 {
+        margin: 1.25em 0 1.25em 0;
+      }
+
+      /* reveal on scroll */
+      .reveal {
+        opacity: 1;
+        transition: all 0.5s ease-out;
+      }
+
+      .reveal.unrevealed.picture-reverse {
+        opacity: 0;
+        transform: translateX(-5em);
+      }
+
+      .reveal.unrevealed:not(.picture-reverse) {
+        opacity: 0;
+        transform: translateX(5em);
+      }
     </style>
+    <script>
+    /* reveal on scroll */
+    window.onload = function() {
+        if(typeof IntersectionObserver === "undefined")
+            return;
+
+        const observer = new IntersectionObserver(function(entries) {
+            for(const entry of entries) {
+                if(entry.intersectionRatio >= 0.5)
+                    entry.target.classList.remove("unrevealed");
+                else if(entry.intersectionRatio == 0.0)
+                    entry.target.classList.add("unrevealed");
+            }
+        }, { threshold: [0, 0.5] });
+
+        document.querySelectorAll(".reveal").forEach(function(reveal) {
+            observer.observe(reveal);
+        });
+    };
+    </script>
   </head>
   <body>
-   <div class="container">
-    <header class="text-center my-3">
-        <img class="img-fluid" src="logo.png" alt="Open Surge">
-    </header>
-    <nav class="d-flex flex-column flex-sm-row justify-content-center">
-      <a href="#download" class="btn btn-primary cartoon m-3">Play</a>
-      <a href="http://wiki.opensurge2d.org/Introduction_to_Modding" target="_blank" class="btn btn-primary cartoon m-3">Create</a>
-      <a href="/share" target="_blank" class="btn btn-primary cartoon m-3">Share</a>
-      <a href="https://forum.opensurge2d.org/" class="btn btn-primary cartoon m-3">Forum</a>
-      <a href="https://discord.gg/w8JqM7m" target="_blank" class="btn btn-primary cartoon m-3"><img src="pics/discord.png" alt="Discord server" class="d-none d-sm-inline"><span class="d-sm-none">Discord server</span></a>
-    </nav>
-    <section id="intro" class="text-center p-3">
-      <p class="mx-auto" style="max-width:700px">Open Surge is a fun 2D retro platformer inspired by Sonic games and a game creation system that lets you unleash your creativity!</p>
-      <div class="mx-4 mb-3 text-center cartoon">
-        <img src="surge-demo.gif" alt="Demo" class="img-fluid" style="width:600px">
-      </div>
-      <iframe src="https://ghbtns.com/github-btn.html?user=alemart&repo=opensurge&type=star&count=true&size=large" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
-      <iframe src="https://ghbtns.com/github-btn.html?user=alemart&repo=opensurge&type=watch&count=true&size=large&v=2" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
-    </section>
-    <section id="download">
-      <h2>Download the game</h2>
-      <div class="container-fluid text-center">
-        <div class="row">
-          <div class="col-xs-12 col-md">
-            <a href="https://alemart7.gamejolt.io/surge-the-rabbit" target="_blank"><img src="pics/windows.png" class="os-logo"></a>
-            <h3 class="mb-3">Windows</h3>
-            <a href="https://alemart7.gamejolt.io/surge-the-rabbit" target="_blank" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
-            <small class="d-block">via <a href="https://alemart7.gamejolt.io/surge-the-rabbit" target="_blank">Game Jolt</a></small>
-          </div>
-          <div class="col-xs-12 col-md">
-            <a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" target="_blank"><img src="pics/linux.png" class="os-logo"></a>
-            <h3 class="mb-3">Linux</h3>
-            <a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" target="_blank" class="d-block m-2"><i class="fa fa-download mr-2"></i>Get it here</a>
-            <small class="d-block"><a href="https://snapcraft.io/opensurge" target="_blank">Snap</a> | <a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" target="_blank">Flatpak</a> | <a href="http://forum.opensurge2d.org/viewtopic.php?id=2041" target="_blank">distros</a></small>
-          </div>
-          <div class="col-xs-12 col-md">
-            <a href="https://forms.gle/BRArRjgfw1Bs59ii7" target="_blank"><img src="pics/android.png" class="os-logo"></a>
-            <h3 class="mb-3">Android</h3>
-            <a href="https://forms.gle/BRArRjgfw1Bs59ii7" target="_blank" class="d-block m-2"><i class="fa fa-mobile mr-2"></i>Join our beta</a>
-            <small class="d-block">mobile version: soon</small>
-          </div>
+    <header id="splash" class="pure-g">
+      <div class="pure-u-1">
+        <div class="bound-layout h-padding text-center">
+          <h1>Surge Engine</h1>
+          <h2>The 2D retro game engine that helps you make your dreams come true!</h2>
+          <img id="surge-cartoon" src="img/surge.png" alt="Surge the Rabbit">
         </div>
       </div>
-      <p class="mt-2">&nbsp;</p>
-      <p class="small text-center">
-        <span>Latest release: 0.6.0.3</span><br>
-        <a href="http://forum.opensurge2d.org/viewtopic.php?id=1931" target="_blank">dev builds for nerds</a> | <a href="http://wiki.opensurge2d.org/Introduction_to_Modding" target="_blank">create your game</a> | <a href="https://docs.opensurge2d.org" target="_blank">learn scripting</a><br>
-        <a href="https://forum.opensurge2d.org/viewtopic.php?id=2135" target="_blank">unofficial macOS version</a> | <a href="https://snapcraft.io/install/opensurge/raspbian" target="_blank">play on Raspberry Pi</a><br>
-        <a href="https://github.com/alemart/opensurge" target="_blank">explore the source code</a>
-      </p>
-    </section>
-    <section id="about">
-      <h2>About Open Surge</h2>
-      <p>Open Surge is two projects in one: a game and a game creation system (game engine). It is released as <a href="https://en.wikipedia.org/wiki/Free_and_open-source_software" target="_blank">free and open source software</a>.</p>
-      <p>Open Surge is written from the ground up in C language, using the <a href="http://liballeg.org" target="_blank">Allegro game programming library</a>. The project has been started by <a href="http://github.com/alemart" target="_blank">Alexandre Martins</a>, a developer from Brazil. Nowadays, Open Surge has <a href="http://wiki.opensurge2d.org/Contact_the_developers" target="_blank">contributors all over the world</a>!</p>
-    </section>
-    <section id="play">
-      <h2>How do I play?</h2>
-      <p>You can play using a keyboard or a joystick.</p>
-      <table class="table table-borderless w-75 mx-auto text-white text-center">
-        <thead>
-          <tr>
-            <th scope="col">Key</th>
-            <th scope="col">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Arrows</td>
-            <td>Move</td>
-          </tr>
-          <tr>
-            <td>Space</td>
-            <td>Jump</td>
-          </tr>
-          <tr>
-            <td>Enter</td>
-            <td>Pause</td>
-          </tr>
-          <tr>
-            <td>Esc</td>
-            <td>Quit</td>
-          </tr>
-          <tr>
-            <td>Left Ctrl</td>
-            <td>Switch character</td>
-          </tr>
-          <tr>
-            <td>Equals (=)</td>
-            <td>Take snapshot</td>
-          </tr>
-          <tr>
-            <td>F12</td>
-            <td>Open the editor</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-    <section id="create">
-      <h2>How do I create a game?</h2>
-      <p>Use Open Surge to create your own amazing games! Create new levels, items, bosses, gameplay mechanics, playable characters, special abilities and more!</p>
-      <ul>
-        <li>First, learn how to create a level using the <a href="http://wiki.opensurge2d.org/How_to_make_a_level" target="_blank">built-in editor</a> (press F12 during gameplay)</li>
-        <li>Next, learn how to do <a href="http://wiki.opensurge2d.org/Introduction_to_Modding" target="_blank">basic hacking</a> (modify the images/sounds, create new scenery, new characters, etc.)</li>
-        <li>Finally, have fun with scripting! <a href="http://docs.opensurge2d.org" target="_blank">SurgeScript</a>, the scripting language featured in Open Surge, gives you ultimate power to create anything you desire and make your dreams come alive!</li>
-      </ul>
-      <p>To learn more, read the <a href="/wiki" target="_blank">project wiki</a> and watch the <a href="http://youtube.com/alemart88" target="_blank">video tutorials</a> made by the developer of the engine.</p>
-      <p class="text-center"><a href="http://wiki.opensurge2d.org/Introduction_to_Modding" target="_blank" class="btn btn-primary cartoon m-3">Create your game</a></p>
-    </section>
-    <section id="create">
-      <h2>This is so awesome!</h2>
-      <p>Indeed it is!</p>
-      <p class="text-center">
-        <a href="#download" class="btn btn-primary cartoon m-3">Get it now!</a>
-      </p>
-    </section>
-   </div>
-   <footer>
-    <div class="container p-2">
-     <p class="no-shadow">
-       <span class="position-relative float-right"><a href="https://discord.gg/w8JqM7m" target="_blank">Join us on Discord!</a></span>
-       Open Surge Engine &copy; 2008 &ndash; 2022 <a href="https://github.com/alemart" target="_blank">Alexandre Martins</a>.<br>
-       Thanks to <a href="http://wiki.opensurge2d.org/Contact_the_developers" target="_blank">many contributors</a> over the web.
-     </p>
+    </header>
+
+    <div id="content" class="pure-g bound-layout">
+      <div class="pure-u-1 pure-u-lg-1-12"></div>
+      <div class="pure-u-1 pure-u-lg-5-6">
+
+        <section id="introduction">
+          <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-3-5">
+              <div class="h-padding">
+                <h2>Make your dreams come true!</h2>
+                <p>Create your own amazing retro games! If you dream of making a retro game, you're good to go. It's easy to get started: simply download the Surge Engine and get creative! It includes:</p>
+                <ul>
+                  <li>A base game called Surge the Rabbit</li>
+                  <li>A built-in level editor</li>
+                  <li>Ready to use items, scripts, and more</li>
+                  <li>Free to use game assets under Creative Commons licenses</li>
+                </ul>
+              </div>
+            </div>
+            <div class="pure-u-1 pure-u-lg-2-5 picture-container reveal">
+              <img src="img/debug_mode.png" alt="Screenshot" class="picture">
+            </div>
+          </div>
+        </section>
+
+        <section id="surge-the-rabbit">
+          <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-2-5 picture-container picture-reverse reveal">
+              <img src="img/waterworks_2.png" alt="Screenshot" class="picture">
+            </div>
+            <div class="pure-u-1 pure-u-lg-3-5">
+              <div class="h-padding">
+                <h2>Featuring Surge the Rabbit</h2>
+                <p>Surge the Rabbit is the game that is bundled with the engine. It's a fun retro platformer inspired by 16-bit Sonic classics of the 1990s. You can play it and also use it as a base to create your own games!</p>
+                <ul>
+                  <li>Play on amazing levels!</li>
+                  <li>360&deg; physics system</li>
+                  <li>Up to 2 players</li>
+                  <li>Easy to MOD</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="surgescript">
+          <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-3-5">
+              <div class="h-padding">
+                <h2>A powerful engine for retro games</h2>
+                <p>With SurgeScript, you can create anything: items, bosses, gameplay mechanics, you name it! It's scripting for games! SurgeScript is easy and powerful. Never written code before? It's for you too!</p>
+                <ul>
+                  <li>Fun to play with - seriously!</li>
+                  <li>Beginner-friendly</li>
+                  <li>Rich set of features</li>
+                  <li>User-friendly documentation</li>
+                </ul>
+              </div>
+            </div>
+            <div class="pure-u-1 pure-u-lg-2-5 picture-container reveal">
+              <img src="img/level_editor_1.png" alt="Screenshot" class="picture">
+            </div>
+          </div>
+        </section>
+
+        <section id="open-source">
+          <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-2-5 picture-container picture-reverse reveal">
+              <img src="img/sunshine_classic.png" alt="Screenshot" class="picture">
+            </div>
+            <div class="pure-u-1 pure-u-lg-3-5">
+              <div class="h-padding">
+                <h2>Open-source & cross-platform</h2>
+                <p>Surge Engine is free and open source sofware. It's a lightweight game engine that is available on multiple platforms. Run your games on Desktop and mobile! Supported platforms include:</p>
+                <ul>
+                  <li>Microsoft Windows</li>
+                  <li>GNU/Linux</li>
+                  <li>Android</li>
+                  <li>macOS (community builds)</li>
+                  <li>SteamOS &amp; Raspberry Pi OS (via Flatpak)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="learn">
+          <div class="h-padding">
+            <h2 class="text-center">Plenty of learning materials</h2>
+          </div>
+          <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-1-4">
+              <a href="https://wiki.opensurge2d.org/Introduction_to_Modding" target="_blank" class="card">
+                <h4><span class="icon">&#x1F56E;</span> Get started</h4>
+                <p>The written tutorials for beginners guide you step-by-step on how to use the engine!</p>
+              </a>
+            </div>
+            <div class="pure-u-1 pure-u-lg-1-4">
+              <a href="https://docs.opensurge2d.org" target="_blank" class="card">
+                <h4><span class="smaller icon">&#x1F5F2;</span> SurgeScript docs</h4>
+                <p>The SurgeScript documentation is the reference for all your scripting needs!</p>
+              </a>
+            </div>
+            <div class="pure-u-1 pure-u-lg-1-4">
+              <a href="https://youtube.com/alemart88" target="_blank" class="card">
+                <h4><span class="icon">&#x1F3A5;</span> Video lessons</h4>
+                <p>Learn with a hands-on approach with video lessons that cover various subjects.</p>
+              </a>
+            </div>
+            <div class="pure-u-1 pure-u-lg-1-4">
+              <a href="https://discord.gg/w8JqM7m" target="_blank" class="card">
+                <h4><span class="icon">&#x1F5EA;</span> Need help?</h4>
+                <p>Ask questions and get direct help from our friendly community on Discord!</p>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="download">
+          <div class="h-padding">
+            <h2 class="text-center">Ready to make your dreams come true?</h2>
+          </div>
+          <div class="pure-g text-center">
+            <div class="pure-u-1 pure-u-lg-1-3">
+            <div class="h-padding">
+              <img src="img/windows.png" alt="Microsoft Windows" class="platform"><br>
+              <a href="https://alemart7.gamejolt.io/surge-the-rabbit" target="_blank" class="pure-button">Download for Windows</a>
+            </div>
+            </div>
+            <div class="pure-u-1 pure-u-lg-1-3">
+            <div class="h-padding">
+              <img src="img/linux.png" alt="GNU/Linux" class="platform"><br>
+              <a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" target="_blank" class="pure-button">Download for GNU/Linux</a>
+            </div>
+            </div>
+            <div class="pure-u-1 pure-u-lg-1-3">
+            <div class="h-padding">
+              <img src="img/android.png" alt="Android" class="platform"><br>
+              <a href="https://forms.gle/BRArRjgfw1Bs59ii7" target="blank" class="pure-button">Very soon for Android</a>
+            </div>
+            </div>
+          </div>
+          <div class="h-padding v-padding">
+            <p class="text-center text-note">The Android edition is available as a donate version to support the development of the project. You can also support this work via <a href="https://github.com/sponsors/alemart" target="_blank">GitHub Sponsors</a>.</p>
+          </div>
+        </section>
+
+      </div>
+      <div class="pure-u-1 pure-u-md-1-12"></div>
     </div>
-   </footer>
+
+    <footer>
+      <div class="pure-g bound-layout">
+        <div class="pure-u-1 pure-u-lg-1-12"></div>
+        <div class="pure-u-1 pure-u-lg-5-6">
+          <div class="pure-g text-center">
+            <div class="pure-u-1 pure-u-lg-1-4">
+              <h5>Downloads</h5>
+              <ul>
+                <li><a href="https://alemart7.gamejolt.io/surge-the-rabbit" target="_blank">Windows</a></li>
+                <li><a href="https://forms.gle/BRArRjgfw1Bs59ii7" target="_blank">Android (soon)</a></li>
+                <li><a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" target="_blank">Linux Flatpak</a></li>
+                <li><a href="https://snapcraft.io/opensurge" target="_blank">Linux Snap</a></li>
+                <li><a href="https://forum.opensurge2d.org/viewtopic.php?id=2135" target="_blank">macOS community builds</a></li>
+                <li><a href="http://forum.opensurge2d.org/viewtopic.php?id=1931" target="_blank">dev builds for nerds</a></li>
+              </ul>
+            </div>
+            <div class="pure-u-1 pure-u-lg-1-4">
+              <h5>Documentation</h5>
+              <ul>
+                <li><a href="https://wiki.opensurge2d.org/Introduction_to_Modding" target="_blank">Introduction to Modding</a></li>
+                <li><a href="https://docs.opensurge2d.org" target="_blank">SurgeScript Documentation</a></li>
+                <li><a href="https://wiki.opensurge2d.org/FAQ" target="_blank">Frequently Asked Questions</a></li>
+                <li><a href="https://wiki.opensurge2d.org" target="_blank">Open Surge Wiki</a></li>
+                <li><a href="https://github.com/alemart/opensurge/blob/master/CONTRIBUTING.md" target="_blank">How to contribute</a></li>
+
+              </ul>
+            </div>
+            <div class="pure-u-1 pure-u-lg-1-4">
+              <h5>Social</h5>
+              <ul>
+                <li><a href="https://discord.gg/w8JqM7m" target="_blank">Discord</a></li>
+                <li><a href="https://youtube.com/alemart88" target="_blank">YouTube</a></li>
+                <li><a href="https://github.com/alemart/opensurge" target="_blank">GitHub</a></li>
+                <li><a href="https://forum.opensurge2d.org" target="_blank">Forum</a></li>
+                <li><a href="share/" target="_blank">Share</a></li>
+              </ul>
+            </div>
+            <div class="pure-u-1 pure-u-lg-1-4">
+              <h5>Misc</h5>
+              <ul>
+                <li><a href="contribute/" target="_blank">Donate</a></li>
+                <li><a href="rating/" target="_blank">Give your feedback</a></li>
+                <li><a href="https://github.com/alemart/opensurge" target="_blank">Source code</a></li>
+                <li><a href="https://github.com/alemart/opensurge/blob/master/LICENSE" target="_blank">License</a></li>
+                <li><a href="https://wiki.opensurge2d.org/Trademark_Policy" target="_blank">Trademark policy</a></li>
+                <li><a href="privacy/" target="_blank">Privacy policy</a></li>
+              </ul>
+            </div>
+          </div>
+          <p class="text-center">
+            Open Surge Engine &copy; 2008 &ndash; present <a href="https://github.com/alemart" target="_blank">Alexandre Martins</a>
+            <br>
+            Special thanks to the <a href="http://wiki.opensurge2d.org/Contact_the_developers" target="_blank">many contributors</a> of the project
+            <br><br>
+            Made with &#x2764;&#xfe0f; in Brazil &#x1f1e7;&#x1f1f7;
+          </p>
+        </div>
+        <div class="pure-u-1 pure-u-lg-1-12"></div>
+      </div>
+    </footer>
   </body>
 </html>
