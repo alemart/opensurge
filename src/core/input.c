@@ -240,6 +240,12 @@ void input_init()
 
     /* loading custom input mappings */
     inputmap_init();
+
+#if defined(__ANDROID__)
+    /* this seems to be needed on Android TV */
+    if(is_tv_device())
+        input_reconfigure_joysticks();
+#endif
 }
 
 /*
