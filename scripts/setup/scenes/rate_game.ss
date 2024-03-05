@@ -68,7 +68,7 @@ object "Rate the Game" is "setup"
 
     fun onChooseYes()
     {
-        SurgeTheRabbit.rate();
+        SurgeTheRabbit.submitFeedback();
         ratingTime.memorize();
 
         goToNextLevel();

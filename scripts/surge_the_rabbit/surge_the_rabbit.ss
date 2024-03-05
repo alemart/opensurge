@@ -37,17 +37,31 @@ object "SurgeTheRabbit"
         }
     }
 
-    fun rate()
-    {
-        openWebsite("/rating", {
-            "platform": platformName()
-        });
-    }
-
     fun download()
     {
         openWebsite("/download", {
             "type": Platform.isAndroid ? "desktop" : "mobile"
+        });
+    }
+
+    fun submitFeedback()
+    {
+        if(Platform.isAndroid) {
+            if(isBuild("googleplay")) {
+                Web.launchURL("https://play.google.com/store/apps/details?id=org.opensurge2d.surgeengine");
+                return;
+            }
+        }
+
+        openWebsite("/feedback", {
+            "platform": platformName()
+        });
+    }
+
+    fun reportIssue()
+    {
+        openWebsite("/issues", {
+            "platform": platformName()
         });
     }
 
