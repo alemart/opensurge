@@ -231,9 +231,10 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
     transform = Transform();
     slide = Sound("samples/slide.wav");
     select = Sound("samples/select.wav");
-    spacing = 128; // spacing between menu items
+    spacing = 80; // spacing between items
     selectedItem = 0;
     items = [];
+    offsets = [];
     swipeTime = 0.5; // in seconds
     timer = 1.0;
 
@@ -248,7 +249,7 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
 
         // swipe logic
         timer += Time.delta / swipeTime;
-        x = Math.smoothstep(transform.localPosition.x, selectedItem * -spacing, timer);
+        x = Math.smoothstep(transform.localPosition.x, -offsets[selectedItem], timer);
         transform.localPosition = Vector2(Math.round(x), 0);
     }
 
@@ -272,38 +273,49 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
         parent.onSelect(menuItem);
     }
 
+    fun computeOffsets()
+    {
+        offsets.clear();
+        if(items.length == 0)
+            return;
+
+        offsets.push(0);
+        items[0].setOffset(Vector2.zero);
+        totalOffset = Math.floor(items[0].width / 2);
+
+        for(i = 1; i < items.length; i++) {
+            item = items[i];
+
+            halfWidth = Math.floor(item.width / 2);
+            totalOffset += spacing + halfWidth;
+
+            offsets.push(totalOffset);
+            item.setOffset(Vector2.right.scaledBy(totalOffset));
+
+            totalOffset += halfWidth;
+        }
+    }
+
     fun constructor()
     {
-        offset = 0;
-
         // spawn menu items
-        items.push(
-            spawn("Title Screen - Menu Item - Start Game").setOffset(Vector2.zero)
-        );
+        items.push(spawn("Title Screen - Menu Item - Start Game"));
+        items.push(spawn("Title Screen - Menu Item - Options"));
 
-        items.push(
-            spawn("Title Screen - Menu Item - Options").setOffset(Vector2.right.scaledBy(offset += spacing))
-        );
+        if(!SurgeEngine.mobile)
+            items.push(spawn("Title Screen - Menu Item - Mobile"));
 
-        if(!SurgeEngine.mobile) {
-            items.push(
-                spawn("Title Screen - Menu Item - Mobile").setOffset(Vector2.right.scaledBy(offset += spacing))
-            );
-        }
+        items.push(spawn("Title Screen - Menu Item - Share"));
 
-        items.push(
-            spawn("Title Screen - Menu Item - Share").setOffset(Vector2.right.scaledBy(offset += spacing))
-        );
+        if(SurgeTheRabbit.canAcceptDonations())
+            items.push(spawn("Title Screen - Menu Item - Donate"));
 
-        if(SurgeTheRabbit.canAcceptDonations()) {
-            items.push(
-                spawn("Title Screen - Menu Item - Donate").setOffset(Vector2.right.scaledBy(offset += spacing))
-            );
-        }
+        items.push(spawn("Title Screen - Menu Item - Report Issue"));
+        items.push(spawn("Title Screen - Menu Item - Submit Feedback"));
+        items.push(spawn("Title Screen - Menu Item - Quit"));
 
-        items.push(
-            spawn("Title Screen - Menu Item - Quit").setOffset(Vector2.right.scaledBy(offset += spacing))
-        );
+        // compute offsets of the menu items
+        computeOffsets();
     }
 }
 
@@ -349,6 +361,11 @@ object "Title Screen - Menu Item - Start Game" is "private", "detached", "entity
         delegate.setOffset(offset);
         return this;
     }
+
+    fun get_width()
+    {
+        return delegate.width;
+    }
 }
 
 object "Title Screen - Menu Item - Options" is "private", "detached", "entity"
@@ -381,6 +398,11 @@ object "Title Screen - Menu Item - Options" is "private", "detached", "entity"
     {
         delegate.setOffset(offset);
         return this;
+    }
+
+    fun get_width()
+    {
+        return delegate.width;
     }
 }
 
@@ -415,6 +437,11 @@ object "Title Screen - Menu Item - Mobile" is "private", "detached", "entity"
         delegate.setOffset(offset);
         return this;
     }
+
+    fun get_width()
+    {
+        return delegate.width;
+    }
 }
 
 object "Title Screen - Menu Item - Share" is "private", "detached", "entity"
@@ -448,6 +475,11 @@ object "Title Screen - Menu Item - Share" is "private", "detached", "entity"
         delegate.setOffset(offset);
         return this;
     }
+
+    fun get_width()
+    {
+        return delegate.width;
+    }
 }
 
 object "Title Screen - Menu Item - Donate" is "private", "detached", "entity"
@@ -480,6 +512,11 @@ object "Title Screen - Menu Item - Donate" is "private", "detached", "entity"
     {
         delegate.setOffset(offset);
         return this;
+    }
+
+    fun get_width()
+    {
+        return delegate.width;
     }
 }
 
@@ -522,6 +559,87 @@ object "Title Screen - Menu Item - Quit" is "private", "detached", "entity"
     {
         delegate.setOffset(offset);
         return this;
+    }
+
+    fun get_width()
+    {
+        return delegate.width;
+    }
+}
+
+object "Title Screen - Menu Item - Submit Feedback" is "private", "detached", "entity"
+{
+    delegate = spawn("Title Screen - Menu Item")
+               .setText(SurgeEngine.mobile ? "$TITLESCREEN_RATEAPP" : "$TITLESCREEN_SUBMITFEEDBACK");
+
+    fun onEnter()
+    {
+        SurgeTheRabbit.submitFeedback();
+        Level.restart();
+    }
+
+    fun onSelect()
+    {
+        parent.onSelect(this);
+    }
+
+    fun onHighlight()
+    {
+    }
+
+    fun setHighlighted(highlighted)
+    {
+        delegate.setHighlighted(highlighted);
+        return this;
+    }
+
+    fun setOffset(offset)
+    {
+        delegate.setOffset(offset);
+        return this;
+    }
+
+    fun get_width()
+    {
+        return delegate.width;
+    }
+}
+
+object "Title Screen - Menu Item - Report Issue" is "private", "detached", "entity"
+{
+    delegate = spawn("Title Screen - Menu Item")
+               .setText("$TITLESCREEN_REPORTISSUE");
+
+    fun onEnter()
+    {
+        SurgeTheRabbit.reportIssue();
+        Level.restart();
+    }
+
+    fun onSelect()
+    {
+        parent.onSelect(this);
+    }
+
+    fun onHighlight()
+    {
+    }
+
+    fun setHighlighted(highlighted)
+    {
+        delegate.setHighlighted(highlighted);
+        return this;
+    }
+
+    fun setOffset(offset)
+    {
+        delegate.setOffset(offset);
+        return this;
+    }
+
+    fun get_width()
+    {
+        return delegate.width;
     }
 }
 
@@ -570,6 +688,11 @@ object "Title Screen - Menu Item" is "private", "detached", "entity"
     {
         transform.localPosition = offset;
         return this;
+    }
+
+    fun get_width()
+    {
+        return label.size.x;
     }
 
     fun constructor()
