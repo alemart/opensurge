@@ -291,6 +291,14 @@ static void share(settings_entry_t* e);
 #define vt_download (settings_entryvt_t){ nop, download, nop, nop, nop, nop, visible }
 static void download(settings_entry_t* e);
 
+#define vt_submitfeedback (settings_entryvt_t){ nop, submitfeedback, nop, nop, nop, nop, display_submitfeedback }
+static void submitfeedback(settings_entry_t* e);
+static bool display_submitfeedback(settings_entry_t* e);
+
+#define vt_reportissue (settings_entryvt_t){ nop, reportissue, nop, nop, nop, nop, display_reportissue }
+static void reportissue(settings_entry_t* e);
+static bool display_reportissue(settings_entry_t* e);
+
 
 
 
@@ -342,6 +350,12 @@ static const struct
     { TYPE_SUBTITLE, "$OPTIONS_ENGINE", (const char*[]){ NULL }, 0, vt_engine, 8 },
     { TYPE_SETTING, "$OPTIONS_ABOUT", (const char*[]){ NULL }, 0, vt_about, 8 },
     { TYPE_SETTING, "$OPTIONS_SHARE", (const char*[]){ NULL }, 0, vt_share, 0 },
+    { TYPE_SETTING, "$OPTIONS_REPORTISSUE", (const char*[]){ NULL }, 0, vt_reportissue, 0 },
+#if IS_MOBILE_PLATFORM
+    { TYPE_SETTING, "$OPTIONS_RATEAPP", (const char*[]){ NULL }, 0, vt_submitfeedback, 0 },
+#else
+    { TYPE_SETTING, "$OPTIONS_SUBMITFEEDBACK", (const char*[]){ NULL }, 0, vt_submitfeedback, 0 },
+#endif
 #if IS_MOBILE_PLATFORM
     { TYPE_SETTING, "$OPTIONS_DOWNLOAD_DESKTOP", (const char*[]){ NULL }, 0, vt_download, 0 },
 #else
@@ -377,6 +391,7 @@ static bool handle_fading();
 static void update_camera();
 static void save_preferences();
 static const char* create_url(const char* path);
+static bool is_base_game();
 
 
 
@@ -760,6 +775,22 @@ const char* create_url(const char* path)
 
     return buffer;
 }
+
+bool is_base_game()
+{
+    const int version_number = VERSION_CODE_EX(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP, GAME_VERSION_FIX);
+    char version_string[16];
+
+    if(0 != strcmp(opensurge_game_name(), "Surge the Rabbit"))
+        return false;
+
+    stringify_version_number(version_number, version_string, sizeof(version_string));
+    if(0 != strcmp(opensurge_game_version(), version_string))
+        return false;
+
+    return true;
+}
+
 
 
 
@@ -1285,6 +1316,49 @@ void download(settings_entry_t* e)
 }
 
 
+/*
+ * Submit feedback
+ */
+
+void submitfeedback(settings_entry_t* e)
+{
+#if defined(__ANDROID__)
+    if(is_base_game()) {
+        char app_id[64];
+        application_id(app_id, sizeof(app_id));
+        if(0 == strcmp(app_id, "org.opensurge2d.surgeengine") && NULL != strstr(GAME_VERSION_STRING, "googleplay")) {
+            launch_url(create_url("https://play.google.com/store/apps/details?id=org.opensurge2d.surgeengine"));
+            return;
+        }
+    }
+#endif
+
+    launch_url(create_url("/feedback"));
+    (void)e;
+}
+
+bool display_submitfeedback(settings_entry_t* e)
+{
+    (void)e;
+    return is_base_game();
+}
+
+
+/*
+ * Report an issue
+ */
+
+void reportissue(settings_entry_t* e)
+{
+    launch_url(create_url("/issues"));
+    (void)e;
+}
+
+bool display_reportissue(settings_entry_t* e)
+{
+    (void)e;
+    return is_base_game();
+}
 
 
 /*
@@ -1329,20 +1403,11 @@ bool display_mods_from_base_game(settings_entry_t* e)
 {
 #if WANT_PLAYMOD
     /* only Surge the Rabbit can reliably be expected to have the correct
-       scripts for a proper compatibility experience.
-
-       please don't change it!
+       scripts for a proper compatibility experience. Please don't change it!
 
        TODO an additional integrity check would be more robust.
        maybe embed the original scripts into the executable? */
-    const int version_number = VERSION_CODE_EX(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP, GAME_VERSION_FIX);
-    char version_string[16];
-
-    if(0 != strcmp(opensurge_game_name(), "Surge the Rabbit"))
-        return false;
-
-    stringify_version_number(version_number, version_string, sizeof(version_string));
-    if(0 != strcmp(opensurge_game_version(), version_string))
+    if(!is_base_game())
         return false;
 
     /* no custom gamedir */
