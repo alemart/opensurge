@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-03-01"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-03-05"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -114,6 +114,10 @@ OPTIONS_MODSTORAGE          "Storage"
 OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
 OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
 OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
+OPTIONS_SUBMITFEEDBACK      "Submit feedback"
+OPTIONS_WRITEREVIEW         "Write a review"
+OPTIONS_RATEAPP             "Rate the app"
+OPTIONS_REPORTISSUE         "Report an issue"
 OPTIONS_BACKTOBASEGAME      "Go back to the base game"
 
 // Stage Select
@@ -160,6 +164,10 @@ TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "SHARE"
 TITLESCREEN_DONATE          "DONATE"
 TITLESCREEN_QUIT            "QUIT"
+TITLESCREEN_SUBMITFEEDBACK  "SUBMIT FEEDBACK"
+TITLESCREEN_WRITEREVIEW     "WRITE A REVIEW"
+TITLESCREEN_RATEAPP         "RATE THE APP"
+TITLESCREEN_REPORTISSUE     "REPORT AN ISSUE"
 TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
@@ -171,7 +179,7 @@ ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in developm
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
 RATEGAME_TITLE              "Rate Surge the Rabbit?"
-RATEGAME_MESSAGE            "We'd love to hear about your experience so far! Your feedback helps to grow this open source game!" // 2 lines max.
+RATEGAME_MESSAGE            "We'd love to hear from you!\nYour feedback helps this open source game & engine!" // 2 lines max.
 RATEGAME_YES                "Sure!"
 RATEGAME_NO                 "Not now"
 

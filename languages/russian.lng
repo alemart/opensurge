@@ -109,6 +109,10 @@ FIXME OPTIONS_MODSTORAGE          "Storage"
 FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
 FIXME OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
 FIXME OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
+FIXME OPTIONS_SUBMITFEEDBACK      "Submit feedback"
+FIXME OPTIONS_WRITEREVIEW         "Write a review"
+FIXME OPTIONS_RATEAPP             "Rate the app"
+FIXME OPTIONS_REPORTISSUE         "Report an Issue"
 FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
 
 // Stage Select
@@ -156,6 +160,10 @@ FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "ПОДЕЛИТЬСЯ"
 TITLESCREEN_DONATE          "ПОДДЕРЖАТЬ"
 TITLESCREEN_QUIT            "ВЫХОД"
+FIXME TITLESCREEN_SUBMITFEEDBACK  "SUBMIT FEEDBACK"
+FIXME TITLESCREEN_WRITEREVIEW     "WRITE A REVIEW"
+FIXME TITLESCREEN_RATEAPP         "RATE THE APP"
+FIXME TITLESCREEN_REPORTISSUE     "REPORT AN ISSUE"
 TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
@@ -167,8 +175,8 @@ ENDOFDEMO_TEXT              "Спасибо за игру! Surge the Rabbit на
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
-FIXME RATEGAME_TITLE              "Enjoying Surge the Rabbit?"
-FIXME RATEGAME_MESSAGE            "We'd love to hear about your experience so far! Your feedback helps to grow this open source game!" // 2 lines max.
+FIXME RATEGAME_TITLE              "Rate Surge the Rabbit?"
+FIXME RATEGAME_MESSAGE            "We'd love to hear from you!\nYour feedback helps this open source game & engine!" // 2 lines max.
 FIXME RATEGAME_YES                "Sure!"
 FIXME RATEGAME_NO                 "Not now"
 
