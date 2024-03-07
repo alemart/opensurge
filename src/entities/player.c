@@ -1875,17 +1875,21 @@ void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
 /* angle interpolation */
 float smooth_angle(const physicsactor_t* pa, float current_angle)
 {
-    const float ninety = 90.0f * DEG2RAD;
-    const float min_t = 0.15f, max_t = 1.0f;
     movmode_t movmode = physicsactor_get_movmode(pa);
     physicsactorstate_t state = physicsactor_get_state(pa);
 
     if(!require_angle_to_be_zero(state, movmode)) {
+        const float threshold = 101.25f * DEG2RAD;
         float new_angle = fix_angle(physicsactor_get_angle(pa), 15) * DEG2RAD;
         float delta = delta_angle(new_angle, current_angle);
 
-        if(delta < ninety) {
-            float t = min_t + (delta / ninety) * (max_t - min_t);
+        if(delta < threshold) {
+            const float min_t = 0.125f, max_t = 1.0f;
+            float t = min_t + (delta / threshold) * (max_t - min_t);
+
+            if(physicsactor_is_midair(pa) && physicsactor_get_angle(pa) == 0)
+                t = 0.0625f; /* make the animation more fluid after running on a wall */
+
             return lerp_angle(current_angle, new_angle, t);
         }
 
