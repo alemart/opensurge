@@ -1327,7 +1327,7 @@ void submitfeedback(settings_entry_t* e)
         char app_id[64];
         application_id(app_id, sizeof(app_id));
         if(0 == strcmp(app_id, "org.opensurge2d.surgeengine") && NULL != strstr(GAME_VERSION_STRING, "googleplay")) {
-            launch_url(create_url("https://play.google.com/store/apps/details?id=org.opensurge2d.surgeengine"));
+            launch_url("https://play.google.com/store/apps/details?id=org.opensurge2d.surgeengine");
             return;
         }
     }
