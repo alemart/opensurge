@@ -134,7 +134,7 @@ void* fasthash_get(fasthash_t* hashtable, uint64_t key)
                 return hashtable->data[k].value;
             }
         }
-        else if(marker == hashtable->capacity)
+        else if(marker == hashtable->capacity) /* state is DELETED */
             marker = k; /* save first deleted entry */
 
         /* probe */
@@ -247,7 +247,7 @@ void* fasthash_find(fasthash_t* hashtable, bool (*test)(const void*,void*), void
 
 void grow(fasthash_t* hashtable)
 {
-    int old_cap = hashtable->capacity;
+    int old_capacity = hashtable->capacity;
     fasthash_entry_t* old_data = hashtable->data;
 
     /* double the capacity */
@@ -256,11 +256,12 @@ void grow(fasthash_t* hashtable)
     hashtable->data = mallocx(hashtable->capacity * sizeof(fasthash_entry_t));
 
     /* clear the whole table */
+    hashtable->length = 0;
     for(int i = 0; i < hashtable->capacity; i++)
         hashtable->data[i] = BLANK_ENTRY;
 
     /* reinsert all elements with a new cap_mask */
-    for(int i = 0; i < old_cap; i++) {
+    for(int i = 0; i < old_capacity; i++) {
         if(old_data[i].state == ACTIVE)
             fasthash_put(hashtable, old_data[i].key, old_data[i].value);
     }
