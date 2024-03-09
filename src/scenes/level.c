@@ -3335,13 +3335,14 @@ void editor_update()
     if(1 == confirmbox_selected_option()) {
         char path[PATH_MAXLEN];
         logfile_message("Reloading the level via the editor...");
+        str_cpy(path, file, sizeof(path));
 
         editor_disable();
         scenestack_pop();
         scripting_reload();
         scenestack_push(
             storyboard_get_scene(SCENE_LEVEL),
-            str_cpy(path, file, sizeof(path))
+            path
         );
 
         return;
