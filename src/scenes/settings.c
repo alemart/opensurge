@@ -1414,14 +1414,6 @@ bool display_mods_from_base_game(settings_entry_t* e)
     if(asset_gamedir() != NULL)
         return false;
 
-# if defined(__ANDROID__)
-    /* official builds */
-    char app_id[64];
-    application_id(app_id, sizeof(app_id));
-    if(!(0 == strcmp(app_id, "org.opensurge2d.surgeengine") && NULL != strstr(GAME_VERSION_STRING, "googleplay")))
-        return false;
-# endif
-
     return true;
 #else
     return false;

@@ -1887,7 +1887,7 @@ float smooth_angle(const physicsactor_t* pa, float current_angle)
             const float min_t = 0.125f, max_t = 1.0f;
             float t = min_t + (delta / threshold) * (max_t - min_t);
 
-            if(physicsactor_is_midair(pa) && physicsactor_get_angle(pa) == 0)
+            if(physicsactor_is_midair(pa))
                 t = 0.0625f; /* make the animation more fluid after running on a wall */
 
             return lerp_angle(current_angle, new_angle, t);

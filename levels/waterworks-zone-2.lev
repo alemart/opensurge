@@ -1319,6 +1319,7 @@ brick 202 17168 9728
 brick 203 17168 9728
 brick 202 17104 9728
 brick 203 17104 9728
+brick 282 17344 9904
 brick 112 16768 10144
 brick 113 16800 10144
 brick 110 16768 10016
@@ -5507,7 +5508,6 @@ entity "RulerSalamander" 15392 10880 "2e48c5ef2ac94858"
 entity "RedMarmot" 19024 9824 "10587e0789f15551"
 entity "SwoopHarrier" 24832 8544 "144de27e15a28e2e"
 entity "SwoopHarrier" 21536 8320 "e0458554d18b80b2"
-entity "Powerup Collectibles" 17888 9824 "419bc27eebe9a76b"
 entity "Powerup Shield Thunder" 10880 8528 "52c37dc1b22f2086"
 entity "Powerup Collectibles" 16080 9232 "e6aa14741cde6116"
 entity "RulerSalamander" 2448 10432 "18ecc07abff55854"
@@ -5690,5 +5690,6 @@ entity "Spring Strongest Hidden" 7824 9856 "c6a3bdb3"
 entity "Spring Strongest Hidden" 7856 9856 "fe67f608"
 entity "Spring Strongest Hidden" 7888 9856 "1b6fbbe4"
 entity "Spring Strongest Hidden" 7920 9856 "3eed1d93"
+entity "Spring Standard Hidden" 17888 9824 "9212b507"
 
 // EOF
