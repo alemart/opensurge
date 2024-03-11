@@ -194,12 +194,12 @@ void engine_release()
 void engine_mainloop()
 {
     ALLEGRO_EVENT event;
-    bool is_active = true;
-    bool should_redraw = false;
+    bool can_draw = true;
+    bool is_ready_to_draw = false;
 
     /* setup event listeners */
-    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, &is_active, a5_handle_haltresume_event);
-    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, &is_active, a5_handle_haltresume_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, &can_draw, a5_handle_haltresume_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, &can_draw, a5_handle_haltresume_event);
     engine_add_event_listener(ALLEGRO_EVENT_KEY_DOWN, NULL, a5_handle_hotkey);
 
     /* configure the timer */
@@ -207,26 +207,30 @@ void engine_mainloop()
         fatal_error("Can't create an Allegro timer");
 
     engine_add_event_source(al_get_timer_event_source(a5_timer));
-    engine_add_event_listener(ALLEGRO_EVENT_TIMER, &should_redraw, a5_handle_timer_event);
+    engine_add_event_listener(ALLEGRO_EVENT_TIMER, &is_ready_to_draw, a5_handle_timer_event);
     al_start_timer(a5_timer);
 
     /* game loop */
     while(!wants_to_quit && !wants_to_restart && !scenestack_empty()) {
+        const scene_t* scene = scenestack_top();
 
         /* handle events & update game logic */
         al_wait_for_event(a5_event_queue, &event);
         call_event_listeners(&event);
 
+        /* skip rendering if the scene changed */
+        scene_t* current_scene = scenestack_top();
+        if(current_scene != scene)
+            continue;
+
         /* render */
-        if(is_active && should_redraw && al_is_event_queue_empty(a5_event_queue)) {
-            scene_t* current_scene = scenestack_top();
+        if(can_draw && is_ready_to_draw && al_is_event_queue_empty(a5_event_queue)) {
             current_scene->render();
             fadefx_update();
             video_render(render_overlay);
             screenshot_update();
-            should_redraw = false;
+            is_ready_to_draw = false;
         }
-
     }
 
     /* done */
@@ -897,12 +901,12 @@ void call_event_listeners(const ALLEGRO_EVENT* event)
  */
 void a5_handle_haltresume_event(const ALLEGRO_EVENT* event, void* data)
 {
-    bool* is_active = (bool*)data;
+    bool* can_draw = (bool*)data;
 
     switch(event->type) {
         case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
             logfile_message("Received an ALLEGRO_EVENT_DISPLAY_HALT_DRAWING");
-            *is_active = false;
+            *can_draw = false;
             al_stop_timer(a5_timer);
             timer_pause();
             al_set_default_voice(NULL);
@@ -913,7 +917,7 @@ void a5_handle_haltresume_event(const ALLEGRO_EVENT* event, void* data)
             al_restore_default_mixer();
             timer_resume();
             al_start_timer(a5_timer);
-            *is_active = true;
+            *can_draw = true;
             break;
     }
 }
@@ -966,7 +970,7 @@ void a5_handle_hotkey(const ALLEGRO_EVENT* event, void* data)
  */
 void a5_handle_timer_event(const ALLEGRO_EVENT* event, void* data)
 {
-    bool* should_redraw = (bool*)data;
+    bool* is_ready_to_draw = (bool*)data;
 
     /* update the managers */
     timer_update();
@@ -978,7 +982,7 @@ void a5_handle_timer_event(const ALLEGRO_EVENT* event, void* data)
     /* update the current scene */
     scene_t* current_scene = scenestack_top();
     current_scene->update();
-    *should_redraw = (current_scene == scenestack_top()); /* same scene? */
+    *is_ready_to_draw = true;
 
     /* prevent locking */
     ALLEGRO_EVENT next_event;
