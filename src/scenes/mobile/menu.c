@@ -277,10 +277,13 @@ mobilemenu_button_t button_at(v2d_t position)
 
 void animate_button(mobilemenu_button_t b)
 {
-    actor_change_animation(
-        button[b].actor,
-        sprite_get_animation(SPRITE_NAME[b], ANIMATION_NUMBER[button[b].state])
-    );
+    const char* sprite_name = SPRITE_NAME[b];
+    int anim_id = ANIMATION_NUMBER[button[b].state];
+
+    if(sprite_animation_exists(sprite_name, anim_id))
+        actor_change_animation(button[b].actor, sprite_get_animation(sprite_name, anim_id));
+    else
+        actor_change_animation(button[b].actor, sprite_get_animation(NULL, 0));
 }
 
 
