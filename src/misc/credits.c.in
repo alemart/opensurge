@@ -6,7 +6,7 @@ $CREDITS_HEADER \n\
 \n\
 $CREDITS_ACTIVE \n\
 \n\
-Alexandre Martins \n\
+Alexandre Martins (alemart) \n\
 $CREDITS_ALEXANDRE \n\
 \n\
 Alexandre Almeida (M374LX) \n\
@@ -16,7 +16,20 @@ Cody Licorish (svgmovement) \n\
 $CREDITS_CODY \n\
 \n\
 \n\
-$CREDITS_THANKS \n\
+$CREDITS_TRANSLATORS \n\
+\n\
+Alexandre Martins (alemart) \n\
+Wuzzy \n\
+Álvaro Bazán (reaperplayer91) \n\
+Stilic \n\
+SecularSteve \n\
+Artur \"suve\" Iwicki \n\
+Halatnikov \n\
+Nicolò Patanè (Nick) \n\
+Jorge Maldonado Ventura (jorgesumle) \n\
+\n\
+\n\
+$CREDITS_RETIRED \n\
 \n\
 João Victor (Race the Hedgehog) \n\
 $CREDITS_JOAO \n\
@@ -39,6 +52,17 @@ $CREDITS_COLIN \n\
 Brian Zablocky (Celdecea) \n\
 $CREDITS_BRIAN \n\
 \n\
+\n\
+$CREDITS_PASTTRANSLATORS \n\
+\n\
+Jinwoong Yoo (krumaska) \n\
+AntsThatWander \n\
+David Demelier (markand) \n\
+Aleska \n\
+\n\
+\n\
+$CREDITS_THANKS \n\
+\n\
 Leandro Diaz (Lainz) \n\
 Ruben Caceres (wrath1138) \n\
 Felicia_Val \n\
@@ -46,20 +70,6 @@ Christopher Martinus (SurgeChris) \n\
 Dalton Sterritt (lunarrush) \n\
 Sonic Physics Guide \n\
 Allegro gamedev community \n\
-\n\
-\n\
-$CREDITS_TRANSLATORS \n\
-\n\
-Wuzzy \n\
-Álvaro Bazán (reaperplayer91) \n\
-Stilic \n\
-SecularSteve \n\
-David Demelier \n\
-Artur \"suve\" Iwicki \n\
-Aleska \n\
-Halatnikov \n\
-Nicolò Patanè (Nick) \n\
-Jorge Maldonado Ventura \n\
 \n\
 \n\
 $CREDITS_RES_TITLE \n\

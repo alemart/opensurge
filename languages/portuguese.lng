@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-03-05"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-03-10"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -125,9 +125,10 @@ CREDITS_TITLE               "<color=$COLOR_TITLE>CRÉDITOS</color>"
 CREDITS_BACK                "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versão $ENGINE_VERSION</color>\nrodando na $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Galera</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Ex-membros</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Agradecimentos</color>"
 CREDITS_ALEXANDRE           "Líder e fundador do projeto\nDesenvolvedor do projeto\nArtista"
-CREDITS_JOAO                "Artista"
+CREDITS_JOAO                "Artista\nIlustrador"
 CREDITS_MATEUS              "Efeitos sonoros"
 CREDITS_CODY                "Artista conceitual\nDesigner de inimigos"
 CREDITS_JOHAN               "Músico (descanse em paz, amigo)"
@@ -136,9 +137,9 @@ CREDITS_VICTOR              "Músico"
 CREDITS_M374LX              "Músico"
 CREDITS_COLIN               "Sprites, primeira história"
 CREDITS_BRIAN               "Sprites"
-CREDITS_LEMON               "Ilustrador"
 CREDITS_TRANSLATOR          "Tradutor"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tradutores</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Ex-tradutores</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Créditos dos assets</color>"
 CREDITS_RES_TEXT            "Todos os arquivos listados abaixo estão sob licenças livres. A seguir, apresentamos os respectivos autores:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Imagens</color>"

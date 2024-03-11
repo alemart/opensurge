@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-03-05"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-03-10"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -132,9 +132,10 @@ CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
 CREDITS_BACK                "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME version $ENGINE_VERSION</color>\npowered by $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>People</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Past members</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Thanks to</color>"
 CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
-CREDITS_JOAO                "Artist"
+CREDITS_JOAO                "Artist\nIllustrator"
 CREDITS_MATEUS              "Sound effects"
 CREDITS_CODY                "Concept artist\nEnemy designer"
 CREDITS_JOHAN               "Musician (rest in peace, friend)"
@@ -143,9 +144,9 @@ CREDITS_VICTOR              "Musician"
 CREDITS_M374LX              "Musician"
 CREDITS_COLIN               "Sprites, first story"
 CREDITS_BRIAN               "Sprite artist"
-CREDITS_LEMON               "Illustrator"
 CREDITS_TRANSLATOR          "Translator"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Translators</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Past translators</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individual resources</color>"
 CREDITS_RES_TEXT            "The files listed below are all under libre licenses. Their respective authors are presented:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Images</color>"
