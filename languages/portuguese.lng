@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-03-10"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-03-11"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -63,7 +63,7 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 //
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_TITLE>CONFIGURAÇÕES</color>"
+OPTIONS_TITLE               "CONFIGURAÇÕES"
 OPTIONS_GRAPHICS            "Gráficos"
 OPTIONS_CONTROLS            "Controles"
 OPTIONS_GAME                "Jogo"
@@ -114,14 +114,14 @@ OPTIONS_REPORTISSUE         "Reportar um problema"
 OPTIONS_BACKTOBASEGAME      "Voltar ao jogo base"
 
 // Stage Select
-STAGESELECT_TITLE           "<color=$COLOR_TITLE>SELEÇÃO DE FASES</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>MODO DO DESENVOLVEDOR</color>"
+STAGESELECT_TITLE           "SELEÇÃO DE FASES"
+STAGESELECT_DEBUG           "MODO DO DESENVOLVEDOR"
 STAGESELECT_MSG             "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
 STAGESELECT_PAGE            "pág. $1/$2"
 STAGESELECT_ACT             "Zona"
 
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>CRÉDITOS</color>"
+CREDITS_TITLE               "CRÉDITOS"
 CREDITS_BACK                "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versão $ENGINE_VERSION</color>\nrodando na $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Galera</color>"

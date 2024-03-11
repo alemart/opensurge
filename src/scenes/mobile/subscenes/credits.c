@@ -116,7 +116,7 @@ void init(mobile_subscene_t* subscene_ptr)
 
     /* set the credits text */
     font_set_textargumentsv(font, assets_argc, assets_argv);
-    font_set_text(font, "%s\n\n%s\n%s", "$CREDITS_TITLE", credits_mod_text(), base_text);
+    font_set_text(font, "%s\n\n%s\n%s", "$CREDITS_COLORED_TITLE", credits_mod_text(), base_text);
 
     /* misc */
     subscene->text_height = font_get_textsize(font).y;

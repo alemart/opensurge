@@ -98,7 +98,7 @@ void credits_init(void *foo)
 
     /* load title */
     title = font_create("MenuTitle");
-    font_set_text(title, "%s", lang_get("CREDITS_TITLE"));
+    font_set_text(title, "%s", lang_get("CREDITS_COLORED_TITLE"));
     font_set_position(title, v2d_new(VIDEO_SCREEN_W / 2, 5));
     font_set_align(title, FONTALIGN_CENTER);
 

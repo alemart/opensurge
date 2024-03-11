@@ -62,7 +62,7 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 //
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_TITLE>INSTELLINGEN</color>"
+OPTIONS_TITLE               "INSTELLINGEN"
 FIXME OPTIONS_GRAPHICS            "Graphics"
 FIXME OPTIONS_CONTROLS            "Controls"
 FIXME OPTIONS_GAME                "Game"
@@ -113,14 +113,14 @@ FIXME OPTIONS_REPORTISSUE         "Report an Issue"
 FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
 
 // Stage Select
-STAGESELECT_TITLE           "<color=$COLOR_TITLE>LEVEL SELECT</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>ONTWIKKELAARSMODUS</color>"
+STAGESELECT_TITLE           "LEVEL SELECT"
+STAGESELECT_DEBUG           "ONTWIKKELAARSMODUS"
 STAGESELECT_MSG             "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> om terug te gaan"
 STAGESELECT_PAGE            "pagina $1/$2"
 STAGESELECT_ACT             "Zone"
 
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
+CREDITS_TITLE               "CREDITS"
 CREDITS_BACK                "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> om terug te gaan"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versie $ENGINE_VERSION</color>\naangedreven door $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Mensen</color>"

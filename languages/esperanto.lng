@@ -63,7 +63,7 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 //
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_TITLE>OPCIOJ</color>"
+OPTIONS_TITLE               "OPCIOJ"
 FIXME OPTIONS_GRAPHICS            "Graphics"
 FIXME OPTIONS_CONTROLS            "Controls"
 FIXME OPTIONS_GAME                "Game"
@@ -114,14 +114,14 @@ FIXME OPTIONS_REPORTISSUE         "Report an Issue"
 FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
 
 // Stage Select
-STAGESELECT_TITLE           "<color=$COLOR_TITLE>ELEKTADO DE NIVELO</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>PROGRAMADA MODO</color>"
+STAGESELECT_TITLE           "ELEKTADO DE NIVELO"
+STAGESELECT_DEBUG           "PROGRAMADA MODO"
 STAGESELECT_MSG             "Premu <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> por iri reen"
 STAGESELECT_PAGE            "paĝo $1/$2"
 STAGESELECT_ACT             "Zono"
 
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>ATRIBUOJ</color>"
+CREDITS_TITLE               "ATRIBUOJ"
 CREDITS_BACK                "Premu <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> por iri reen"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versio $ENGINE_VERSION</color>\nfunciigita de $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Homoj</color>"

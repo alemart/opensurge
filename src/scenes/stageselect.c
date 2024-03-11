@@ -126,7 +126,7 @@ void stageselect_init(void *should_enable_debug)
     can_play_music = (!enable_debug || timer_get_elapsed() >= 10.0);
 
     title = font_create("MenuTitle");
-    font_set_text(title, "%s", !enable_debug ? "$STAGESELECT_TITLE" : "$STAGESELECT_DEBUG");
+    font_set_text(title, "%s", !enable_debug ? "$STAGESELECT_COLORED_TITLE" : "$STAGESELECT_COLORED_DEBUG");
     font_set_position(title, v2d_new(VIDEO_SCREEN_W/2, 10));
     font_set_align(title, FONTALIGN_CENTER);
 

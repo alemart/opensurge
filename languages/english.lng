@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-03-10"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-03-11"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -70,7 +70,7 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 //
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_TITLE>OPTIONS</color>"
+OPTIONS_TITLE               "OPTIONS"
 OPTIONS_GRAPHICS            "Graphics"
 OPTIONS_AUDIO               "Audio"
 OPTIONS_CONTROLS            "Controls"
@@ -121,14 +121,14 @@ OPTIONS_REPORTISSUE         "Report an issue"
 OPTIONS_BACKTOBASEGAME      "Go back to the base game"
 
 // Stage Select
-STAGESELECT_TITLE           "<color=$COLOR_TITLE>STAGE SELECT</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>DEVELOPER MODE</color>"
+STAGESELECT_TITLE           "STAGE SELECT"
+STAGESELECT_DEBUG           "DEVELOPER MODE"
 STAGESELECT_MSG             "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 STAGESELECT_PAGE            "page $1/$2"
 STAGESELECT_ACT             "Zone"
 
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
+CREDITS_TITLE               "CREDITS"
 CREDITS_BACK                "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME version $ENGINE_VERSION</color>\npowered by $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>People</color>"
@@ -164,7 +164,7 @@ TITLESCREEN_OPTIONS         "OPTIONS"
 TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "SHARE"
 TITLESCREEN_DONATE          "DONATE"
-TITLESCREEN_QUIT            "QUIT"
+TITLESCREEN_QUIT            "EXIT"
 TITLESCREEN_SUBMITFEEDBACK  "SUBMIT FEEDBACK"
 TITLESCREEN_WRITEREVIEW     "WRITE A REVIEW"
 TITLESCREEN_RATEAPP         "RATE THE APP"
@@ -473,6 +473,12 @@ INPUT_FIRE5                 "${INPUT_${INPUT_TYPE}_FIRE5}"
 INPUT_FIRE6                 "${INPUT_${INPUT_TYPE}_FIRE6}"
 INPUT_FIRE7                 "${INPUT_${INPUT_TYPE}_FIRE7}"
 INPUT_FIRE8                 "${INPUT_${INPUT_TYPE}_FIRE8}"
+
+// Colored titles
+OPTIONS_COLORED_TITLE       "<color=$COLOR_TITLE>$OPTIONS_TITLE</color>"
+STAGESELECT_COLORED_TITLE   "<color=$COLOR_TITLE>$STAGESELECT_TITLE</color>"
+STAGESELECT_COLORED_DEBUG   "<color=$COLOR_TITLE>$STAGESELECT_DEBUG</color>"
+CREDITS_COLORED_TITLE       "<color=$COLOR_TITLE>$CREDITS_TITLE</color>"
 
 // Backward compatibility
 HUD_COLLECTIBLES            "$HUD_POWER"

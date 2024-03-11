@@ -300,7 +300,7 @@ static const struct
 } entry_decl[] = {
 
     /* Title */
-    { TYPE_TITLE, "$OPTIONS_TITLE", (const char*[]){ NULL }, 0, vt_title, 8 },
+    { TYPE_TITLE, "$OPTIONS_COLORED_TITLE", (const char*[]){ NULL }, 0, vt_title, 8 },
 
     /* Graphics */
     { TYPE_SUBTITLE, "$OPTIONS_GRAPHICS", (const char*[]){ NULL }, 0, vt_graphics, 8 },

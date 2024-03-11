@@ -63,7 +63,7 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 //
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_TITLE>USTAWIENIA</color>"
+OPTIONS_TITLE               "USTAWIENIA"
 FIXME OPTIONS_GRAPHICS            "Graphics"
 FIXME OPTIONS_CONTROLS            "Controls"
 FIXME OPTIONS_GAME                "Game"
@@ -114,14 +114,14 @@ FIXME OPTIONS_REPORTISSUE         "Report an Issue"
 FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
 
 // Stage Select
-STAGESELECT_TITLE           "<color=$COLOR_TITLE>WYBÓR POZIOMU</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>TRYB DEVELOPERSKI</color>"
+STAGESELECT_TITLE           "WYBÓR POZIOMU"
+STAGESELECT_DEBUG           "TRYB DEVELOPERSKI"
 STAGESELECT_MSG             "Wciśnij <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color>, by wyjść"
 STAGESELECT_PAGE            "strona $1/$2"
 STAGESELECT_ACT             "Etap"
 
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>AUTORZY</color>"
+CREDITS_TITLE               "AUTORZY"
 CREDITS_BACK                "Wciśnij <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color>, by wyjść"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME, wersja $ENGINE_VERSION</color>\nnapędzana przez $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Ludzie</color>"

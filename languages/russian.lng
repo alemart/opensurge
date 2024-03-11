@@ -65,7 +65,7 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 //
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_TITLE>НАСТРОЙКИ</color>"
+OPTIONS_TITLE               "НАСТРОЙКИ"
 FIXME OPTIONS_GRAPHICS            "Graphics"
 FIXME OPTIONS_CONTROLS            "Controls"
 FIXME OPTIONS_GAME                "Game"
@@ -116,14 +116,14 @@ FIXME OPTIONS_REPORTISSUE         "Report an Issue"
 FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
 
 // Stage Select
-STAGESELECT_TITLE           "<color=$COLOR_TITLE>ВЫБОР УРОВНЯ</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>РЕЖИМ РАЗРАБОТЧИКА</color>"
+STAGESELECT_TITLE           "ВЫБОР УРОВНЯ"
+STAGESELECT_DEBUG           "РЕЖИМ РАЗРАБОТЧИКА"
 STAGESELECT_MSG             "Нажмите <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> чтобы вернуться"
 STAGESELECT_PAGE            "страница $1/$2"
 STAGESELECT_ACT             "Зона"
 
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>АВТОРЫ</color>"  //v2
+CREDITS_TITLE               "АВТОРЫ"  //v2
 CREDITS_BACK                "Нажмите <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> чтобы вернуться"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME версия $ENGINE_VERSION</color>\nиспользует $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Активные участники</color>"
