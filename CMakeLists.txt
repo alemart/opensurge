@@ -373,6 +373,7 @@ SET(GAME_SRCS
   src/scenes/level.c
   src/scenes/pause.c
   src/scenes/quest.c
+  src/scenes/restart.c
   src/scenes/stageselect.c
   src/scenes/settings.c
 
@@ -526,6 +527,7 @@ SET(GAME_HEADERS
   src/scenes/level.h
   src/scenes/pause.h
   src/scenes/quest.h
+  src/scenes/restart.h
   src/scenes/settings.h
   src/scenes/stageselect.h
 

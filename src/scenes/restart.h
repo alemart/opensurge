@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * storyboard.h - storyboard (stores the scenes of the game)
+ * restart.h - a helper scene that restarts the engine
  * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
@@ -18,32 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _STORYBOARD_H
-#define _STORYBOARD_H
+#ifndef _RESTART_H
+#define _RESTART_H
 
-/* available scenes */
-typedef enum scenetype_t {
-    SCENE_INTRO,
-    SCENE_LEVEL,
-    SCENE_PAUSE,
-    SCENE_GAMEOVER,
-    SCENE_QUEST,
-    SCENE_CONFIRMBOX,
-    SCENE_LANGSELECT,
-    SCENE_CREDITS,
-    SCENE_INFO,
-    SCENE_OPTIONS,
-    SCENE_STAGESELECT,
-    SCENE_EDITORHELP,
-    SCENE_EDITORPAL,
-    SCENE_RESTART,
-    SCENE_MOBILEMENU,
-    SCENE_MOBILEPOPUP
-} scenetype_t;
-
-/* Storyboard */
-void storyboard_init();
-void storyboard_release();
-struct scene_t* storyboard_get_scene(scenetype_t type);
+/* public functions */
+void restart_init(void*);
+void restart_release();
+void restart_update();
+void restart_render();
 
 #endif

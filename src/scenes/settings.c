@@ -18,16 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define ALLEGRO_UNSTABLE /* al_android_open_fd() */
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
-
-#if defined(__ANDROID__)
-#include <allegro5/allegro_android.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#endif
-
 #include <stdbool.h>
 #include "settings.h"
 #include "../core/global.h"
@@ -136,12 +128,6 @@ static void* filechooser_run(ALLEGRO_THREAD* thread, void* arg);
 static void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg);
 
 #if defined(__ANDROID__)
-static const char* find_absolute_filepath(const char* content_uri);
-static bool open_file_at_uri(const char* uri, ALLEGRO_FILE** out_f);
-static const char* url_encoded_basename(const char* url);
-static bool download_to_cache(ALLEGRO_FILE* f, const char* destination_path, void (*on_progress)(double,void*), void* context);
-static bool need_to_download_to_cache(ALLEGRO_FILE* f, const char* destination_path);
-static void show_download_progress(double percentage, void* context);
 static char* application_id(char* buffer, size_t buffer_size);
 #endif
 
@@ -1607,7 +1593,7 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
 #if defined(__ANDROID__)
     /* path_to_game is a content:// URI */
     if(path_to_game != NULL && *path_to_game != '\0')
-        path_to_game = find_absolute_filepath(path_to_game);
+        assertx(want_zipped_mods); /* folders are not supported */
 #endif
 
     /* load the game */
@@ -1620,7 +1606,7 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
             cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
 
             save_preferences();
-            engine_restart(&cmd);
+            scenestack_push(storyboard_get_scene(SCENE_RESTART), &cmd);
         }
         else {
             sound_play(SFX_DENY);
@@ -1644,216 +1630,6 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
  */
 
 #if defined(__ANDROID__)
-
-/* find an absolute path equivalent to an openable document URI;
-   returns a statically allocated string on success or NULL on error */
-const char* find_absolute_filepath(const char* content_uri)
-{
-    const char* filename = url_encoded_basename(content_uri);
-    const char* path_to_game = NULL;
-    static char cache_path[1024];
-    ALLEGRO_FILE* f = NULL;
-
-    /* create relative path "games/$filename" */
-    char relative_path[1024] = "games/";
-    size_t len = strlen(relative_path);
-    str_cpy(relative_path + len, filename, sizeof(relative_path) - len);
-    assertx(0 == strcmp(relative_path + len, filename), "filename too long");
-
-    if(!want_zipped_mods) {
-        /* unsupported - this operation shouldn't happen */
-        ;
-    }
-    else if(!open_file_at_uri(content_uri, &f)) {
-        /* can't open the file */
-        sound_play(SFX_DENY);
-        alert("%s", "Can't open the selected file! Make sure you have the necessary permissions.");
-    }
-    else if('\0' == *(asset_cache_path(relative_path, cache_path, sizeof(cache_path)))) {
-        /* this shouldn't happen */
-        sound_play(SFX_DENY);
-        alert("%s %s", "Can't find the application cache!", filename);
-    }
-    else {
-        /* download the game to the application cache */
-        logfile_message("Path at the cache: \"%s\"", cache_path);
-
-        if(need_to_download_to_cache(f, cache_path)) {
-            logfile_message("The game is not yet cached. We'll cache it.");
-
-            if(download_to_cache(f, cache_path, show_download_progress, video_display_loading_screen_ex)) {
-                logfile_message("The game is now cached!");
-                path_to_game = cache_path;
-            }
-            else {
-                sound_play(SFX_DENY);
-                alert("%s", "Can't open the game! You may clear the application cache to get extra storage space.");
-            }
-        }
-        else {
-            logfile_message("The game is already cached");
-            show_download_progress(1.0, video_display_loading_screen_ex);
-            path_to_game = cache_path;
-        }
-    }
-
-    /* close the file */
-    if(f != NULL)
-        al_fclose(f);
-
-    /* make sure the path points to a valid opensurge game */
-    bool is_legacy_gamedir = false;
-    if(path_to_game != NULL && !asset_is_valid_gamedir(path_to_game, &is_legacy_gamedir)) {
-
-        /* remove the downloaded file from cache */
-        if(0 != remove(path_to_game)) {
-            const char* err = strerror(errno);
-            logfile_message("Error deleting file from cache. %s", err);
-        }
-
-        /* display an error message */
-        sound_play(SFX_DENY);
-
-        if(is_legacy_gamedir)
-            alert("%s", lang_get("OPTIONS_PLAYMOD_LEGACYERROR"));
-        else
-            alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
-
-        /* not a valid gamedir */
-        path_to_game = NULL;
-
-    }
-
-    /* done! */
-    return path_to_game;
-}
-
-/* open a file given a Universal Resource Identifier (URI) */
-bool open_file_at_uri(const char* uri, ALLEGRO_FILE** out_f)
-{
-    int fd = al_android_open_fd(uri, "r");
-
-    if(fd < 0) {
-        logfile_message("%s al_android_open_fd failed fd=%d uri=%s", __func__, fd, uri);
-        *out_f = NULL;
-        return false;
-    }
-
-    if(NULL == (*out_f = al_fopen_fd(fd, "rb"))) {
-        logfile_message("%s al_fopen_fd failed", __func__);
-        close(fd);
-        return false;
-    }
-
-    return true;
-}
-
-/* get the basename of a URL-encoded string */
-const char* url_encoded_basename(const char* url)
-{
-    const char* SLASH = "%2F";
-
-    for(const char *p = NULL; NULL != (p = strstr(url, SLASH));)
-        url = p+3;
-
-    return url; /* XXX is (*url == '\0') possible? */
-}
-
-/* copy an open file stream f to the application cache */
-bool download_to_cache(ALLEGRO_FILE* f, const char* destination_path, void (*on_progress)(double,void*), void* context)
-{
-    /* since we're operating on the application cache, we have
-       write permissions to open the destination path for writing */
-    enum { BUFFER_SIZE = 4096, MEGABYTE = 1048576, PROGRESS_CHUNK = 1 * MEGABYTE };
-    typedef char __chunksize_assertion[-1 + 2 * (!!(PROGRESS_CHUNK % BUFFER_SIZE == 0))];
-
-    uint8_t buffer[BUFFER_SIZE];
-    size_t n;
-    bool error;
-    FILE* f_copy;
-    int64_t total_bytes;
-    int64_t bytes_written;
-
-    /* open filepath for writing */
-    if(NULL == (f_copy = fopen(destination_path, "wb"))) {
-        const char* err = strerror(errno);
-        sound_play(SFX_DENY);
-        alert("%s %s", "Can't write a cached copy!", err);
-        return false;
-    }
-
-    /* copy the file */
-    total_bytes = al_fsize(f);
-    bytes_written = 0;
-    error = false;
-
-    on_progress(0.0, context);
-    while(!error && 0 < (n = al_fread(f, buffer, sizeof(buffer)))) {
-        error = (n != fwrite(buffer, 1, n, f_copy));
-
-        /* show progress */
-        if(0 == ((bytes_written += n) % PROGRESS_CHUNK)) {
-            int64_t fraction = (bytes_written << 10) / total_bytes;
-            double percentage = (double)fraction / 1024.0;
-
-            on_progress(percentage, context);
-        }
-    }
-    on_progress(1.0, context);
-
-    /* error checking */
-    if(error) {
-        sound_play(SFX_DENY);
-        alert("%s", "Can't copy the file to the application cache! Make sure there is enough storage space in your device.");
-
-        if(al_ferror(f) != 0)
-            alert("READ ERROR: %s", al_ferrmsg(f));
-
-        if(ferror(f_copy) != 0)
-            alert("WRITE ERROR: %d", ferror(f_copy));
-    }
-
-    /* close the copy */
-    fclose(f_copy);
-
-    /* done! */
-    return !error;
-}
-
-/* do we need to download file f to destination_path at the application cache? */
-bool need_to_download_to_cache(ALLEGRO_FILE* f, const char* destination_path)
-{
-#if 1
-    /* Simple heuristic: compare the size of the files. This is not always
-       correct, but it is probably correct. We want this routine to be fast.
-       Computing a checksum takes time; the file is expected to have a size of
-       hundreds of megabytes. Users can clear the cache to force new downloads. */
-    struct stat buf;
-
-    if(0 != stat(destination_path, &buf)) {
-        const char* err = strerror(errno);
-        logfile_message("can't stat \"%s\": %s", destination_path, err);
-        return true; /* file not found (possibly) */
-    }
-
-    int64_t f_size = al_fsize(f);
-    int64_t d_size = buf.st_size;
-
-    return (f_size != d_size);
-#else
-    /* always download to cache */
-    return true;
-#endif
-}
-
-/* show download progress */
-void show_download_progress(double percentage, void* context)
-{
-    void (*fn)(double) = (void (*)(double))context;
-
-    if(fn != NULL)
-        fn(percentage);
-}
 
 /* get the application ID */
 char* application_id(char* buffer, size_t buffer_size)
