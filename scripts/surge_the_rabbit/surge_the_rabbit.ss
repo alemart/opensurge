@@ -114,9 +114,8 @@ object "SurgeTheRabbit"
 
     fun canAcceptDonations()
     {
-        /* adding an external donation page to an Android app published
-           in the Google Play Store is a violation of their policy */
         if(Platform.isAndroid) {
+            /* no external donation page */
             if(isBuild("googleplay"))
                 return false;
         }
