@@ -53,7 +53,7 @@
 #define FONT_PATHMAX                1024     /* buffer size for multilingual paths */
 #define FONT_BLANKSMAXSIZE          8192     /* max buffer size for find_blanks() */
 #define FONT_COLORBREAKPOINT     ((char)0x2) /* a control character that delimits a change of color */
-#define FONT_MAXBITMAPCHARS         0x500    /* maximum number of bitmap characters (we support up to codepoint U+04FF) */
+#define FONT_MAXBITMAPGLYPHS        0x500    /* maximum number of bitmap glyphs (we currently support up to codepoint U+04FF) */
 
 /* macros */
 #define IS_VAR_ANYCHAR(c)           ((isalnum((unsigned char)(c))) || ((c) == '_'))
@@ -83,10 +83,9 @@ static int dirfill(const char* vpath, void* param);
 
 typedef struct charproperties_t charproperties_t;
 struct charproperties_t {
-    bool valid; /* whether this character is valid (exists) */
-    struct { /* spritesheet info */
-        int x, y, width, height;
-    } source_rect;
+    bool valid; /* whether or not this character is defined */
+    struct { int x, y, width, height; } source_rect; /* spritesheet info */
+    point2d_t offset; /* offset of this character (defaults to zero) */
     int index; /* index is such that keymap[index] == this_character (if this_character is not in keymap, index is -1) */
 };
 
@@ -99,7 +98,7 @@ struct fontscript_t {
             char source_file[FONT_PATHMAX]; /* source file (relative file path) */
             int source_rect[4]; /* spritesheet rect: x, y, width, height */
             int spacing[2]; /* character spacing: x, y */
-            charproperties_t chr[FONT_MAXBITMAPCHARS]; /* properties of each character */
+            charproperties_t chr[FONT_MAXBITMAPGLYPHS]; /* properties of each glyph */
         } bmp;
 
         /* true-type */
@@ -131,7 +130,8 @@ typedef struct fontdrv_bmp_t fontdrv_bmp_t;
 struct fontdrv_bmp_t { /* bitmap font */
     fontdrv_t base;
     const image_t* atlas; /* image atlas */
-    image_t* glyph[FONT_MAXBITMAPCHARS]; /* glyph indexed by codepoint */
+    image_t* glyph[FONT_MAXBITMAPGLYPHS]; /* glyph indexed by codepoint */
+    point2d_t glyph_offset[FONT_MAXBITMAPGLYPHS]; /* offset of a glyph (defaults to zero) */
     v2d_t spacing; /* character spacing */
     int line_height; /* max({ image_height(glyph[j]) | j >= 0 }) */
     char* filepath; /* relative path */
@@ -142,7 +142,7 @@ static int fontdrv_bmp_lineheight(const fontdrv_t* fnt);
 static const char* fontdrv_bmp_filepath(const fontdrv_t* fnt);
 static const image_t* fontdrv_bmp_image(const fontdrv_t* fnt);
 static void fontdrv_bmp_release(fontdrv_t* fnt);
-static inline const image_t* find_bmp_glyph(const fontdrv_bmp_t* f, uint32_t codepoint);
+static inline const image_t* find_bmp_glyph(const fontdrv_bmp_t* f, uint32_t codepoint, point2d_t* out_offset);
 
 typedef struct fontdrv_ttf_t fontdrv_ttf_t;
 struct fontdrv_ttf_t { /* truetype font */
@@ -1520,7 +1520,7 @@ int traverse_block(const parsetree_statement_t* stmt, void* data)
         header->data.bmp.spacing[0] = 1; /* default spacing */
         header->data.bmp.spacing[1] = 1;
 
-        for(int i = 0; i < FONT_MAXBITMAPCHARS; i++) {
+        for(int i = 0; i < FONT_MAXBITMAPGLYPHS; i++) {
             /* initialize all characters to: unspecified */
             header->data.bmp.chr[i].valid = false;
             header->data.bmp.chr[i].index = -1;
@@ -1528,11 +1528,12 @@ int traverse_block(const parsetree_statement_t* stmt, void* data)
             header->data.bmp.chr[i].source_rect.y = 0;
             header->data.bmp.chr[i].source_rect.width = 0;
             header->data.bmp.chr[i].source_rect.height = 0;
+            header->data.bmp.chr[i].offset = point2d_new(0, 0);
         }
 
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), data, traverse_bmp);
 
-        for(int i = 0; i < FONT_MAXBITMAPCHARS; i++) {
+        for(int i = 0; i < FONT_MAXBITMAPGLYPHS; i++) {
             /* has the user declared a keymap? (monospaced bitmap font) */
             if(header->data.bmp.chr[i].index >= 0 && header->data.bmp.chr[i].source_rect.width > 0) {
                 /* find the source_rect of individual characters (keymap) */
@@ -1591,7 +1592,7 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
 
         width = max(0, atoi(nanoparser_get_string(p1)));
         height = max(0, atoi(nanoparser_get_string(p2)));
-        for(int i = 0; i < FONT_MAXBITMAPCHARS; i++) {
+        for(int i = 0; i < FONT_MAXBITMAPGLYPHS; i++) {
             if(header->data.bmp.chr[i].source_rect.width <= 0) {
                 header->data.bmp.chr[i].source_rect.width = width;
                 header->data.bmp.chr[i].source_rect.height = height;
@@ -1608,7 +1609,7 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
 
         keymap = nanoparser_get_string(p1);
         for(prev_i = i = 0; (chr = u8_nextchar(keymap, &i)) != 0; prev_i = i) {
-            if(chr < FONT_MAXBITMAPCHARS) {
+            if(chr < FONT_MAXBITMAPGLYPHS) {
                 if(!header->data.bmp.chr[chr].valid) {
                     header->data.bmp.chr[chr].index = prev_i;
                     header->data.bmp.chr[chr].valid = true;
@@ -1635,7 +1636,7 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
         size_t i = 0;
         uint32_t c = u8_nextchar(nanoparser_get_string(p1), &i);
 
-        if(c < FONT_MAXBITMAPCHARS)
+        if(c < FONT_MAXBITMAPGLYPHS)
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), &header->data.bmp.chr[c], traverse_bmp_char);
     }
     else
@@ -1667,6 +1668,16 @@ int traverse_bmp_char(const parsetree_statement_t* stmt, void* data)
         chr->source_rect.height = max(0, atoi(nanoparser_get_string(p4)));
         chr->index = -1;
         chr->valid = true;
+    }
+    else if(str_icmp(id, "offset") == 0) {
+        const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
+        const parsetree_parameter_t* p2 = nanoparser_get_nth_parameter(param_list, 2);
+
+        nanoparser_expect_string(p1, "Font script error: offset expects two parameters: offset_x, offset_y");
+        nanoparser_expect_string(p2, "Font script error: offset expects two parameters: offset_x, offset_y");
+
+        chr->offset.x = atoi(nanoparser_get_string(p1));
+        chr->offset.y = atoi(nanoparser_get_string(p2));
     }
     else
         fatal_error("Font script error: unknown keyword '%s' in bitmap font", id);
@@ -1796,7 +1807,7 @@ fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int 
     ((fontdrv_t*)f)->release = fontdrv_bmp_release;
 
     /* initialize the glyphs */
-    for(int j = 0; j < FONT_MAXBITMAPCHARS; j++)
+    for(int j = 0; j < FONT_MAXBITMAPGLYPHS; j++)
         f->glyph[j] = NULL;
 
     /* set the image atlas */
@@ -1804,9 +1815,10 @@ fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int 
 
     /* configure the spritesheet */
     f->line_height = 0;
-    for(int j = 1 + FONT_COLORBREAKPOINT; j < FONT_MAXBITMAPCHARS; j++) {
+    for(int j = 1 + FONT_COLORBREAKPOINT; j < FONT_MAXBITMAPGLYPHS; j++) {
         if(chr[j].valid) {
             f->glyph[j] = image_create_shared(img, chr[j].source_rect.x, chr[j].source_rect.y, chr[j].source_rect.width, chr[j].source_rect.height);
+            f->glyph_offset[j] = chr[j].offset;
             f->line_height = max(f->line_height, chr[j].source_rect.height);
         }
     }
@@ -1828,7 +1840,7 @@ void fontdrv_bmp_release(fontdrv_t* fnt)
 {
     fontdrv_bmp_t* f = (fontdrv_bmp_t*)fnt;
 
-    for(int i = 0; i < FONT_MAXBITMAPCHARS; i++) {
+    for(int i = 0; i < FONT_MAXBITMAPGLYPHS; i++) {
         if(f->glyph[i] != NULL)
             image_destroy(f->glyph[i]);
     }
@@ -1847,10 +1859,11 @@ void fontdrv_bmp_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
     uint32_t c = 0;
 
     for(size_t i = 0; (c = u8_nextchar(text, &i)) != 0; ) {
-        const image_t* glyph = find_bmp_glyph(f, c);
+        point2d_t glyph_offset;
+        const image_t* glyph = find_bmp_glyph(f, c, &glyph_offset);
         if(glyph != NULL) {
             int dy = f->line_height - vsp - image_height(glyph);
-            image_draw_tinted(glyph, x, y + dy, color, IF_NONE);
+            image_draw_tinted(glyph, x + glyph_offset.x, y + dy + glyph_offset.y, color, IF_NONE);
             x += image_width(glyph) + hsp;
         }
     }
@@ -1871,7 +1884,7 @@ int fontdrv_bmp_linewidth(const fontdrv_t* fnt, const char* text)
     uint32_t c = 0;
 
     for(size_t i = 0; (c = u8_nextchar(text, &i)) != 0; ) {
-        const image_t* glyph = find_bmp_glyph(f, c);
+        const image_t* glyph = find_bmp_glyph(f, c, NULL);
         if(glyph != NULL) {
             line_width += image_width(glyph) + space;
             space = (text[i] != '\0') ? hsp : 0;
@@ -1893,9 +1906,18 @@ const image_t* fontdrv_bmp_image(const fontdrv_t* fnt)
     return f->atlas;
 }
 
-const image_t* find_bmp_glyph(const fontdrv_bmp_t* f, uint32_t codepoint)
+const image_t* find_bmp_glyph(const fontdrv_bmp_t* f, uint32_t codepoint, point2d_t* out_offset)
 {
-    return f->glyph[codepoint % FONT_MAXBITMAPCHARS]; /* possibly NULL */
+    if(codepoint < FONT_MAXBITMAPGLYPHS) {
+        const image_t* glyph = f->glyph[codepoint]; /* possibly NULL */
+
+        if(out_offset != NULL && glyph != NULL)
+            *out_offset = f->glyph_offset[codepoint];
+
+        return glyph;
+    }
+
+    return NULL;
 }
 
 /* ------------------------------------------------- */
