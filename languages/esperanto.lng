@@ -82,7 +82,7 @@ FIXME OPTIONS_QUALITY_LOW         "Low"
 FIXME OPTIONS_QUALITY_MEDIUM      "Medium"
 FIXME OPTIONS_QUALITY_HIGH        "High"
 OPTIONS_FPS                 "Montri FPS-jn"
-FIXME OPTIONS_VSYNC               "V-Sync"
+FIXME OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
 FIXME OPTIONS_PIXELSCALER         "Pixel scaler"
 FIXME OPTIONS_COMINGSOON          "Coming soon!"
 FIXME OPTIONS_VOLUME              "Volume"
@@ -184,7 +184,7 @@ FIXME PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 FIXME THANKSFORPLAYING_TITLE      "Thanks for playing!"
-FIXME THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile!"
+FIXME THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile devices!"
 FIXME THANKSFORPLAYING_PARAGRAPH2 "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
 FIXME THANKSFORPLAYING_PARAGRAPH3 "Become a supporter of this open source game engine today!"
 FIXME THANKSFORPLAYING_YES        "Sure!"

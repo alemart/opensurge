@@ -89,7 +89,7 @@ OPTIONS_QUALITY_LOW         "Low"
 OPTIONS_QUALITY_MEDIUM      "Medium"
 OPTIONS_QUALITY_HIGH        "High"
 OPTIONS_FPS                 "Display FPS"
-OPTIONS_VSYNC               "V-Sync"
+OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
 OPTIONS_PIXELSCALER         "Pixel scaler"
 OPTIONS_COMINGSOON          "Coming soon!"
 OPTIONS_VOLUME              "Volume"
@@ -191,7 +191,7 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Thanks for playing!"
-THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile!"
+THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile devices!"
 THANKSFORPLAYING_PARAGRAPH2 "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
 THANKSFORPLAYING_PARAGRAPH3 "Become a supporter of this open source game engine today!"
 THANKSFORPLAYING_YES        "Sure!"
