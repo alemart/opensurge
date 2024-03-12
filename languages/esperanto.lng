@@ -396,11 +396,8 @@ EDITOR_MESSAGE_YELLOWLAYER  "Ŝanĝita al la <color=$1>flava</color> tavolo"
 //
 // Translators:
 //
-// Since the game uses bitmap fonts, parts of
-// the translation don't accept special characters.
-//
-// This section doesn't accept language-specific
-// special characters.
+// This section accepts SOME language-specific
+// special characters. Please test as necessary.
 //
 // If a translation is not possible, you may
 // leave the following sentences in English.

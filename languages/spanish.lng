@@ -389,11 +389,8 @@ EDITOR_MESSAGE_YELLOWLAYER  "Cambiado a la capa <color=$1>amarilla</color>"
 //
 // Translators:
 //
-// Since the game uses bitmap fonts, parts of
-// the translation don't accept special characters.
-//
-// This section does not accept language-specific
-// special characters.
+// This section accepts SOME language-specific
+// special characters. Please test as necessary.
 //
 // If a translation is not possible, you may
 // leave the following sentences in English.
