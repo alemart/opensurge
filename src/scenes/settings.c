@@ -86,7 +86,7 @@ struct settings_entry_t
     int number_of_possible_values;
     int index_of_current_value;
 
-    int ypos;
+    point2d_t position;
 };
 
 /* constants */
@@ -339,12 +339,9 @@ static const struct
     { TYPE_SETTING, "$OPTIONS_REPORTISSUE", (const char*[]){ NULL }, 0, vt_reportissue, 0 },
 #if IS_MOBILE_PLATFORM
     { TYPE_SETTING, "$OPTIONS_RATEAPP", (const char*[]){ NULL }, 0, vt_submitfeedback, 0 },
-#else
-    { TYPE_SETTING, "$OPTIONS_SUBMITFEEDBACK", (const char*[]){ NULL }, 0, vt_submitfeedback, 0 },
-#endif
-#if IS_MOBILE_PLATFORM
     { TYPE_SETTING, "$OPTIONS_DOWNLOAD_DESKTOP", (const char*[]){ NULL }, 0, vt_download, 0 },
 #else
+    { TYPE_SETTING, "$OPTIONS_SUBMITFEEDBACK", (const char*[]){ NULL }, 0, vt_submitfeedback, 0 },
     { TYPE_SETTING, "$OPTIONS_DOWNLOAD_MOBILE", (const char*[]){ NULL }, 0, vt_download, 0 },
 #endif
 
@@ -487,7 +484,7 @@ void settings_render()
 void init_entries()
 {
     int screen_width = video_get_screen_size().x;
-    int xpos = 0, ypos = 0;
+    int ypos = 0;
 
     for(int i = 0; i < number_of_entries; i++) {
         entry[i].type = entry_decl[i].type;
@@ -507,16 +504,16 @@ void init_entries()
         font_set_text(entry[i].value, "");
         font_set_align(entry[i].value, FONTALIGN_RIGHT);
 
-        entry[i].ypos = ypos + entry_decl[i].padding_top;
-        xpos = FONT_RELATIVE_XPOS[entry[i].type] * screen_width;
-        font_set_position(entry[i].key, v2d_new(xpos, entry[i].ypos));
-        font_set_position(entry[i].value, v2d_new(screen_width - xpos, entry[i].ypos));
+        entry[i].position.x = FONT_RELATIVE_XPOS[entry[i].type] * screen_width;
+        entry[i].position.y = ypos + entry_decl[i].padding_top;
+        font_set_position(entry[i].key, v2d_new(entry[i].position.x, entry[i].position.y));
+        font_set_position(entry[i].value, v2d_new(screen_width - entry[i].position.x, entry[i].position.y));
 
         bool is_visible = entry[i].vt->is_visible(&entry[i]);
         font_set_visible(entry[i].key, is_visible);
         font_set_visible(entry[i].value, is_visible);
         if(is_visible)
-            ypos = entry[i].ypos + font_get_textsize(entry[i].key).y;
+            ypos = entry[i].position.y + font_get_textsize(entry[i].key).y;
     }
 
     number_of_settings = 0;
@@ -723,7 +720,7 @@ bool handle_fading()
 /* update the camera */
 void update_camera()
 {
-    int ypos = setting[index_of_highlighted_setting]->ypos;
+    int ypos = setting[index_of_highlighted_setting]->position.y;
     int line_ypos = video_get_screen_size().y * 0.5f;
 
     int target_ypos = max(ypos, line_ypos);
@@ -1169,7 +1166,7 @@ void update_flag_icon(const settings_entry_t* e)
     v2d_t font_size = font_get_textsize(f);
 
     float flag_xpos = font_get_position(f).x - font_size.x + flag_offset.x;
-    float flag_ypos = e->ypos + font_size.y * 0.5f + flag_offset.y;
+    float flag_ypos = e->position.y + font_size.y * 0.5f + flag_offset.y;
     flag_icon->position = v2d_new(flag_xpos, flag_ypos);
 }
 
