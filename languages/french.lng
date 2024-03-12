@@ -14,8 +14,8 @@
 // (use the English alphabet)
 LANG_ID                  "fr_FR"                          // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                "Français"                       // language name
-LANG_AUTHOR              "Stilic"                       // translation author
-LANG_LASTUPDATE          "2022-08-03"                     // date format: yyyy-mm-dd
+LANG_AUTHOR              "Stilic"                         // translation author
+LANG_LASTUPDATE          "2024-03-12"                     // date format: yyyy-mm-dd
 LANG_COMPATIBILITY       "0.6.1"                          // required engine version
 
 
@@ -63,54 +63,54 @@ LANG_COMPATIBILITY       "0.6.1"                          // required engine ver
 
 // Options
 OPTIONS_TITLE            "OPTIONS"
-FIXME OPTIONS_GRAPHICS            "Graphics"
-FIXME OPTIONS_CONTROLS            "Controls"
-FIXME OPTIONS_GAME                "Game"
-FIXME OPTIONS_ENGINE              "Engine"
-FIXME OPTIONS_MODS                "MODs"
-FIXME OPTIONS_AUDIO               "Audio"
-FIXME OPTIONS_BACK                "Back"
-FIXME OPTIONS_YES                 "Yes"
-FIXME OPTIONS_NO                  "No"
-FIXME OPTIONS_ON                  "On" // alternatively: Enabled
-FIXME OPTIONS_OFF                 "Off" // alternatively: Disabled
+OPTIONS_GRAPHICS            "Graphismes"
+OPTIONS_CONTROLS            "Contrôles"
+OPTIONS_GAME                "Jeu"
+OPTIONS_ENGINE              "Moteur"
+OPTIONS_MODS                "MODs"
+OPTIONS_AUDIO               "Audio"
+OPTIONS_BACK                "Retour"
+OPTIONS_YES                 "Oui"
+OPTIONS_NO                  "Non"
+OPTIONS_ON                  "Activé" // alternatively: Enabled
+OPTIONS_OFF                 "Désactivé" // alternatively: Disabled
 OPTIONS_FULLSCREEN       "Plein écran"
 OPTIONS_RESOLUTION       "Résolution"
-FIXME OPTIONS_QUALITY             "Quality"
-FIXME OPTIONS_QUALITY_LOW         "Low"
-FIXME OPTIONS_QUALITY_MEDIUM      "Medium"
-FIXME OPTIONS_QUALITY_HIGH        "High"
+OPTIONS_QUALITY             "Qualité"
+OPTIONS_QUALITY_LOW         "Bas"
+OPTIONS_QUALITY_MEDIUM      "Moyenne"
+OPTIONS_QUALITY_HIGH        "Haute"
 OPTIONS_FPS              "Voir les FPS"
-FIXME OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
-FIXME OPTIONS_PIXELSCALER         "Pixel scaler"
-FIXME OPTIONS_COMINGSOON          "Coming soon!"
-FIXME OPTIONS_VOLUME              "Volume"
-FIXME OPTIONS_MUTE                "Muted"
-FIXME OPTIONS_GAMEPADOPACITY      "Opacity"
+OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Scaler de pixels"
+OPTIONS_COMINGSOON          "Bientôt disponible !"
+OPTIONS_VOLUME              "Volume"
+OPTIONS_MUTE                "Coupé"
+OPTIONS_GAMEPADOPACITY      "Opacité"
 OPTIONS_GAMEPAD          "Utiliser une manette"
-FIXME OPTIONS_LANGUAGE            "Language"
+OPTIONS_LANGUAGE            "Langue"
 OPTIONS_STAGESELECT      "Sélection de stage"
-FIXME OPTIONS_DEVELOPERMODE       "Developer mode"
+OPTIONS_DEVELOPERMODE       "Mode développeur"
 OPTIONS_CREDITS          "Crédits d'Open Surge"
-FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
+OPTIONS_WEBSITE             "Visiter Open Surge sur le web"
 OPTIONS_DONATE           "Faire un don pour Open Surge"
-FIXME OPTIONS_ABOUT               "About the engine"
-FIXME OPTIONS_SHARE               "Share the engine"
-FIXME OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
-FIXME OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
-FIXME OPTIONS_PLAYMOD             "Play a game"
-FIXME OPTIONS_PLAYMOD_NOTAGAME    "The selected item is not an Open Surge game!"
-FIXME OPTIONS_PLAYMOD_LEGACYERROR "Legacy Open Surge games are not supported."
-FIXME OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your gaming experience. Are you sure you want to disable it?"
-FIXME OPTIONS_MODSTORAGE          "Storage"
-FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
-FIXME OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
-FIXME OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
-FIXME OPTIONS_SUBMITFEEDBACK      "Submit feedback"
-FIXME OPTIONS_WRITEREVIEW         "Write a review"
-FIXME OPTIONS_RATEAPP             "Rate the app"
-FIXME OPTIONS_REPORTISSUE         "Report an issue"
-FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
+OPTIONS_ABOUT               "À propos du moteur"
+OPTIONS_SHARE               "Partager le moteur"
+OPTIONS_DOWNLOAD_DESKTOP    "Obtenir le moteur pour bureaux"
+OPTIONS_DOWNLOAD_MOBILE     "Obtenir le moteur pour mobile"
+OPTIONS_PLAYMOD             "Jouer à un jeu"
+OPTIONS_PLAYMOD_NOTAGAME    "L'item sélectionné n'est pas un jeu Open Surge !"
+OPTIONS_PLAYMOD_LEGACYERROR "Les anciens jeux Open Surge ne sont pas supportés."
+OPTIONS_PLAYMOD_COMPATWARN  "Le mode de compabilité est une fonctionnalité conçue pour améliorer votre expérience de gaming. Êtes-vous sûr de vouloir le désactiver ?"
+OPTIONS_MODSTORAGE          "Stockage"
+OPTIONS_MODSTORAGE_FOLDER   "Dossier" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  "archive .zip"
+OPTIONS_COMPATIBILITYMODE   "Mode de compabilité"
+OPTIONS_SUBMITFEEDBACK      "Soumettre un retour d'information"
+OPTIONS_WRITEREVIEW         "Rédiger un avis"
+OPTIONS_RATEAPP             "Évaluer l'application"
+OPTIONS_REPORTISSUE         "Signaler un problème"
+OPTIONS_BACKTOBASEGAME      "Retourner vers le jeu de base"
 
 // Stage Select
 STAGESELECT_TITLE        "SÉLECTION DE STAGE"
@@ -123,8 +123,8 @@ STAGESELECT_ACT          "Zone"
 CREDITS_TITLE            "CRÉDITS"
 CREDITS_BACK             "Appuyer sur <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> pour RETOUR"
 CREDITS_HEADER           "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME version $ENGINE_VERSION</color>\nbasée sur $ENGINE_NAME\n$ENGINE_WEBSITE"
-CREDITS_ACTIVE           "<color=$COLOR_HIGHLIGHT>Personnes</color>"
-FIXME CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Past members</color>"
+CREDITS_ACTIVE           "<color=$COLOR_HIGHLIGHT>Membres</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Anciens membres</color>"
 CREDITS_THANKS           "<color=$COLOR_HIGHLIGHT>Merci à</color>"
 CREDITS_ALEXANDRE           "Directeur du Projet et Fondateur\nDéveloppeur du Projet\nArtiste"
 CREDITS_JOAO             "Artiste\nIllustrateur"
@@ -138,7 +138,7 @@ CREDITS_COLIN            "Sprites, première histoire"
 CREDITS_BRIAN            "Spriteur"
 CREDITS_TRANSLATOR       "Traducteur"
 CREDITS_TRANSLATORS      "<color=$COLOR_HIGHLIGHT>Traducteurs</color>"
-FIXME CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Past translators</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Anciens traducteurs</color>"
 CREDITS_RES_TITLE        "<color=$COLOR_HIGHLIGHT>Crédits par ressources individuelles</color>"
 CREDITS_RES_TEXT            "Les fichiers listées ci-dessus sont tous disponibles en licenses libres. Leurs auteurs respectifs sont présentées :"
 CREDITS_RES_IMAGES       "<color=$COLOR_HIGHLIGHT>Images</color>"
@@ -153,14 +153,14 @@ CREDITS_RES_SCRIPTS_TEXT "Les auteurs sont identifiés dans les scripts eux-mêm
 // Title Screen
 TITLESCREEN_PLAY            "LANCER LE JEU"
 TITLESCREEN_OPTIONS         "OPTIONS"
-FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
+TITLESCREEN_MOBILE          "JOUER SUR MOBILE"
 TITLESCREEN_SHARE           "PARTAGER"
 TITLESCREEN_DONATE          "FAIRE UN DON"
 TITLESCREEN_QUIT            "QUITTER"
-FIXME TITLESCREEN_SUBMITFEEDBACK  "SUBMIT FEEDBACK"
-FIXME TITLESCREEN_WRITEREVIEW     "WRITE A REVIEW"
-FIXME TITLESCREEN_RATEAPP         "RATE THE APP"
-FIXME TITLESCREEN_REPORTISSUE     "REPORT AN ISSUE"
+TITLESCREEN_SUBMITFEEDBACK  "SOUMETTRE UN RETOUR D'INFORMATION"
+TITLESCREEN_WRITEREVIEW     "RÉDIGER UN AVIS"
+TITLESCREEN_RATEAPP         "ÉVALUER L'APPLICATION"
+TITLESCREEN_REPORTISSUE     "SIGNALER UN PROBLÈME"
 TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
@@ -171,23 +171,23 @@ ENDOFDEMO_TEXT              "Merci d'avoir joué ! Surge the Rabbit est en déve
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
-FIXME RATEGAME_TITLE              "Rate Surge the Rabbit?"
-FIXME RATEGAME_MESSAGE            "We'd love to hear from you!\nYour feedback helps this open source game & engine!" // 2 lines max.
-FIXME RATEGAME_YES                "Sure!"
-FIXME RATEGAME_NO                 "Not now"
+RATEGAME_TITLE              "Évaluer Surge the Rabbit ?"
+RATEGAME_MESSAGE            "Nous serions ravis de vous entendre !\nVos commentaires aident ce jeu et ce moteur open source !" // 2 lines max.
+RATEGAME_YES                "Bien sûr !"
+RATEGAME_NO                 "Pas maintenant"
 
 // Play classic levels
-FIXME PLAYCLASSICLEVELS_TEXT      "Play the classic levels?"
-FIXME PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
-FIXME PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+PLAYCLASSICLEVELS_TEXT      "Jouer aux niveaux classiques ?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-FIXME THANKSFORPLAYING_TITLE      "Thanks for playing!"
-FIXME THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile devices!"
-FIXME THANKSFORPLAYING_PARAGRAPH2 "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
-FIXME THANKSFORPLAYING_PARAGRAPH3 "Become a supporter of this open source game engine today!"
-FIXME THANKSFORPLAYING_YES        "Sure!"
-FIXME THANKSFORPLAYING_NO         "Not now"
+THANKSFORPLAYING_TITLE      "Merci d'avoir joué !"
+THANKSFORPLAYING_PARAGRAPH1 "Soutenez ce travail indépendant ! Obtenez l'édition officielle du moteur pour les appareils mobiles !"
+THANKSFORPLAYING_PARAGRAPH2 "Jouez à Surge the Rabbit - et aussi à vos propres jeux - sur votre téléphone et votre tablette !"
+THANKSFORPLAYING_PARAGRAPH3 "Devenez un supporter de ce moteur de jeu open source dès aujourd'hui !"
+THANKSFORPLAYING_YES        "Bien sûr !"
+THANKSFORPLAYING_NO         "Pas maintenant"
 
 // (legacy) Main Menu
 MAINMENU_TITLE           "MENU"
@@ -232,10 +232,10 @@ INPUT_KEYB_FIRE1         "ESPACE"
 INPUT_KEYB_FIRE2         "CONTRÔLE DROIT"
 INPUT_KEYB_FIRE3         "ENTRÉE"
 INPUT_KEYB_FIRE4         "ESC"
-FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
-FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
-FIXME INPUT_KEYB_FIRE7            "<available>"
-FIXME INPUT_KEYB_FIRE8            "<available>"
+INPUT_KEYB_FIRE5            "MAJ GAUCHE"
+INPUT_KEYB_FIRE6            "MAJ DROITE"
+INPUT_KEYB_FIRE7            "<disponible>"
+INPUT_KEYB_FIRE8            "<disponible>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL    "les DIRECTIONS"
@@ -243,12 +243,12 @@ INPUT_JOY_LEFT           "la TOUCHE GAUCHE"
 INPUT_JOY_RIGHT          "la TOUCHE DROITE"
 INPUT_JOY_UP             "la TOUCHE HAUT"
 INPUT_JOY_DOWN           "la TOUCHE BAS"
-FIXME INPUT_JOY_FIRE1             "the ACTION BUTTON"
-FIXME INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
+INPUT_JOY_FIRE1             "le BOUTON D'ACTION"
+INPUT_JOY_FIRE2             "le BOUTON D'ACTION SECONDAIRE"
 INPUT_JOY_FIRE3             "PAUSE"
 INPUT_JOY_FIRE4             "RETOUR"
-FIXME INPUT_JOY_FIRE5             "L1"
-FIXME INPUT_JOY_FIRE6             "R1"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<disponible>"
 INPUT_JOY_FIRE8             "<disponible>"
 
@@ -275,10 +275,10 @@ LOADING_TEXT             "chargement..."
 // Demo Level
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Créez vos propres jeux !</color>\nCe jeu est créé avec <color=$COLOR_HIGHLIGHT>Open Surge</color>, un moteur de jeu 2D très flexible et open-source qui est maintenant entre vos mains !"
 LEV_DEMO_2               "<color=$COLOR_TITLE>Saviez-vous que...</color>\nTout dans Open Surge est personnalisable. Vous pouvez créer des niveaux, des objets, des boss, des personnages et plus encore ! C'est un <color=$COLOR_HIGHLIGHT>système de création de jeu</color>."
-LEV_DEMO_3               "<color=$COLOR_TITLE>Libérez votre créativité !</color>\nL'une des principales caractéristiques d'Open Surge est <color=$COLOR_HIGHLIGHT>SurgeScript</color>. C'est un script pour les jeux ! Utilisez-le pour construire tout ce que vous pouvez imaginer !"
+LEV_DEMO_3               "<color=$COLOR_TITLE>Libérez votre créativité !</color>\nL'une des principales caractéristiques d'Open Surge est <color=$COLOR_HIGHLIGHT>SurgeScript</color>. C'est un langage de script pour les jeux ! Utilisez-le pour construire tout ce que vous pouvez imaginer !"
 LEV_DEMO_4               "<color=$COLOR_TITLE>Cool !</color>\nÊtes-vous déjà excité ? Le ciel est la limite ! Visitez <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> pour créer vos propres jeux géniaux dès aujourd'hui !"
 LEV_DEMO_5               "<color=$COLOR_TITLE>Essayez vous-même !</color>\nMaintenant, c'est ton tour ! <color=$COLOR_HIGHLIGHT>Appuyer sur F12 pour ouvrir l'éditeur de stage</color>. Ensuite, ouvrez la palette d'objets et commencez à construire votre stage ! (utilisez F1 pour l'aide)"
-FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Essayez-le vous-même !</color>\nMettez le jeu en pause, faites glisser la poignée en bas de l'écran et entrez dans le <color=$COLOR_HIGHLIGHT>MODE DEBUG</color> pour <color=$COLOR_HIGHLIGHT>modifier le niveau</color> !"
 
 
 //
@@ -422,7 +422,7 @@ TIMEOVER_PART1           "TEMPS"
 TIMEOVER_PART2           "DEPASSE"
 
 // Pause Menu
-FIXME PAUSE_TITLE                 "PAUSE"
-FIXME PAUSE_CONTINUE              "CONTINUE"
-FIXME PAUSE_RESTART               "RESTART"
-FIXME PAUSE_EXIT                  "EXIT"
+PAUSE_TITLE                 "PAUSE"
+PAUSE_CONTINUE              "CONTINUER"
+PAUSE_RESTART               "REDÉMARRER"
+PAUSE_EXIT                  "QUITTER"
