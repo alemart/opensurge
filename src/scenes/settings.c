@@ -18,8 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if !defined(__ANDROID__)
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
+#else
+#define ALLEGRO_UNSTABLE
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_android.h>
+#endif
+
 #include <stdbool.h>
 #include "settings.h"
 #include "../core/global.h"
