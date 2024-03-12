@@ -53,6 +53,7 @@
 #define FONT_PATHMAX                1024     /* buffer size for multilingual paths */
 #define FONT_BLANKSMAXSIZE          8192     /* max buffer size for find_blanks() */
 #define FONT_COLORBREAKPOINT     ((char)0x2) /* a control character that delimits a change of color */
+#define FONT_MAXBITMAPCHARS         0x500    /* maximum number of bitmap characters (we support up to codepoint U+04FF) */
 
 /* macros */
 #define IS_VAR_ANYCHAR(c)           ((isalnum((unsigned char)(c))) || ((c) == '_'))
@@ -98,7 +99,7 @@ struct fontscript_t {
             char source_file[FONT_PATHMAX]; /* source file (relative file path) */
             int source_rect[4]; /* spritesheet rect: x, y, width, height */
             int spacing[2]; /* character spacing: x, y */
-            charproperties_t chr[256]; /* properties of char x (0..255) */
+            charproperties_t chr[FONT_MAXBITMAPCHARS]; /* properties of each character */
         } bmp;
 
         /* true-type */
@@ -130,7 +131,7 @@ typedef struct fontdrv_bmp_t fontdrv_bmp_t;
 struct fontdrv_bmp_t { /* bitmap font */
     fontdrv_t base;
     const image_t* atlas; /* image atlas */
-    image_t* glyph[256]; /* glyph indexed by codepoint */
+    image_t* glyph[FONT_MAXBITMAPCHARS]; /* glyph indexed by codepoint */
     v2d_t spacing; /* character spacing */
     int line_height; /* max({ image_height(glyph[j]) | j >= 0 }) */
     char* filepath; /* relative path */
@@ -1514,13 +1515,12 @@ int traverse_block(const parsetree_statement_t* stmt, void* data)
     }
     else if(str_icmp(id, "bitmap") == 0) {
         /* default configuration */
-        int i, n = sizeof(header->data.bmp.chr) / sizeof(charproperties_t);
-
         header->type = FONTSCRIPTTYPE_BMP;
         strcpy(header->data.bmp.source_file, "");
         header->data.bmp.spacing[0] = 1; /* default spacing */
         header->data.bmp.spacing[1] = 1;
-        for(i = 0; i < n; i++) {
+
+        for(int i = 0; i < FONT_MAXBITMAPCHARS; i++) {
             /* initialize all characters to: unspecified */
             header->data.bmp.chr[i].valid = false;
             header->data.bmp.chr[i].index = -1;
@@ -1532,7 +1532,7 @@ int traverse_block(const parsetree_statement_t* stmt, void* data)
 
         nanoparser_traverse_program_ex(nanoparser_get_program(p1), data, traverse_bmp);
 
-        for(i = 0; i < n; i++) {
+        for(int i = 0; i < FONT_MAXBITMAPCHARS; i++) {
             /* has the user declared a keymap? (monospaced bitmap font) */
             if(header->data.bmp.chr[i].index >= 0 && header->data.bmp.chr[i].source_rect.width > 0) {
                 /* find the source_rect of individual characters (keymap) */
@@ -1584,7 +1584,6 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
     else if(str_icmp(id, "frame_size") == 0) {
         const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
         const parsetree_parameter_t* p2 = nanoparser_get_nth_parameter(param_list, 2);
-        int i, n = sizeof(header->data.bmp.chr) / sizeof(charproperties_t);
         int width, height;
 
         nanoparser_expect_string(p1, "Font script error: frame_size expects two parameters: char_width, char_height");
@@ -1592,7 +1591,7 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
 
         width = max(0, atoi(nanoparser_get_string(p1)));
         height = max(0, atoi(nanoparser_get_string(p2)));
-        for(i = 0; i < n; i++) {
+        for(int i = 0; i < FONT_MAXBITMAPCHARS; i++) {
             if(header->data.bmp.chr[i].source_rect.width <= 0) {
                 header->data.bmp.chr[i].source_rect.width = width;
                 header->data.bmp.chr[i].source_rect.height = height;
@@ -1609,7 +1608,7 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
 
         keymap = nanoparser_get_string(p1);
         for(prev_i = i = 0; (chr = u8_nextchar(keymap, &i)) != 0; prev_i = i) {
-            if(chr <= 0xFF) {
+            if(chr < FONT_MAXBITMAPCHARS) {
                 if(!header->data.bmp.chr[chr].valid) {
                     header->data.bmp.chr[chr].index = prev_i;
                     header->data.bmp.chr[chr].valid = true;
@@ -1630,12 +1629,14 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
     else if(str_icmp(id, "char") == 0) {
         const parsetree_parameter_t* p1 = nanoparser_get_nth_parameter(param_list, 1);
         const parsetree_parameter_t* p2 = nanoparser_get_nth_parameter(param_list, 2);
-        int c;
 
         nanoparser_expect_string(p1, "Font script error: a character is expected in char");
-        c = *(nanoparser_get_string(p1));
 
-        nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)(header->data.bmp.chr + c), traverse_bmp_char);
+        size_t i = 0;
+        uint32_t c = u8_nextchar(nanoparser_get_string(p1), &i);
+
+        if(c < FONT_MAXBITMAPCHARS)
+            nanoparser_traverse_program_ex(nanoparser_get_program(p2), &header->data.bmp.chr[c], traverse_bmp_char);
     }
     else
         fatal_error("Font script error: unknown keyword '%s' in bitmap font", id);
@@ -1785,7 +1786,6 @@ fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int 
 {
     fontdrv_bmp_t* f = mallocx(sizeof *f);
     const image_t* img = image_load(source_file);
-    const int n = sizeof(f->glyph) / sizeof(image_t*);
 
     /* initialize the vtable */
     ((fontdrv_t*)f)->textout = fontdrv_bmp_textout;
@@ -1796,7 +1796,7 @@ fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int 
     ((fontdrv_t*)f)->release = fontdrv_bmp_release;
 
     /* initialize the glyphs */
-    for(int j = 0; j < n; j++)
+    for(int j = 0; j < FONT_MAXBITMAPCHARS; j++)
         f->glyph[j] = NULL;
 
     /* set the image atlas */
@@ -1804,7 +1804,7 @@ fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int 
 
     /* configure the spritesheet */
     f->line_height = 0;
-    for(int j = 1 + FONT_COLORBREAKPOINT; j < n; j++) {
+    for(int j = 1 + FONT_COLORBREAKPOINT; j < FONT_MAXBITMAPCHARS; j++) {
         if(chr[j].valid) {
             f->glyph[j] = image_create_shared(img, chr[j].source_rect.x, chr[j].source_rect.y, chr[j].source_rect.width, chr[j].source_rect.height);
             f->line_height = max(f->line_height, chr[j].source_rect.height);
@@ -1827,9 +1827,8 @@ fontdrv_t* fontdrv_bmp_new(const char* source_file, charproperties_t chr[], int 
 void fontdrv_bmp_release(fontdrv_t* fnt)
 {
     fontdrv_bmp_t* f = (fontdrv_bmp_t*)fnt;
-    const int n = sizeof(f->glyph) / sizeof(image_t*);
 
-    for(int i = 0; i < n; i++) {
+    for(int i = 0; i < FONT_MAXBITMAPCHARS; i++) {
         if(f->glyph[i] != NULL)
             image_destroy(f->glyph[i]);
     }
@@ -1896,11 +1895,7 @@ const image_t* fontdrv_bmp_image(const fontdrv_t* fnt)
 
 const image_t* find_bmp_glyph(const fontdrv_bmp_t* f, uint32_t codepoint)
 {
-    /* currently, bitmap fonts only support up
-       to 256 characters. That can be expanded
-       in the future. */
-
-    return f->glyph[codepoint & 0xFF]; /* possibly NULL */
+    return f->glyph[codepoint % FONT_MAXBITMAPCHARS]; /* possibly NULL */
 }
 
 /* ------------------------------------------------- */
