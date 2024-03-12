@@ -33,6 +33,7 @@
 #include "../core/logfile.h"
 #include "../core/config.h"
 #include "../core/asset.h"
+#include "../core/lang.h"
 #include "../core/resourcemanager.h"
 
 #if defined(__ANDROID__)
@@ -225,11 +226,20 @@ bool confirm(const char* fmt, ...)
     /* log */
     logfile_message("<< %s >> %s", __func__, buf);
 
+    /* translate yes/no buttons */
+    char buttons[32] = "";
+    if(lang_haskey("OPTIONS_YES") && lang_haskey("OPTIONS_NO")) {
+        char yes[16], no[16];
+        lang_getstring("OPTIONS_YES", yes, sizeof(yes));
+        lang_getstring("OPTIONS_NO", no, sizeof(no));
+        snprintf(buttons, sizeof(buttons), "%s|%s", yes, no);
+    }
+
     /* show message box */
     /* al_show_native_message_box may be called without Allegro being initialized.
        https://liballeg.org/a5docs/trunk/native_dialog.html#al_show_native_message_box */
     result = al_show_native_message_box(al_get_current_display(),
-        GAME_TITLE, GAME_TITLE, buf, NULL, ALLEGRO_MESSAGEBOX_YES_NO | ALLEGRO_MESSAGEBOX_WARN);
+        GAME_TITLE, GAME_TITLE, buf, *buttons ? buttons : NULL, ALLEGRO_MESSAGEBOX_YES_NO | ALLEGRO_MESSAGEBOX_WARN);
 
     /* log result */
     logfile_message("<< %s >> result: %d", __func__, result);

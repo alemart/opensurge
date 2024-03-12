@@ -1513,6 +1513,8 @@ void change_compatibilitymode(settings_entry_t* e)
     /* warn the user if the compatibility mode is disabled */
     if(!want_compatibility_mode) {
         sound_play(SFX_QUESTION);
+
+        /* Suggestion: use an in-game widget instead of a native message box */
         if(!confirm("%s", lang_get("OPTIONS_PLAYMOD_COMPATWARN"))) {
             want_compatibility_mode = true;
             e->index_of_current_value = 1;
