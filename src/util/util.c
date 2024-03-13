@@ -228,11 +228,15 @@ bool confirm(const char* fmt, ...)
 
     /* translate yes/no buttons */
     char buttons[32] = "";
+
     if(lang_haskey("OPTIONS_YES") && lang_haskey("OPTIONS_NO")) {
         char yes[16], no[16];
+
         lang_getstring("OPTIONS_YES", yes, sizeof(yes));
         lang_getstring("OPTIONS_NO", no, sizeof(no));
-        snprintf(buttons, sizeof(buttons), "%s|%s", yes, no);
+
+        if(strchr(yes, '|') == NULL && strchr(no, '|') == NULL)
+            snprintf(buttons, sizeof(buttons), "%s|%s", yes, no);
     }
 
     /* show message box */
