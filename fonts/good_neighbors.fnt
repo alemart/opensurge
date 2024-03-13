@@ -6,8 +6,31 @@
 // -----------------------------------------------------------------------------
 
 // GoodNeighbors font by Clint Bellanger
+// Includes additional characters by usr_share / devurandom and PROWNE (opengameart.org)
 font "GoodNeighbors"
 {
+    /*
+
+    Supported languages:
+
+    English
+    French
+    Spanish
+    German
+    Italian
+    Portuguese
+    Russian
+    Turkish
+    Danish
+    Norwegian
+    Swedish
+    Dutch
+    Ukrainian
+    Belarusian
+    Bulgarian
+
+    */
+
     bitmap
     {
         source_file             "fonts/good_neighbors.png"
