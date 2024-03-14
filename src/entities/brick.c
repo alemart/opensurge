@@ -274,8 +274,9 @@ void brick_update(brick_t *brk, player_t** team, int team_size)
         case BRB_BREAKABLE: {
             for(i=0; i<team_size; i++) {
                 if(
-                    (player_is_aggressive(team[i]) || player_is_charging(team[i])) ||
-                    (player_is_rolling(team[i]) /*&& fabs(player_speed(team[i]) >= 240.0f*/)
+                    player_is_aggressive(team[i]) ||
+                    player_is_charging(team[i]) ||
+                    (player_is_rolling(team[i]) && fabs(player_speed(team[i])) >= 270.0f)
                 ) {
                     if(
                         !player_is_frozen(team[i]) &&
