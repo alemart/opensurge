@@ -36,9 +36,9 @@ typedef enum scenetype_t {
     SCENE_STAGESELECT,
     SCENE_EDITORHELP,
     SCENE_EDITORPAL,
-    SCENE_RESTART,
     SCENE_MOBILEMENU,
-    SCENE_MOBILEPOPUP
+    SCENE_MOBILEPOPUP,
+    SCENE_MODLOADER
 } scenetype_t;
 
 /* Storyboard */

@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * restart.h - a helper scene that restarts the engine
+ * modloader.c - a helper scene that loads a MOD
  * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
@@ -29,7 +29,7 @@
 #include <sys/stat.h>
 #endif
 
-#include "restart.h"
+#include "modloader.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 #include "../core/asset.h"
@@ -37,12 +37,13 @@
 #include "../core/video.h"
 #include "../core/engine.h"
 #include "../core/scene.h"
+#include "../core/lang.h"
 #include "../core/storyboard.h"
 #include "../core/commandline.h"
 #include "../core/logfile.h"
 #include "../entities/sfx.h"
 
-static const char EXIT_SCENE[] = "levels/scenes/thanks_for_playing.lev";
+static const char EXIT_LEVEL[] = "levels/scenes/thanks_for_playing.lev";
 static commandline_t args;
 
 #if defined(__ANDROID__)
@@ -57,10 +58,10 @@ static void show_download_progress(double percentage, void* context);
 
 
 /*
- * restart_init()
+ * modloader_init()
  * Initializes the restart scene
  */
-void restart_init(void* ctx)
+void modloader_init(void* ctx)
 {
     /* set the command line arguments */
     if(ctx != NULL)
@@ -69,28 +70,36 @@ void restart_init(void* ctx)
         args = commandline_parse(0, NULL);
 
     /* show the exit scene */
-    if(asset_exists(EXIT_SCENE) && args.gamedir[0] != '\0')
-        scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)EXIT_SCENE);
+    if(asset_exists(EXIT_LEVEL) && args.gamedir[0] != '\0') {
+#if !defined(__ANDROID__)
+        if(asset_is_valid_gamedir(args.gamedir, NULL)) {
+#else
+        if(1) { /* download the gamedir to cache first, before checking if it's valid */
+#endif
+            scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)EXIT_LEVEL);
+        }
+    }
 }
 
 
 /*
- * restart_release()
+ * modloader_release()
  * Releases the restart scene
  */
-void restart_release()
+void modloader_release()
 {
     ;
 }
 
 
 /*
- * restart_update()
+ * modloader_update()
  * Updates the restart scene
  */
-void restart_update()
+void modloader_update()
 {
     bool success = true;
+    bool is_legacy_gamedir = false;
 
 #if defined(__ANDROID__)
     /* get an absolute filepath if gamedir is a content:// URI */
@@ -104,6 +113,20 @@ void restart_update()
     }
 #endif
 
+    /* validate the gamedir, if any */
+    if(success && args.gamedir[0] != '\0')
+        success = asset_is_valid_gamedir(args.gamedir, &is_legacy_gamedir);
+
+    /* display an error message */
+    if(!success) {
+        sound_play(SFX_DENY);
+
+        if(!is_legacy_gamedir)
+            alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
+        else
+            alert("%s", lang_get("OPTIONS_PLAYMOD_LEGACYERROR"));
+    }
+
     /* restart the engine on success or return to the previous scene on error */
     if(success)
         engine_restart(&args);
@@ -113,10 +136,10 @@ void restart_update()
 
 
 /*
- * restart_render()
+ * modloader_render()
  * Renders the restart scene
  */
-void restart_render()
+void modloader_render()
 {
     ;
 }
@@ -186,22 +209,15 @@ const char* find_absolute_filepath(const char* content_uri)
         al_fclose(f);
 
     /* make sure the path points to a valid opensurge game */
-    bool is_legacy_gamedir = false;
-    if(path_to_game != NULL && !asset_is_valid_gamedir(path_to_game, &is_legacy_gamedir)) {
+    if(path_to_game != NULL && !asset_is_valid_gamedir(path_to_game, NULL)) {
 
         /* remove the downloaded file from cache */
+        logfile_message("Not a valid gamedir: %s", path_to_game);
+
         if(0 != remove(path_to_game)) {
             const char* err = strerror(errno);
             logfile_message("Error deleting file from cache. %s", err);
         }
-
-        /* display an error message */
-        sound_play(SFX_DENY);
-
-        if(is_legacy_gamedir)
-            alert("%s", lang_get("OPTIONS_PLAYMOD_LEGACYERROR"));
-        else
-            alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
 
         /* not a valid gamedir */
         path_to_game = NULL;

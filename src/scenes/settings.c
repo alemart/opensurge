@@ -1584,11 +1584,14 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
     if(file_chooser == NULL) {
         /* error */
         logfile_message("Play a game: there was an error with the file chooser");
+        video_showmessage("File Chooser ERROR!");
+        sound_play(SFX_DENY);
         return;
     }
     else if(0 == al_get_native_file_dialog_count(file_chooser)) {
         /* cancelled */
         logfile_message("Play a game: the file chooser was cancelled");
+        sound_play(SFX_BACK);
         return;
     }
     else {
@@ -1605,25 +1608,14 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
 
     /* load the game */
     if(path_to_game != NULL && *path_to_game != '\0') {
-        bool is_legacy_gamedir = false;
-        if(asset_is_valid_gamedir(path_to_game, &is_legacy_gamedir)) {
-            commandline_t cmd = commandline_parse(0, NULL);
-            str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
-            cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
-            cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
+        commandline_t cmd = commandline_parse(0, NULL);
 
-            save_preferences();
-            scenestack_push(storyboard_get_scene(SCENE_RESTART), &cmd);
-        }
-        else {
-            sound_play(SFX_DENY);
+        str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
+        cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
+        cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
 
-            if(is_legacy_gamedir)
-                alert("%s", lang_get("OPTIONS_PLAYMOD_LEGACYERROR"));
-            else
-                alert("%s", lang_get("OPTIONS_PLAYMOD_NOTAGAME"));
-        }
-
+        save_preferences();
+        scenestack_push(storyboard_get_scene(SCENE_MODLOADER), &cmd);
     }
 }
 

@@ -34,7 +34,7 @@
 #include "../scenes/stageselect.h"
 #include "../scenes/editorhelp.h"
 #include "../scenes/editorpal.h"
-#include "../scenes/restart.h"
+#include "../scenes/modloader.h"
 #include "../scenes/mobile/menu.h"
 #include "../scenes/mobile/popup.h"
 
@@ -68,9 +68,9 @@ void storyboard_init()
     storyboard[SCENE_STAGESELECT] = scene_create(stageselect_init, stageselect_update, stageselect_render, stageselect_release);
     storyboard[SCENE_EDITORHELP] = scene_create(editorhelp_init, editorhelp_update, editorhelp_render, editorhelp_release);
     storyboard[SCENE_EDITORPAL] = scene_create(editorpal_init, editorpal_update, editorpal_render, editorpal_release);
-    storyboard[SCENE_RESTART] = scene_create(restart_init, restart_update, restart_render, restart_release);
     storyboard[SCENE_MOBILEMENU] = scene_create(mobilemenu_init, mobilemenu_update, mobilemenu_render, mobilemenu_release);
     storyboard[SCENE_MOBILEPOPUP] = scene_create(mobilepopup_init, mobilepopup_update, mobilepopup_render, mobilepopup_release);
+    storyboard[SCENE_MODLOADER] = scene_create(modloader_init, modloader_update, modloader_render, modloader_release);
 }
 
 

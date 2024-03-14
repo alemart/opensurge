@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * restart.h - a helper scene that restarts the engine
+ * modloader.h - a helper scene that loads a MOD
  * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _RESTART_H
-#define _RESTART_H
+#ifndef _MODLOADER_H
+#define _MODLOADER_H
 
 /* public functions */
-void restart_init(void*);
-void restart_release();
-void restart_update();
-void restart_render();
+void modloader_init(void*);
+void modloader_release();
+void modloader_update();
+void modloader_render();
 
 #endif

@@ -371,9 +371,9 @@ SET(GAME_SRCS
   src/scenes/intro.c
   src/scenes/langselect.c
   src/scenes/level.c
+  src/scenes/modloader.c
   src/scenes/pause.c
   src/scenes/quest.c
-  src/scenes/restart.c
   src/scenes/stageselect.c
   src/scenes/settings.c
 
@@ -525,9 +525,9 @@ SET(GAME_HEADERS
   src/scenes/intro.h
   src/scenes/langselect.h
   src/scenes/level.h
+  src/scenes/modloader.h
   src/scenes/pause.h
   src/scenes/quest.h
-  src/scenes/restart.h
   src/scenes/settings.h
   src/scenes/stageselect.h
 
