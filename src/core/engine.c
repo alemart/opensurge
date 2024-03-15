@@ -202,7 +202,7 @@ void engine_mainloop()
     engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, &can_draw, a5_handle_haltresume_event);
     engine_add_event_listener(ALLEGRO_EVENT_KEY_DOWN, NULL, a5_handle_hotkey);
 
-    /* configure the timer */
+    /* initialize the timer */
     if(NULL == (a5_timer = al_create_timer(1.0 / TARGET_FPS)))
         fatal_error("Can't create an Allegro timer");
 
@@ -233,9 +233,23 @@ void engine_mainloop()
         }
     }
 
-    /* done */
+    /* release the timer */
     al_stop_timer(a5_timer);
     al_destroy_timer(a5_timer);
+
+    /* cleanup: handle the remaining display events that require acknowledgement */
+    while(al_get_next_event(a5_event_queue, &event)) {
+        switch(event.type) {
+            case ALLEGRO_EVENT_DISPLAY_RESIZE:
+            case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
+            case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
+                call_event_listeners(&event);
+                break;
+
+            default:
+                break;
+        }
+    }
 }
 
 /*
