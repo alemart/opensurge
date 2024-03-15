@@ -103,6 +103,8 @@ static void a5_handle_timer_event(const ALLEGRO_EVENT* event, void* data);
 static void a5_handle_haltresume_event(const ALLEGRO_EVENT* event, void* data);
 static void a5_handle_hotkey(const ALLEGRO_EVENT* event, void* data);
 
+static void a5_handle_remaining_display_events();
+
 
 
 /* private stuff ;) */
@@ -237,19 +239,8 @@ void engine_mainloop()
     al_stop_timer(a5_timer);
     al_destroy_timer(a5_timer);
 
-    /* cleanup: handle the remaining display events that require acknowledgement */
-    while(al_get_next_event(a5_event_queue, &event)) {
-        switch(event.type) {
-            case ALLEGRO_EVENT_DISPLAY_RESIZE:
-            case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
-            case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
-                call_event_listeners(&event);
-                break;
-
-            default:
-                break;
-        }
-    }
+    /* cleanup */
+    a5_handle_remaining_display_events();
 }
 
 /*
@@ -906,6 +897,34 @@ void call_event_listeners(const ALLEGRO_EVENT* event)
     for(event_listener_list_t *it = event_listener_table[index]; it != NULL; it = it->next) {
         if(it->event_listener.event_type == event->type)
             it->event_listener.callback(event, it->event_listener.data);
+    }
+}
+
+/*
+ * a5_handle_remaining_display_events()
+ * Handle the remaining display events (after the main loop) that require acknowledgement
+ */
+void a5_handle_remaining_display_events()
+{
+    ALLEGRO_EVENT event;
+
+    while(al_get_next_event(a5_event_queue, &event)) {
+        switch(event.type) {
+            case ALLEGRO_EVENT_DISPLAY_RESIZE:
+                al_acknowledge_resize(event.display.source);
+                break;
+
+            case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
+                al_acknowledge_drawing_halt(event.display.source);
+                break;
+
+            case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
+                al_acknowledge_drawing_resume(event.display.source);
+                break;
+
+            default:
+                break;
+        }
     }
 }
 
