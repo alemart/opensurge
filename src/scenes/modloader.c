@@ -117,8 +117,13 @@ void modloader_update()
     if(success && args.gamedir[0] != '\0')
         success = asset_is_valid_gamedir(args.gamedir, &is_legacy_gamedir);
 
-    /* display an error message */
-    if(!success) {
+    /* are... you... ready??? */
+    if(success) {
+        /* restart the engine on success */
+        engine_restart(&args);
+    }
+    else {
+        /* display an error message */
         sound_play(SFX_DENY);
 
         if(!is_legacy_gamedir)
@@ -127,11 +132,8 @@ void modloader_update()
             alert("%s", lang_get("OPTIONS_PLAYMOD_LEGACYERROR"));
     }
 
-    /* restart the engine on success or return to the previous scene on error */
-    if(success)
-        engine_restart(&args);
-    else
-        scenestack_pop();
+    /* return to the previous scene */
+    scenestack_pop();
 }
 
 

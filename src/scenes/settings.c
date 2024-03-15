@@ -1425,6 +1425,18 @@ void enter_playgame(settings_entry_t* e)
     filechooser_data_t* f = (filechooser_data_t*)e->data;
     f->want_chooser_of_folders = !want_zipped_mods;
 
+#if defined(__ANDROID__)
+    /* this prevents, in SCENE_MODLOADER, two deadlocks that may happen due to
+       immersive mode changes that trigger display resize events:
+
+       a) when popping the exit scene, just before restarting the engine OR
+       b) before showing an error message box
+
+       FIXME think of a more elegant way of handling this
+             freeze the immersive mode? */
+    video_set_immersive(true);
+#endif
+
     /* create and start a new thread
        only one file chooser must be active at any given time */
     if(f->thread != NULL)
