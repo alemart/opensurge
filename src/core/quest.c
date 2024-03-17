@@ -156,6 +156,21 @@ const char* quest_entry_path(const quest_t* quest, int index)
 }
 
 /*
+ * quest_index_of_entry()
+ * Finds the index of the entry that matches the given path.
+ * Returns -1 if there is no such entry
+ */
+int quest_index_of_entry(const quest_t* quest, const char* filepath)
+{
+    for(int i = 0; i < darray_length(quest->entry); i++) {
+        if(0 == str_icmp(quest->entry[i], filepath))
+            return i;
+    }
+
+    return -1;
+}
+
+/*
  * quest_entry_is_level()
  * Checks if an entry of the quest is a regular level file
  */

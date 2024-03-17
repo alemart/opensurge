@@ -51,6 +51,7 @@ const char* quest_file(const quest_t* quest);
 /* entries of the quest */
 int quest_entry_count(const quest_t* quest);
 const char* quest_entry_path(const quest_t* quest, int index); /* index = 0, 1, 2... */
+int quest_index_of_entry(const quest_t* quest, const char* filepath);
 bool quest_entry_is_level(const quest_t* quest, int index);
 bool quest_entry_is_quest(const quest_t* quest, int index);
 bool quest_entry_is_builtin_scene(const quest_t* quest, int index);
