@@ -426,7 +426,7 @@ TIMEOVER_PART1              "VRIJEME"
 TIMEOVER_PART2              "JE ISTEKLO"
 
 // Pause Menu
-PAUSE_TITLE                 "PAUZIRAJ"
+PAUSE_TITLE                 "PAUZA"
 PAUSE_CONTINUE              "NASTAVI"
 PAUSE_RESTART               "PONOVO POKRENI"
 PAUSE_EXIT                  "IZLAZ"
