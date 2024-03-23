@@ -15,7 +15,7 @@
 LANG_ID                     "nl_NL"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Nederlands"              // language name
 LANG_AUTHOR                 "SecularSteve"	          // translation author
-LANG_LASTUPDATE             "2022-08-26"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-03-20"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -63,54 +63,54 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 // Options
 OPTIONS_TITLE               "INSTELLINGEN"
-FIXME OPTIONS_GRAPHICS            "Graphics"
-FIXME OPTIONS_CONTROLS            "Controls"
-FIXME OPTIONS_GAME                "Game"
-FIXME OPTIONS_ENGINE              "Engine"
-FIXME OPTIONS_MODS                "MODs"
-FIXME OPTIONS_AUDIO               "Audio"
-FIXME OPTIONS_BACK                "Back"
-FIXME OPTIONS_YES                 "Yes"
-FIXME OPTIONS_NO                  "No"
-FIXME OPTIONS_ON                  "On" // alternatively: Enabled
-FIXME OPTIONS_OFF                 "Off" // alternatively: Disabled
+OPTIONS_GRAPHICS            "Afbeelding"
+OPTIONS_CONTROLS            "Controlen"
+OPTIONS_GAME                "Speel"
+OPTIONS_ENGINE              "Module"
+OPTIONS_MODS                "MODs"
+OPTIONS_AUDIO               "Audio"
+OPTIONS_BACK                "Terug"
+OPTIONS_YES                 "Ja"
+OPTIONS_NO                  "Nee"
+OPTIONS_ON                  "Aan" // alternatively: Enabled
+OPTIONS_OFF                 "Uit" // alternatively: Disabled
 OPTIONS_FULLSCREEN          "Volle Scherm"
 OPTIONS_RESOLUTION          "Scherm grootte"
-FIXME OPTIONS_QUALITY             "Quality"
-FIXME OPTIONS_QUALITY_LOW         "Low"
-FIXME OPTIONS_QUALITY_MEDIUM      "Medium"
-FIXME OPTIONS_QUALITY_HIGH        "High"
+OPTIONS_QUALITY             "Kwaliteit"
+OPTIONS_QUALITY_LOW         "Laag"
+OPTIONS_QUALITY_MEDIUM      "Middel"
+OPTIONS_QUALITY_HIGH        "Hoog"
 OPTIONS_FPS                 "FPS Weergeven"
-FIXME OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
-FIXME OPTIONS_PIXELSCALER         "Pixel scaler"
-FIXME OPTIONS_COMINGSOON          "Coming soon!"
-FIXME OPTIONS_VOLUME              "Volume"
-FIXME OPTIONS_MUTE                "Muted"
-FIXME OPTIONS_GAMEPADOPACITY      "Opacity"
+OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Pixel-schaler"
+OPTIONS_COMINGSOON          "Komt snel!"
+OPTIONS_VOLUME              "Volume"
+OPTIONS_MUTE                "Gedempt"
+OPTIONS_GAMEPADOPACITY      "Opaciteit"
 OPTIONS_GAMEPAD             "Gamepad gebruiken"
-FIXME OPTIONS_LANGUAGE            "Language"
+OPTIONS_LANGUAGE            "Taal"
 OPTIONS_STAGESELECT         "Level select"
-FIXME OPTIONS_DEVELOPERMODE       "Developer mode"
+OPTIONS_DEVELOPERMODE       "Ontwikkelaarsmodus"
 OPTIONS_CREDITS             "Open Surge Credits"
-FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
+OPTIONS_WEBSITE             "Bezoek Open Surge op het web"
 OPTIONS_DONATE              "Aan Open Surge Doneren"
-FIXME OPTIONS_ABOUT               "About the engine"
-FIXME OPTIONS_SHARE               "Share the engine"
-FIXME OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
-FIXME OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
-FIXME OPTIONS_PLAYMOD             "Play a game"
-FIXME OPTIONS_PLAYMOD_NOTAGAME    "The selected item is not an Open Surge game!"
-FIXME OPTIONS_PLAYMOD_LEGACYERROR "Legacy Open Surge games are not supported."
-FIXME OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your gaming experience. Are you sure you want to disable it?"
-FIXME OPTIONS_MODSTORAGE          "Storage"
-FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
-FIXME OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
-FIXME OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
-FIXME OPTIONS_SUBMITFEEDBACK      "Submit feedback"
-FIXME OPTIONS_WRITEREVIEW         "Write a review"
-FIXME OPTIONS_RATEAPP             "Rate the app"
-FIXME OPTIONS_REPORTISSUE         "Report an issue"
-FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
+OPTIONS_ABOUT               "Over de module"
+OPTIONS_SHARE               "Deel de module"
+OPTIONS_DOWNLOAD_DESKTOP    "Ontvang de module voor desktops"
+OPTIONS_DOWNLOAD_MOBILE     "Ontvang de module voor mobiel"
+OPTIONS_PLAYMOD             "Speel een spel"
+OPTIONS_PLAYMOD_NOTAGAME    "Het geselecteerde item is geen Open Surge-spel!"
+OPTIONS_PLAYMOD_LEGACYERROR "Legacy Open Surge-spellen worden niet ondersteund."
+OPTIONS_PLAYMOD_COMPATWARN  "De compatibiliteitsmodus is een functie die is ontworpen om je game-ervaring te verbeteren. Weet je zeker dat je deze wilt uitschakelen?"
+OPTIONS_MODSTORAGE          "Opslag"
+OPTIONS_MODSTORAGE_FOLDER   "Map" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  ".zip archief"
+OPTIONS_COMPATIBILITYMODE   "Compatibiliteitsmodus"
+OPTIONS_SUBMITFEEDBACK      "Feedback indienen"
+OPTIONS_WRITEREVIEW         "Schrijf een recensie"
+OPTIONS_RATEAPP             "Beoordeel de app"
+OPTIONS_REPORTISSUE         "Een probleem melden"
+OPTIONS_BACKTOBASEGAME      "Ga terug naar het bronspel"
 
 // Stage Select
 STAGESELECT_TITLE           "LEVEL SELECT"
@@ -124,7 +124,7 @@ CREDITS_TITLE               "CREDITS"
 CREDITS_BACK                "Druk <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> om terug te gaan"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versie $ENGINE_VERSION</color>\naangedreven door $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Mensen</color>"
-FIXME CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Past members</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Vorige leden</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Dankzij</color>"
 CREDITS_ALEXANDRE           "Projectleider en oprichter\nProjectontwikkelaar\nKunstenaar"
 CREDITS_JOAO                "Kunstenaar\nIllustrator"
@@ -138,7 +138,7 @@ CREDITS_COLIN               "Sprites, eerste verhaal"
 CREDITS_BRIAN               "Sprite kunstenaar"
 CREDITS_TRANSLATOR          "Vertaler"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Vertalers</color>"
-FIXME CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Past translators</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Vorige vertalers</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individuele middelen</color>"
 CREDITS_RES_TEXT            "De onderstaande bestanden vallen allemaal onder libre-licenties. Hun respectievelijke auteurs worden gepresenteerd:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Foto's</color>"
@@ -153,14 +153,14 @@ CREDITS_RES_SCRIPTS_TEXT    "De auteurs worden geïdentificeerd in de scripts ze
 // Title Screen
 TITLESCREEN_PLAY            "START SPEL"
 TITLESCREEN_OPTIONS         "OPTIES"
-FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
+TITLESCREEN_MOBILE          "SPELEN OP MOBIEL"
 TITLESCREEN_SHARE           "DELEN"
 TITLESCREEN_DONATE          "DONEREN"
 TITLESCREEN_QUIT            "VERLATEN"
-FIXME TITLESCREEN_SUBMITFEEDBACK  "SUBMIT FEEDBACK"
-FIXME TITLESCREEN_WRITEREVIEW     "WRITE A REVIEW"
-FIXME TITLESCREEN_RATEAPP         "RATE THE APP"
-FIXME TITLESCREEN_REPORTISSUE     "REPORT AN ISSUE"
+TITLESCREEN_SUBMITFEEDBACK  "FEEDBACK GEVEN"
+TITLESCREEN_WRITEREVIEW     "SCHRIJF EEN RECENSIE"
+TITLESCREEN_RATEAPP         "BEOORDEEL DE APP"
+TITLESCREEN_REPORTISSUE     "EEN PROBLEEM MELDEN"
 TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
@@ -171,23 +171,23 @@ ENDOFDEMO_TEXT              "Bedankt voor het spelen! Surge the Rabbit is in ont
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
-FIXME RATEGAME_TITLE              "Rate Surge the Rabbit?"
-FIXME RATEGAME_MESSAGE            "We'd love to hear from you!\nYour feedback helps this open source game & engine!" // 2 lines max.
-FIXME RATEGAME_YES                "Sure!"
-FIXME RATEGAME_NO                 "Not now"
+RATEGAME_TITLE              "Beoordeel Surge the Rabbit?"
+RATEGAME_MESSAGE            "We horen graag van jullie!\nJullie feedback helpt deze open-bron spel en module!" // 2 lines max.
+RATEGAME_YES                "Natuurlijk!"
+RATEGAME_NO                 "Niet nu"
 
 // Play classic levels
-FIXME PLAYCLASSICLEVELS_TEXT      "Play the classic levels?"
-FIXME PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
-FIXME PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+PLAYCLASSICLEVELS_TEXT      "De klassieke levels spelen?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-FIXME THANKSFORPLAYING_TITLE      "Thanks for playing!"
-FIXME THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile devices!"
-FIXME THANKSFORPLAYING_PARAGRAPH2 "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
-FIXME THANKSFORPLAYING_PARAGRAPH3 "Become a supporter of this open source game engine today!"
-FIXME THANKSFORPLAYING_YES        "Sure!"
-FIXME THANKSFORPLAYING_NO         "Not now"
+THANKSFORPLAYING_TITLE      "Bedankt voor het spelen!"
+THANKSFORPLAYING_PARAGRAPH1 "Steun dit onafhankelijke werk! Koop de officiële editie van de engine voor mobiele apparaten!"
+THANKSFORPLAYING_PARAGRAPH2 "Speel Surge the Rabbit - en ook je eigen spellen - op je telefoon en tablet!"
+THANKSFORPLAYING_PARAGRAPH3 "Word vandaag nog supporter van deze open source game module!"
+THANKSFORPLAYING_YES        "Natuurlijk!"
+THANKSFORPLAYING_NO         "Niet nu"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -232,10 +232,10 @@ INPUT_KEYB_FIRE1            "SPATIEBALK"
 INPUT_KEYB_FIRE2            "LINKER CTRL"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
-FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
-FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
-FIXME INPUT_KEYB_FIRE7            "<available>"
-FIXME INPUT_KEYB_FIRE8            "<available>"
+INPUT_KEYB_FIRE5            "LINKER SHIFT"
+INPUT_KEYB_FIRE6            "RECHTER SHIFT"
+INPUT_KEYB_FIRE7            "<available>"
+INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "de RICHTLIJNEN"
@@ -243,12 +243,12 @@ INPUT_JOY_LEFT              "de LINKE-KNOP"
 INPUT_JOY_RIGHT             "de RECHTE-KNOP"
 INPUT_JOY_UP                "de BOVEN-KNOP"
 INPUT_JOY_DOWN              "de BENEDEN-KNOP"
-FIXME INPUT_JOY_FIRE1             "the ACTION BUTTON"
-FIXME INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
+INPUT_JOY_FIRE1             "de ACTIE KNOP"
+INPUT_JOY_FIRE2             "de TWEEDE ACTIE KNOP"
 INPUT_JOY_FIRE3             "PAUZEREN"
 INPUT_JOY_FIRE4             "TERUG"
-FIXME INPUT_JOY_FIRE5             "L1"
-FIXME INPUT_JOY_FIRE6             "R1"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<beschikbaar>"
 INPUT_JOY_FIRE8             "<beschikbaar>"
 
@@ -378,7 +378,7 @@ LEV_DEMO_2                  "<color=$COLOR_TITLE>Wist je dat...?</color>\nAlles 
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Laat uw creativiteit de vrije loop!</color>\nEen van de belangrijkste functies in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Het is scripting voor games! Gebruik het om alles te bouwen wat je maar kunt bedenken!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Koel!</color>\nVoel je je al opgewonden? De lucht is de limiet! Ga naar <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> om vandaag nog je eigen geweldige spellen te maken!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Probeer het zelf!</color>\nNu is het jouw beurt! <color=$COLOR_HIGHLIGHT>Druk op F12 om de editor te openen.</color> Open vervolgens het itempalet en begin met het opbouwen van je niveau! (gebruik F1 voor hulp)"
-FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Probeer het zelf!</color>\nNu is het jouw beurt! Pauzeer het spel, sleep de hendel aan de onderkant van het scherm en ga naar de <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> om <color=$COLOR_HIGHLIGHT>de level te bewerken</color>!"
 
 
 
@@ -420,7 +420,7 @@ TIMEOVER_PART1              "TIJD"
 TIMEOVER_PART2              "IS OP"
 
 // Pause Menu
-FIXME PAUSE_TITLE                 "PAUSE"
-FIXME PAUSE_CONTINUE              "CONTINUE"
-FIXME PAUSE_RESTART               "RESTART"
-FIXME PAUSE_EXIT                  "EXIT"
+PAUSE_TITLE                 "PAUZE"
+PAUSE_CONTINUE              "DOORGAAN"
+PAUSE_RESTART               "HERSTART"
+PAUSE_EXIT                  "UIT"
