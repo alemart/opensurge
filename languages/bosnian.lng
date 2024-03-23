@@ -428,5 +428,5 @@ TIMEOVER_PART2              "JE ISTEKLO"
 // Pause Menu
 PAUSE_TITLE                 "PAUZA"
 PAUSE_CONTINUE              "NASTAVI"
-PAUSE_RESTART               "PONOVO POKRENI"
-PAUSE_EXIT                  "IZLAZ"
+PAUSE_RESTART               "RESETUJ"
+PAUSE_EXIT                  "IZAĐI"
