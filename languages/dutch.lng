@@ -420,7 +420,7 @@ TIMEOVER_PART1              "TIJD"
 TIMEOVER_PART2              "IS OP"
 
 // Pause Menu
-PAUSE_TITLE                 "PAUZEREN"
+PAUSE_TITLE                 "PAUZE"
 PAUSE_CONTINUE              "DOORGAAN"
 PAUSE_RESTART               "HERSTART"
 PAUSE_EXIT                  "UIT"
