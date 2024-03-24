@@ -946,7 +946,57 @@ font "Title Screen - Menu Item"
             offset              0 -3
         }
         char "ß" {
-            source_rect         550 37 6 19
+            source_rect         550 37 9 19
+            offset              0 -3
+        }
+
+
+        char "Ć" {
+            source_rect         560 37 8 19
+            offset              0 -3
+        }
+        char "ć" {
+            source_rect         569 37 8 19
+            offset              0 -3
+        }
+        char "Č" {
+            source_rect         578 37 8 19
+            offset              0 -3
+        }
+        char "č" {
+            source_rect         587 37 8 19
+            offset              0 -3
+        }
+        char "Đ" {
+            source_rect         596 37 10 19
+            offset              0 -3
+        }
+        char "đ" {
+            source_rect         607 37 9 19
+            offset              0 -3
+        }
+        char "Š" {
+            source_rect         617 37 8 19
+            offset              0 -3
+        }
+        char "š" {
+            source_rect         626 37 8 19
+            offset              0 -3
+        }
+        char "Ŝ" {
+            source_rect         635 37 8 19
+            offset              0 -3
+        }
+        char "ŝ" {
+            source_rect         644 37 8 19
+            offset              0 -3
+        }
+        char "Ž" {
+            source_rect         653 37 8 19
+            offset              0 -3
+        }
+        char "ž" {
+            source_rect         662 37 8 19
             offset              0 -3
         }
     }
