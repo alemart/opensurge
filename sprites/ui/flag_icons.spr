@@ -32,6 +32,7 @@ sprite "Flag Icon"
         bs_BA       9
         ru_RU       10
         sr_RS       11
+        hr_HR       12
         eo          31
     }
 
@@ -129,6 +130,14 @@ sprite "Flag Icon"
         repeat      TRUE
         fps         8
         data        198
+    }
+
+    // hr_HR
+    animation 12
+    {
+        repeat      TRUE
+        fps         8
+        data        101
     }
 
     // eo
