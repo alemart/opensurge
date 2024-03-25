@@ -1001,28 +1001,6 @@ font "Loading"
     }
 }
 
-font "Loading" for "bs_BA"
-{
-    truetype
-    {
-        source_file             "fonts/Roboto-Black.ttf"
-        size                    18
-        antialias
-        shadow
-    }
-}
-
-font "Loading" for "sr_RS"
-{
-    truetype
-    {
-        source_file             "fonts/Roboto-Black.ttf"
-        size                    18
-        antialias
-        shadow
-    }
-}
-
 font "Loading" for "eo"
 {
     truetype
