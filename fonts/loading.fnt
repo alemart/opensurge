@@ -998,5 +998,45 @@ font "Loading"
             source_rect         662 37 8 19
             offset              0 -3
         }
+        char "Ĉ" {
+            source_rect         671 37 8 19
+            offset              0 -3
+        }
+        char "ĉ" {
+            source_rect         680 37 8 19
+            offset              0 -3
+        }
+        char "Ĝ" {
+            source_rect         689 37 8 19
+            offset              0 -3
+        }
+        char "ĝ" {
+            source_rect         698 37 8 19
+            offset              0 -3
+        }
+        char "Ĥ" {
+            source_rect         707 37 8 19
+            offset              0 -3
+        }
+        char "ĥ" {
+            source_rect         716 37 9 19
+            offset              0 -3
+        }
+        char "Ĵ" {
+            source_rect         726 37 9 19
+            offset              0 -3
+        }
+        char "ĵ" {
+            source_rect         736 37 7 19
+            offset              0 -3
+        }
+        char "Ŭ" {
+            source_rect         744 37 8 19
+            offset              0 -3
+        }
+        char "ŭ" {
+            source_rect         753 37 8 19
+            offset              0 -3
+        }
     }
 }
