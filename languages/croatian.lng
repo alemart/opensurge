@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: languages/bosnian.lng
-// Description: bosnian translation (encoding: UTF-8)
+// Description: croatian translation (encoding: UTF-8)
 // Author: SecularSteve
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -12,8 +12,8 @@
 
 // Translation metadata
 // (use the English alphabet)
-LANG_ID                     "bs_BA"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
-LANG_NAME                   "Bosanski"                // language name
+LANG_ID                     "hr_HR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Hrvatski"                // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
 LANG_LASTUPDATE             "2024-03-20"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
@@ -81,7 +81,7 @@ OPTIONS_QUALITY             "Kvalitet"
 OPTIONS_QUALITY_LOW         "Nizak"
 OPTIONS_QUALITY_MEDIUM      "Srednji"
 OPTIONS_QUALITY_HIGH        "Visok"
-OPTIONS_FPS                 "Pokaži FPS"
+OPTIONS_FPS                 "Prikaži FPS"
 OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
 OPTIONS_PIXELSCALER         "Skaler piksela"
 OPTIONS_COMINGSOON          "Uskoro dolazi!"
@@ -90,7 +90,7 @@ OPTIONS_MUTE                "Utišano"
 OPTIONS_GAMEPADOPACITY      "Neprozirnost"
 OPTIONS_GAMEPAD             "Koristi Džojstik"
 OPTIONS_LANGUAGE            "Jezik"
-OPTIONS_STAGESELECT         "Odaberi nivo"
+OPTIONS_STAGESELECT         "Izaberite razinu"
 OPTIONS_DEVELOPERMODE       "Programerski mod"
 OPTIONS_CREDITS             "Open Surge Krediti"
 OPTIONS_WEBSITE             "Posjetite Open Surge na webu"
@@ -114,7 +114,7 @@ OPTIONS_REPORTISSUE         "Prijavite problem"
 OPTIONS_BACKTOBASEGAME      "Vratite se na glavnu igru"
 
 // Stage Select
-STAGESELECT_TITLE           "ODABERI NIVO"
+STAGESELECT_TITLE           "IZABERITE RAZINU"
 STAGESELECT_DEBUG           "RAZVOJNI MOD"
 STAGESELECT_MSG             "Pritisni <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> da natrag ideš"
 STAGESELECT_PAGE            "stranica $1/$2"
@@ -146,7 +146,7 @@ CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Slike</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muzika</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Zvučni efekti</color>"
 CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Fontovi</color>"
-CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Nivoi</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Razine</color>"
 CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Prijevodi</color>"
 CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skripte</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Autori su prepoznati u samim skriptama."
@@ -178,7 +178,7 @@ RATEGAME_YES                "Može!"
 RATEGAME_NO                 "Ne sad"
 
 // Play classic levels
-PLAYCLASSICLEVELS_TEXT      "Igrajte klasične nivoe?"
+PLAYCLASSICLEVELS_TEXT      "Igrajte klasične razine?"
 PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
 PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
@@ -207,7 +207,7 @@ CREATEMENU_PLAY             "IGRAJ DEMO"
 CREATEMENU_LEARN            "NAUČI"
 CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "NATRAG"
-CREATEMENU_TEXT             "Open Surge vam omogućava da napravite svoje nevjerovatne igre! Oslobodite svoju kreativnost! Neka vam kreativni sokovi teku!\nZapočnite vlastiti projekt! Kreirajte nove nivoe, predmete, akcije, likove i još mnogo toga! Okusite urednik nivoa, naučite motor i zaronite u SurgeScript za maksimalnu snagu!"
+CREATEMENU_TEXT             "Open Surge vam omogućava da napravite svoje nevjerovatne igre! Oslobodite svoju kreativnost! Neka vam kreativni sokovi teku!\nZapočnite vlastiti projekt! Kreirajte nove razinue, predmete, akcije, likove i još mnogo toga! Okusite urednik razina, naučite motor i zaronite u SurgeScript za maksimalnu snagu!"
 
 // (legacy) Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
@@ -319,15 +319,15 @@ EDITOR_HELP_LAYERSTUTORIAL  "Igrač će promjeniti slojeve ako dodirne Zelene/Ž
 
 EDITOR_HELP_CMD_RETURN      "Vratite se u igru"
 EDITOR_HELP_CMD_PALETTE     "Otvorite paletu predmeta"
-EDITOR_HELP_CMD_SAVE        "Spasite nivo"
-EDITOR_HELP_CMD_RELOAD      "Ponovo učitajte nivo"
+EDITOR_HELP_CMD_SAVE        "Spasite razinu"
+EDITOR_HELP_CMD_RELOAD      "Ponovno učitajte razinu"
 EDITOR_HELP_CMD_MOVE        "Pomaknite kameru"
 EDITOR_HELP_CMD_MOVEFASTER  "Pomaknite kameru (brže)"
 EDITOR_HELP_CMD_UNDO        "Poništi"
 EDITOR_HELP_CMD_REDO        "Ponovi"
-EDITOR_HELP_CMD_HELP        "Pokažite pomoć"
+EDITOR_HELP_CMD_HELP        "Prikažite pomoć"
 EDITOR_HELP_CMD_GRID        "Prikvači na mrežu"
-EDITOR_HELP_CMD_MASKS       "Pokaži maske sudara"
+EDITOR_HELP_CMD_MASKS       "Prikaži maske sudara"
 EDITOR_HELP_CMD_PUTITEM     "Stavi predmet"
 EDITOR_HELP_CMD_PICKITEM    "Odaberi predmet"
 EDITOR_HELP_CMD_DELETEITEM  "Izbriši predmet (drži: gumicu)"
@@ -349,15 +349,15 @@ EDITOR_INPUT_MIDDLECLICK    "Srednja tipka miša"
 EDITOR_INPUT_MOUSEWHEEL     "Točak miša"
 
 // Confirm boxes
-EDITOR_CONFIRM_RELOAD       "Ponovo učitati nivo?"
+EDITOR_CONFIRM_RELOAD       "Ponovno učitati razinu?"
 EDITOR_CONFIRM_YES          "Da"
 EDITOR_CONFIRM_NO           "Ne"
 
 // Messages
 EDITOR_MESSAGE_WELCOME      "Dobrodošli u Level Editor!"
 EDITOR_MESSAGE_SAVED        "Spašeno u <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
-EDITOR_MESSAGE_SAVEERROR    "Nije moguće sačuvati nivo. Molimo vas provjerite zapisnike"
-EDITOR_MESSAGE_RELOADED     "Nivo je ponovo učitan"
+EDITOR_MESSAGE_SAVEERROR    "Nije moguće sačuvati razinu. Molimo vas provjerite zapisnike"
+EDITOR_MESSAGE_RELOADED     "Nivo je ponovno učitan"
 EDITOR_MESSAGE_UNDOERROR    "Već kod najstarije promjene"
 EDITOR_MESSAGE_REDOERROR    "Već kod najnovije promjene"
 EDITOR_MESSAGE_SNAP2GRIDON  "Prikvači na mrežu: koristeći $1 × $2 mrežu"
@@ -374,11 +374,11 @@ EDITOR_MESSAGE_YELLOWLAYER  "Prebačeno na <color=$1>žuti</color> sloj"
 
 // Demo Level
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Kreirajte svoje nevjerovatne igre!</color>\nOva igra je kreirana sa <color=$COLOR_HIGHLIGHT>Open Surge-om</color>, vrlo fleksibilnim i otvorenim kodom za 2D igre koji je sada u vašim rukama!"
-LEV_DEMO_2                  "<color=$COLOR_TITLE>Jeste znali...?</color>\nSve u Open Surge-u je izmjenivo. Možete praviti nivoe, predmete, šefove, likove i više! Potpun je <color=$COLOR_HIGHLIGHT>sistem za kreaciju igre</color>."
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Jeste znali...?</color>\nSve u Open Surge-u je izmjenivo. Možete praviti razine, predmete, šefove, likove i više! Potpun je <color=$COLOR_HIGHLIGHT>sistem za kreaciju igre</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Oslobodite svoju kreativnost!</color>\nJedna od ključnih karakteristika u Open Surge-u je <color=$COLOR_HIGHLIGHT>SurgeScript</color>. To je skriptanje za igre! Koristite ga da napravite bilo šta šta možete zamisliti!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Kul!</color>\nJeste već uzbuđeni? Nebo je granica! Posjetite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> da napravite svoje nevjerovatne igre danas!"
-LEV_DEMO_5                  "<color=$COLOR_TITLE>Probajte sami!</color>\nSad je vaš red! <color=$COLOR_HIGHLIGHT>Pritisnite F12 da biste otvorili uređivač.</color> Zatim otvorite paletu predmeta i počnite graditi svoj nivo! (za pomoć koristite F1)"
-LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Probajte sami!</color>\nSada je vaš red! Pauzirajte igru, povucite ručicu na dnu ekrana i uđite u <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> da <color=$COLOR_HIGHLIGHT>biste uredili nivo</color>!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Probajte sami!</color>\nSad je vaš red! <color=$COLOR_HIGHLIGHT>Pritisnite F12 da biste otvorili uređivač.</color> Zatim otvorite paletu predmeta i počnite graditi svoju razinu! (za pomoć koristite F1)"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Probajte sami!</color>\nSada je vaš red! Pauzirajte igru, povucite ručicu na dnu ekrana i uđite u <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> da <color=$COLOR_HIGHLIGHT>biste uredili razinu</color>!"
 
 
 
