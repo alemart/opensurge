@@ -154,7 +154,7 @@ CREDITS_RES_SCRIPTS_TEXT    "La aŭtoroj estas identigitaj en la propraj skripto
 // Title Screen
 TITLESCREEN_PLAY            "KOMENCI LUDON"
 TITLESCREEN_OPTIONS         "OPCIOJ"
-TITLESCREEN_MOBILE          "LUDI EN POSXTELEFONO"
+TITLESCREEN_MOBILE          "LUDI EN POŜTELEFONO"
 TITLESCREEN_SHARE           "DISKONIGI"
 TITLESCREEN_DONATE          "DONACI"
 TITLESCREEN_QUIT            "ELIRI"
@@ -414,8 +414,8 @@ HUD_POWER                   "Forto"
 // Level Cleared animation
 CLEARED_LINE1               "VI PLENUMIS"
 CLEARED_LINE2               "ZONON $LEVEL_ACT"
-CLEARED_POWER               "Kromajxo de Forto"
-CLEARED_TIME                "Kromajxo de Tempo"
+CLEARED_POWER               "Kromaĵo de Forto"
+CLEARED_TIME                "Kromaĵo de Tempo"
 CLEARED_SCORE               "POENTARO"
 
 // Game Over
