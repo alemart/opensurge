@@ -15,7 +15,7 @@
 LANG_ID                     "eo"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Esperanto"                 // language name
 LANG_AUTHOR                 "Jorge Maldonado Ventura"       // translation author
-LANG_LASTUPDATE             "2021-11-16"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-03-25"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -64,58 +64,58 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 // Options
 OPTIONS_TITLE               "OPCIOJ"
-FIXME OPTIONS_GRAPHICS            "Graphics"
-FIXME OPTIONS_CONTROLS            "Controls"
-FIXME OPTIONS_GAME                "Game"
-FIXME OPTIONS_ENGINE              "Engine"
-FIXME OPTIONS_MODS                "MODs"
-FIXME OPTIONS_AUDIO               "Audio"
-FIXME OPTIONS_BACK                "Back"
-FIXME OPTIONS_YES                 "Yes"
-FIXME OPTIONS_NO                  "No"
-FIXME OPTIONS_ON                  "On" // alternatively: Enabled
-FIXME OPTIONS_OFF                 "Off" // alternatively: Disabled
+OPTIONS_GRAPHICS            "Grafikoj"
+OPTIONS_CONTROLS            "Regiloj"
+OPTIONS_GAME                "Ludo"
+OPTIONS_ENGINE              "Motoro"
+OPTIONS_MODS                "Modifoj"
+OPTIONS_AUDIO               "Sono"
+OPTIONS_BACK                "Reen"
+OPTIONS_YES                 "Jes"
+OPTIONS_NO                  "Ne"
+OPTIONS_ON                  "Ebligita" // alternatively: Enabled
+OPTIONS_OFF                 "Malebligita" // alternatively: Disabled
 OPTIONS_FULLSCREEN          "Plena ekrano"
 OPTIONS_RESOLUTION          "Ekrana grando"
-FIXME OPTIONS_QUALITY             "Quality"
-FIXME OPTIONS_QUALITY_LOW         "Low"
-FIXME OPTIONS_QUALITY_MEDIUM      "Medium"
-FIXME OPTIONS_QUALITY_HIGH        "High"
+OPTIONS_QUALITY             "Kvalito"
+OPTIONS_QUALITY_LOW         "Malalta"
+OPTIONS_QUALITY_MEDIUM      "Meza"
+OPTIONS_QUALITY_HIGH        "Alta"
 OPTIONS_FPS                 "Montri FPS-jn"
-FIXME OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
-FIXME OPTIONS_PIXELSCALER         "Pixel scaler"
-FIXME OPTIONS_COMINGSOON          "Coming soon!"
-FIXME OPTIONS_VOLUME              "Volume"
-FIXME OPTIONS_MUTE                "Muted"
-FIXME OPTIONS_GAMEPADOPACITY      "Opacity"
+OPTIONS_VSYNC               "Vertikala sinkronigo" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Piksela adaptigilo"
+OPTIONS_COMINGSOON          "Baldaŭ venos!"
+OPTIONS_VOLUME              "Laŭteco"
+OPTIONS_MUTE                "Silentigita"
+OPTIONS_GAMEPADOPACITY      "Opakeco"
 OPTIONS_GAMEPAD             "Uzi ludregilon"
-FIXME OPTIONS_LANGUAGE            "Language"
+OPTIONS_LANGUAGE            "Lingvo"
 OPTIONS_STAGESELECT         "Elekti nivelon"
-FIXME OPTIONS_DEVELOPERMODE       "Developer mode"
+OPTIONS_DEVELOPERMODE       "Programista reĝimo"
 OPTIONS_CREDITS             "Atribuoj de Open Surge"
-FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
+OPTIONS_WEBSITE             "Viziti Open Surge en la Reto"
 OPTIONS_DONATE              "Donaci al Open Surge"
-FIXME OPTIONS_ABOUT               "About the engine"
-FIXME OPTIONS_SHARE               "Share the engine"
-FIXME OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
-FIXME OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
-FIXME OPTIONS_PLAYMOD             "Play a game"
-FIXME OPTIONS_PLAYMOD_NOTAGAME    "The selected item is not an Open Surge game!"
-FIXME OPTIONS_PLAYMOD_LEGACYERROR "Legacy Open Surge games are not supported."
-FIXME OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your gaming experience. Are you sure you want to disable it?"
-FIXME OPTIONS_MODSTORAGE          "Storage"
-FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
-FIXME OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
-FIXME OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
-FIXME OPTIONS_SUBMITFEEDBACK      "Submit feedback"
-FIXME OPTIONS_WRITEREVIEW         "Write a review"
-FIXME OPTIONS_RATEAPP             "Rate the app"
-FIXME OPTIONS_REPORTISSUE         "Report an issue"
-FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
+OPTIONS_ABOUT               "Pri la motoro"
+OPTIONS_SHARE               "Kunhavigi la motoron"
+OPTIONS_DOWNLOAD_DESKTOP    "Akiri la motoron por komputiloj"
+OPTIONS_DOWNLOAD_MOBILE     "Akiri la motoron por poŝtelefonoj"
+OPTIONS_PLAYMOD             "Ludi ludon"
+OPTIONS_PLAYMOD_NOTAGAME    "La elektita ero ne estas ludo de Open Surge!"
+OPTIONS_PLAYMOD_LEGACYERROR "Malnovaj Open Surge ludoj ne estas subtenata."
+OPTIONS_PLAYMOD_COMPATWARN  "La kongrueca reĝimo estas funkcio kreita por plibonigi vian sperton de ludado. Ĉu vi certas, ke vi volas malebligi ĝin?"
+OPTIONS_MODSTORAGE          "Konservilo"
+OPTIONS_MODSTORAGE_FOLDER   "Dosierujo" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  ".zip dosiero"
+OPTIONS_COMPATIBILITYMODE   "Kongrueca reĝimo"
+OPTIONS_SUBMITFEEDBACK      "Sendi komentojn"
+OPTIONS_WRITEREVIEW         "Skribi recenzon"
+OPTIONS_RATEAPP             "Taksi la apon"
+OPTIONS_REPORTISSUE         "Raporti problemon"
+OPTIONS_BACKTOBASEGAME      "Iri reen al la ludo"
 
 // Stage Select
 STAGESELECT_TITLE           "ELEKTADO DE NIVELO"
-STAGESELECT_DEBUG           "PROGRAMADA MODO"
+STAGESELECT_DEBUG           "PROGRAMISTA REĜIMO"
 STAGESELECT_MSG             "Premu <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> por iri reen"
 STAGESELECT_PAGE            "paĝo $1/$2"
 STAGESELECT_ACT             "Zono"
@@ -125,7 +125,7 @@ CREDITS_TITLE               "ATRIBUOJ"
 CREDITS_BACK                "Premu <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> por iri reen"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versio $ENGINE_VERSION</color>\nfunciigita de $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Homoj</color>"
-FIXME CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Past members</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Estintaj membroj</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Dankon al</color>"
 CREDITS_ALEXANDRE           "Projektestro kaj Fondinto\nProjekta Programisto\nArtisto"
 CREDITS_JOAO                "Artisto\nIlustristo"
@@ -139,7 +139,7 @@ CREDITS_COLIN               "Bildetoj, unua historio"
 CREDITS_BRIAN               "Bildeta artisto"
 CREDITS_TRANSLATOR          "Tradukisto"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tradukistoj</color>"
-FIXME CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Past translators</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Estintaj tradukistoj</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Atribuoj laŭ unuopaj iloj</color>"
 CREDITS_RES_TEXT            "La dosieroj listigitaj malsupre estas ĉiuj sub liberaj licencoj. Ilia respektitaj aŭtoroj estas montritaj:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Bildoj</color>"
@@ -154,41 +154,41 @@ CREDITS_RES_SCRIPTS_TEXT    "La aŭtoroj estas identigitaj en la propraj skripto
 // Title Screen
 TITLESCREEN_PLAY            "KOMENCI LUDON"
 TITLESCREEN_OPTIONS         "OPCIOJ"
-FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
+TITLESCREEN_MOBILE          "LUDI EN POŜTELEFONO"
 TITLESCREEN_SHARE           "DISKONIGI"
 TITLESCREEN_DONATE          "DONACI"
 TITLESCREEN_QUIT            "ELIRI"
-FIXME TITLESCREEN_SUBMITFEEDBACK  "SUBMIT FEEDBACK"
-FIXME TITLESCREEN_WRITEREVIEW     "WRITE A REVIEW"
-FIXME TITLESCREEN_RATEAPP         "RATE THE APP"
-FIXME TITLESCREEN_REPORTISSUE     "REPORT AN ISSUE"
+TITLESCREEN_SUBMITFEEDBACK  "SENDI KOMENTOJN"
+TITLESCREEN_WRITEREVIEW     "SKRIBI RECENZON"
+TITLESCREEN_RATEAPP         "TAKSI LA APON"
+TITLESCREEN_REPORTISSUE     "RAPORTI PROBLEMON"
 TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "DAŬRIGI"
-FIXME ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
+ENDOFDEMO_VERSION           "MONTRO $GAME_VERSION\n"
 ENDOFDEMO_TEXT              "Danko pro ludi! Surge the Rabbit disvolviĝas.\n\nVizitu <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> por ĝisdatigoj!\n\nNun ni vidu kiel vi povas krei viajn proprajn ludojn!"
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
-FIXME RATEGAME_TITLE              "Rate Surge the Rabbit?"
-FIXME RATEGAME_MESSAGE            "We'd love to hear from you!\nYour feedback helps this open source game & engine!" // 2 lines max.
-FIXME RATEGAME_YES                "Sure!"
-FIXME RATEGAME_NO                 "Not now"
+RATEGAME_TITLE              "Taksi Surge the Rabbit?"
+RATEGAME_MESSAGE            "Ni ŝatus scii de vi!\nViaj komentoj helpas ĉi tiun malfermitkodan ludon kaj motoron!" // 2 lines max.
+RATEGAME_YES                "Jes ja!"
+RATEGAME_NO                 "Ne nun"
 
 // Play classic levels
-FIXME PLAYCLASSICLEVELS_TEXT      "Play the classic levels?"
-FIXME PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
-FIXME PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+PLAYCLASSICLEVELS_TEXT      "Ludi la klasikajn nivelojn?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-FIXME THANKSFORPLAYING_TITLE      "Thanks for playing!"
-FIXME THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile devices!"
-FIXME THANKSFORPLAYING_PARAGRAPH2 "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
-FIXME THANKSFORPLAYING_PARAGRAPH3 "Become a supporter of this open source game engine today!"
-FIXME THANKSFORPLAYING_YES        "Sure!"
-FIXME THANKSFORPLAYING_NO         "Not now"
+THANKSFORPLAYING_TITLE      "Dankon pro ludi"
+THANKSFORPLAYING_PARAGRAPH1 "Subtenu ĉi tiun sendependan laboron! Akiru la oficialan eldonon de la motoro por porteblaj iloj!"
+THANKSFORPLAYING_PARAGRAPH2 "Ludi Surge the Rabbit - kaj ankaŭ viajn proprajn ludojn - en viaj poŝtelefono kaj tabulkomputiloj!"
+THANKSFORPLAYING_PARAGRAPH3 "Iĝi subtenanto de ĉi tiu malfermitkoda ludo hodiaŭ!"
+THANKSFORPLAYING_YES        "Jes ja!"
+THANKSFORPLAYING_NO         "Ne nun"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -235,10 +235,10 @@ INPUT_KEYB_FIRE2            "MALDEKSTRA STIRKLAVO"
 INPUT_KEYB_FIRE2__EO        "MALDEKSTRAN STIRKLAVON"
 INPUT_KEYB_FIRE3            "ENIGA KLAVO"
 INPUT_KEYB_FIRE4            "ESC"
-FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
-FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
-FIXME INPUT_KEYB_FIRE7            "<available>"
-FIXME INPUT_KEYB_FIRE8            "<available>"
+INPUT_KEYB_FIRE5            "MALDEKSTRA MAJUSKLIGA KL."
+INPUT_KEYB_FIRE6            "DEKSTRA MAJUSKLIGA KL."
+INPUT_KEYB_FIRE7            "<disponebla>"
+INPUT_KEYB_FIRE8            "<disponebla>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "la STIRSTANGO"
@@ -247,13 +247,13 @@ INPUT_JOY_LEFT              "the MALDEKSTRA BUTONO"
 INPUT_JOY_RIGHT             "the DEKSTRA BUTONO"
 INPUT_JOY_UP                "the SUPRA BUTONO"
 INPUT_JOY_DOWN              "the MALSUPRA BUTONO"
-FIXME INPUT_JOY_FIRE1             "the ACTION BUTTON"
-FIXME INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
+INPUT_JOY_FIRE1             "la AGA BUTONO"
+INPUT_JOY_FIRE2             "la DUAGRADA AGA BUTONO"
 INPUT_JOY_FIRE2__EO         "ŜANĜI"
 INPUT_JOY_FIRE3             "PAŬZI"
 INPUT_JOY_FIRE4             "REEN"
-FIXME INPUT_JOY_FIRE5             "L1"
-FIXME INPUT_JOY_FIRE6             "R1"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<disponebla>"
 INPUT_JOY_FIRE8             "<disponebla>"
 
@@ -285,7 +285,7 @@ LEV_DEMO_2                  "<color=$COLOR_TITLE>Ĉu vi sciis...?</color>\nĈio 
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uzu vian kreemon!</color>\nUnu el la plej gravaj funkcioj en Open Surge estas <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Ĝi estas skriptado por ludoj! Uzu ĝin por konstrui ĉion, kion vi povas imagi!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Provu ĝin vi!</color>\nNun estas via vico! <color=$COLOR_HIGHLIGHT>Premu F12-n por malfermi la redaktilon.</color> Poste malfermu la paletron de eroj kaj komencu konstrui vian nivelon! (uzu F1-n por helpo)"
-FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Vi provu mem!</color>\nNun estas via vico! Paŭzigi la ludon, trenu tenilon en la malsupro de la ekrano kaj eniri en la <color=$COLOR_HIGHLIGHT>PROGRAMISTAN REĜIMON</color> por <color=$COLOR_HIGHLIGHT>redakti la nivelon</color>!"
 
 
 
@@ -414,8 +414,8 @@ HUD_POWER                   "Forto"
 // Level Cleared animation
 CLEARED_LINE1               "VI PLENUMIS"
 CLEARED_LINE2               "ZONON $LEVEL_ACT"
-CLEARED_POWER               "Kromajxo de Forto"
-CLEARED_TIME                "Kromajxo de Tempo"
+CLEARED_POWER               "Kromaĵo de Forto"
+CLEARED_TIME                "Kromaĵo de Tempo"
 CLEARED_SCORE               "POENTARO"
 
 // Game Over
@@ -427,7 +427,7 @@ TIMEOVER_PART1              "TEMPO"
 TIMEOVER_PART2              "FINIS"
 
 // Pause Menu
-FIXME PAUSE_TITLE                 "PAUSE"
-FIXME PAUSE_CONTINUE              "CONTINUE"
-FIXME PAUSE_RESTART               "RESTART"
-FIXME PAUSE_EXIT                  "EXIT"
+PAUSE_TITLE                 "PAŬZO"
+PAUSE_CONTINUE              "DAŬRIGI"
+PAUSE_RESTART               "REKOMENCI"
+PAUSE_EXIT                  "ELIRI"
