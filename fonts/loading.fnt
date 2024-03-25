@@ -1000,14 +1000,3 @@ font "Loading"
         }
     }
 }
-
-font "Loading" for "eo"
-{
-    truetype
-    {
-        source_file             "fonts/Roboto-Black.ttf"
-        size                    18
-        antialias
-        shadow
-    }
-}
