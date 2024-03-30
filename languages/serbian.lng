@@ -428,7 +428,7 @@ TIMEOVER_PART1              "ВРЕМЕ"
 TIMEOVER_PART2              "ЈЕ ИСТЕКЛО"
 
 // Pause Menu
-PAUSE_TITLE                 "ПАУЗА"
-PAUSE_CONTINUE              "НАСТАВИ"
-PAUSE_RESTART               "РЕССЕТУЈ"
-PAUSE_EXIT                  "ИЗАДјИ"
+PAUSE_TITLE                 "PAUZA"
+PAUSE_CONTINUE              "NASTAVI"
+PAUSE_RESTART               "RESETUJ"
+PAUSE_EXIT                  "IZAĐI"
