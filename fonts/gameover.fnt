@@ -14,291 +14,401 @@ font "gameover"
 
         char " " {
             source_rect         2 94 16 32
+            offset              0 -6
         }
         char "!" {
             source_rect         20 94 12 32
+            offset              0 -6
         }
         char "\"" {
             source_rect         34 94 14 32
+            offset              0 -6
         }
         char "#" {
             source_rect         50 94 20 32
+            offset              0 -6
         }
         char "$" {
             source_rect         72 94 20 32
+            offset              0 -6
         }
         char "%" {
             source_rect         94 94 22 32
+            offset              0 -6
         }
         char "&" {
             source_rect         118 94 22 32
+            offset              0 -6
         }
         char "'" {
             source_rect         142 94 8 32
+            offset              0 -6
         }
         char "(" {
             source_rect         152 94 12 32
+            offset              0 -6
         }
         char ")" {
             source_rect         166 94 12 32
+            offset              0 -6
         }
         char "*" {
             source_rect         180 94 20 32
+            offset              0 -6
         }
         char "+" {
             source_rect         202 94 16 32
+            offset              0 -6
         }
         char "," {
             source_rect         220 94 8 32
+            offset              0 -6
         }
         char "-" {
             source_rect         230 94 18 32
+            offset              0 -6
         }
         char "." {
             source_rect         250 94 8 32
+            offset              0 -6
         }
         char "/" {
             source_rect         260 94 16 32
+            offset              0 -6
         }
         char "0" {
             source_rect         278 94 16 32
+            offset              0 -6
         }
         char "1" {
             source_rect         296 94 12 32
+            offset              0 -6
         }
         char "2" {
             source_rect         310 94 16 32
+            offset              0 -6
         }
         char "3" {
             source_rect         328 94 16 32
+            offset              0 -6
         }
         char "4" {
             source_rect         346 94 18 32
+            offset              0 -6
         }
         char "5" {
             source_rect         366 94 16 32
+            offset              0 -6
         }
         char "6" {
             source_rect         384 94 16 32
+            offset              0 -6
         }
         char "7" {
             source_rect         402 94 16 32
+            offset              0 -6
         }
         char "8" {
             source_rect         420 94 16 32
+            offset              0 -6
         }
         char "9" {
             source_rect         438 94 16 32
+            offset              0 -6
         }
         char ":" {
             source_rect         456 94 8 32
+            offset              0 -6
         }
         char ";" {
             source_rect         466 94 8 32
+            offset              0 -6
         }
         char "<" {
             source_rect         476 94 18 32
+            offset              0 -6
         }
         char "=" {
             source_rect         496 94 14 32
+            offset              0 -6
         }
         char ">" {
             source_rect         512 94 18 32
+            offset              0 -6
         }
         char "?" {
             source_rect         532 94 16 32
+            offset              0 -6
         }
         char "@" {
             source_rect         550 94 20 32
+            offset              0 -6
         }
         char "A" {
             source_rect         572 94 16 32
+            offset              0 -6
         }
         char "B" {
             source_rect         590 94 16 32
+            offset              0 -6
         }
         char "C" {
             source_rect         608 94 16 32
+            offset              0 -6
         }
         char "D" {
             source_rect         626 94 18 32
+            offset              0 -6
         }
         char "E" {
             source_rect         646 94 16 32
+            offset              0 -6
         }
         char "F" {
             source_rect         664 94 16 32
+            offset              0 -6
         }
         char "G" {
             source_rect         682 94 16 32
+            offset              0 -6
         }
         char "H" {
             source_rect         700 94 16 32
+            offset              0 -6
         }
         char "I" {
             source_rect         718 94 12 32
+            offset              0 -6
         }
         char "J" {
             source_rect         732 94 18 32
+            offset              0 -6
         }
         char "K" {
             source_rect         752 94 16 32
+            offset              0 -6
         }
         char "L" {
             source_rect         770 94 16 32
+            offset              0 -6
         }
         char "M" {
             source_rect         788 94 20 32
+            offset              0 -6
         }
         char "N" {
             source_rect         810 94 18 32
+            offset              0 -6
         }
         char "O" {
             source_rect         830 94 16 32
+            offset              0 -6
         }
         char "P" {
             source_rect         848 94 16 32
+            offset              0 -6
         }
         char "Q" {
             source_rect         866 94 18 32
+            offset              0 -6
         }
         char "R" {
             source_rect         886 94 18 32
+            offset              0 -6
         }
         char "S" {
             source_rect         906 94 16 32
+            offset              0 -6
         }
         char "T" {
             source_rect         924 94 16 32
+            offset              0 -6
         }
         char "U" {
             source_rect         942 94 16 32
+            offset              0 -6
         }
         char "V" {
             source_rect         960 94 16 32
+            offset              0 -6
         }
         char "W" {
             source_rect         978 94 20 32
+            offset              0 -6
         }
         char "X" {
             source_rect         1000 94 18 32
+            offset              0 -6
         }
         char "Y" {
             source_rect         1020 94 16 32
+            offset              0 -6
         }
         char "Z" {
             source_rect         1038 94 16 32
+            offset              0 -6
         }
         char "[" {
             source_rect         1056 94 12 32
+            offset              0 -6
         }
         char "\\" {
             source_rect         1070 94 16 32
+            offset              0 -6
         }
         char "]" {
             source_rect         1088 94 12 32
+            offset              0 -6
         }
         char "^" {
             source_rect         1102 94 22 32
+            offset              0 -6
         }
         char "_" {
             source_rect         1126 94 16 32
+            offset              0 -6
         }
         char "`" {
             source_rect         1144 94 16 32
+            offset              0 -6
         }
         char "a" {
             source_rect         1158 94 16 32
+            offset              0 -6
         }
         char "b" {
             source_rect         1176 94 16 32
+            offset              0 -6
         }
         char "c" {
             source_rect         1194 94 16 32
+            offset              0 -6
         }
         char "d" {
             source_rect         1212 94 16 32
+            offset              0 -6
         }
         char "e" {
             source_rect         1230 94 16 32
+            offset              0 -6
         }
         char "f" {
             source_rect         1248 94 14 32
+            offset              0 -6
         }
         char "g" {
             source_rect         1264 94 16 32
+            offset              0 -6
         }
         char "h" {
             source_rect         1282 94 16 32
+            offset              0 -6
         }
         char "i" {
             source_rect         1300 94 12 32
+            offset              0 -6
         }
         char "j" {
             source_rect         1314 94 12 32
+            offset              0 -6
         }
         char "k" {
             source_rect         1328 94 16 32
+            offset              0 -6
         }
         char "l" {
             source_rect         1346 94 10 32
+            offset              0 -6
         }
         char "m" {
             source_rect         1358 94 20 32
+            offset              0 -6
         }
         char "n" {
             source_rect         1380 94 16 32
+            offset              0 -6
         }
         char "o" {
             source_rect         1398 94 16 32
+            offset              0 -6
         }
         char "p" {
             source_rect         1416 94 16 32
+            offset              0 -6
         }
         char "q" {
             source_rect         1434 94 18 32
+            offset              0 -6
         }
         char "r" {
             source_rect         1454 94 16 32
+            offset              0 -6
         }
         char "s" {
             source_rect         1472 94 16 32
+            offset              0 -6
         }
         char "t" {
             source_rect         1490 94 16 32
+            offset              0 -6
         }
         char "u" {
             source_rect         1508 94 16 32
+            offset              0 -6
         }
         char "v" {
             source_rect         1526 94 16 32
+            offset              0 -6
         }
         char "w" {
             source_rect         1544 94 20 32
+            offset              0 -6
         }
         char "x" {
             source_rect         1566 94 16 32
+            offset              0 -6
         }
         char "y" {
             source_rect         1584 94 16 32
+            offset              0 -6
         }
         char "z" {
             source_rect         1602 94 16 32
+            offset              0 -6
         }
         char "{" {
             source_rect         1620 94 14 32
+            offset              0 -6
         }
         char "|" {
             source_rect         1636 94 8 32
+            offset              0 -6
         }
         char "}" {
             source_rect         1646 94 14 32
+            offset              0 -6
         }
         char "~" {
             source_rect         1662 94 18 32
+            offset              0 -6
         }
         char "\x7f" {
             source_rect         1682 94 20 32
+            offset              0 -6
+        }
+
+
+        char "Ê" {
+            source_rect         306 166 16 38
+            offset              0 -6
+        }
+        char "Š" {
+            source_rect         1234 166 16 38
+            offset              0 -6
+        }
+        char "Ń" {
+            source_rect         1630 166 18 38
+            offset              0 -6
         }
     }
 }
