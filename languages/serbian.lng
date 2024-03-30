@@ -399,6 +399,14 @@ LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Пробајте сами!</col
 // sentences as necessary.
 //
 
+//
+// NOTE BY TRANSLATOR:
+//  The following letters are missing from and for Serbian:
+// Ћћ Ђђ Џџ
+// Latin equivalent
+// Ćć Đđ Dždž
+//
+
 // Heads-Up Display
 HUD_SCORE                   "Поени"
 HUD_TIME                    "Време"
@@ -423,4 +431,4 @@ TIMEOVER_PART2              "ЈЕ ИСТЕКЛО"
 PAUSE_TITLE                 "ПАУЗА"
 PAUSE_CONTINUE              "НАСТАВИ"
 PAUSE_RESTART               "РЕССЕТУЈ"
-PAUSE_EXIT                  "ИЗАЂИ"
+PAUSE_EXIT                  "ИЗАДјИ"
