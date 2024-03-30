@@ -1,0 +1,86 @@
+#include <winver.h>
+
+/*
+ * Game version
+ */
+
+#define GAME_VERSION_MAJOR          @GAME_VERSION_MAJOR@
+#define GAME_VERSION_MINOR          @GAME_VERSION_MINOR@
+#define GAME_VERSION_PATCH          @GAME_VERSION_PATCH@
+#define GAME_VERSION_BUILD          @GAME_VERSION_BUILD@
+
+#cmakedefine GAME_BUILD_VERSION
+#ifdef GAME_BUILD_VERSION
+#  define GAME_VERSION_SUFFIX       "@GAME_BUILD_VERSION@"
+#endif
+
+#define GAME_YEARS                  "@GAME_YEARS@"
+
+/*
+ * Helpers
+ */
+
+#define _STRINGIFY(x)               #x
+#define STRINGIFY(x)                _STRINGIFY(x)
+
+#define PRODUCT_VERSION_STRING      STRINGIFY(GAME_VERSION_MAJOR) "." STRINGIFY(GAME_VERSION_MINOR) "." STRINGIFY(GAME_VERSION_PATCH) "." STRINGIFY(GAME_VERSION_BUILD)
+
+#ifdef GAME_VERSION_SUFFIX
+#  define FILE_VERSION_STRING       STRINGIFY(GAME_VERSION_MAJOR) "." STRINGIFY(GAME_VERSION_MINOR) "." STRINGIFY(GAME_VERSION_PATCH) "." STRINGIFY(GAME_VERSION_BUILD) "-" GAME_VERSION_SUFFIX
+#else
+#  define FILE_VERSION_STRING       STRINGIFY(GAME_VERSION_MAJOR) "." STRINGIFY(GAME_VERSION_MINOR) "." STRINGIFY(GAME_VERSION_PATCH) "." STRINGIFY(GAME_VERSION_BUILD)
+#endif
+
+#if GAME_VERSION_BUILD != 0
+#  define VS_PRERELEASE             VS_FF_PRERELEASE
+#else
+#  define VS_PRERELEASE             0
+#endif
+
+#cmakedefine GAME_DEBUG_INFO
+#ifdef GAME_DEBUG_INFO
+#  define VS_DEBUG                  VS_FF_DEBUG
+#else
+#  define VS_DEBUG                  0
+#endif
+
+#if 0
+#  define VS_PATCHED                VS_FF_PATCHED
+#else
+#  define VS_PATCHED                0
+#endif
+
+/*
+ * Resource-definition statements
+ */
+
+GAME_ICON       ICON  "opensurge.ico"
+
+1 VERSIONINFO
+FILEVERSION     GAME_VERSION_MAJOR,GAME_VERSION_MINOR,GAME_VERSION_PATCH,GAME_VERSION_BUILD
+PRODUCTVERSION  GAME_VERSION_MAJOR,GAME_VERSION_MINOR,GAME_VERSION_PATCH,GAME_VERSION_BUILD
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       VS_PRERELEASE | VS_DEBUG | VS_PATCHED
+FILEOS          VOS__WINDOWS32
+FILETYPE        VFT_APP
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4" /* language: U.S. English (0x0409); charset: Windows-1252 (0x04E4) */
+    BEGIN
+      VALUE "ProductName",      "Open Surge Engine\0"
+      VALUE "ProductVersion",   PRODUCT_VERSION_STRING "\0"
+      VALUE "CompanyName",      "Alexandre Martins\0"
+      VALUE "LegalCopyright",   "\xA9 " GAME_YEARS " Alexandre Martins\0"
+      VALUE "FileDescription",  "Open source 2D retro game engine\0"
+      VALUE "FileVersion",      FILE_VERSION_STRING "\0"
+      VALUE "OriginalFilename", "opensurge.exe\0"
+      VALUE "InternalName",     "opensurge\0"
+      VALUE "Comments",         "http://opensurge2d.org\0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0409, 0x04E4
+  END
+END

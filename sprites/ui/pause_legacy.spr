@@ -1,0 +1,22 @@
+// -----------------------------------------------------------------------------
+// File: pause_legacy.spr
+// Description: sprite script for the legacy pause icon
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+// art by Colin Beard
+sprite "Pause"
+{
+    source_file     "images/pause.png"
+    source_rect     0 0 23 20
+    frame_size      23 20
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

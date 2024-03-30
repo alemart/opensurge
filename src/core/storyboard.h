@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * storyboard.h - storyboard (stores the scenes of the game)
- * Copyright (C) 2010, 2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,11 +31,14 @@ typedef enum scenetype_t {
     SCENE_CONFIRMBOX,
     SCENE_LANGSELECT,
     SCENE_CREDITS,
+    SCENE_INFO,
     SCENE_OPTIONS,
     SCENE_STAGESELECT,
-    SCENE_QUESTSELECT,
     SCENE_EDITORHELP,
-    SCENE_EDITORPAL
+    SCENE_EDITORPAL,
+    SCENE_MOBILEMENU,
+    SCENE_MOBILEPOPUP,
+    SCENE_MODLOADER
 } scenetype_t;
 
 /* Storyboard */

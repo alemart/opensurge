@@ -8,8 +8,8 @@
 // art by Cody Licorish
 sprite "RulerSalamander"
 {
-    source_file     "images/ruler-salamander.png"
-    source_rect     0 40 300 280
+    source_file     "images/enemies/waterworks_zone.png"
+    source_rect     0 72 300 280
     frame_size      50 40
     hot_spot        25 40
 

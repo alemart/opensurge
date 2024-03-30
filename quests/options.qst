@@ -9,7 +9,6 @@
 
 // quest properties
 name            "Options screen"
-hidden
 
 // level list
 <options>

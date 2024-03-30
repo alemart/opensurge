@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * quest.c - quest module
- * Copyright (C) 2008-2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,103 +22,187 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include "global.h"
-#include "image.h"
-#include "util.h"
-#include "stringutil.h"
 #include "logfile.h"
 #include "quest.h"
-#include "assetfs.h"
-#include "nanoparser/nanoparser.h"
+#include "asset.h"
+#include "nanoparser.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+#include "../util/darray.h"
 
 
+/* quest structure */
+struct quest_t {
+    char* file; /* relative path of the quest file */
+    char* name; /* quest name */
+    DARRAY(char*, entry); /* entries / relative paths */
+};
 
 /* private stuff */
-static image_t *load_quest_image(const char *image_file);
 static int traverse_quest(const parsetree_statement_t* stmt, void *quest);
-static const char* DEFAULT_QUEST_IMAGE = "images/null.png";
-static const int QUEST_IMAGE_WIDTH = 100;
-static const int QUEST_IMAGE_HEIGHT = 75;
+static bool has_extension(const char* filepath, const char* extension);
+static quest_t* create_single_level_quest(const char* path_to_lev_file);
 
 
 
 /*
  * quest_load()
- * Loads the quest data from a file
+ * Loads quest data from a file
  */
 quest_t *quest_load(const char *filepath)
 {
-    quest_t *q = mallocx(sizeof *q);
-    parsetree_program_t *prog;
-    const char* fullpath;
+    quest_t* q = NULL;
 
     logfile_message("Loading quest \"%s\"...", filepath);
-    fullpath = assetfs_fullpath(filepath);
-
-    /* default values */
-    q->file = str_dup(filepath);
-    q->name = str_dup("-");
-    q->author = str_dup("-");
-    q->version = str_dup("-");
-    q->description = str_dup("-");
-    q->image = load_quest_image(NULL);
-    q->level_count = 0;
-    q->is_hidden = FALSE;
 
     /* reading the quest */
-    prog = nanoparser_construct_tree(fullpath);
-    nanoparser_traverse_program_ex(prog, (void*)q, traverse_quest);
-    prog = nanoparser_deconstruct_tree(prog);
+    if(has_extension(filepath, ".qst")) {
+
+        /* create a new quest with default values */
+        q = mallocx(sizeof *q);
+        q->file = str_dup(filepath);
+        q->name = str_dup(filepath); /* use the filepath as the default name */
+        darray_init(q->entry);
+
+        /* read quest file */
+        const char* fullpath = asset_path(filepath);
+        parsetree_program_t* prog = nanoparser_construct_tree(fullpath);
+        nanoparser_traverse_program_ex(prog, q, traverse_quest);
+        nanoparser_deconstruct_tree(prog);
+
+    }
+    else if(has_extension(filepath, ".lev")) {
+
+        /* implicitly create a quest with a single level */
+        q = create_single_level_quest(filepath);
+
+    }
+    else {
+
+        /* not a quest file */
+        q = NULL;
+
+    }
+
+    /* validate */
+    if(q == NULL)
+        fatal_error("Can't load quest file \"%s\"", filepath);
+    else if(darray_length(q->entry) == 0)
+        fatal_error("Quest \"%s\" has no entries", q->name);
 
     /* success! */
     logfile_message("Quest \"%s\" has been loaded successfully!", q->name);
     return q;
 }
 
-
-
-
 /*
  * quest_unload()
- * Unload quest data
+ * Unloads quest data
  */
-quest_t *quest_unload(quest_t *qst)
+quest_t *quest_unload(quest_t *quest)
 {
-    int i;
+    for(int i = darray_length(quest->entry) - 1; i >= 0; i--)
+        free(quest->entry[i]);
 
-    free(qst->file);
-    free(qst->name);
-    free(qst->author);
-    free(qst->version);
-    free(qst->description);
+    darray_release(quest->entry);
 
-    for(i=0; i<qst->level_count; i++)
-        free(qst->level_path[i]);
+    free(quest->name);
+    free(quest->file);
 
-    image_destroy(qst->image);
-    free(qst);
+    free(quest);
     return NULL;
 }
 
+/*
+ * quest_name()
+ * The name of the quest
+ */
+const char* quest_name(const quest_t* quest)
+{
+    return quest->name;
+}
+
+/*
+ * quest_file()
+ * The relative filepath of the .qst file
+ */
+const char* quest_file(const quest_t* quest)
+{
+    return quest->file;
+}
+
+/*
+ * quest_entry_count()
+ * The number of entries of the quest
+ */
+int quest_entry_count(const quest_t* quest)
+{
+    return darray_length(quest->entry);
+}
+
+/*
+ * quest_entry_path()
+ * The relative filepath of the i-th entry of the quest.
+ * Returns NULL if there is no such entry
+ */
+const char* quest_entry_path(const quest_t* quest, int index)
+{
+    if(index >= 0 && index < darray_length(quest->entry))
+        return quest->entry[index];
+
+    return NULL;
+}
+
+/*
+ * quest_index_of_entry()
+ * Finds the index of the entry that matches the given path.
+ * Returns -1 if there is no such entry
+ */
+int quest_index_of_entry(const quest_t* quest, const char* filepath)
+{
+    for(int i = 0; i < darray_length(quest->entry); i++) {
+        if(0 == str_icmp(quest->entry[i], filepath))
+            return i;
+    }
+
+    return -1;
+}
+
+/*
+ * quest_entry_is_level()
+ * Checks if an entry of the quest is a regular level file
+ */
+bool quest_entry_is_level(const quest_t* quest, int index)
+{
+    const char* path = quest_entry_path(quest, index);
+    return (path != NULL) && has_extension(path, ".lev");
+}
+
+/*
+ * quest_entry_is_level()
+ * Checks if an entry of the quest is a regular level path
+ */
+bool quest_entry_is_quest(const quest_t* quest, int index)
+{
+    const char* path = quest_entry_path(quest, index);
+    return (path != NULL) && has_extension(path, ".qst");
+}
+
+/*
+ * quest_entry_is_builtin_scene()
+ * Checks if an entry of the quest is a built-in scene
+ */
+bool quest_entry_is_builtin_scene(const quest_t* quest, int index)
+{
+    const char* path = quest_entry_path(quest, index);
+    return (path != NULL) && (path[0] == '<') && (path[strlen(path)-1] == '>');
+}
 
 
 
 /* private functions */
-
-/* returns the quest image */
-image_t *load_quest_image(const char *image_file)
-{
-    const char *src = image_file ? image_file : DEFAULT_QUEST_IMAGE;
-    image_t *ret, *img;
-
-    img = image_load(src);
-    if(img == NULL)
-        img = image_load(DEFAULT_QUEST_IMAGE);
-
-    ret = image_clone_region(img, 0, 0, QUEST_IMAGE_WIDTH, QUEST_IMAGE_HEIGHT);
-    image_unload(img);
-    return ret;
-}
 
 /* interprets a statement from a .qst file */
 int traverse_quest(const parsetree_statement_t* stmt, void *quest)
@@ -128,47 +212,80 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
     const parsetree_parameter_t* param_list = nanoparser_get_parameter_list(stmt);
     const parsetree_parameter_t* p = nanoparser_get_nth_parameter(param_list, 1);
 
-    if(str_icmp(id, "name") == 0) {
+    if(str_icmp(id, "level") == 0 || str_icmp(id, "quest") == 0) {
+
+        /* a .lev or a .qst file */
+        /* read my commentary in ../scenes/quest.c about circular dependencies */
+        const char* required_extension = tolower(*id) == 'l' ? ".lev" : ".qst";
+        nanoparser_expect_string(p, "Quest loader: expected file path");
+
+        if(has_extension(nanoparser_get_string(p), required_extension))
+            darray_push(q->entry, str_dup(nanoparser_get_string(p)));
+        else
+            fatal_error("Quest loader: command %s expects a %s file at %s:%d", str_to_lower(id, NULL, 0), required_extension, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+    }
+    else if(id[0] == '<' && id[strlen(id)-1] == '>') {
+
+        /* built-in scene */
+        darray_push(q->entry, str_dup(id));
+
+    }
+    else if(str_icmp(id, "name") == 0) {
+
+        /* set quest name */
         nanoparser_expect_string(p, "Quest loader: quest name is expected");
         free(q->name);
         q->name = str_dup(nanoparser_get_string(p));
+
     }
-    else if(str_icmp(id, "author") == 0) {
-        nanoparser_expect_string(p, "Quest loader: quest author is expected");
-        free(q->author);
-        q->author = str_dup(nanoparser_get_string(p));
-    }
-    else if(str_icmp(id, "version") == 0) {
-        nanoparser_expect_string(p, "Quest loader: quest version is expected");
-        free(q->version);
-        q->version = str_dup(nanoparser_get_string(p));
-    }
-    else if(str_icmp(id, "description") == 0) {
-        nanoparser_expect_string(p, "Quest loader: quest description is expected");
-        free(q->description);
-        q->description = str_dup(nanoparser_get_string(p));
-    }
-    else if(str_icmp(id, "image") == 0) {
-        nanoparser_expect_string(p, "Quest loader: quest image is expected");
-        image_destroy(q->image);
-        q->image = load_quest_image(nanoparser_get_string(p));
+    else if(
+        str_icmp(id, "image") == 0 ||
+        str_icmp(id, "description") == 0 ||
+        str_icmp(id, "version") == 0 ||
+        str_icmp(id, "author") == 0
+    ) {
+
+        /* these fields are obsolete and were removed
+           this code is kept for retro-compatibility */
+        nanoparser_expect_string(p, "Quest loader: quest parameter is expected");
+        logfile_message("Quest loader: field %s is obsolete", str_to_lower(id, NULL, 0));
+
     }
     else if(str_icmp(id, "hidden") == 0) {
-        q->is_hidden = TRUE;
+
+        /* this field is obsolete and was removed
+           this code is kept for retro-compatibility */
+        logfile_message("Quest loader: field %s is obsolete", str_to_lower(id, NULL, 0));
+
     }
-    else if(str_icmp(id, "level") == 0) {
-        nanoparser_expect_string(p, "Quest loader: expected level path");
-        if(q->level_count < QUEST_MAXLEVELS)
-            q->level_path[q->level_count++] = str_dup(nanoparser_get_string(p));
-        else
-            fatal_error("Quest loader: quests can't have more than %d levels", QUEST_MAXLEVELS);
-    }
-    else if(id[0] == '<' && id[strlen(id)-1] == '>') { /* special */
-        if(q->level_count < QUEST_MAXLEVELS)
-            q->level_path[q->level_count++] = str_dup(id);
-        else
-            fatal_error("Quest loader: quests can't have more than %d levels", QUEST_MAXLEVELS);
+    else {
+
+        /* invalid command */
+        fatal_error("Quest loader: unexpected \"%s\" at %s:%d", id, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
     }
 
     return 0;
+}
+
+/* create a quest structure with a single level (give a relative path to a .lev file) */
+quest_t* create_single_level_quest(const char* path_to_lev_file)
+{
+    quest_t* q = mallocx(sizeof *q);
+
+    q->file = str_dup(path_to_lev_file);
+    q->name = str_dup(path_to_lev_file);
+
+    darray_init(q->entry);
+    darray_push(q->entry, str_dup(path_to_lev_file));
+
+    return q;
+}
+
+/* checks if the provided filepath has the given extension (include the '.' at the extension) */
+bool has_extension(const char* filepath, const char* extension)
+{
+    const char* ext = strrchr(filepath, '.');
+    return (ext != NULL) && (0 == str_icmp(ext, extension));
 }

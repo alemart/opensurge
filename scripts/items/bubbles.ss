@@ -9,18 +9,21 @@ using SurgeEngine.Actor;
 using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
-using SurgeEngine.Collisions.CollisionBall;
 
 // these Bubbles help the player breathe (useful when underwater)
 object "Water Bubbles" is "entity", "basic"
 {
     transform = Transform();
     bubbles = Actor("Water Bubbles");
-    hy = 16; cnt = 10;
+    bubbleTime = 0.5; // in seconds
+    bigBubbleTime = 8.0; // in seconds
+    maxCounter = Math.floor(bigBubbleTime / bubbleTime);
+    counter = 0;
+    hy = 16;
 
     state "main"
     {
-        if(timeout(0.5))
+        if(timeout(bubbleTime))
             state = "create bubble";
         else if(transform.position.y - hy <= Level.waterlevel)
             state = "hidden";
@@ -39,7 +42,7 @@ object "Water Bubbles" is "entity", "basic"
     {
         position = transform.position;
 
-        if(++cnt < 16) {
+        if(++counter < maxCounter) {
             size = (Math.random() <= 0.5) ? "sm" : "xs";
             Level.spawnEntity(
                 "Water Bubble",
@@ -50,8 +53,8 @@ object "Water Bubbles" is "entity", "basic"
             Level.spawnEntity(
                 "Water Bubble",
                 position.translatedBy(0, -4)
-            ).setSize("lg").addComponent("BreathableBubble");
-            cnt = 0;
+            ).setSize("lg").makeBreathable();
+            counter = 0;
         }
 
         state = "main";
@@ -63,28 +66,29 @@ object "Water Bubbles" is "entity", "basic"
         bubbles.zindex = 0.99;
         bubbles.anim = 0;
         hy = bubbles.animation.hotSpot.y / 2;
+
+        restartCounter();
     }
-}
 
-// breathable behavior: bubble that the player can use to breathe
-object "BreathableBubble"
-{
-    collider = CollisionBall(10);
-    bubble = parent;
-
-    state "main"
+    fun onReset()
     {
-        player = Player.active;
-        if(player.shield != "water" && timeout(2)) {
-            if(collider.collidesWith(player.collider)) {
-                player.breathe();
-                bubble.burst();
-            }
-        }
+        restartCounter();
+    }
+
+    fun restartCounter()
+    {
+        // bubbles should be spawned quickly
+        // when this object becomes visible.
+        anticipatedSeconds = 2.0;
+
+        // players can trick this logic to
+        // get an air bubble faster!
+        counter = maxCounter - anticipatedSeconds / bubbleTime;
+        counter = Math.max(0, Math.floor(counter));
     }
 }
 
-// this is for retro compatibility
+// this is for retro compatibility with Legacy Open Surge
 object "water.air_source" is "entity", "private"
 {
     bubbles = spawn("Water Bubbles");

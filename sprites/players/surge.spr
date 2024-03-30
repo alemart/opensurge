@@ -255,6 +255,7 @@ sprite "Surge"
         repeat      TRUE
         fps         20
         data        78 79
+        action_spot 26 23
     }
 
     // winning (victory)
@@ -323,7 +324,7 @@ sprite "Surge"
     transition 32 to 1
     {
         repeat      FALSE
-        fps         24
+        fps         16
         data        28
     }
 
@@ -371,10 +372,10 @@ sprite "Surge"
 // Life Icon corresponding to the character (Heads-Up Display)
 sprite "Life Icon Surge"
 {
-    source_file       "images/players/surge_life_icon.png"
-    source_rect       0 0 24 24
-    frame_size        24 24
-    hot_spot          12 12
+    source_file       "images/players/surge_extra.png"
+    source_rect       0 32 32 32
+    frame_size        32 32
+    hot_spot          16 16
 
     animation 0
     {
@@ -387,16 +388,52 @@ sprite "Life Icon Surge"
 // Goal Sign corresponding to the character
 sprite "Goal Surge"
 {
-    source_file     "images/players/surge_goal.png"
-    source_rect     0 0 48 56
-    frame_size      48 56
-    hot_spot        24 56
+    source_file     "images/players/surge_extra.png"
+    source_rect     128 32 48 64
+    frame_size      48 64
+    hot_spot        24 64
 
     animation 0
     {
         repeat      TRUE
         fps         8
-        data        5
+        data        0
+    }
+}
+
+// Powerup 1up (Life box) corresponding to the character
+sprite "Powerup 1up Surge"
+{
+    source_file     "images/players/surge_extra.png"
+    source_rect     32 32 96 64
+    frame_size      32 32
+    hot_spot        16 32
+    action_spot     16 16
+
+    // Life box
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        1 2 3 4 1 0 3 0 1 2 3 4 1 2 3 4 1 2 3 4 1 2 3 4
+    }
+}
+
+// Powerup 1up Icon (Icon of Life box) corresponding to the character
+sprite "Powerup 1up Icon Surge"
+{
+    source_file     "images/players/surge_extra.png"
+    source_rect     96 64 32 32
+    frame_size      32 32
+    hot_spot        16 13
+    action_spot     8 6
+
+    // Icon of Life box
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
     }
 }
 

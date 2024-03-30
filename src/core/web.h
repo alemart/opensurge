@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * web.h - Web routines
- * Copyright (C) 2012, 2013, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,5 +24,6 @@
 #include <stdbool.h>
 
 bool launch_url(const char *url); /* launch URL; returns true on success */
+char* encode_uri_component(const char* uri, char* dest, size_t dest_size); /* returns dest */
 
 #endif

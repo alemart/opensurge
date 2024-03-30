@@ -11,6 +11,7 @@ sprite "Zipline Grabber"
     source_rect     0 32 16 160
     frame_size      16 16
     hot_spot        8 4
+    action_spot     8 15
 
     // Basic Zipline
     animation 0

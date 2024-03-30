@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * storyboard.c - storyboard (stores the scenes of the game)
- * Copyright (C) 2010, 2011  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,8 +19,8 @@
  */
 
 #include "storyboard.h"
-#include "util.h"
 #include "scene.h"
+#include "../util/util.h"
 #include "../scenes/quest.h"
 #include "../scenes/level.h"
 #include "../scenes/gameover.h"
@@ -29,11 +29,14 @@
 #include "../scenes/confirmbox.h"
 #include "../scenes/langselect.h"
 #include "../scenes/credits.h"
-#include "../scenes/options.h"
+#include "../scenes/info.h"
+#include "../scenes/settings.h"
 #include "../scenes/stageselect.h"
-#include "../scenes/questselect.h"
 #include "../scenes/editorhelp.h"
 #include "../scenes/editorpal.h"
+#include "../scenes/modloader.h"
+#include "../scenes/mobile/menu.h"
+#include "../scenes/mobile/popup.h"
 
 /* private stuff */
 #define STORYBOARD_CAPACITY         32     /* up to this amount of scenes in the storyboard */
@@ -47,10 +50,8 @@ static scene_t *storyboard[STORYBOARD_CAPACITY];
  */
 void storyboard_init()
 {
-    int i;
-
     /* initializing... */
-    for(i=0; i<STORYBOARD_CAPACITY; i++)
+    for(int i = 0; i < STORYBOARD_CAPACITY; i++)
         storyboard[i] = NULL;
 
     /* registering the scenes */
@@ -62,14 +63,15 @@ void storyboard_init()
     storyboard[SCENE_CONFIRMBOX] = scene_create(confirmbox_init, confirmbox_update, confirmbox_render, confirmbox_release);
     storyboard[SCENE_LANGSELECT] = scene_create(langselect_init, langselect_update, langselect_render, langselect_release);
     storyboard[SCENE_CREDITS] = scene_create(credits_init, credits_update, credits_render, credits_release);
-    storyboard[SCENE_OPTIONS] = scene_create(options_init, options_update, options_render, options_release);
+    storyboard[SCENE_INFO] = scene_create(info_init, info_update, info_render, info_release);
+    storyboard[SCENE_OPTIONS] = scene_create(settings_init, settings_update, settings_render, settings_release);
     storyboard[SCENE_STAGESELECT] = scene_create(stageselect_init, stageselect_update, stageselect_render, stageselect_release);
-    storyboard[SCENE_QUESTSELECT] = scene_create(questselect_init, questselect_update, questselect_render, questselect_release);
     storyboard[SCENE_EDITORHELP] = scene_create(editorhelp_init, editorhelp_update, editorhelp_render, editorhelp_release);
     storyboard[SCENE_EDITORPAL] = scene_create(editorpal_init, editorpal_update, editorpal_render, editorpal_release);
+    storyboard[SCENE_MOBILEMENU] = scene_create(mobilemenu_init, mobilemenu_update, mobilemenu_render, mobilemenu_release);
+    storyboard[SCENE_MOBILEPOPUP] = scene_create(mobilepopup_init, mobilepopup_update, mobilepopup_render, mobilepopup_release);
+    storyboard[SCENE_MODLOADER] = scene_create(modloader_init, modloader_update, modloader_render, modloader_release);
 }
-
-
 
 
 /*
@@ -78,15 +80,11 @@ void storyboard_init()
  */
 void storyboard_release()
 {
-    int i;
-
-    for(i=0; i<STORYBOARD_CAPACITY; i++) {
+    for(int i = 0; i < STORYBOARD_CAPACITY; i++) {
         if(storyboard[i])
             scene_destroy(storyboard[i]);
     }
 }
-
-
 
 
 /*
@@ -98,4 +96,3 @@ scene_t* storyboard_get_scene(scenetype_t type)
     int scene_id = clip((int)type, 0, STORYBOARD_CAPACITY-1);
     return storyboard[scene_id];
 }
-

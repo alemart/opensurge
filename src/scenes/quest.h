@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * quest.h - quest scene
- * Copyright (C) 2010, 2012-2013  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,9 +25,11 @@
    Multiple quest scenes may be pushed onto the
    scene stack. It will work.
 
-   This is actually a "mock" scene that just
-   dispatches the player to the correct levels.
+   This scene just dispatches the player to the
+   appropriate scenes.
 */
+
+struct quest_t;
 
 /* quest scene: functions */
 void quest_init(void *path_to_qst_file); /* pass an string */

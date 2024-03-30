@@ -1,0 +1,28 @@
+// -----------------------------------------------------------------------------
+// File: thanks_for_playing.fnt
+// Description: scripts for the fonts used at the Thanks for Playing scene
+// Author: script by Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "Thanks for Playing - Title"
+{
+    truetype
+    {
+        source_file             "fonts/NotoSans-Black.ttf"
+        size                    28
+        shadow
+        antialias
+    }
+}
+
+font "Thanks for Playing - Text"
+{
+    truetype
+    {
+        source_file             "fonts/NotoSans-Bold.ttf"
+        size                    15
+        shadow
+        antialias
+    }
+}

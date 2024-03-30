@@ -1,11 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=Open Surge
+Name=Surge Engine
 GenericName=Game Engine
 GenericName[de]=Spiel-Engine
-Comment=A fun 2D retro platformer inspired by Sonic games and a game creation system
-Comment[de]=Ein lustiges 2D-Retro-Jump-’n’-Run-Spiel, inspiriert von Sonic-Spielen; und ein Spielerstellungssystem
-Keywords=game;gaming;maker;fun;2d;retro;platform;platformer;jump;run;action;arcade;side-scroller;play;create;children;kids;teens;
+Comment=Open source 2D retro game engine
+Keywords=opensurge;games;gaming;gamedev;game-engine;game-creator;game-maker;game-development;video-game;retro-game;mobile-game;open-source-game;libre-game;free-game;indie-game;platformer;side-scroller;jump-'n-run;action;arcade;cool;fun;c;opengl;allegro;allegro5;surgescript;surge;sonic;mods;modding;homebrew
 Exec=opensurge
 Icon=@DESKTOP_ICON_FULLPATH@
 Terminal=false

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * renderqueue.h - render queue
- * Copyright (C) 2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,15 +21,8 @@
 #ifndef _RENDERQUEUE_H
 #define _RENDERQUEUE_H
 
-#include "../core/v2d.h"
-
-/*
- * a render queue is used to render entities in the correct order (according to their z-indexes).
- * Just add the entities to the queue and it will do all the hard work for you
- *
- * ps: if two entities have the same z-index, the entity that was enqueued first will be
- * rendered first
- */
+#include <stdbool.h>
+#include "../util/v2d.h"
 
 /* forward declarations */
 struct brick_t;
@@ -39,24 +32,30 @@ struct player_t;
 struct bgtheme_t;
 struct surgescript_object_t;
 
-/* starts a new rendering process */
-void renderqueue_begin(v2d_t camera_position);
+/* initialization & deinitialization */
+void renderqueue_init(bool want_depth_buffer);
+void renderqueue_release();
 
-/* finishes an existing rendering process, rendering everything */
+/* rendering */
+void renderqueue_begin(v2d_t camera_position);
 void renderqueue_end();
 
 /* enqueues entities */
-void renderqueue_enqueue_brick(struct brick_t *brick);
-void renderqueue_enqueue_brick_mask(struct brick_t *brick);
-void renderqueue_enqueue_item(struct item_t *item);
-void renderqueue_enqueue_object(struct enemy_t *object);
-void renderqueue_enqueue_player(struct player_t *player);
-void renderqueue_enqueue_particles(); /* enqueues the whole particle system defined in particle.h */
+void renderqueue_enqueue_brick(struct brick_t* brick);
+void renderqueue_enqueue_brick_mask(struct brick_t* brick);
+void renderqueue_enqueue_brick_debug(struct brick_t* brick);
+void renderqueue_enqueue_brick_path(struct brick_t* brick);
+void renderqueue_enqueue_item(struct item_t* item);
+void renderqueue_enqueue_object(struct enemy_t* object);
+void renderqueue_enqueue_player(struct player_t* player);
 void renderqueue_enqueue_ssobject(struct surgescript_object_t* object);
-void renderqueue_enqueue_ssobject_debug(struct surgescript_object_t* object);
 void renderqueue_enqueue_ssobject_gizmo(struct surgescript_object_t* object);
+void renderqueue_enqueue_ssobject_debug(struct surgescript_object_t* object);
 void renderqueue_enqueue_background(struct bgtheme_t* background);
 void renderqueue_enqueue_foreground(struct bgtheme_t* foreground);
 void renderqueue_enqueue_water();
+
+/* misc */
+bool renderqueue_toggle_stats_report();
 
 #endif

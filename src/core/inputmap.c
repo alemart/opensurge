@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * inputmap.c - custom input mappings
- * Copyright (C) 2011, 2019-2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,13 +21,13 @@
 #include <allegro5/allegro.h>
 
 #include "inputmap.h"
-#include "stringutil.h"
-#include "util.h"
 #include "logfile.h"
 #include "resourcemanager.h"
-#include "assetfs.h"
-#include "hashtable.h"
-#include "nanoparser/nanoparser.h"
+#include "asset.h"
+#include "nanoparser.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+#include "../util/hashtable.h"
 
 /* storage */
 typedef struct inputmapnode_t inputmapnode_t;
@@ -237,10 +237,10 @@ void inputmap_init()
     mappings = hashtable_inputmapnode_t_create();
 
     /* read the inputmap scripts */
-    assetfs_foreach_file("inputs/", ".in", read_script, NULL, true);
+    asset_foreach_file("inputs/", ".in", read_script, NULL, true);
 
     /* read the legacy script AFTER you read all the regular scripts */
-    if(assetfs_exists("config/input.def"))
+    if(asset_exists("config/input.def"))
         read_script("config/input.def", NULL);
 }
 
@@ -263,15 +263,31 @@ const inputmap_t* inputmap_get(const char* name)
     inputmapnode_t* f = hashtable_inputmapnode_t_find(mappings, name);
 
     if(f == NULL) {
+        /* fail silently */
         logfile_message("WARNING: Can't find inputmap '%s'", name);
-        if((f = hashtable_inputmapnode_t_find(mappings, NULL_INPUTMAP)) == NULL) { /* fail silently */
-            fatal_error("Can't find inputmap '%s'", name); /* shouldn't happen */
+
+        if((f = hashtable_inputmapnode_t_find(mappings, NULL_INPUTMAP)) == NULL) {
+            /* this shouldn't happen */
+            fatal_error("Can't find inputmap '%s'", name);
             return NULL;
         }
     }
 
     return f->data;
 }
+
+/*
+ * inputmap_exists()
+ * Checks if an input mapping with the given name exists
+ */
+bool inputmap_exists(const char* name)
+{
+    if(name == NULL)
+        return false;
+
+    return NULL != hashtable_inputmapnode_t_find(mappings, name);
+}
+
 
 
 
@@ -282,7 +298,7 @@ const inputmap_t* inputmap_get(const char* name)
 int read_script(const char* vpath, void* param)
 {
     /* load the script */
-    const char* fullpath = assetfs_fullpath(vpath);
+    const char* fullpath = asset_path(vpath);
     parsetree_program_t* prog = nanoparser_construct_tree(fullpath);
 
     /* traverse the script */
@@ -312,6 +328,9 @@ int traverse(const parsetree_statement_t* stmt, void* vpath)
         nanoparser_expect_program(p2, "inputmap: must provide inputmap attributes");
 
         name = nanoparser_get_string(p1);
+        if(*name == '\0')
+            fatal_error("inputmap: empty names are not accepted in %s:%d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
         if(NULL == hashtable_inputmapnode_t_find(mappings, name)) {
             inputmapnode_t* f = inputmapnode_create(name);
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)f, traverse_inputmap);
@@ -360,18 +379,18 @@ int traverse_inputmap(const parsetree_statement_t* stmt, void* inputmapnode)
         if(n == 2) {
             p1 = nanoparser_get_nth_parameter(param_list, 1);
             p2 = nanoparser_get_nth_parameter(param_list, 2);
-            nanoparser_expect_string(p1, "inputmap: must provide the joystick id");
+            nanoparser_expect_string(p1, "inputmap: must provide the joystick number");
             nanoparser_expect_program(p2, "inputmap: must provide the joystick mappings");
 
             if(f->data->joystick.enabled)
                 fatal_error("inputmap: can't define multiple joysticks for inputmap '%s' in %s:%d", f->data->name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
             f->data->joystick.enabled = true;
-            f->data->joystick.id = max(0, atoi(nanoparser_get_string(p1)));
+            f->data->joystick.number = max(1, atoi(nanoparser_get_string(p1)));
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), inputmapnode, traverse_inputmap_joystick);
         }
         else
-            fatal_error("inputmap: 'joystick' requires two parameters: joystick_id and a block containing the mappings (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+            fatal_error("inputmap: 'joystick' requires two parameters: joystick_number and a block containing the mappings (in %s:%d)", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
     }
     else
         fatal_error("inputmap: unknown identifier '%s' defined at inputmap block in %s:%d. Valid keywords: 'keyboard', 'joystick'", identifier, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
@@ -479,7 +498,7 @@ inputmapnode_t* inputmapnode_create(const char* name)
 
     /* joystick defaults */
     f->data->joystick.enabled = false;
-    f->data->joystick.id = 0;
+    f->data->joystick.number = 1;
     for(button = 0; button < IB_MAX; button++)
         f->data->joystick.button_mask[(int)button] = NO_BUTTONS;
 

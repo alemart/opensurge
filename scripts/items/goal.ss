@@ -63,17 +63,23 @@ object "Goal" is "entity", "basic"
 
     fun goal(player)
     {
-        if(!player.dying) {
-            sfx.play();
-            Level.clear();
-            clearedPlayer = player.name;
-            state = "rotating";
-        }
+        sfx.play();
+        Level.clear();
+        clearedPlayer = player.name;
+        state = "rotating";
+    }
+
+    fun accept(player)
+    {
+        return !player.dying && !player.secondary;
     }
 
     fun onCollision(otherCollider)
     {
-        if(state == "not cleared" && otherCollider.entity.hasTag("player"))
-            goal(otherCollider.entity);
+        if(state == "not cleared" && otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            if(accept(player))
+                goal(player);
+        }
     }
 }

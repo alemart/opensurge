@@ -105,7 +105,7 @@ object "Skaterbug" is "entity", "friend", "gimmick"
         if(carrying) {
             dx = Math.floor(transform.position.x) - Math.floor(xpos);
             dy = Math.floor(transform.position.y) - Math.floor(ypos);
-            player.transform.translateBy(dx, dy);
+            player.moveBy(dx, dy);
         }
         else if(player != null && player.jumping && ysp != 0) {
             if(xsp > 0)

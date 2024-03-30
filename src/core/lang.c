@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * lang.c - language/translation module
- * Copyright (C) 2009-2010, 2019-2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,12 +21,13 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "lang.h"
-#include "util.h"
-#include "assetfs.h"
-#include "stringutil.h"
+#include "global.h"
+#include "asset.h"
 #include "logfile.h"
-#include "hashtable.h"
-#include "nanoparser/nanoparser.h"
+#include "nanoparser.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+#include "../util/hashtable.h"
 
 /* fake string type */
 typedef struct { char* data; } stringadapter_t;
@@ -95,7 +96,7 @@ void lang_loadfile(const char* filepath)
     int supver, subver, wipver;
 
     #define READ_LANGUAGE_FILE(path_to_lng_file) do { \
-        const char* fullpath = assetfs_fullpath(path_to_lng_file); \
+        const char* fullpath = asset_path(path_to_lng_file); \
         parsetree_program_t* prog = nanoparser_construct_tree(fullpath); \
         nanoparser_traverse_program(prog, traverse); \
         prog = nanoparser_deconstruct_tree(prog); \
@@ -111,7 +112,7 @@ void lang_loadfile(const char* filepath)
         fatal_error("Won't load \"%s\". Language files are expected to be in the %s folder.", path, LANGUAGES_FOLDER);
 
     /* Check if the path exists */
-    if(!assetfs_exists(path)) {
+    if(!asset_exists(path)) {
 
         /* Crash if the default language file is missing */
         if(0 == str_icmp(path, DEFAULT_LANGUAGE_FILEPATH))
@@ -150,7 +151,7 @@ void lang_loadfile(const char* filepath)
         char* extpath = path_to_language_extension(path);
 
         /* There is a language extension */
-        if(assetfs_exists(extpath)) {
+        if(asset_exists(extpath)) {
 
             /* Load language extension */
             logfile_message("Loading language extension at \"%s\"...", extpath);
@@ -179,15 +180,10 @@ void lang_loadfile(const char* filepath)
  */
 char* lang_metadata(const char* filepath, const char* desired_key, char* dest, size_t dest_size)
 {
-    inout_t param;
-    parsetree_program_t *prog;
-    const char* fullpath;
+    const char* fullpath = asset_path(filepath);
+    inout_t param = { .key = desired_key, .value = NULL };
+    parsetree_program_t *prog = nanoparser_construct_tree(fullpath);
 
-    fullpath = assetfs_fullpath(filepath);
-    param.key = desired_key;
-    param.value = NULL;
-
-    prog = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program_ex(prog, (void*)(&param), traverse_inout);
 
     if(param.value == NULL)

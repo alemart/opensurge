@@ -11,7 +11,7 @@
 character "None"
 {
     companions                      "None"
-    
+
     multipliers
     {
         acceleration                1.0
@@ -25,7 +25,7 @@ character "None"
         airacceleration             1.0
         airdrag                     1.0
     }
-    
+
     animations
     {
         sprite_name                 "None"
@@ -56,7 +56,7 @@ character "None"
         brake                       FALSE
         charge                      FALSE
     }
-    
+
     samples
     {
         jump                        "samples/jump.wav"

@@ -184,10 +184,25 @@ object "Lock Camera"
 }
 
 // this object is used to keep a state between event calls
-object "Lock Camera Direction" { public direction = 0; }
+object "Lock Camera Direction"
+{
+    public direction = 0;
+}
 
 // this is a utility to find the position of the ground
-object "Lock Camera Ground Finder" is "private", "awake", "entity"
+object "Lock Camera Ground Finder"
+{
+    entity = Level.spawnEntity("Lock Camera Ground Finder - Helper", Vector2.zero);
+
+    // finds the y position of the ground nearest the given position
+    fun findGround(position)
+    {
+        return entity.findGround(position);
+    }
+}
+
+// an entity that belongs to Lock Camera Ground Finder
+object "Lock Camera Ground Finder - Helper" is "private", "awake", "entity"
 {
     transform = Transform();
     sensor = Sensor(0, 0, 16, 1);

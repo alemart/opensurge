@@ -700,6 +700,10 @@ object "Spring Behavior" is "private", "entity"
 
             // diagonal spring
             else if(direction.x != 0 && direction.y != 0) {
+                // skip if we're on ceiling mode
+                if(ceilRun && direction.y < 0)
+                    return;
+
                 // change speed
                 if(wallRun || (v.y > 0 && v.y > player.ysp) || (v.y < 0 && v.y < player.ysp)) {
                     player.ysp = v.y; // gsp affects xsp and ysp when not midair

@@ -88,7 +88,7 @@ object "Pipe Out" is "entity", "special"
 
     state "main"
     {
-        brick.enabled = (isBlocked[Player.active.name] || false);
+        brick.enabled = (isBlocked[Player.active.id] || false);
     }
 
     state "block"
@@ -96,7 +96,7 @@ object "Pipe Out" is "entity", "special"
         if(!playerCollider.collidesWith(pipeSensor.collider)) {
             player = playerCollider.entity;
             if(!player.midair || player.ysp >= 0) {
-                isBlocked[player.name] = true;
+                isBlocked[player.id] = true;
                 state = "main";
             }
         }
@@ -221,19 +221,14 @@ object "Pipe Sensor" is "private", "entity"
             //if(entrance && !player.hasFocus()) return; // FIXME
             insidePipe = pipeManager.isInsidePipe(player);
             if((entrance && !insidePipe) || (!entrance && insidePipe)) {
+                // set the center of the player.collider to the center of this.collider
                 player.transform.position = transform.position
-                    .plus(player.animation.hotSpot)
-                    .minus(ballCenter(player))
+                    .minus(player.collider.center)
+                    .plus(player.transform.position)
                 ;
                 parent.onPipeActivate(player);
             }
         }
-    }
-
-    fun ballCenter(player)
-    {
-        player.springify(); // hack: unroll to adjust collider
-        return Vector2(player.width / 2, Math.floor(player.height - player.collider.height * 0.3));
     }
 
     fun constructor()
@@ -242,7 +237,7 @@ object "Pipe Sensor" is "private", "entity"
     }
 }
 
-object "Pipe Manager" is "private", "awake", "entity"
+object "Pipe Manager"
 {
     public speed = 600; // in px/s
     pipeInSfx = Sound("samples/pipe_in.wav");
@@ -258,7 +253,7 @@ object "Pipe Manager" is "private", "awake", "entity"
         // for each player, create a Pipe Traveler
         for(i = 0; i < Player.count; i++) {
             player = Player[i];
-            travelers[player.name] = spawn("Pipe Traveler").setPlayer(player);
+            travelers[player.id] = spawn("Pipe Traveler").setPlayer(player);
         }
 
         // done
@@ -274,10 +269,10 @@ object "Pipe Manager" is "private", "awake", "entity"
     //
     fun travelerOf(player)
     {
-        if(!travelers.has(player.name))
-            travelers[player.name] = spawn("Pipe Traveler").setPlayer(player);
+        if(!travelers.has(player.id))
+            travelers[player.id] = spawn("Pipe Traveler").setPlayer(player);
 
-        return travelers[player.name];
+        return travelers[player.id];
     }
 
     //
@@ -325,7 +320,7 @@ object "Pipe Manager" is "private", "awake", "entity"
     }
 }
 
-object "Pipe Traveler" is "private", "awake", "entity"
+object "Pipe Traveler"
 {
     player = null;
     rollAnimation = 18;

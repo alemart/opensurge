@@ -1,0 +1,418 @@
+// -----------------------------------------------------------------------------
+// File: flag_icons.spr
+// Description: sprite script for a set of flag icons
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+//
+// The artwork is the freely available, MIT-licensed, GoSquared's Flag Icon Set
+// available at https://github.com/gosquared/flags
+//
+
+sprite "Flag Icon"
+{
+    source_file     "images/ui/flag_icons.png"
+    source_rect     0 32 256 272
+    frame_size      16 16
+    hot_spot        8 8
+
+    custom_properties
+    {
+        // associate each LANG_ID with an animation number
+        // LANG_IDs are defined in the .lng files
+        en_US       1
+        pt_BR       2
+        es_ES       3
+        fr_FR       4
+        de_DE       5
+        nl_NL       6
+        it_IT       7
+        pl_PL       8
+        bs_BA       9
+        ru_RU       10
+        sr_RS       11
+        hr_HR       12
+        eo          31
+    }
+
+    // unknown
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // en_US
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        242
+    }
+
+    // pt_BR
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        34
+    }
+
+    // es_ES
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        72
+    }
+
+    // fr_FR
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        80
+    }
+
+    // de_DE
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        60
+    }
+
+    // nl_NL
+    animation 6
+    {
+        repeat      TRUE
+        fps         8
+        data        173
+    }
+
+    // it_IT
+    animation 7
+    {
+        repeat      TRUE
+        fps         8
+        data        113
+    }
+
+    // pl_PL
+    animation 8
+    {
+        repeat      TRUE
+        fps         8
+        data        188
+    }
+
+    // bs_BA
+    animation 9
+    {
+        repeat      TRUE
+        fps         8
+        data        19
+    }
+
+    // ru_RU
+    animation 10
+    {
+        repeat      TRUE
+        fps         8
+        data        199
+    }
+
+    // sr_RS
+    animation 11
+    {
+        repeat      TRUE
+        fps         8
+        data        198
+    }
+
+    // hr_HR
+    animation 12
+    {
+        repeat      TRUE
+        fps         8
+        data        101
+    }
+
+    // eo
+    animation 31
+    {
+        repeat      TRUE
+        fps         8
+        data        260
+    }
+}
+
+/*
+
+Frame number <=> Country Code (ISO 3166-1) or Flag Name
+
+0   _unknown
+1   _abkhazia
+2   AD
+3   AE
+4   AF
+5   AG
+6   AI
+7   AL
+8   AM
+9   AN
+10  AO
+11  AQ
+12  AR
+13  AS
+14  AT
+15  AU
+16  AW
+17  AX
+18  AZ
+19  BA
+20  _basque-country
+21  BB
+22  BD
+23  BE
+24  BF
+25  BG
+26  BH
+27  BI
+28  BJ
+29  BL
+30  BM
+31  BN
+32  BO
+33  _british-antarctic-territory
+34  BR
+35  BS
+36  BT
+37  BW
+38  BY
+39  BZ
+40  CA
+41  CC
+42  CD
+43  CF
+44  CG
+45  CH
+46  CI
+47  CK
+48  CL
+49  CM
+50  CN
+51  _commonwealth
+52  CO
+53  CR
+54  CU
+55  CV
+56  CW
+57  CX
+58  CY
+59  CZ
+60  DE
+61  DJ
+62  DK
+63  DM
+64  DO
+65  DZ
+66  EC
+67  EE
+68  EG
+69  EH
+70  _england
+71  ER
+72  ES
+73  ET
+74  EU
+75  FI
+76  FJ
+77  FK
+78  FM
+79  FO
+80  FR
+81  GA
+82  GB
+83  GD
+84  GE
+85  GG
+86  GH
+87  GI
+88  GL
+89  GM
+90  GN
+91  _gosquared
+92  GQ
+93  GR
+94  GS
+95  GT
+96  GU
+97  GW
+98  GY
+99  HK
+100 HN
+101 HR
+102 HT
+103 HU
+104 IC
+105 ID
+106 IE
+107 IL
+108 IM
+109 IN
+110 IQ
+111 IR
+112 IS
+113 IT
+114 JE
+115 JM
+116 JO
+117 JP
+118 KE
+119 KG
+120 KH
+121 KI
+122 KM
+123 KN
+124 _kosovo
+125 KP
+126 KR
+127 KW
+128 KY
+129 KZ
+130 LA
+131 LB
+132 LC
+133 LI
+134 LK
+135 LR
+136 LS
+137 LT
+138 LU
+139 LV
+140 LY
+141 MA
+142 _mars
+143 MC
+144 MD
+145 ME
+146 MF
+147 MG
+148 MH
+149 MK
+150 ML
+151 MM
+152 MN
+153 MO
+154 MP
+155 MQ
+156 MR
+157 MS
+158 MT
+159 MU
+160 MV
+161 MW
+162 MX
+163 MY
+164 MZ
+165 _nagorno-karabakh
+166 NA
+167 _nato
+168 NC
+169 NE
+170 NF
+171 NG
+172 NI
+173 NL
+174 NO
+175 _northern-cyprus
+176 NP
+177 NR
+178 NU
+179 NZ
+180 _olympics
+181 OM
+182 PA
+183 PE
+184 PF
+185 PG
+186 PH
+187 PK
+188 PL
+189 PN
+190 PR
+191 PS
+192 PT
+193 PW
+194 PY
+195 QA
+196 _red-cross
+197 RO
+198 RS
+199 RU
+200 RW
+201 SA
+202 SB
+203 _scotland
+204 SC
+205 SD
+206 SE
+207 SG
+208 SH
+209 SI
+210 SK
+211 SL
+212 SM
+213 SN
+214 _somaliland
+215 SO
+216 _south-ossetia
+217 SR
+218 SS
+219 ST
+220 SV
+221 SY
+222 SZ
+223 TC
+224 TD
+225 TF
+226 TG
+227 TH
+228 TJ
+229 TK
+230 TL
+231 TM
+232 TN
+233 TO
+234 TR
+235 TT
+236 TV
+237 TW
+238 TZ
+239 UA
+240 UG
+241 _united-nations
+242 US
+243 UY
+244 UZ
+245 VA
+246 VC
+247 VE
+248 VG
+249 VI
+250 VN
+251 VU
+252 _wales
+253 WF
+254 WS
+255 YE
+256 YT
+257 ZA
+258 ZM
+259 ZW
+260 Esperanto Flag (not in the original icon set)
+
+*/

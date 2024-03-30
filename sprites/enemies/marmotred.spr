@@ -11,8 +11,8 @@ sprite "RedMarmot"
     // NOTE: since the marmot carries the chain on only one side
     //   of the body, sometimes the marmot needs two separate
     //   direction sprites to look consistent.
-    source_file     "images/marmotred.png"
-    source_rect     0 80 240 160
+    source_file     "images/enemies/waterworks_zone.png"
+    source_rect     400 112 240 160
     frame_size      40 40
     hot_spot        20 40
 

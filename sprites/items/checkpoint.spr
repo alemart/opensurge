@@ -24,8 +24,8 @@ sprite "Checkpoint"
     animation 1
     {
         repeat      FALSE
-        fps         24
-        data        1 2 3 4 5 6 7
+        fps         30
+        data        1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
     }
 
     // turned on

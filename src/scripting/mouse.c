@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * mouse.c - scripting system: mouse input
- * Copyright (C) 2018, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@
 #include "scripting.h"
 #include "../core/video.h"
 #include "../core/input.h"
+#include "../util/djb2.h"
 
 /* private */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -37,13 +38,12 @@ static surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const 
 static surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getscrollup(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getscrolldown(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static uint64_t hash(const char *str);
 static const surgescript_heapptr_t POSITION_ADDR = 0;
 
 /* button hashes */
-#define BUTTON_LEFT         UINT64_C(0x17C9A03B0)         /* hash("left") */
-#define BUTTON_RIGHT        UINT64_C(0x3110494163)        /* hash("right") */
-#define BUTTON_MIDDLE       UINT64_C(0x6530DC5EBD4)       /* hash("middle") */
+#define BUTTON_LEFT     DJB2_CONST('l','e','f','t')
+#define BUTTON_RIGHT    DJB2_CONST('r','i','g','h','t')
+#define BUTTON_MIDDLE   DJB2_CONST('m','i','d','d','l','e')
 
 /*
  * scripting_register_mouse()
@@ -118,12 +118,10 @@ surgescript_var_t* fun_getposition(surgescript_object_t* object, const surgescri
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, POSITION_ADDR));
     surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
-    v2d_t screen_size = video_get_screen_size();
-    v2d_t window_size = video_get_window_size();
-    v2d_t m = v2d_new(screen_size.x / window_size.x, screen_size.y / window_size.y);
-    v2d_t pos = input_get_xy((inputmouse_t*)surgescript_object_userdata(object));
+    v2d_t window_coordinates = input_get_xy((inputmouse_t*)surgescript_object_userdata(object));
+    v2d_t screen_coordinates = video_convert_window_to_screen(window_coordinates);
 
-    scripting_vector2_update(v2, floor(pos.x * m.x), floor(pos.y * m.y));
+    scripting_vector2_update(v2, screen_coordinates.x, screen_coordinates.y);
 
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
@@ -135,7 +133,7 @@ surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescrip
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
-    switch(hash(button)) {
+    switch(djb2(button)) {
         case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE1));
         case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE2));
         case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_FIRE3));
@@ -150,7 +148,7 @@ surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgesc
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
-    switch(hash(button)) {
+    switch(djb2(button)) {
         case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE1));
         case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE2));
         case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_FIRE3));
@@ -165,10 +163,10 @@ surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surges
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
-    switch(hash(button)) {
-        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE1));
-        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE2));
-        case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_up(input, IB_FIRE3));
+    switch(djb2(button)) {
+        case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE1));
+        case BUTTON_RIGHT:  return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE2));
+        case BUTTON_MIDDLE: return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_FIRE3));
         default:            return surgescript_var_set_bool(surgescript_var_create(), false);
     }
 }
@@ -185,19 +183,4 @@ surgescript_var_t* fun_getscrolldown(surgescript_object_t* object, const surgesc
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_DOWN));
-}
-
-
-
-/* -- private -- */
-
-/* djb2 hash function */
-uint64_t hash(const char *str)
-{
-    int c; uint64_t hash = 5381;
-
-    while((c = *((unsigned char*)(str++))))
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-    return hash;
 }

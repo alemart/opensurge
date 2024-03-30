@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * credits.h - credits scene
- * Copyright (C) 2009  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,5 +26,11 @@ void credits_init(void*);
 void credits_release();
 void credits_update();
 void credits_render();
+
+/* generates the credits text and stores it in statically allocated buffers */
+void credits_text(const char** base_text, int* assets_argc, const char*** assets_argv);
+
+/* credits text of a mod; returns a statically allocated buffer */
+const char* credits_mod_text();
 
 #endif

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * actor.c - scripting system: actor component
- * Copyright (C) 2018, 2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,10 +22,11 @@
 #include <string.h>
 #include <math.h>
 #include "scripting.h"
-#include "../core/v2d.h"
 #include "../core/video.h"
 #include "../core/image.h"
-#include "../core/util.h"
+#include "../util/v2d.h"
+#include "../util/numeric.h"
+#include "../util/util.h"
 #include "../entities/actor.h"
 #include "../entities/camera.h"
 
@@ -34,6 +35,10 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_canbeclippedout(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_gettexturehandle(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getistranslucent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -66,7 +71,6 @@ static const surgescript_heapptr_t DETACHED_ADDR = 2;
 static const surgescript_heapptr_t ANIMATION_ADDR = 3;
 static const surgescript_heapptr_t OFFSET_ADDR = 4;
 static const double DEFAULT_ZINDEX = 0.5;
-static const double DEG2RAD = 0.01745329251994329576;
 static inline surgescript_object_t* get_animation(surgescript_object_t* object);
 
 /*
@@ -100,7 +104,11 @@ void scripting_register_actor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Actor", "get_entity", fun_getentity, 0);
     surgescript_vm_bind(vm, "Actor", "get_offset", fun_getoffset, 0);
     surgescript_vm_bind(vm, "Actor", "set_offset", fun_setoffset, 1);
-    surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 0);
+    surgescript_vm_bind(vm, "Actor", "onRender", fun_onrender, 2);
+    surgescript_vm_bind(vm, "Actor", "__canBeClippedOut", fun_canbeclippedout, 0);
+    surgescript_vm_bind(vm, "Actor", "get___filepathOfRenderable", fun_getfilepathofrenderable, 0);
+    surgescript_vm_bind(vm, "Actor", "get___textureHandle", fun_gettexturehandle, 0);
+    surgescript_vm_bind(vm, "Actor", "get___isTranslucent", fun_getistranslucent, 0);
 
     /* animation methods */
     surgescript_vm_bind(vm, "Actor", "get_animation", fun_getanimation, 0);
@@ -138,7 +146,7 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     surgescript_objecthandle_t transform = scripting_util_require_component(object, "Transform");
     surgescript_objecthandle_t parent_handle = surgescript_object_parent(object); 
     surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
-    bool is_detached = surgescript_object_has_tag(parent, "detached");
+    bool is_detached = scripting_util_is_effectively_detached_entity(parent);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     actor_t* actor = actor_create();
 
@@ -182,10 +190,15 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 /* render */
 surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
-    v2d_t camera = !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
     actor_t* actor = scripting_actor_ptr(object);
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    double camera_x = surgescript_var_get_number(param[0]);
+    double camera_y = surgescript_var_get_number(param[1]);
+    v2d_t camera = v2d_new(camera_x, camera_y);
+    bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
+
+    if(is_detached)
+        camera = v2d_multiply(video_get_screen_size(), 0.5f);
 
     actor->position = scripting_util_world_position(object);
     actor->angle = scripting_util_world_angle(object) * DEG2RAD;
@@ -193,6 +206,77 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
 
     actor_render(actor, camera);
     return NULL;
+}
+
+/* can this renderable be clipped out from the screen, so that no rendering takes place? */
+surgescript_var_t* fun_canbeclippedout(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    actor_t* actor = scripting_actor_ptr(object);
+    bool can_be_clipped_out = !actor->visible || actor->alpha == 0.0f; /* clip out invisible actors */
+
+    /* we do a simple, fast bounding-box check */
+    /* could we leave this to the scissor test...? */
+    if(!can_be_clipped_out && actor->angle == 0.0f && actor->scale.x == 1.0f && actor->scale.y == 1.0f) {
+        surgescript_heap_t* heap = surgescript_object_heap(object);
+        bool is_detached = surgescript_var_get_bool(surgescript_heap_at(heap, DETACHED_ADDR));
+
+        v2d_t screen_size = video_get_screen_size();
+        v2d_t center_of_screen = v2d_multiply(screen_size, 0.5f);
+        v2d_t camera = !is_detached ? camera_get_position() : center_of_screen;
+        v2d_t camera_topleft = v2d_subtract(camera, center_of_screen);
+
+        v2d_t position_in_world_space = scripting_util_world_position(object);
+        v2d_t position_in_screen_space = v2d_subtract(position_in_world_space, camera_topleft);
+
+        const image_t* image = actor_image(actor);
+        int width = image_width(image);
+        int height = image_height(image);
+
+        v2d_t topleft = v2d_subtract(position_in_screen_space, actor->hot_spot);
+        v2d_t bottomright = v2d_add(topleft, v2d_new(width, height));
+
+        can_be_clipped_out = (topleft.x >= screen_size.x) || (bottomright.x <= 0.0f) || (topleft.y >= screen_size.y) || (bottomright.y <= 0.0f);
+    }
+
+    /* done! */
+    return surgescript_var_set_bool(surgescript_var_create(), can_be_clipped_out);
+}
+
+/* the filepath of this renderable (used by the render queue) */
+surgescript_var_t* fun_getfilepathofrenderable(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const actor_t* actor = scripting_actor_ptr(object);
+    const image_t* image = actor_image(actor);
+    const char* filepath = image_filepath(image);
+
+    return surgescript_var_set_string(surgescript_var_create(), filepath);
+}
+
+/* the texture handle of this renderable (used by the render queue) */
+surgescript_var_t* fun_gettexturehandle(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const actor_t* actor = scripting_actor_ptr(object);
+    const image_t* image = actor_image(actor);
+    texturehandle_t tex = image_texture(image);
+
+    return surgescript_var_set_rawbits(surgescript_var_create(), tex);
+}
+
+/* is this renderable translucent? (used by the render queue) */
+surgescript_var_t* fun_getistranslucent(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    actor_t* actor = scripting_actor_ptr(object);
+    bool is_translucent = (actor->alpha < 1.0f); /* doesn't take individual pixels into account */
+
+    if(!is_translucent) {
+        const surgescript_object_t* animation = get_animation(object);
+        const animation_t* anim = scripting_animation_ptr(animation);
+
+        if(animation_has_keyframes(anim)) /* FIXME should be has_keyframes_with_changed_opacity or similar */
+            is_translucent = true;
+    }
+
+    return surgescript_var_set_bool(surgescript_var_create(), is_translucent);
 }
 
 /* __init: set sprite name */
@@ -352,12 +436,10 @@ surgescript_var_t* fun_getentity(surgescript_object_t* object, const surgescript
 /* get offset */
 surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_transform_t* transform = surgescript_object_transform(object);
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_heap_t* heap = surgescript_object_heap(object);
     surgescript_var_t* offset = surgescript_heap_at(heap, OFFSET_ADDR);
     surgescript_objecthandle_t handle;
-    surgescript_object_t* v2;
 
     /* lazy evaluation */
     if(surgescript_var_is_null(offset)) {
@@ -368,9 +450,14 @@ surgescript_var_t* fun_getoffset(surgescript_object_t* object, const surgescript
     else
         handle = surgescript_var_get_objecthandle(offset);
 
+    /* read transform */
+    surgescript_transform_t* transform = surgescript_object_transform(object);
+    float x, y;
+    surgescript_transform_getposition2d(transform, &x, &y);
+
     /* get offset */
-    v2 = surgescript_objectmanager_get(manager, handle);
-    scripting_vector2_update(v2, transform->position.x, transform->position.y);
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, handle);
+    scripting_vector2_update(v2, x, y);
     return surgescript_var_set_objecthandle(surgescript_var_create(), handle);
 }
 
@@ -382,9 +469,9 @@ surgescript_var_t* fun_setoffset(surgescript_object_t* object, const surgescript
     surgescript_objecthandle_t v2h = surgescript_var_get_objecthandle(param[0]);
     double x = 0.0, y = 0.0;
 
-    scripting_vector2_read(surgescript_objectmanager_get(manager, v2h), &x, &y);
-    transform->position.x = x;
-    transform->position.y = y;
+    surgescript_object_t* v2 = surgescript_objectmanager_get(manager, v2h);
+    scripting_vector2_read(v2, &x, &y);
+    surgescript_transform_setposition2d(transform, x, y);
 
     return NULL;
 }

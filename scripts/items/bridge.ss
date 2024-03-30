@@ -203,10 +203,15 @@ object "Bridge Element" is "entity", "private"
     timer = 0;
     ninety = Math.deg2rad(90);
     originalOffset = Vector2.zero;
+    playerOnTheBridge = false;
 
     state "main"
     {
-        //collider.visible = true;
+        // improve collisions
+        if(!playerOnTheBridge)
+            brick.type = "cloud";
+        else
+            brick.type = "solid";
     }
 
     state "collapsing"
@@ -255,6 +260,7 @@ object "Bridge Element" is "entity", "private"
             f1 = (index + 1) / (deepestElementIndex + 1);
             f2 = (length - index) / (length - deepestElementIndex);
             factor = Math.min(f1, f2);
+            sin = Math.sin(ninety * factor);
 
             // update timer
             timer += Time.delta / 0.33;
@@ -262,11 +268,11 @@ object "Bridge Element" is "entity", "private"
                 timer = 1;
 
             // update graphics
-            targetFrame = Math.floor(Math.sin(ninety * factor) * (actor.animation.frameCount - 1));
+            targetFrame = Math.floor(sin * (actor.animation.frameCount - 1));
             actor.animation.frame = targetFrame;
 
             // update position
-            offy = maxDepth * Math.sin(ninety * factor);
+            offy = maxDepth * sin;
             y = Math.smoothstep(0, offy, timer);
             dy = y - transform.localPosition.y;
             transform.translateBy(0, dy);
@@ -276,11 +282,14 @@ object "Bridge Element" is "entity", "private"
                 for(j = 0; j < Player.count; j++) {
                     player = Player[j];
                     if(player.ysp >= 0 && collider.collidesWith(player.collider)) {
-                        ddy = player == Player.active ? Math.max(0, dy - 0.7) : dy;
-                        player.transform.translateBy(0, ddy);
+                        ddy = player.hasFocus() ? Math.max(0, dy - 0.7) : dy;
+                        player.moveBy(0, ddy);
                     }
                 }
             }
+
+            // a player is on the bridge
+            playerOnTheBridge = true;
         }
         else if(timer > 0) { // bridge going back to normal
             // update timer
@@ -296,11 +305,15 @@ object "Bridge Element" is "entity", "private"
             y = Math.smoothstep(0, offy, timer);
             dy = y - transform.localPosition.y;
             transform.translateBy(0, dy);
+
+            // a player is not on the bridge
+            playerOnTheBridge = false;
         }
         else {
             // no movement
             actor.animation.frame = 0;
             transform.localPosition = originalOffset;
+            playerOnTheBridge = false;
         }
     }
 
@@ -328,6 +341,7 @@ object "Bridge Element" is "entity", "private"
     fun constructor()
     {
         brick.type = "cloud";
+        collider.enabled = false; // optimize; no need to call onCollision()
     }
 }
 

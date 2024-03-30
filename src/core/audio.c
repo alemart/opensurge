@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * audio.c - audio module
- * Copyright (C) 2008-2012, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,12 +20,13 @@
 
 #include <stdlib.h>
 #include "audio.h"
-#include "assetfs.h"
-#include "stringutil.h"
+#include "asset.h"
 #include "resourcemanager.h"
 #include "logfile.h"
 #include "timer.h"
-#include "util.h"
+#include "video.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 #define ALLEGRO_UNSTABLE
 #include <allegro5/allegro.h>
@@ -51,8 +52,14 @@ struct sound_t {
 };
 
 /* private stuff */
-static const int PREFERRED_NUMBER_OF_SAMPLES = 32; /* how many samples can be played at the same time */
+static const int PREFERRED_NUMBER_OF_SAMPLES = 16; /* how many samples can be played at the same time */
+
 static music_t *current_music = NULL; /* music being played at the moment (NULL if none) */
+static float master_volume = 1.0f; /* a value in [0,1] affecting all musics and sounds */
+static bool globally_muted = false; /* global mute / unmute */
+
+static int preload_sample(const char* vpath, void* data);
+static void set_global_gain(float gain);
 
 /*
  * music_load()
@@ -66,7 +73,7 @@ music_t *music_load(const char *path)
         return NULL;
 
     if(NULL == (m = resourcemanager_find_music(path))) {
-        const char* fullpath = assetfs_fullpath(path);
+        const char* fullpath = asset_path(path);
         logfile_message("Loading music \"%s\"...", fullpath);
 
         /* build the music object */
@@ -269,6 +276,9 @@ bool music_is_paused()
     return (current_music != NULL) && (current_music->is_paused);
 }
 
+
+
+
 /* sound management */
 
 
@@ -282,7 +292,7 @@ sound_t *sound_load(const char *path)
 
     if(NULL == (s = resourcemanager_find_sample(path))) {
         ALLEGRO_SAMPLE_INSTANCE* spl;
-        const char* fullpath = assetfs_fullpath(path);
+        const char* fullpath = asset_path(path);
         logfile_message("Loading sound \"%s\"...", fullpath);
 
         /* build the sound object */
@@ -373,7 +383,7 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
 
         /* play the sample */
         if(al_play_sample(sample->sample, vol, pan, freq, ALLEGRO_PLAYMODE_ONCE, &sample->id)) {
-            sample->end_time = (0.001f * timer_get_ticks()) + sample->duration; /* when does it end? */
+            sample->end_time = timer_get_elapsed() + sample->duration; /* when does it end? */
             sample->valid_id = true;
             sample->volume = vol;
         }
@@ -407,7 +417,7 @@ void sound_stop(sound_t *sample)
 bool sound_is_playing(sound_t *sample)
 {
     if(sample != NULL)
-        return (0.001f * timer_get_ticks()) < sample->end_time;
+        return timer_get_elapsed() < sample->end_time;
     else
         return false;
 
@@ -474,18 +484,22 @@ void sound_set_volume(sound_t *sample, float volume)
  */
 void audio_init()
 {
-    int samples;
-
     logfile_message("Initializing the audio system...");
     current_music = NULL;
+    master_volume = 1.0f;
+    globally_muted = false;
 
-    if(!al_install_audio())
-        fatal_error("Can't initialize Allegro's audio addon");
+    if(!al_is_audio_installed()) {
+        if(!al_install_audio())
+            fatal_error("Can't initialize Allegro's audio addon");
+    }
 
-    if(!al_init_acodec_addon())
-        fatal_error("Can't initialize Allegro's acodec addon");
+    if(!al_is_acodec_addon_initialized()) {
+        if(!al_init_acodec_addon())
+            fatal_error("Can't initialize Allegro's acodec addon");
+    }
 
-    for(samples = PREFERRED_NUMBER_OF_SAMPLES; samples > 0; samples /= 2) {
+    for(int samples = PREFERRED_NUMBER_OF_SAMPLES; samples > 0; samples /= 2) {
         if(al_reserve_samples(samples)) {
             logfile_message("Reserved %d samples", samples);
             break;
@@ -518,4 +532,80 @@ void audio_update()
             current_music = NULL;
         }
     }
+}
+
+/*
+ * audio_preload()
+ * Preload samples
+ */
+void audio_preload()
+{
+    assertx(resourcemanager_is_initialized());
+    logfile_message("Preloading samples...");
+
+    /* preload the samples, so that we don't access the disk during gameplay */
+    asset_foreach_file("samples/", ".wav", preload_sample, NULL, true);
+    /*asset_foreach_file("samples/", ".ogg", preload_sample, NULL, true);*/
+}
+
+/*
+ * audio_get_master_volume()
+ * Get the master volume affecting all musics and samples
+ */
+float audio_get_master_volume()
+{
+    return master_volume;
+}
+
+/*
+ * audio_set_master_volume()
+ * Set the master volume affecting all musics and samples
+ * 0.0 <= volume <= 1.0 (default)
+ */
+void audio_set_master_volume(float volume)
+{
+    master_volume = clip(volume, 0.0f, 1.0f);
+    set_global_gain(!globally_muted ? master_volume : 0.0f);
+}
+
+/*
+ * audio_is_muted()
+ * Is the audio globally muted?
+ */
+bool audio_is_muted()
+{
+    return globally_muted;
+}
+
+/*
+ * audio_set_mute()
+ * Globally mute / unmute the audio
+ */
+void audio_set_muted(bool muted)
+{
+    globally_muted = muted;
+    set_global_gain(!globally_muted ? master_volume : 0.0f);
+}
+
+
+
+/* private */
+
+int preload_sample(const char* vpath, void* data)
+{
+    sound_load(vpath);
+    return 0;
+}
+
+void set_global_gain(float gain)
+{
+    ALLEGRO_MIXER* mixer = al_get_default_mixer();
+
+    if(mixer == NULL) {
+        video_showmessage("Can't set the global gain to %f: no mixer", gain);
+        return;
+    }
+
+    if(!al_set_mixer_gain(mixer, gain))
+        video_showmessage("Can't set the global gain to %f", gain);
 }

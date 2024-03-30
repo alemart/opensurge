@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * surgeengine.c - scripting system: SurgeEngine plugin
- * Copyright (C) 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,36 @@
 
 #include <surgescript.h>
 #include "../core/global.h"
+#include "../entities/mobilegamepad.h"
+
+/* private */
+static surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getmobile(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static const char code_in_surgescript[];
+
+/*
+ * scripting_register_surgeengine()
+ * Register SurgeEngine
+ */
+void scripting_register_surgeengine(surgescript_vm_t* vm)
+{
+    surgescript_vm_bind(vm, "SurgeEngine", "get_version", fun_getversion, 0);
+    surgescript_vm_bind(vm, "SurgeEngine", "get_mobile", fun_getmobile, 0);
+
+    surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
+}
+
+/* the version of the game engine, as a string */
+surgescript_var_t* fun_getversion(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_string(surgescript_var_create(), GAME_VERSION_STRING);
+}
+
+/* checks whether or not the engine has been **SUCCESSFULLY** launched in mobile mode */
+surgescript_var_t* fun_getmobile(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    return surgescript_var_set_bool(surgescript_var_create(), mobilegamepad_is_available());
+}
 
 /* SurgeScript code */
 static const char code_in_surgescript[] = "\
@@ -40,9 +70,10 @@ object 'SurgeEngine' \n\
     public readonly Input = spawn('InputFactory'); \n\
     public readonly Camera = spawn('Camera'); \n\
     public readonly Collisions = spawn('Collision'); \n\
-    public readonly UI = spawn('UI'); \n\
     public readonly Events = spawn('Events'); \n\
-    public readonly version = '" GAME_VERSION_STRING "'; \n\
+    public readonly UI = spawn('UI'); \n\
+    public readonly Platform = spawn('Platform'); \n\
+    public readonly Game = spawn('GameSettings'); \n\
 \n\
     fun get_Level() \n\
     { \n\
@@ -51,7 +82,7 @@ object 'SurgeEngine' \n\
 \n\
     fun get_Player() \n\
     { \n\
-        return LevelManager.playerManager; \n\
+        return LevelManager.currentLevel.__playerManager; \n\
     } \n\
 \n\
     fun get_Behavior() { return Behaviors; } \n\
@@ -138,6 +169,7 @@ object 'SensorFactory' \n\
 object 'InputFactory' \n\
 { \n\
     public readonly Mouse = spawn('Mouse'); \n\
+    public readonly MobileGamepad = spawn('MobileGamepad'); \n\
 \n\
     fun call(inputMap) \n\
     { \n\
@@ -229,6 +261,7 @@ object 'VectorFactory' \n\
     public readonly down = spawn('Vector2').__init(0, 1); \n\
     public readonly left = spawn('Vector2').__init(-1, 0); \n\
     public readonly zero = spawn('Vector2').__init(0, 0); \n\
+    public readonly one = spawn('Vector2').__init(1, 1); \n\
     temp = System.child('__Temp'); \n\
 \n\
     fun call(x, y) \n\
@@ -272,13 +305,6 @@ object 'SoundFactory' \n\
         sound.__init(pathToSound); \n\
         return sound; \n\
     } \n\
-\n\
-    fun destroy() { } \n\
-} \n\
-\n\
-object 'Video' \n\
-{ \n\
-    public readonly Screen = spawn('Screen'); \n\
 \n\
     fun destroy() { } \n\
 } \n\
@@ -356,11 +382,4 @@ object 'EventChainFactory' \n\
 } \n\
 ";
 
-/*
- * scripting_register_surgeengine()
- * Register SurgeEngine
- */
-void scripting_register_surgeengine(surgescript_vm_t* vm)
-{
-    surgescript_vm_compile_code_in_memory(vm, code_in_surgescript);
-}
+/* EOF */

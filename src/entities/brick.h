@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * brick.h - brick module
- * Copyright (C) 2008-2012, 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 #ifndef _BRICK_H
 #define _BRICK_H
 
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 #include "../core/color.h"
 
 /* brick type */
@@ -62,8 +62,6 @@ enum brickflip_t {
 /* forward declarations */
 struct actor_t;
 struct player_t;
-struct item_list_t;
-struct enemy_list_t;
 struct obstacle_t;
 struct brickdata_t;
 struct brick_t;
@@ -92,9 +90,11 @@ int brickset_loaded(); /* is a brickset loaded? */
 /* brick interface */
 brick_t* brick_create(int id, v2d_t position, bricklayer_t layer, brickflip_t flip_flags); /* creates a new brick */
 brick_t* brick_destroy(brick_t *brk); /* destroys an existing brick */
-void brick_update(brick_t *brk, struct player_t** team, int team_size, struct brick_list_t *brick_list, struct item_list_t *item_list, struct enemy_list_t *enemy_list); /* updates a brick */
+void brick_update(brick_t *brk, struct player_t** team, int team_size); /* updates a brick */
 void brick_render(brick_t *brk, v2d_t camera_position); /* renders a brick */
-void brick_render_mask(brick_t *brk, v2d_t camera_position); /* renders the mask of a brick */
+void brick_render_debug(brick_t *brk, v2d_t camera_position); /* renders a brick (editor) */
+void brick_render_mask(const brick_t *brk, v2d_t camera_position); /* renders the mask of a brick */
+void brick_render_path(const brick_t *brk, v2d_t camera_position); /* renders the path of a moving brick (editor) */
 
 /* brick properties & operations */
 int brick_id(const brick_t* brk); /* brick id (its number in the brickset) */
@@ -110,6 +110,8 @@ v2d_t brick_spawnpoint(const brick_t* brk); /* brick spawn point */
 v2d_t brick_size(const brick_t* brk); /* brick size, in pixels */
 void brick_kill(brick_t* brk); /* kills a brick */
 int brick_is_alive(const brick_t* brk); /* checks if a brick is alive */
+bool brick_has_movement_path(const brick_t* brk); /* checks if a brick has a movement path */
+bool brick_has_mask(const brick_t* brk); /* checks if a brick has a collision mask */
 
 /* brick utilities */
 int brick_exists(int id); /* does a brick with the given id exist in the brickset? */
@@ -120,7 +122,6 @@ const char* brick_util_typename(bricktype_t type); /* type name */
 const char* brick_util_behaviorname(brickbehavior_t behavior); /* behavior name */
 const char* brick_util_layername(bricklayer_t layer); /* layer name */
 const char* brick_util_flipstr(brickflip_t flip); /* flip string */
-void brick_render_path(const brick_t *brk, v2d_t camera_position); /* movable platforms path */
 int brick_image_flags(brickflip_t flip); /* convert flags: brick flip to image flip */
 const struct image_t* brick_image_preview(int id); /* image of the brick having the given id (may be NULL) */
 bricktype_t brick_type_preview(int id); /* the type of the brick having the given id */

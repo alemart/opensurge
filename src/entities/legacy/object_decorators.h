@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * object_decorators.h - Legacy scripting API: commands
- * Copyright (C) 2010-2013, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

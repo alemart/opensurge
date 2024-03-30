@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * item.c - legacy items (replaced by SurgeScript)
- * Copyright (C) 2008-2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,16 +29,18 @@
 #include "../actor.h"
 #include "../sfx.h"
 
-#include "../../core/v2d.h"
 #include "../../core/global.h"
-#include "../../core/util.h"
-#include "../../core/stringutil.h"
 #include "../../core/timer.h"
 #include "../../core/video.h"
 #include "../../core/image.h"
 #include "../../core/color.h"
 #include "../../core/font.h"
 #include "../../core/audio.h"
+
+#include "../../util/v2d.h"
+#include "../../util/numeric.h"
+#include "../../util/util.h"
+#include "../../util/stringutil.h"
 
 #include "../../scenes/quest.h"
 #include "../../scenes/level.h"
@@ -1003,7 +1005,7 @@ void state_idle_handle(state_t *state, item_t *item, player_t **team, int team_s
             actor_change_animation(act, sprite_get_animation("SD_ENDLEVEL", 1));
             sound_play(SFX_BOSSHIT);
             player_bounce_ex(player, act, FALSE);
-            player->actor->speed.x *= -0.5;
+            player_set_speed(player, player_speed(player) * -0.5f);
 
             if(++(s->hit_count) >= 3) /* 3 hits and you're done */
                 animalprison_set_state(item, state_exploding_new());
@@ -1474,7 +1476,8 @@ void bump(item_t *bumper, player_t *player)
 
 
 
-    v0 = player->actor->speed; /* initial speed of the player */
+    v0.x = player_xsp(player); /* initial speed of the player */
+    v0.y = player_ysp(player);
     v0.x = (v0.x < 0) ? min(-300, v0.x) : max(300, v0.x);
 
 
@@ -1490,13 +1493,16 @@ void bump(item_t *bumper, player_t *player)
 
 
 
-    player->actor->speed = v2d_multiply(
+    v2d_t new_speed = v2d_multiply(
         v2d_add(
             v0,
             v2d_multiply(separation_speed, -mass_ratio)
         ),
         1.0f / (mass_ratio + 1.0f)
     );
+
+    player_set_xsp(player, new_speed.x);
+    player_set_ysp(player, new_speed.y);
 
     act->speed = v2d_multiply(
         v2d_add(v0, separation_speed),
@@ -2007,7 +2013,7 @@ void dnadoor_update(item_t* item, player_t** team, int team_size, brick_list_t* 
     for(i=0; i<team_size; i++) {
         player_t *player = team[i];
         if(!player_is_dying(player) && dnadoor_hittest(player, item)) {
-            if(str_icmp(player->name, me->authorized_player_name) == 0) {
+            if(str_icmp(player_name(player), me->authorized_player_name) == 0) {
                 item->obstacle = FALSE;
                 collision = player_collision(player, act);
             }
@@ -2247,11 +2253,11 @@ void endsign_update(item_t* item, player_t** team, int team_size, brick_list_t* 
         if(actor_animation_finished(act)) {
             int anim_id;
 
-            if(str_icmp(me->who->name, "Surge") == 0)
+            if(str_icmp(player_name(me->who), "Surge") == 0)
                 anim_id = 2;
-            else if(str_icmp(me->who->name, "Neon") == 0)
+            else if(str_icmp(player_name(me->who), "Neon") == 0)
                 anim_id = 3;
-            else if(str_icmp(me->who->name, "Charge") == 0)
+            else if(str_icmp(player_name(me->who), "Charge") == 0)
                 anim_id = 4;
             else
                 anim_id = 5;
@@ -2570,23 +2576,28 @@ void icon_update(item_t* item, player_t** team, int team_size, brick_list_t* bri
         act->position.y -= 40.0f * dt;
     }
     else if(me->elapsed_time >= 2.5f) {
+        #if 0
         /* death */
         int i, j;
         int x = (int)(act->position.x-act->hot_spot.x);
         int y = (int)(act->position.y-act->hot_spot.y);
-        image_t *img = actor_image(act), *particle;
+        image_t *img = actor_image(act);
         int w = image_width(img), h = image_height(img);
 
         /* particle party! :) */
         for(i=0; i<h; i++) {
             for(j=0; j<w; j++) {
-                particle = image_clone_region(img, j, i, 1, 1);
-                level_create_particle(particle, v2d_new(x+j, y+i), v2d_new(
-                    (j - w/2) * 2.0f + (random(w) - w/2),
-                    (i - h/2) * 2.0f + (random(h) - h/2)
-                ), FALSE);
+                level_create_particle(
+                    img, j, i, 1, 1,
+                    v2d_new(x+j, y+i),
+                    v2d_new(
+                        (j - w/2) * 2.0f + (random(w) - w/2),
+                        (i - h/2) * 2.0f + (random(h) - h/2)
+                    )
+                );
             }
         }
+        #endif
 
         /* done */
         item->state = IS_DEAD;
@@ -2724,7 +2735,7 @@ void starbox_strategy(item_t *item, player_t *player)
 void speedbox_strategy(item_t *item, player_t *player)
 {
     level_add_to_score(100);
-    player_set_turbo(player, TRUE);
+    player_set_turbocharged(player, TRUE);
     music_play(music_load("musics/speed.ogg"), false);
 }
 
@@ -2849,7 +2860,7 @@ void itembox_update(item_t* item, player_t** team, int team_size, brick_list_t* 
     }
 
     /* animation */
-    me->anim_id = me->anim_id < 3 ? get_anim_id( level_player()->name ) : me->anim_id;
+    me->anim_id = me->anim_id < 3 ? get_anim_id( player_name(level_player()) ) : me->anim_id;
     actor_change_animation(item->actor, sprite_get_animation("SD_ITEMBOX", me->anim_id));
 }
 
@@ -2876,7 +2887,7 @@ int get_anim_id(const char *player_name)
 typedef struct loop_t loop_t;
 struct loop_t {
     item_t item; /* base class */
-    animation_t *animation;
+    const animation_t *animation;
     bricklayer_t layer_to_be_activated;
 
     int *player_was_touching_me;
@@ -3527,7 +3538,7 @@ void volatilespring_strategy(item_t *item, player_t *player)
 /* springs using the classic strategy are activated when you jump on them */
 void classicspring_strategy(item_t *item, player_t *player)
 {
-    if(player->actor->speed.y >= 1.0f || !nearly_zero(player->actor->angle))
+    if(player_ysp(player) >= 1.0f || !nearly_zero(player->actor->angle))
         activate_spring((spring_t*)item, player);
 }
 
@@ -3554,7 +3565,7 @@ item_t* spring_create(void (*strategy)(item_t*,player_t*), const char *sprite_na
 void spring_init(item_t *item)
 {
     spring_t *me = (spring_t*)item;
-    image_t* img;
+    const image_t* img;
     v2d_t v;
 
     item->always_active = FALSE;
@@ -3636,14 +3647,17 @@ void spring_render(item_t* item, v2d_t camera_position)
 /* 'springfy' player */
 void springfy_player(player_t *player, v2d_t strength)
 {
-    actor_t *act = player->actor;
-
-    if(!nearly_zero(strength.y) && !nearly_zero(strength.x))
-        act->speed = strength;
-    else if(!nearly_zero(strength.y))
-        act->speed.y = strength.y;
+    if(!nearly_zero(strength.y) && !nearly_zero(strength.x)) {
+        player_set_xsp(player, strength.x);
+        player_set_ysp(player, strength.y);
+        player_detach_from_ground(player);
+    }
+    else if(!nearly_zero(strength.y)) {
+        player_set_ysp(player, strength.y);
+        player_detach_from_ground(player);
+    }
     else if(!nearly_zero(strength.x)) {
-        act->speed.x = strength.x;
+        player_set_speed(player, strength.x);
         player_lock_horizontally_for(player, 0.27f);
     }
 }
@@ -3660,7 +3674,7 @@ void activate_spring(spring_t *spring, player_t *player)
 
     if(!nearly_zero(spring->strength.y)) {
         player_detach_from_ground(player);
-        player_spring(player);
+        player_springify(player);
     }
 
     if(!nearly_zero(spring->strength.x)) {
@@ -3670,7 +3684,7 @@ void activate_spring(spring_t *spring, player_t *player)
             player->actor->mirror |= IF_HFLIP;
     }
     else
-        player_spring(player);
+        player_springify(player);
 
     if(spring->bang_timer > SPRING_BANG_TIMER) {
         sound_play(SFX_SPRING);
@@ -4016,7 +4030,7 @@ void teleporter_activate(item_t *teleporter, player_t *who)
         me->is_active = TRUE;
         me->who = who;
 
-        input_ignore(who->actor->input);
+        input_disable(who->actor->input);
         level_set_camera_focus(act);
         sound_play(SFX_TELEPORTER);
     }
@@ -4062,7 +4076,7 @@ void teleporter_update(item_t* item, player_t** team, int team_size, brick_list_
             /* okay, teleport them all! */
             player_t *who = me->who; /* who has activated the teleporter? */
 
-            input_restore(who->actor->input);
+            input_enable(who->actor->input);
             level_set_camera_focus(who->actor);
 
             for(i=0; i<team_size; i++) {
@@ -4095,8 +4109,10 @@ void teleporter_render(item_t* item, v2d_t camera_position)
 /* teleports the player to the given position */
 void teleport_player_to(player_t *player, v2d_t position)
 {
-    player->actor->position = position;
-    player->actor->speed = v2d_new(0,0);
-    player->actor->angle = 0;
+    player_set_position(player, position);
+    player_set_angle(player, 0.0f);
+    player_set_gsp(player, 0.0f);
+    player_set_xsp(player, 0.0f);
+    player_set_ysp(player, 0.0f);
 }
 

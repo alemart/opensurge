@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * audio.h - audio module
- * Copyright (C) 2008-2009, 2012, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,12 @@ typedef struct sound_t sound_t;
 void audio_init();
 void audio_update();
 void audio_release();
+void audio_preload();
+
+float audio_get_master_volume();
+void audio_set_master_volume(float volume); /* 0.0 <= volume <= 1.0 (default) */
+bool audio_is_muted();
+void audio_set_muted(bool muted); /* global mute / unmute */
 
 /* music management */
 music_t *music_load(const char *path); /* will be unloaded automatically */

@@ -1,0 +1,242 @@
+// -----------------------------------------------------------------------------
+// File: item_picker.spr
+// Description: sprite script of the Item Picker (Debug Mode)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+sprite "Debug Mode - Item Picker - Back"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     32 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Specials"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     64 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Basics"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     96 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Powerups"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     128 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Gimmicks"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     160 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Enemies"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     192 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Bosses"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     224 0 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+
+
+
+
+
+
+sprite "Debug Mode - Item Picker - Camera"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     0 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Camera - Player Mode"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     32 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Camera - Free Look Mode"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     64 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Camera - Scroll Mode"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     96 32 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+
+
+
+
+
+sprite "Debug Mode - Item Picker - Grid"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     0 64 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Grid - Off"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     32 64 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Grid - 8 pixels"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     64 64 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Picker - Grid - 16 pixels"
+{
+    source_file     "images/debug_mode/item_picker.png"
+    source_rect     96 64 32 32
+    frame_size      32 32
+    hot_spot        16 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

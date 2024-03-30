@@ -1,0 +1,31 @@
+// -----------------------------------------------------------------------------
+// File: secondary.in
+// Description: secondary input map
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// The secondary input map is similar to the default input map, except that it
+// accepts input from a second joystick. It's typically used for Player 2.
+inputmap "secondary"
+{
+    // default mapping for XInput controllers in Allegro
+    // (standard gamepad based on the layout of the Xbox 360 controller)
+    joystick 2
+    {
+        up              BUTTON_14                       // D-pad
+        right           BUTTON_11
+        down            BUTTON_13
+        left            BUTTON_12
+
+        fire1           BUTTON_1 | BUTTON_3 | BUTTON_4  // A, X, Y
+        fire2           BUTTON_2                        // B
+        fire3           BUTTON_10                       // START
+        fire4           BUTTON_9                        // BACK / SELECT
+
+        fire5           BUTTON_6                        // L1
+        fire6           BUTTON_5                        // R1
+        fire7           BUTTON_8                        // THUMBL
+        fire8           BUTTON_7                        // THUMBR
+    }
+}

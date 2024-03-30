@@ -1,0 +1,22 @@
+// -----------------------------------------------------------------------------
+// File: end_of_demo.spr
+// Description: sprite script - "End of Demo" scene
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "End of Demo - Pointer"
+{
+    source_file     "images/scenes/end_of_demo.png"
+    source_rect     432 0 22 11
+    frame_size      11 11
+    hot_spot        12 -2
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         4
+        data        0 1
+    }
+}
+

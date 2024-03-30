@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * editorgrp.c - level editor: groups
- * Copyright (C) 2010, 2012, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,10 +25,10 @@
 #include "../../entities/legacy/item.h"
 #include "../../entities/legacy/enemy.h"
 #include "../../core/logfile.h"
-#include "../../core/assetfs.h"
-#include "../../core/util.h"
-#include "../../core/stringutil.h"
-#include "../../core/nanoparser/nanoparser.h"
+#include "../../core/asset.h"
+#include "../../core/nanoparser.h"
+#include "../../util/util.h"
+#include "../../util/stringutil.h"
 
 /* internal data */
 #define EDITORGRP_MAX_GROUPS        512
@@ -112,7 +112,7 @@ editorgrp_entity_list_t* editorgrp_get_group(int id)
 void read_from_file(const char *filename)
 {
     parsetree_program_t *prog;
-    const char* fullpath = assetfs_fullpath(filename);
+    const char* fullpath = asset_path(filename);
 
     logfile_message("Loading group file \"%s\"...", filename);
 

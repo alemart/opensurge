@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * object_compiler.h - compiles legacy object scripts
- * Copyright (C) 2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #define _OBJECT_COMPILER_H
 
 #include "object_vm.h"
+#include "../../core/nanoparser.h"
 
 void objectcompiler_compile(object_t *obj, const parsetree_program_t *script);
 

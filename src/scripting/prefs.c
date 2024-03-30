@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * prefs.c - scripting system: prefs
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,6 @@
 
 #include <surgescript.h>
 #include "../core/prefs.h"
-#include "../core/modmanager.h"
 
 /* private */
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -62,7 +61,7 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    prefs_t* prefs = modmanager_prefs();
+    extern prefs_t* prefs;
     surgescript_object_set_userdata(object, prefs);
     return NULL;
 }
@@ -118,37 +117,32 @@ surgescript_var_t* fun_set(surgescript_object_t* object, const surgescript_var_t
     prefs_t* prefs = (prefs_t*)surgescript_object_userdata(object);
     char* key = surgescript_var_get_string(param[0], manager);
 
-    switch(surgescript_var_typecode(param[1])) {
-        case 'b':
-            prefs_set_bool(prefs, key, surgescript_var_get_bool(param[1]));
-            break;
-        case 'n':
-            prefs_set_double(prefs, key, surgescript_var_get_number(param[1]));
-            break;
-        case 's':
-            prefs_set_string(prefs, key, surgescript_var_fast_get_string(param[1]));
-            break;
-        case 'o': {
-            /* convert object to string: using toString() */
-            surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[1]);
-            surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
-            if(obj != NULL) {
-                surgescript_var_t* tmp = surgescript_var_create();
-                char* str = NULL;
-                surgescript_object_call_function(obj, "toString", NULL, 0, tmp);
-                str = surgescript_var_get_string(tmp, manager);
-                prefs_set_string(prefs, key, str);
-                ssfree(str);
-                surgescript_var_destroy(tmp);
-            }
-            else
-                prefs_set_null(prefs, key);
-            break;
+    if(surgescript_var_is_objecthandle(param[1])) {
+
+        /* convert object to string: using toString() */
+        surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[1]);
+        surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
+        if(obj != NULL) {
+            surgescript_var_t* tmp = surgescript_var_create();
+            char* str = NULL;
+            surgescript_object_call_function(obj, "toString", NULL, 0, tmp);
+            str = surgescript_var_get_string(tmp, manager);
+            prefs_set_string(prefs, key, str);
+            ssfree(str);
+            surgescript_var_destroy(tmp);
         }
-        default:
+        else
             prefs_set_null(prefs, key);
-            break;
+
     }
+    else if(surgescript_var_is_string(param[1]))
+        prefs_set_string(prefs, key, surgescript_var_fast_get_string(param[1]));
+    else if(surgescript_var_is_number(param[1]))
+        prefs_set_double(prefs, key, surgescript_var_get_number(param[1]));
+    else if(surgescript_var_is_bool(param[1]))
+        prefs_set_bool(prefs, key, surgescript_var_get_bool(param[1]));
+    else
+        prefs_set_null(prefs, key);
 
     ssfree(key);
     return NULL;

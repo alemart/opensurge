@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * editorhelp.c - level editor help
- * Copyright (C) 2011, 2018, 2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,10 +20,10 @@
 
 #include <stdbool.h>
 #include "editorhelp.h"
+#include "../util/util.h"
 #include "../core/font.h"
 #include "../core/scene.h"
 #include "../core/audio.h"
-#include "../core/util.h"
 #include "../core/color.h"
 #include "../core/video.h"
 #include "../core/image.h"
@@ -88,7 +88,7 @@ void editorhelp_init(void *foo)
     int box_xpos, box_ypos, box_width, box_height;
 
     /* setup background & input device */
-    background = image_clone(video_get_backbuffer());
+    background = video_take_snapshot();
     in = input_create_user("editorhelp");
 
     /* configure the text columns */

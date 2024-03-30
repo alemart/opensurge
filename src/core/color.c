@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * color.c - color utility
- * Copyright (C) 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,8 +19,9 @@
  */
 
 #include <string.h>
-#include "stringutil.h"
 #include "color.h"
+#include "../util/stringutil.h"
+#include "../util/numeric.h"
 
 /*
  * color_rgb()
@@ -36,6 +37,7 @@ color_t color_rgb(uint8_t r, uint8_t g, uint8_t b)
  * color_rgba()
  * Generates a color from its RGBA components
  * 0 <= r, g, b, a <= 255
+ * Note: color_premul_rgba() may be preferable over this
  */
 color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
@@ -43,9 +45,47 @@ color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 }
 
 /*
+ * color_premul_rgba()
+ * Generates a color from its RGBA components
+ * The RGB components will be premultiplied by the alpha value
+ * 0 <= r, g, b, a <= 255
+ */
+color_t color_premul_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    float rf = (float)r / 255.0f;
+    float gf = (float)g / 255.0f;
+    float bf = (float)b / 255.0f;
+    float af = (float)a / 255.0f;
+
+    return (color_t){ al_map_rgba_f(rf * af, gf * af, bf * af, af) };
+}
+
+/*
+ * color_mix()
+ * Blend two colors, x and y, linearly in RGBA space with t in [0,1]
+ */
+color_t color_mix(color_t x, color_t y, float t)
+{
+    float r, g, b, a;
+    uint8_t xr, xg, xb, xa;
+    uint8_t yr, yg, yb, ya;
+
+    color_unmap(x, &xr, &xg, &xb, &xa);
+    color_unmap(y, &yr, &yg, &yb, &ya);
+
+    r = lerp((float)xr, (float)yr, t);
+    g = lerp((float)xg, (float)yg, t);
+    b = lerp((float)xb, (float)yb, t);
+    a = lerp((float)xa, (float)ya, t);
+
+    return color_rgba(r, g, b, a);
+}
+
+/*
  * color_hex()
  * Converts a 3, 6 or 8-character RGB[A] hex string to a color
  * Example: "fff" becomes white; "ff8800" becomes orange
+ * Note: this will return a color with premultiplied alpha
  */
 color_t color_hex(const char* hex_string)
 {
@@ -77,7 +117,7 @@ color_t color_hex(const char* hex_string)
     }
 
     /* done! */
-    return color_rgba(r, g, b, a);
+    return color_premul_rgba(r, g, b, a);
 }
 
 /*

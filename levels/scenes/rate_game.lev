@@ -1,0 +1,11 @@
+name "Rate the Game"
+author "Alexandre Martins"
+license "CC BY 4.0"
+version "1.0"
+requires "0.6.1"
+act 1
+theme "themes/none.brk"
+bgtheme "themes/scenes/rate_game.bg"
+setup "Rate the Game"
+players "None"
+readonly

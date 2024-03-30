@@ -16,6 +16,10 @@ object "Lock Angle" is "companion"
 
     state "main"
     {
+    }
+
+    fun lateUpdate()
+    {
         player.angle = 0;
     }
 }

@@ -9,7 +9,7 @@
 sprite "Neon"
 {
     source_file     "images/neon.png"
-    source_rect     0 0 500 600
+    source_rect     0 32 500 600
     frame_size      50 50
     hot_spot        25 30
 
@@ -141,12 +141,13 @@ sprite "Neon"
         data        38 39 40 41 42 43 44 45 46 47 48 49 0 0 0 0 0 0 0
     }
 
-    // ceiling (being carried)
+    // zipline
     animation 16
     {
         repeat      TRUE
         fps         8
         data        26
+        action_spot 21 7
     }
 
     // winning (victory)
@@ -278,12 +279,20 @@ sprite "Neon"
         data        84 85
     }
 
-    // happy easter!
+    // winning: Happy Easter!
     animation 34
     {
         repeat      FALSE
         fps         8
         data        90 91 92 93 94 95 96 97 98 99
+    }
+
+    // winning: Merry Christmas!
+    animation 35
+    {
+        repeat      FALSE
+        fps         8
+        data        90 91 92 93 94 100 101 102 103 104
     }
 }
 

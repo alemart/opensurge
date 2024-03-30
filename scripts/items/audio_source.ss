@@ -25,7 +25,7 @@ using SurgeEngine.Video.Screen;
 // - volume: number. Base volume: a number between 0 and 1. Usually set to 1.
 // - enabled: boolean. Whether the audio source is enabled or not.
 //
-object "Audio Source" is "entity", "special", "awake"
+object "Audio Source" is "entity", "special"
 {
     public sound = null;
     public type = "line";
@@ -63,7 +63,15 @@ object "Audio Source" is "entity", "special", "awake"
     // this audio source is disabled
     state "disabled"
     {
-        mixer.notify(snd, 0.0);
+        if(snd !== null)
+            mixer.notify(snd, 0.0);
+    }
+
+    // stop the sound
+    fun onReset()
+    {
+        if(snd !== null)
+            mixer.notify(snd, 0.0);
     }
 
     // compute the volume of the audio source at a certain position
@@ -107,32 +115,56 @@ object "Audio Source" is "entity", "special", "awake"
 // Mixes multiple audio sources
 object "Audio Mixer"
 {
-    volume = {};
-    sound = {};
-    audible = false;
-
-    state "main"
-    {
-        if(audible) {
-            audible = false;
-            foreach(entry in volume) {
-                sfx = sound[entry.key];
-                if(0 < (sfx.volume = entry.value)) {
-                    audible = true;
-                    if(!sfx.playing)
-                        sfx.play();
-                }
-            }
-            volume.clear();
-        }
-    }
+    channel = {};
 
     fun notify(snd, vol)
     {
-        if(!sound.has(snd))
-            sound[snd] = Sound(snd);
-        if(0 < (volume[snd] = Math.max(vol, volume[snd] || 0)))
-            audible = true;
+        if((c = channel[snd]) === null)
+            channel[snd] = spawn("Audio Mixer - Channel").setSound(snd).increaseVolume(vol);
+        else
+            c.increaseVolume(vol);
+    }
+}
+
+object "Audio Mixer - Channel"
+{
+    sound = null;
+    volume = 0.0;
+
+    state "main"
+    {
+        assert(sound !== null);
+
+        if(volume == 0.0) {
+            sound.volume = 0.0;
+            //sound.stop(); // will restart the sound if the player moves back and forth
+            return;
+        }
+
+        sound.volume = volume;
+        if(!sound.playing)
+            sound.play();
+
+        volume = 0.0; // need to increaseVolume() every frame
+    }
+
+    fun setSound(filepath)
+    {
+        sound = Sound(filepath);
+        return this;
+    }
+
+    fun increaseVolume(vol)
+    {
+        vol = Math.clamp(vol, 0.0, 1.0);
+        volume = Math.max(volume, vol);
+        return this;
+    }
+
+    fun destructor()
+    {
+        assert(sound !== null);
+        sound.stop();
     }
 }
 
@@ -145,6 +177,7 @@ object "Audio Source - Horizontal Distance"
     fun call(a, b)
     {
         dy = Math.abs(a.y - b.y) - margin;
+
         if(dy < 0)
             return Math.abs(a.x - b.x);
         else

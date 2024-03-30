@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * prefs.c - load/save user preferences
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,19 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <allegro5/allegro.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
 #include <math.h>
-#include "darray.h"
+#include "../util/darray.h"
+#include "../util/util.h"
 #include "prefs.h"
-#include "util.h"
 #include "logfile.h"
 #include "global.h"
-#include "assetfs.h"
-#include "whereami/whereami.h"
+#include "asset.h"
 
 /* OS-specific includes */
 #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
@@ -137,11 +137,11 @@ static uint32_t double_serialize(double input, uint8_t* buf);
 static double double_deserialize(const uint8_t* buf, uint32_t size);
 static inline int keycmp(const char* a, const char* b);
 static size_t keylen(const char* key, size_t maxlen);
-static int write_header(FILE* fp, const prefs_t* prefs);
-static int write_entry(FILE* fp, const prefsentry_t* entry);
-static prefsentry_t* read_entry(FILE* fp);
-static int read_header(FILE* fp, pfheader_t* header);
-static int validate_header(FILE* fp, const prefs_t* prefs, const pfheader_t* header);
+static int write_header(ALLEGRO_FILE* fp, const prefs_t* prefs);
+static int write_entry(ALLEGRO_FILE* fp, const prefsentry_t* entry);
+static prefsentry_t* read_entry(ALLEGRO_FILE* fp);
+static int read_header(ALLEGRO_FILE* fp, pfheader_t* header);
+static int validate_header(ALLEGRO_FILE* fp, const prefs_t* prefs, const pfheader_t* header);
 
 
 
@@ -691,15 +691,16 @@ char* clone_str(const char* str)
 
 /* read an entry from fp
  * returns NULL on corrupt file */
-prefsentry_t* read_entry(FILE* fp)
+prefsentry_t* read_entry(ALLEGRO_FILE* fp)
 {
     prefsentry_t* entry = NULL;
     pfentry_t pfentry;
 
     /* read type & data size */
-    if(1 == fread(&pfentry.type, sizeof(pfentry.type), 1, fp)) {
+    if(sizeof(pfentry.type) == al_fread(fp, &pfentry.type, sizeof(pfentry.type))) {
         uint8_t buf[sizeof(pfentry.data_size)];
-        if(1 == fread(buf, sizeof(buf), 1, fp)) {
+
+        if(sizeof(buf) == al_fread(fp, buf, sizeof(buf))) {
             pfentry.data_size = le32_to_cpu(buf);
 
             /* check if the type is known */
@@ -707,13 +708,15 @@ prefsentry_t* read_entry(FILE* fp)
                 case PREFS_NULL: {
                     uint8_t* data = mallocx(1 + pfentry.data_size);
                     data[pfentry.data_size] = '\0';
-                    if(1 == fread(data, pfentry.data_size, 1, fp)) {
+
+                    if(pfentry.data_size == al_fread(fp, data, pfentry.data_size)) {
                         const char* key = (const char*)data;
                         const uint8_t* value_buf = (data + keylen(key, pfentry.data_size - 1) + 1);
                         int value_size = pfentry.data_size - (value_buf - data);
                         if(value_size == 0)
                             entry = new_null_entry(key);
                     }
+
                     free(data);
                     break;
                 }
@@ -721,7 +724,8 @@ prefsentry_t* read_entry(FILE* fp)
                 case PREFS_INT32: {
                     uint8_t* data = mallocx(1 + pfentry.data_size);
                     data[pfentry.data_size] = '\0';
-                    if(1 == fread(data, pfentry.data_size, 1, fp)) {
+
+                    if(pfentry.data_size == al_fread(fp, data, pfentry.data_size)) {
                         const char* key = (const char*)data;
                         const uint8_t* value_buf = (data + keylen(key, pfentry.data_size - 1) + 1);
                         int value_size = pfentry.data_size - (value_buf - data);
@@ -730,6 +734,7 @@ prefsentry_t* read_entry(FILE* fp)
                             entry = new_int_entry(key, *((int32_t*)&value));
                         }
                     }
+
                     free(data);
                     break;
                 }
@@ -737,7 +742,8 @@ prefsentry_t* read_entry(FILE* fp)
                 case PREFS_FLOAT64: {
                     uint8_t* data = mallocx(1 + pfentry.data_size);
                     data[pfentry.data_size] = '\0';
-                    if(1 == fread(data, pfentry.data_size, 1, fp)) {
+
+                    if(pfentry.data_size == al_fread(fp, data, pfentry.data_size)) {
                         const char* key = (const char*)data;
                         const uint8_t* value_buf = (data + keylen(key, pfentry.data_size - 1) + 1);
                         int value_size = pfentry.data_size - (value_buf - data);
@@ -746,6 +752,7 @@ prefsentry_t* read_entry(FILE* fp)
                             entry = new_double_entry(key, value);
                         }
                     }
+
                     free(data);
                     break;
                 }
@@ -753,7 +760,8 @@ prefsentry_t* read_entry(FILE* fp)
                 case PREFS_STRING: {
                     uint8_t* data = mallocx(1 + pfentry.data_size);
                     data[pfentry.data_size] = '\0';
-                    if(1 == fread(data, pfentry.data_size, 1, fp)) {
+
+                    if(pfentry.data_size == al_fread(fp, data, pfentry.data_size)) {
                         const char* key = (const char*)data;
                         const uint8_t* value_buf = (data + keylen(key, pfentry.data_size - 1) + 1);
                         int value_size = pfentry.data_size - (value_buf - data);
@@ -762,6 +770,7 @@ prefsentry_t* read_entry(FILE* fp)
                             entry = new_string_entry(key, value);
                         }
                     }
+
                     free(data);
                     break;
                 }
@@ -769,7 +778,8 @@ prefsentry_t* read_entry(FILE* fp)
                 case PREFS_BOOL: {
                     uint8_t* data = mallocx(1 + pfentry.data_size);
                     data[pfentry.data_size] = '\0';
-                    if(1 == fread(data, pfentry.data_size, 1, fp)) {
+
+                    if(pfentry.data_size == al_fread(fp, data, pfentry.data_size)) {
                         const char* key = (const char*)data;
                         const uint8_t* value_buf = (data + keylen(key, pfentry.data_size - 1) + 1);
                         int value_size = pfentry.data_size - (value_buf - data);
@@ -778,6 +788,7 @@ prefsentry_t* read_entry(FILE* fp)
                             entry = new_bool_entry(key, value != 0);
                         }
                     }
+
                     free(data);
                     break;
                 }
@@ -786,10 +797,12 @@ prefsentry_t* read_entry(FILE* fp)
                     /* unknown type: ignore field */
                     uint8_t* data = mallocx(1 + pfentry.data_size);
                     data[pfentry.data_size] = '\0';
-                    if(1 == fread(data, pfentry.data_size, 1, fp)) {
+
+                    if(pfentry.data_size == al_fread(fp, data, pfentry.data_size)) {
                         const char* key = (const char*)data;
                         entry = new_null_entry(key);
                     }
+
                     free(data);
                     break;
                 }
@@ -798,47 +811,47 @@ prefsentry_t* read_entry(FILE* fp)
     }
 
     /* error? */
-    if(ferror(fp) != 0 || entry == NULL) {
-        prefs_log("Prefs reading error (%d) near byte %ld", ferror(fp), ftell(fp));
-        clearerr(fp);
+    if(al_ferror(fp) != 0 || entry == NULL) {
+        prefs_log("Prefs reading error (%d) near byte %ld", al_ferror(fp), al_ftell(fp));
+        al_fclearerr(fp);
     }
 
     /* done */
     return entry;
 }
 
-int read_header(FILE* fp, pfheader_t* header)
+int read_header(ALLEGRO_FILE* fp, pfheader_t* header)
 {
     uint8_t buf32[sizeof(uint32_t)];
 
     /* read file signature */
-    if(1 != fread(header->magic, sizeof(header->magic), 1, fp)) {
+    if(sizeof(header->magic) != al_fread(fp, header->magic, sizeof(header->magic))) {
         prefs_log("Can't read prefs file signature");
         return 0;
     }
 
     /* discard unused bytes */
-    if(1 != fread(header->unused, sizeof(header->unused), 1, fp)) {
+    if(sizeof(header->unused) != al_fread(fp, header->unused, sizeof(header->unused))) {
         prefs_log("Can't read prefs file header: invalid format");
         return 0;
     }
 
     /* read version code */
-    if(1 != fread(buf32, sizeof(buf32), 1, fp)) {
+    if(sizeof(buf32) != al_fread(fp, buf32, sizeof(buf32))) {
         prefs_log("Can't read prefs file header: expected version code");
         return 0;
     }
     header->version_code = le32_to_cpu(buf32);
 
     /* read prefsid hash */
-    if(1 != fread(buf32, sizeof(buf32), 1, fp)) {
+    if(sizeof(buf32) != al_fread(fp, buf32, sizeof(buf32))) {
         prefs_log("Can't read prefs file header: expected prefs hash");
         return 0;
     }
     header->prefsid_hash = le32_to_cpu(buf32);
 
     /* read entry count */
-    if(1 != fread(buf32, sizeof(buf32), 1, fp)) {
+    if(sizeof(buf32) != al_fread(fp, buf32, sizeof(buf32))) {
         prefs_log("Can't read prefs file header: expected entry count");
         return 0;
     }
@@ -848,7 +861,7 @@ int read_header(FILE* fp, pfheader_t* header)
     return 1;
 }
 
-int validate_header(FILE* fp, const prefs_t* prefs, const pfheader_t* header)
+int validate_header(ALLEGRO_FILE* fp, const prefs_t* prefs, const pfheader_t* header)
 {
     /* check magic */
     if(0 != memcmp(header->magic, PREFS_MAGIC, sizeof(header->magic))) {
@@ -870,33 +883,35 @@ int validate_header(FILE* fp, const prefs_t* prefs, const pfheader_t* header)
     return 1;
 }
 
-int write_entry(FILE* fp, const prefsentry_t* entry)
+int write_entry(ALLEGRO_FILE* fp, const prefsentry_t* entry)
 {
     int success = 0;
 
     /* write the entry */
     if(entry != NULL) {
         pfentry_t pfentry = { .type = entry->type };
-        if(1 == fwrite(&pfentry.type, sizeof(pfentry.type), 1, fp)) {
+
+        if(sizeof(pfentry.type) == al_fwrite(fp, &pfentry.type, sizeof(pfentry.type))) {
             uint32_t key_size = 1 + strlen(entry->key); /* key + '\0' */
             uint8_t data_size[sizeof(pfentry.data_size)]; /* little endian */
+
             switch(entry->type) {
                 case PREFS_NULL: {
                     uint32_t value_size = 0;
                     cpu_to_le32(key_size + value_size, data_size);
-                    if(1 == fwrite(data_size, sizeof(data_size), 1, fp))
-                        success = (1 == fwrite(entry->key, key_size, 1, fp));
+                    if(sizeof(data_size) == al_fwrite(fp, data_size, sizeof(data_size)))
+                        success = (key_size == al_fwrite(fp, entry->key, key_size));
                     break;
                 }
 
                 case PREFS_INT32: {
                     uint32_t value_size = sizeof(int32_t);
                     cpu_to_le32(key_size + value_size, data_size);
-                    if(1 == fwrite(data_size, sizeof(data_size), 1, fp)) {
-                        if(1 == fwrite(entry->key, key_size, 1, fp)) {
+                    if(sizeof(data_size) == al_fwrite(fp, data_size, sizeof(data_size))) {
+                        if(key_size == al_fwrite(fp, entry->key, key_size)) {
                             uint8_t value_buf[sizeof(int32_t)];
                             cpu_to_le32(*((uint32_t*)&(entry->value.integer)), value_buf);
-                            success = (1 == fwrite(value_buf, value_size, 1, fp));
+                            success = (value_size == al_fwrite(fp, value_buf, value_size));
                         }
                     }
                     break;
@@ -906,9 +921,9 @@ int write_entry(FILE* fp, const prefsentry_t* entry)
                     uint8_t value_buf[32];
                     uint32_t value_size = double_serialize(entry->value.real, value_buf);
                     cpu_to_le32(key_size + value_size, data_size);
-                    if(1 == fwrite(data_size, sizeof(data_size), 1, fp)) {
-                        if(1 == fwrite(entry->key, key_size, 1, fp))
-                            success = (1 == fwrite(value_buf, value_size, 1, fp));
+                    if(sizeof(data_size) == al_fwrite(fp, data_size, sizeof(data_size))) {
+                        if(key_size == al_fwrite(fp, entry->key, key_size))
+                            success = (value_size == al_fwrite(fp, value_buf, value_size));
                     }
                     break;
                 }
@@ -916,10 +931,10 @@ int write_entry(FILE* fp, const prefsentry_t* entry)
                 case PREFS_STRING: {
                     uint32_t value_size = strlen(entry->value.text);
                     cpu_to_le32(key_size + value_size, data_size);
-                    if(1 == fwrite(data_size, sizeof(data_size), 1, fp)) {
-                        if(1 == fwrite(entry->key, key_size, 1, fp)) {
+                    if(sizeof(data_size) == al_fwrite(fp, data_size, sizeof(data_size))) {
+                        if(key_size == al_fwrite(fp, entry->key, key_size)) {
                             const uint8_t* value_buf = (const uint8_t*)(entry->value.text);
-                            success = (1 == fwrite(value_buf, value_size, 1, fp));
+                            success = (value_size == al_fwrite(fp, value_buf, value_size));
                         }
                     }
                     break;
@@ -928,10 +943,10 @@ int write_entry(FILE* fp, const prefsentry_t* entry)
                 case PREFS_BOOL: {
                     uint32_t value_size = sizeof(uint8_t);
                     cpu_to_le32(key_size + value_size, data_size);
-                    if(1 == fwrite(data_size, sizeof(data_size), 1, fp)) {
-                        if(1 == fwrite(entry->key, key_size, 1, fp)) {
+                    if(sizeof(data_size) == al_fwrite(fp, data_size, sizeof(data_size))) {
+                        if(key_size == al_fwrite(fp, entry->key, key_size)) {
                             uint8_t value = entry->value.boolean;
-                            success = (1 == fwrite(&value, value_size, 1, fp));
+                            success = (value_size == al_fwrite(fp, &value, value_size));
                         }
                     }
                     break;
@@ -941,16 +956,16 @@ int write_entry(FILE* fp, const prefsentry_t* entry)
     }
 
     /* error? */
-    if(ferror(fp) != 0 || !success) {
-        prefs_log("Prefs writing error (%d) near byte %ld", ferror(fp), ftell(fp));
-        clearerr(fp);
+    if(al_ferror(fp) != 0 || !success) {
+        prefs_log("Prefs writing error (%d) near byte %ld", al_ferror(fp), al_ftell(fp));
+        al_fclearerr(fp);
     }
 
     /* done */
     return success;
 }
 
-int write_header(FILE* fp, const prefs_t* prefs)
+int write_header(ALLEGRO_FILE* fp, const prefs_t* prefs)
 {
     uint8_t buf32[sizeof(uint32_t)];
     pfheader_t header;
@@ -964,19 +979,19 @@ int write_header(FILE* fp, const prefs_t* prefs)
     header.entry_count = prefs_count_entries(prefs);
 
     /* save header */
-    success = success && (1 == fwrite(header.magic, sizeof(header.magic), 1, fp));
-    success = success && (1 == fwrite(header.unused, sizeof(header.unused), 1, fp));
+    success = success && (sizeof(header.magic) == al_fwrite(fp, header.magic, sizeof(header.magic)));
+    success = success && (sizeof(header.unused) == al_fwrite(fp, header.unused, sizeof(header.unused)));
     cpu_to_le32(header.version_code, buf32);
-    success = success && (1 == fwrite(buf32, sizeof(buf32), 1, fp));
+    success = success && (sizeof(buf32) == al_fwrite(fp, buf32, sizeof(buf32)));
     cpu_to_le32(header.prefsid_hash, buf32);
-    success = success && (1 == fwrite(buf32, sizeof(buf32), 1, fp));
+    success = success && (sizeof(buf32) == al_fwrite(fp, buf32, sizeof(buf32)));
     cpu_to_le32(header.entry_count, buf32);
-    success = success && (1 == fwrite(buf32, sizeof(buf32), 1, fp));
+    success = success && (sizeof(buf32) == al_fwrite(fp, buf32, sizeof(buf32)));
 
     /* error? */
-    if(ferror(fp) != 0 || !success) {
-        prefs_log("Prefs header writing error (%d) near byte %ld", ferror(fp), ftell(fp));
-        clearerr(fp);
+    if(al_ferror(fp) != 0 || !success) {
+        prefs_log("Prefs header writing error (%d) near byte %ld", al_ferror(fp), al_ftell(fp));
+        al_fclearerr(fp);
     }
 
     /* done */
@@ -986,11 +1001,11 @@ int write_header(FILE* fp, const prefs_t* prefs)
 /* load prefs from the disk */
 int load(prefs_t* prefs)
 {
-    const char* filename = assetfs_create_config_file(PREFS_FILE);
-    FILE* fp = fopen_utf8(filename, "rb");
+    const char* fullpath = asset_path(PREFS_FILE);
+    ALLEGRO_FILE* fp = al_fopen(fullpath, "rb");
     int success = 0;
 
-    prefs_log("Loading prefs from file \"%s\"...", filename);
+    prefs_log("Loading prefs from \"%s\"...", fullpath);
 
     /* load file */
     if(fp != NULL) {
@@ -1008,7 +1023,7 @@ int load(prefs_t* prefs)
                 success = good;
             }
         }
-        fclose(fp);
+        al_fclose(fp);
     }
 
     /* error? */
@@ -1024,11 +1039,11 @@ int load(prefs_t* prefs)
 /* save prefs to the disk */
 int save(const prefs_t* prefs)
 {
-    const char* filename = assetfs_create_config_file(PREFS_FILE);
-    FILE* fp = fopen_utf8(filename, "wb");
+    const char* fullpath = asset_path(PREFS_FILE);
+    ALLEGRO_FILE* fp = al_fopen(fullpath, "wb");
     int success = 0;
 
-    prefs_log("Saving prefs to file \"%s\"...", filename);
+    prefs_log("Saving prefs to \"%s\"...", fullpath);
 
     /* save file */
     if(fp != NULL) {
@@ -1040,7 +1055,7 @@ int save(const prefs_t* prefs)
             }
             success = good;
         }
-        fclose(fp);
+        al_fclose(fp);
     }
     else
         prefs_log("Can't open prefs file for writing!");

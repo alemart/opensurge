@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * gameover.c - "game over" scene
- * Copyright (C) 2010, 2018, 2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,16 +20,19 @@
 
 #include "gameover.h"
 #include "quest.h"
+#include "../util/numeric.h"
+#include "../util/util.h"
 #include "../core/font.h"
 #include "../core/scene.h"
 #include "../core/audio.h"
-#include "../core/util.h"
 #include "../core/fadefx.h"
 #include "../core/color.h"
 #include "../core/video.h"
 #include "../core/image.h"
 #include "../core/timer.h"
 #include "../core/lang.h"
+#include "../entities/mobilegamepad.h"
+#include "../entities/player.h"
 
 
 /* private data */
@@ -72,7 +75,7 @@ void gameover_init(void *foo)
 
     /* misc */
     gameover_spacing = gameover_width[2] - gameover_width[1] - gameover_width[0];
-    gameover_bg = image_clone(video_get_backbuffer());
+    gameover_bg = video_take_snapshot();
     gameover_timer = 0;
 
     /* music */
@@ -94,11 +97,16 @@ void gameover_update()
     /* timer */
     gameover_timer += dt;
 
+    /* mobile gamepad */
+    mobilegamepad_fadeout();
+
     /* fade out */
     if(gameover_timer >= GAMEOVER_APPEARTIME && !music_is_playing(music)) {
         if(fadefx_is_over()) {
             quest_abort();
             scenestack_pop();
+            mobilegamepad_fadein();
+            player_set_lives(PLAYER_INITIAL_LIVES);
             return;
         }
         fadefx_out(color_rgb(0,0,0), GAMEOVER_FADETIME);

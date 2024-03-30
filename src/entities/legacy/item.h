@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * item.h - legacy items (replaced by SurgeScript)
- * Copyright (C) 2008-2011, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 #ifndef _ITEM_H
 #define _ITEM_H
 
-#include "../../core/v2d.h"
+#include "../../util/v2d.h"
 
 /* item list */
 #define ITEMDATA_MAX        84 /* number of existing items */

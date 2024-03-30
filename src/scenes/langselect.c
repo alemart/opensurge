@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * langselect.c - language selection screen
- * Copyright (C) 2009-2010, 2019-2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,11 +22,10 @@
 #include <string.h>
 #include <math.h>
 #include "langselect.h"
-#include "options.h"
-#include "../core/util.h"
+#include "settings.h"
+#include "../core/global.h"
 #include "../core/scene.h"
-#include "../core/assetfs.h"
-#include "../core/stringutil.h"
+#include "../core/asset.h"
 #include "../core/logfile.h"
 #include "../core/fadefx.h"
 #include "../core/color.h"
@@ -37,9 +36,12 @@
 #include "../core/timer.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
-#include "../core/modmanager.h"
+#include "../util/numeric.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 #include "../entities/actor.h"
 #include "../entities/background.h"
+#include "../entities/mobilegamepad.h"
 #include "../entities/sfx.h"
 
 
@@ -68,6 +70,7 @@ static bool fresh_install;
 static bool came_from_options;
 static v2d_t sliding_camera;
 static int column_width;
+static bool was_immersive;
 
 /* private functions */
 static void save_preferences(const char *filepath);
@@ -92,7 +95,7 @@ static int option_of(const char *language_name);
  */
 void langselect_init(void *param)
 {
-    prefs_t* prefs = modmanager_prefs();
+    extern prefs_t* prefs;
 
     quit = false;
     option = 0;
@@ -127,6 +130,9 @@ void langselect_init(void *param)
     option = option_of(lang_get("LANG_NAME"));
 
     fadefx_in(color_rgb(0,0,0), 1.0f);
+
+    was_immersive = video_is_immersive();
+    video_set_immersive(false);
 }
 
 
@@ -136,6 +142,8 @@ void langselect_init(void *param)
  */
 void langselect_release()
 {
+    video_set_immersive(was_immersive);
+
     unload_lang_list();
     bgtheme = background_unload(bgtheme);
 
@@ -162,9 +170,11 @@ void langselect_update()
     /* background movement */
     background_update(bgtheme);
 
+    /* display the mobile gamepad */
+    mobilegamepad_fadein();
+
     /* menu option */
     arrow->position = font_get_position(lngfnt[0][option]);
-    arrow->position.x += -20 + 3*cos(2*PI * scene_time);
     if(!quit && !fadefx_is_fading()) {
         if(input_button_pressed(input, IB_DOWN)) {
             if(option / LANG_MAXPERCOL == (option + 1) / LANG_MAXPERCOL) {
@@ -194,7 +204,7 @@ void langselect_update()
             sound_play(SFX_CONFIRM);
             quit = true;
         }
-        if(input_button_pressed(input, IB_FIRE4)) {
+        if(input_button_pressed(input, IB_FIRE4) || input_button_pressed(input, IB_FIRE2)) {
             sound_play(SFX_BACK);
             quit = true;
         }
@@ -281,7 +291,7 @@ int option_of(const char *language_name)
 /* saves the user preferences */
 void save_preferences(const char *filepath)
 {
-    prefs_t* prefs = modmanager_prefs();
+    extern prefs_t* prefs;
     prefs_set_string(prefs, ".langpath", filepath);
 }
 
@@ -293,7 +303,7 @@ void load_lang_list()
 
     /* loading language data */
     lngcount = 0;
-    assetfs_foreach_file("languages", ".lng", dircount, (void*)&lngcount, false);
+    asset_foreach_file("languages", ".lng", dircount, (void*)&lngcount, false);
 
     /* fatal error */
     if(lngcount == 0)
@@ -303,7 +313,7 @@ void load_lang_list()
 
     /* grabbing language data */
     lngdata = mallocx(lngcount * sizeof(lngdata_t));
-    assetfs_foreach_file("languages", ".lng", dirfill, (void*)&c, false);
+    asset_foreach_file("languages", ".lng", dirfill, (void*)&c, false);
     qsort(lngdata, lngcount, sizeof(lngdata_t), sort_cmp);
 
     /* other stuff */

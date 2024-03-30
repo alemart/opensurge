@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * fadefx.c - fade effects
- * Copyright (C) 2009, 2013, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@
 #include "video.h"
 #include "image.h"
 #include "timer.h"
-#include "util.h"
+#include "../util/util.h"
 
 /* Fade-in & fade-out */
 static enum { FADEFX_NONE, FADEFX_IN, FADEFX_OUT } type;
@@ -72,7 +72,7 @@ void fadefx_update()
         alpha = clip(alpha, 0, 255);
         alpha = (type == FADEFX_IN) ? (255 - alpha) : alpha;
         color_unmap(fade_color, &r, &g, &b, NULL);
-        image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgba(r, g, b, alpha));
+        image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_premul_rgba(r, g, b, alpha));
         
         /* the fade effect is over */
         if(just_ended) {

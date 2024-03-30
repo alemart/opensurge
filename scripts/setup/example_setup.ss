@@ -76,6 +76,12 @@ object "Example Setup"
             // Example: configuring all Audio Sources.
             "Audio Source": {
                 "sound": "samples/waterfall.wav" // path to a sound
+            },
+
+            // Example: configuring a transformation powerup
+            "Powerup Transformation": {
+                "character": "Surge", // name of a character
+                "duration": 20 // in seconds
             }
         },
 
@@ -120,6 +126,41 @@ object "Example Setup"
                 "sticky": false,
                 "onActivate": EntityEvent("2bbc752e0454d031").willCall("open"),
                 "onDeactivate": EntityEvent("2bbc752e0454d031").willCall("close")
+            },
+
+            // Example: configuring a powerup that triggers an event
+            "Powerup Event Trigger": {
+                "onTrigger": EventList([
+                    // run on trigger
+                    FunctionEvent("Print").withArgument("3..."),
+                    FunctionEvent("Play Sound").withArgument("samples/choose.wav"),
+
+                    // run after 1 second
+                    DelayedEvent(
+                        EventList([
+                            FunctionEvent("Print").withArgument("2..."),
+                            FunctionEvent("Play Sound").withArgument("samples/choose.wav")
+                        ])
+                    ).willWait(1.0),
+
+                    // run after 2 seconds
+                    DelayedEvent(
+                        EventList([
+                            FunctionEvent("Print").withArgument("1..."),
+                            FunctionEvent("Play Sound").withArgument("samples/choose.wav")
+                        ])
+                    ).willWait(2.0),
+
+                    // run after 3 seconds
+                    DelayedEvent(
+                        EventList([
+                            FunctionEvent("Play Sound").withArgument("samples/choose.wav"),
+                            FunctionEvent("Print").withArgument("Double Lucky Bonus!"),
+                            FunctionEvent("Print").withArgument("yaaaaay!"),
+                            FunctionEvent("Give Lucky Bonus").withArgument(100)
+                        ])
+                    ).willWait(3.0),
+                ])
             }
         },
 

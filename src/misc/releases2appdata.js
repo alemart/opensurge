@@ -26,7 +26,7 @@ function parse(rl)
                 const param = match(line, /(\d\.\d(\.\d(\.\d)?)?)\W*(.*)$/);
                 release = {
                     version: param(1),
-                    date: new Date(param(4).replace(/(\d)(st|nd|tr|th)/gi, "$1").trim()),
+                    date: new Date(param(4).replace(/(\d)(st|nd|rd|th)/gi, "$1").trim()),
                     items: []
                 };
                 releases.push(release);

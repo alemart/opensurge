@@ -1,87 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2020-2021 Alexandre Martins -->
 <component type="desktop-application">
   <id>org.opensurge2d.OpenSurge</id>
-  <name>Open Surge</name>
-  <developer_name>Alexandre Martins &amp; others</developer_name>
-  <update_contact>alemartf_at_gmail.com</update_contact>
+  <name>Surge Engine</name>
+  <developer_name>alemart</developer_name>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <summary>A fun 2D retro platformer inspired by Sonic games and a game creation system</summary>
+  <!-- summary: max len 78 chars -->
+  <summary>Open source retro game engine with a fun platformer inspired by 16-bit Sonic</summary>
   <description>
-    <p>
-      Open Surge is a fun 2D retro platformer inspired by Sonic games
-      and a game creation system that lets you unleash your creativity!
-    </p>
-    <p>
-      How do I play?
-    </p>
-    <p>
-      You can play using a keyboard or a joystick.
-    </p>
-    <ul>
-      <li>Arrows: Move</li>
-      <li>Space: Jump</li>
-      <li>Enter: Pause</li>
-      <li>Esc: Quit</li>
-      <li>Left Ctrl: Switch character</li>
-      <li>Equals: Take snapshot</li>
-      <li>F12: Open the editor</li>
-    </ul>
-    <p>
-      How do I create a game?
-    </p>
-    <p>
-      Use Open Surge to create your own amazing games!
-      Create new levels, items, bosses, gameplay mechanics,
-      playable characters, special abilities and more!
-    </p>
-    <ul>
-      <li>
-        First, learn how to create a level using the
-        built-in editor (press F12 during gameplay)
-      </li>
-      <li>
-        Next, learn how to do basic hacking (modify the
-        images/sounds, create new scenery, new characters, etc.)
-      </li>
-      <li>
-        Finally, have fun with scripting! SurgeScript, the
-        scripting language featured in Open Surge, gives you
-        ultimate power to create anything you desire and make
-        your dreams come alive!
-      </li>
-    </ul>
+    <p>Surge the Rabbit is a fun and open source jump 'n' run retro game made in the spirit of classic 16-bit Sonic platformers of the 90s. The levels are filled with challenges, gimmicks and hazards! Exciting adventures are waiting for you! You can also use it as a base to create your own amazing games!</p>
+    <p>Make your dreams come true! Surge Engine is the very flexible open source 2D game engine that powers Surge the Rabbit. Its capabilities include: level editing, artwork modding, full blown scripting, and much more! It's an open-source, cross-platform retro game engine that runs on Desktop computers and on mobile devices.</p>
+    <p>The fun is multiplied! Several MODs created by the fans in the Open Surge Community can be played on the engine. For those who get involved, this project is also a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.</p>
   </description>
+  <keywords>
+    <keyword>surge the rabbit</keyword>
+    <keyword>opensurge</keyword>
+    <keyword>open surge</keyword>
+    <keyword>surgeengine</keyword>
+    <keyword>surge engine</keyword>
+    <keyword>surgescript</keyword>
+    <keyword>surge script</keyword>
+    <keyword>games</keyword>
+    <keyword>gaming</keyword>
+    <keyword>gamedev</keyword>
+    <keyword>game dev</keyword>
+    <keyword>game development</keyword>
+    <keyword>game engine</keyword>
+    <keyword>game creator</keyword>
+    <keyword>game maker</keyword>
+    <keyword>video game</keyword>
+    <keyword>retro game</keyword>
+    <keyword>mobile game</keyword>
+    <keyword>open source game</keyword>
+    <keyword>libre game</keyword>
+    <keyword>free game</keyword>
+    <keyword>indie game</keyword>
+    <keyword>fan game</keyword>
+    <keyword>platform game</keyword>
+    <keyword>platformer</keyword>
+    <keyword>side scroller</keyword>
+    <keyword>jump and run</keyword>
+    <keyword>jump 'n' run</keyword>
+    <keyword>action game</keyword>
+    <keyword>arcade</keyword>
+    <keyword>free and open source</keyword>
+    <keyword>foss</keyword>
+    <keyword>floss</keyword>
+    <keyword>awesome</keyword>
+    <keyword>amazing</keyword>
+    <keyword>epic</keyword>
+    <keyword>cool</keyword>
+    <keyword>fun</keyword>
+    <keyword>joy</keyword>
+    <keyword>joyful</keyword>
+    <keyword>happy</keyword>
+    <keyword>happiness</keyword>
+    <keyword>c</keyword>
+    <keyword>c language</keyword>
+    <keyword>opengl</keyword>
+    <keyword>allegro</keyword>
+    <keyword>allegro5</keyword>
+    <keyword>allegro library</keyword>
+    <keyword>liballegro</keyword>
+    <keyword>liballeg</keyword>
+    <keyword>16 bit</keyword>
+    <keyword>surge</keyword>
+    <keyword>sonic</keyword>
+    <keyword>mods</keyword>
+    <keyword>modding</keyword>
+    <keyword>homebrew</keyword>
+    <keyword>hobby</keyword>
+    <keyword>hobbyist</keyword>
+  </keywords>
   <url type="homepage">https://opensurge2d.org</url>
-  <url type="donation">https://opensurge2d.org/contribute</url>
+  <url type="donation">https://github.com/sponsors/alemart</url>
   <url type="help">https://wiki.opensurge2d.org</url>
-  <url type="bugtracker">https://opensurge2d.org/appdata/bugtracker.html</url>
+  <url type="bugtracker">https://github.com/alemart/opensurge/issues</url>
   <url type="translate">https://opensurge2d.org/appdata/translate.html</url>
   <screenshots>
     <screenshot type="default">
-      <image>https://opensurge2d.org/appdata/screenshot1.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot1.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot2.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot2.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot3.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot3.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot4.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot4.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot5.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot5.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot6.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot6.png</image>
     </screenshot>
     <screenshot>
-      <image>https://opensurge2d.org/appdata/screenshot7.png</image>
+      <image>https://opensurge2d.org/appdata/0_6_0/screenshot7.png</image>
     </screenshot>
     <screenshot>
-      <video>https://opensurge2d.org/appdata/trailer.webm</video>
+      <video>https://opensurge2d.org/appdata/0_6_0/trailer.webm</video>
     </screenshot>
   </screenshots>
   <categories>
@@ -101,6 +120,58 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
+    <release version="0.6.0.3" date="2022-09-23">
+      <description>
+        <ul>
+          <li>Tweaks to the level design, to the default controls and to the build system</li>
+          <li>Changed the way the engine handles analog sticks</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.6.0.2" date="2022-09-15">
+      <description>
+        <ul>
+          <li>Adjusted gimmicks: Water Bubbles, Spikes</li>
+          <li>Made tweaks to the level design, to the title screen and to the build script</li>
+          <li>Changed the parser used on the stage select</li>
+          <li>Added support for loading quests via developer mode</li>
+          <li>Removed the quest selection screen</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.6.0.1" date="2022-09-06">
+      <description>
+        <ul>
+          <li>Updated the default mapping for gamepads</li>
+          <li>Adjusted the "Walk on Water" gimmick</li>
+          <li>Optimized the creation and the rendering of brick particles</li>
+          <li>Made tweaks to the level design</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.6.0" date="2022-09-02">
+      <description>
+        <ul>
+          <li>Renamed the game to Surge the Rabbit</li>
+          <li>Improved the pixel art style of the game</li>
+          <li>Created a new Waterworks Zone</li>
+          <li>New gimmicks: Conveyor Belts, Walk on Water, Power Pluggy</li>
+          <li>New title screen and new title card animation</li>
+          <li>New translations: Italian, Esperanto</li>
+          <li>Introduced language extensions (languages/extends/ folder)</li>
+          <li>Improved macOS compatibility</li>
+          <li>Introduced support for transitions between animations</li>
+          <li>Introduced the concepts of action spot and sprite anchor</li>
+          <li>Improvements to the SurgeScript API</li>
+          <li>Improved several core scripts</li>
+          <li>Added support for compound ${EXPRESSIONS} when evaluating text</li>
+          <li>Changed the physics</li>
+          <li>Added support for D-pad input on Xbox controllers</li>
+          <li>Removed legacy Allegro 4 code</li>
+          <li>Bugfixes and general improvements</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.5.2.1" date="2021-04-15">
       <ul>
         <li>Fix sprites/overrides/ detection bug on Windows</li>

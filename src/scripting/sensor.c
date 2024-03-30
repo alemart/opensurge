@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * sensor.c - scripting system: sensor component
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,8 +21,8 @@
 #include <surgescript.h>
 #include <string.h>
 #include "scripting.h"
-#include "../core/v2d.h"
-#include "../core/util.h"
+#include "../util/util.h"
+#include "../util/v2d.h"
 #include "../core/image.h"
 #include "../entities/camera.h"
 #include "../physics/obstacle.h"
@@ -38,6 +38,8 @@ static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getzindex(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvisible(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -51,6 +53,7 @@ static const surgescript_heapptr_t OBSTACLEMAP_ADDR = 0;
 static const surgescript_heapptr_t VISIBLE_ADDR = 1;
 static const surgescript_heapptr_t STATUS_ADDR = 2;
 static const surgescript_heapptr_t ENABLED_ADDR = 3;
+static const surgescript_heapptr_t LAYER_ADDR = 4;
 #define SENSOR_COLOR() (color_hex("ffff00"))
 
 /*
@@ -71,13 +74,15 @@ void scripting_register_sensor(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sensor", "__init", fun_init, 5);
     surgescript_vm_bind(vm, "Sensor", "get_zindex", fun_getzindex, 0);
     surgescript_vm_bind(vm, "Sensor", "get_status", fun_getstatus, 0);
+    surgescript_vm_bind(vm, "Sensor", "set_layer", fun_setlayer, 1);
+    surgescript_vm_bind(vm, "Sensor", "get_layer", fun_getlayer, 0);
     surgescript_vm_bind(vm, "Sensor", "set_visible", fun_setvisible, 1);
     surgescript_vm_bind(vm, "Sensor", "get_visible", fun_getvisible, 0);
     surgescript_vm_bind(vm, "Sensor", "set_enabled", fun_setenabled, 1);
     surgescript_vm_bind(vm, "Sensor", "get_enabled", fun_getenabled, 0);
     surgescript_vm_bind(vm, "Sensor", "onTransformChange", fun_ontransformchange, 0);
-    surgescript_vm_bind(vm, "Sensor", "onRender", fun_onrender, 0);
-    surgescript_vm_bind(vm, "Sensor", "onRenderGizmos", fun_onrendergizmos, 0);
+    surgescript_vm_bind(vm, "Sensor", "onRender", fun_onrender, 2);
+    surgescript_vm_bind(vm, "Sensor", "onRenderGizmos", fun_onrendergizmos, 2);
 }
 
 
@@ -96,13 +101,26 @@ surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescri
     ssassert(VISIBLE_ADDR == surgescript_heap_malloc(heap));
     ssassert(STATUS_ADDR == surgescript_heap_malloc(heap));
     ssassert(ENABLED_ADDR == surgescript_heap_malloc(heap));
+    ssassert(LAYER_ADDR == surgescript_heap_malloc(heap));
+
+    /* initial configuration */
+    surgescript_var_set_null(surgescript_heap_at(heap, OBSTACLEMAP_ADDR));
+    surgescript_var_set_bool(surgescript_heap_at(heap, VISIBLE_ADDR), false);
+    surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), 0);
+    surgescript_var_set_bool(surgescript_heap_at(heap, ENABLED_ADDR), true);
+    surgescript_var_set_rawbits(surgescript_heap_at(heap, LAYER_ADDR), OL_DEFAULT);
 
     /* will create the sensor later */
     surgescript_object_set_userdata(object, NULL);
 
     /* the parent object can't be detached */
-    if(surgescript_object_has_tag(parent, "detached"))
-        scripting_error(object, "An object (\"%s\") that spawns a Sensor cannot be \"detached\".", scripting_util_parent_name(object));
+    if(surgescript_object_has_tag(parent, "detached")) {
+        scripting_error(object,
+            "An object (\"%s\") that spawns a %s cannot be \"detached\"",
+            scripting_util_parent_name(object),
+            surgescript_object_name(object)
+        );
+    }
 
     /* done! */
     return NULL;
@@ -143,11 +161,8 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     /* make sure that the obstacle map is alright */
     ssassert(0 == strcmp("ObstacleMap", surgescript_object_name(surgescript_objectmanager_get(manager, obstaclemap))));
 
-    /* initial configuration */
+    /* setup the obstacle map */
     surgescript_var_set_objecthandle(surgescript_heap_at(heap, OBSTACLEMAP_ADDR), obstaclemap);
-    surgescript_var_set_bool(surgescript_heap_at(heap, VISIBLE_ADDR), false);
-    surgescript_var_set_number(surgescript_heap_at(heap, STATUS_ADDR), 0);
-    surgescript_var_set_bool(surgescript_heap_at(heap, ENABLED_ADDR), true);
 
     /* create a new sensor */
     if(x1 == x2) {
@@ -190,7 +205,10 @@ surgescript_var_t* fun_onrender(surgescript_object_t* object, const surgescript_
 surgescript_var_t* fun_onrendergizmos(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     sensor_t* sensor = get_sensor(object);
-    sensor_render(sensor, scripting_util_world_position(object), MM_FLOOR, scripting_util_parent_camera(object));
+    double camera_x = surgescript_var_get_number(param[0]);
+    double camera_y = surgescript_var_get_number(param[1]);
+    v2d_t camera = v2d_new(camera_x, camera_y);
+    sensor_render(sensor, scripting_util_world_position(object), MM_FLOOR, camera);
     return NULL;
 }
 
@@ -226,6 +244,7 @@ surgescript_var_t* fun_setenabled(surgescript_object_t* object, const surgescrip
     /* changed the variable? */
     if(enabled != currently_enabled) {
         surgescript_var_set_bool(surgescript_heap_at(heap, ENABLED_ADDR), enabled);
+        sensor_set_enabled(get_sensor(object), enabled);
         update(object);
     }
 
@@ -246,6 +265,67 @@ surgescript_var_t* fun_getstatus(surgescript_object_t* object, const surgescript
     return surgescript_var_clone(surgescript_heap_at(heap, STATUS_ADDR));
 }
 
+/* set the layer of this sensor */
+surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* layer_var = surgescript_heap_at(heap, LAYER_ADDR);
+    obstaclelayer_t prev_layer = (obstaclelayer_t)surgescript_var_get_rawbits(layer_var);
+    const char* layer_name = surgescript_var_fast_get_string(param[0]);
+
+    /*
+
+    if the layer is set to "default", then this sensor senses all bricks*, regardless of the layer
+    if the layer is set to "green", then this sensor senses bricks at the default and at the green layers
+    if the layer is set to "yellow", then this sensor senses bricks at the default and at the yellow layers
+
+    (*) non-passable bricks and brick-like objects
+
+    */
+
+    if(strcmp(layer_name, "default") == 0)
+        surgescript_var_set_rawbits(layer_var, OL_DEFAULT);
+    else if(strcmp(layer_name, "green") == 0)
+        surgescript_var_set_rawbits(layer_var, OL_GREEN);
+    else if(strcmp(layer_name, "yellow") == 0)
+        surgescript_var_set_rawbits(layer_var, OL_YELLOW);
+    else
+        ; /* do nothing */
+
+    /* update the collision status if the layer was just changed */
+    obstaclelayer_t curr_layer = (obstaclelayer_t)surgescript_var_get_rawbits(layer_var);
+    if(curr_layer != prev_layer)
+        update(object);
+
+    /* done! */
+    return NULL;
+}
+
+/* get the layer of this sensor */
+surgescript_var_t* fun_getlayer(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_var_t* layer_var = surgescript_heap_at(heap, LAYER_ADDR);
+    obstaclelayer_t layer = (obstaclelayer_t)surgescript_var_get_rawbits(layer_var);
+    const char* layer_name = "";
+
+    switch(layer) {
+        case OL_DEFAULT:
+            layer_name = "default";
+            break;
+
+        case OL_GREEN:
+            layer_name = "green";
+            break;
+
+        case OL_YELLOW:
+            layer_name = "yellow";
+            break;
+    }
+
+    return surgescript_var_set_string(surgescript_var_create(), layer_name);
+}
+
 
 
 
@@ -258,7 +338,7 @@ const obstaclemap_t* get_obstaclemap(const surgescript_object_t* object)
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(surgescript_heap_at(heap, OBSTACLEMAP_ADDR));
     surgescript_object_t* target = surgescript_objectmanager_get(manager, handle);
-    obstaclemap_t* obstaclemap = scripting_obstaclemap_ptr(target);
+    const obstaclemap_t* obstaclemap = scripting_obstaclemap_ptr(target);
     ssassert(obstaclemap != NULL);
     return obstaclemap;
 }
@@ -278,8 +358,9 @@ void update(surgescript_object_t* object)
 
     if(sensor_is_enabled) {
         sensor_t* sensor = get_sensor(object);
+        obstaclelayer_t layer = (obstaclelayer_t)surgescript_var_get_rawbits(surgescript_heap_at(heap, LAYER_ADDR));
         const obstaclemap_t* obstaclemap = get_obstaclemap(object);
-        const obstacle_t* obstacle = sensor_check(sensor, scripting_util_world_position(object), MM_FLOOR, obstaclemap);
+        const obstacle_t* obstacle = sensor_check(sensor, scripting_util_world_position(object), MM_FLOOR, layer, obstaclemap);
 
         if(obstacle != NULL) {
             if(obstacle_is_solid(obstacle)) {

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * camera.c - scripting system: web routines
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,13 +22,14 @@
 #include <string.h>
 #include "scripting.h"
 #include "../core/web.h"
-#include "../core/util.h"
+#include "../util/util.h"
 
 /* private */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_launchurl(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_encodeuricomponent(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /*
  * scripting_register_web()
@@ -40,6 +41,7 @@ void scripting_register_web(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Web", "destroy", fun_destroy, 0);
     surgescript_vm_bind(vm, "Web", "spawn", fun_spawn, 1);
     surgescript_vm_bind(vm, "Web", "launchURL", fun_launchurl, 1);
+    surgescript_vm_bind(vm, "Web", "encodeURIComponent", fun_encodeuricomponent, 1);
 }
 
 /* main state */
@@ -66,7 +68,7 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
 /* launch URL: give a URL */
 surgescript_var_t* fun_launchurl(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     char* url = surgescript_var_get_string(param[0], manager);
 
     if(!(strncmp(url, "http://", 7) == 0 || strncmp(url, "https://", 8) == 0 || strncmp(url, "mailto:", 7) == 0)) {
@@ -80,4 +82,21 @@ surgescript_var_t* fun_launchurl(surgescript_object_t* object, const surgescript
 
     ssfree(url);
     return NULL;
+}
+
+/* encode a URI component */
+surgescript_var_t* fun_encodeuricomponent(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_var_t* ret = surgescript_var_create();
+    char* uri_component = surgescript_var_get_string(param[0], manager);
+    size_t buf_size = (1 + 3 * strlen(uri_component)) * sizeof(char);
+    char* buf = mallocx(buf_size);
+
+    encode_uri_component(uri_component, buf, buf_size);
+    surgescript_var_set_string(ret, buf);
+
+    free(buf);
+    ssfree(uri_component);
+    return ret;
 }

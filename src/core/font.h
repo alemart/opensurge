@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * font.h - font module
- * Copyright (C) 2008-2011, 2013, 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,12 +22,15 @@
 #define _FONT_H
 
 #include <stdbool.h>
-#include "v2d.h"
+#include "../util/v2d.h"
 
 /* font type */
 typedef struct font_t font_t;
 typedef enum fontalign_t fontalign_t;
 enum fontalign_t { FONTALIGN_LEFT, FONTALIGN_CENTER, FONTALIGN_RIGHT };
+
+/* forward declarations */
+struct image_t;
 
 /* public functions */
 font_t* font_create(const char* font_name); /* creates a new font instance. font_name is a font in the *.fnt scripts */
@@ -40,7 +43,6 @@ const char* font_get_text(const font_t* f); /* gets the text of the font */
 void font_set_position(font_t* f, v2d_t position); /* sets the position of the font in the scene */
 v2d_t font_get_position(const font_t* f); /* gets the position of the font in the scene */
 v2d_t font_get_textsize(const font_t* f); /* returns the size, in pixels, of the rendered text */
-v2d_t font_get_charspacing(const font_t* f); /* character spacing */
 void font_set_width(font_t* f, int w); /* wordwrap (w is given in pixels) */
 bool font_is_visible(const font_t* f); /* is the font visible? */
 void font_set_visible(font_t* f, bool is_visible); /* show/hide font */
@@ -48,12 +50,15 @@ void font_use_substring(font_t* f, int index_of_first_char, int length); /* sinc
 fontalign_t font_get_align(const font_t* f); /* get the current align */
 void font_set_align(font_t* f, fontalign_t align); /* set the align */
 int font_get_maxlength(const font_t* f); /* get the maximum number of characters that can be displayed, ignoring color tags and blanks */
-void font_set_maxlength(font_t* f, int maxlength); /* set the maximum number of characters, ignoring color tags and blanks */
+void font_set_maxlength(font_t* f, int max_length); /* set the maximum number of characters, ignoring color tags and blanks */
+const char* font_get_filepath(const font_t* f); /* get the relative path of the file (image, truetype font...) that originates this font */
+const struct image_t* font_get_image(const font_t* f); /* get the image atlas if it's a bitmap font; otherwise NULL is returned */
 
 /* misc */
-void font_init(bool allow_font_smoothing); /* initializes the font module */
+void font_init(); /* initializes the font module */
 void font_release(); /* releases the font module */
 void font_register_variable(const char* variable_name, const char* (*callback)()); /* variable/text interpolation */
+bool font_exists(const char* font_name); /* checks if a font script (.fnt) of the given name exists */
 
 
 #endif

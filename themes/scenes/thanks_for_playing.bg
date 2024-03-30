@@ -1,0 +1,102 @@
+// -----------------------------------------------------------------------------
+// File: thanks_for_playing.bg
+// Description: background script for the "Thanks for Playing" scene
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// background images
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            FALSE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/scenes/thanks_for_playing.png"
+        source_rect     0 240 852 480
+        frame_size      426 240
+
+        animation
+        {
+            repeat      TRUE
+            fps         1
+            data        0 0 0 1 1 1 2 2 2 3 3 3
+        }
+    }
+}
+
+// screenshots
+background
+{
+    initial_position    40 132
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            FALSE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/scenes/thanks_for_playing.png"
+        source_rect     432 0 340 192
+        frame_size      170 96
+
+        animation
+        {
+            repeat      TRUE
+            fps         1
+            data        0 0 0 1 1 1 2 2 2 3 3 3
+        }
+    }
+}
+
+// mobile phone
+background
+{
+    initial_position    32 128
+    scroll_speed        0 0
+    behavior            DEFAULT
+    repeat_x            FALSE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/scenes/thanks_for_playing.png"
+        source_rect     32 128 184 104
+        frame_size      184 104
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// header
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            LINEAR -30 0
+    repeat_x            TRUE
+    repeat_y            FALSE
+
+    sprite
+    {
+        source_file     "images/scenes/thanks_for_playing.png"
+        source_rect     0 0 416 44
+        frame_size      416 44
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}

@@ -1,2129 +1,2137 @@
-// -----------------------------------------------------------------------------
-// File: waterworks.brk
-// Description: brickset script for Waterworks Zone
-// Author: Alexandre Martins <http://opensurge2d.org>
-// License: MIT
-// -----------------------------------------------------------------------------
+// This file was generated automatically by the Quick Brickset Editor version 1.2
+// Date: Mon Jan 02 2023 17:03:30 GMT-0300 (Brasilia Standard Time)
+// https://wiki.opensurge2d.org/Quick_Brickset_Editor
 
 brick 1
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask001.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
     zindex              0.48
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick001.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 0 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 2
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask002.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick002.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 0 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 3
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask003.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick003.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 0 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 4
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask004.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
     zindex              0.49
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick004.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 0 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 5
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask005.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick005.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 0 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 6
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask006.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick006.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 0 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 7
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask007.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick007.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 0 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 8
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask008.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick008.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 0 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 9
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask009.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick009.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1152 0 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 10
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask010.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick010.png"
-        source_rect     0 0 256 256
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 0 256 256
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         12
-            data        0 1 2 3
+            repeat     TRUE
+            fps        12
+            data       0 1 2 3
         }
     }
 }
-
 
 brick 11
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask011.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick011.png"
-        source_rect     0 0 256 256
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 0 256 256
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         12
-            data        0 1 2 3
+            repeat     TRUE
+            fps        12
+            data       0 1 2 3
         }
     }
 }
-
 
 brick 20
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask020.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick020.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 21
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask021.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick021.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 22
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask022.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick022.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 23
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask023.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick023.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 24
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask024.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick024.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 25
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask025.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick025.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 26
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask026.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick026.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 27
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask027.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick027.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 28
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask028.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick028.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 29
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask029.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick029.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1152 128 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 50
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask050.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
     zindex              0.29
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick050.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 256 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 51
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask051.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick051.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 256 128 16
+        frame_size     128 16
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 52
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask052.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick052.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 256 32 128
+        frame_size     32 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 53
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask053.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick053.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 256 32 128
+        frame_size     32 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 54
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask054.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick054.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 256 32 128
+        frame_size     32 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 55
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask055.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick055.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 256 32 128
+        frame_size     32 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 56
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask056.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick056.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 256 128 32
+        frame_size     128 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 57
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask057.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick057.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 256 128 32
+        frame_size     128 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 60
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask060.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick060.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1408 256 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 61
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask061.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick061.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 256 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 62
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask062.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick062.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1664 256 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 63
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask063.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick063.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 256 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 64
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask064.png"
-    zindex              0.30
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.3
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick064.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1920 256 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 101
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask101.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick101.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 384 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 102
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask102.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick102.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 384 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 103
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask103.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick103.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 384 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 104
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask104.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick104.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 384 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 105
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask105.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick105.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 384 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 110
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask110.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick110.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 384 32 128
+        frame_size     32 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 111
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask111.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick111.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1152 384 32 128
+        frame_size     32 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 112
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask112.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick112.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1280 384 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 113
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask113.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick113.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1408 384 128 32
+        frame_size     128 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 114
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask114.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick114.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 384 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 115
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask115.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick115.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1664 384 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 116
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask116.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick116.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 384 128 32
+        frame_size     128 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 117
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask117.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick117.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1920 384 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 130
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask130.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
     zindex              0.49
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick130.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 131
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask131.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
     zindex              0.49
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick131.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 140
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask140.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick140.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 141
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask141.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick141.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 142
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask142.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick142.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 143
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask143.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick143.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 150
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask150.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick150.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 151
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask151.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick151.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 152
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask152.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick152.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 153
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask153.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick153.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1152 512 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 160
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask160.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick160.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 640 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 161
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask161.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick161.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 640 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 162
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask162.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick162.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 640 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 163
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask163.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick163.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 640 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 164
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask164.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick164.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 640 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 165
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask165.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick165.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 640 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
 
+brick 166
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 640 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 167
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 640 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
 
 brick 180
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask180.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick180.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 768 64 48
+        frame_size     64 48
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 181
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask181.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick181.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 768 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 182
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask182.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick182.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 768 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 183
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask183.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick183.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 768 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 184
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask184.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick184.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 768 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 185
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask185.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick185.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 768 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 186
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask186.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick186.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 768 48 96
+        frame_size     48 96
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 187
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask187.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick187.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 768 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 188
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask188.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick188.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 768 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 189
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask189.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick189.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1152 768 48 96
+        frame_size     48 96
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 190
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask190.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick190.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1280 768 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 191
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask191.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick191.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1408 768 16 48
+        frame_size     16 48
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 192
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask192.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick192.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 768 16 32
+        frame_size     16 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 193
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask193.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick193.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1664 768 16 32
+        frame_size     16 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 201
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask201.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick201.png"
-        source_rect     0 0 128 128
-        frame_size      64 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 1024 128 128
+        frame_size     64 128
 
         animation
         {
-            repeat      TRUE
-            fps         12
-            data        0 1
+            repeat     TRUE
+            fps        12
+            data       0 1
         }
     }
 }
-
 
 brick 202
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask202.png"
-    zindex              0.20
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.2
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick202.png"
-        source_rect     0 0 256 256
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 1024 512 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         12
-            data        0 1 2 3
+            repeat     TRUE
+            fps        12
+            data       0 1 2 3
         }
     }
 }
-
 
 brick 203
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask203.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
     zindex              0.21
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick203.png"
-        source_rect     0 0 256 256
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 1024 512 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         12
-            data        0 1 2 3
+            repeat     TRUE
+            fps        12
+            data       0 1 2 3
         }
     }
 }
-
-
-brick 220
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask220.png"
-    zindex              0.1
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick220.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 221
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask221.png"
-    zindex              0.1
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick221.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 222
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask222.png"
-    zindex              0.1
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick222.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 223
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask223.png"
-    zindex              0.1
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick223.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 230
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask230.png"
-    zindex              1.0
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick230.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 231
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask231.png"
-    zindex              1.0
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick231.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 232
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask232.png"
-    zindex              1.0
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick232.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 233
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask233.png"
-    zindex              1.0
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick233.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 234
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask234.png"
-    zindex              1.0
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick234.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 235
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask235.png"
-    zindex              1.0
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick235.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 236
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask236.png"
-    zindex              1.0
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick236.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 237
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask237.png"
-    zindex              1.0
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick237.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-
 
 brick 250
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask250.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
     zindex              0.7
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick250.png"
-        source_rect     0 0 128 128
-        frame_size      32 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 1024 128 96
+        frame_size     32 96
 
         animation
         {
-            repeat      TRUE
-            fps         12
-            data        0 1 2 3
+            repeat     TRUE
+            fps        12
+            data       0 1 2 3
         }
     }
 }
-
 
 brick 251
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask251.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick251.png"
-        source_rect     0 0 128 128
-        frame_size      32 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1920 1024 128 96
+        frame_size     32 96
 
         animation
         {
-            repeat      TRUE
-            fps         12
-            data        0 1 2 3
+            repeat     TRUE
+            fps        12
+            data       0 1 2 3
         }
     }
 }
 
+brick 220
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.1
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 1152 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 221
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.1
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 1152 16 64
+        frame_size     16 64
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 222
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.1
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 1152 64 16
+        frame_size     64 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 223
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.1
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 1152 64 16
+        frame_size     64 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 230
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 1152 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 231
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1152 1152 32 128
+        frame_size     32 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 232
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1280 1152 32 128
+        frame_size     32 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 233
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1408 1152 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 234
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 1152 128 32
+        frame_size     128 32
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 235
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1664 1152 128 32
+        frame_size     128 32
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 236
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 1152 64 64
+        frame_size     64 64
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 237
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              1.0
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1920 1152 32 32
+        frame_size     32 32
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
 
 brick 260
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask260.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick260.png"
-        source_rect     0 0 32 32
-        frame_size      16 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 1280 128 96
+        frame_size     16 32
 
         animation
         {
-            repeat      TRUE
-            fps         24
-            data        0 1 1 1 1 1 0 1 0 1 0 0 0 1 1 0 0 1 1 0 0 0 0 1
+            repeat     TRUE
+            fps        24
+            data       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
         }
     }
 }
@@ -2132,19 +2140,20 @@ brick 261
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask261.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick261.png"
-        source_rect     0 0 32 32
-        frame_size      16 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 1280 128 96
+        frame_size     16 32
 
         animation
         {
-            repeat      TRUE
-            fps         24
-            data        0 1 1 1 1 1 0 1 0 1 0 0 0 1 1 0 0 1 1 0 0 0 0 1
+            repeat     TRUE
+            fps        24
+            data       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
         }
     }
 }
@@ -2153,19 +2162,20 @@ brick 262
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask262.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick262.png"
-        source_rect     0 0 32 32
-        frame_size      16 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 1280 128 96
+        frame_size     16 32
 
         animation
         {
-            repeat      TRUE
-            fps         24
-            data        0 1 1 1 1 1 0 1 0 1 0 0 0 1 1 0 0 1 1 0 0 0 0 1
+            repeat     TRUE
+            fps        24
+            data       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
         }
     }
 }
@@ -2174,19 +2184,20 @@ brick 263
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask263.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick263.png"
-        source_rect     0 0 32 32
-        frame_size      16 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 1280 128 96
+        frame_size     16 32
 
         animation
         {
-            repeat      TRUE
-            fps         24
-            data        0 1 1 1 1 1 0 1 0 1 0 0 0 1 1 0 0 1 1 0 0 0 0 1
+            repeat     TRUE
+            fps        24
+            data       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
         }
     }
 }
@@ -2195,811 +2206,372 @@ brick 264
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask264.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick264.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 1280 16 32
+        frame_size     16 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 268
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask268.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick268.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 1280 80 32
+        frame_size     80 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 269
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask269.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick269.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 1280 64 32
+        frame_size     64 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 270
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask270.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
     zindex              0.51
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick270.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 1280 16 32
+        frame_size     16 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 271
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask271.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick271.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 1280 16 32
+        frame_size     16 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 272
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask272.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.51
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick272.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1408 1280 64 32
+        frame_size     64 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 273
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask273.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.51
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick273.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 1280 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 274
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask274.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.51
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick274.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1664 1280 32 64
+        frame_size     32 64
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 275
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask275.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.51
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick275.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 1280 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
 
+brick 290
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.51
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1920 1280 32 32
+        frame_size     32 32
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
 
 brick 276
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask276.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick276.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 1408 16 64
+        frame_size     16 64
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 277
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask277.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick277.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 1408 16 64
+        frame_size     16 64
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 278
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask278.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick278.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 1408 16 64
+        frame_size     16 64
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 280
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask280.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick280.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 1408 32 16
+        frame_size     32 16
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 281
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask281.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick281.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 1408 32 16
+        frame_size     32 16
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 282
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask282.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick282.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-
-
-//
-// Tubes
-//
-
-brick 501
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask501.png"
-    zindex              0.49
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick501.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 502
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask502.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick502.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 503
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask503.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick503.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 504
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask504.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick504.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 505
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask505.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick505.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 506
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask506.png"
-    zindex              0.49
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick506.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 507
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask507.png"
-    zindex              0.49
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick507.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 508
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask508.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick508.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 509
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask509.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick509.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 510
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask510.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick510.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 511
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask511.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick511.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 512
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask512.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick512.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 513
-{
-    type                SOLID
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask513.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick513.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-
-//
-// Pillar
-//
-
-brick 551
-{
-    type                SOLID
-    behavior            MARKER
-    mask                "images/bricks/waterworks-zone/mask551.png"
-    zindex              0.01
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick551.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 552
-{
-    type                SOLID
-    behavior            MARKER
-    mask                "images/bricks/waterworks-zone/mask552.png"
-    zindex              0.01
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick552.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 553
-{
-    type                SOLID
-    behavior            MARKER
-    mask                "images/bricks/waterworks-zone/mask553.png"
-    zindex              0.01
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick553.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 554
-{
-    type                SOLID
-    behavior            MARKER
-    mask                "images/bricks/waterworks-zone/mask554.png"
-    zindex              0.01
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick554.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 555
-{
-    type                SOLID
-    behavior            MARKER
-    mask                "images/bricks/waterworks-zone/mask555.png"
-    zindex              0.01
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick555.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 556
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask556.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
     zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick556.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 1408 32 16
+        frame_size     32 16
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
-brick 557
-{
-    type                PASSABLE
-    behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask557.png"
-    zindex              0.51
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick557.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-
-
-//
-// Conveyor Belt
-//
 
 brick 801
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask801.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick801.png"
-        source_rect     0 0 32 96
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1280 1408 32 96
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         30
-            data        0 1 2
+            repeat     TRUE
+            fps        30
+            data       0 1 2
         }
     }
 }
@@ -3008,19 +2580,20 @@ brick 802
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask802.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick802.png"
-        source_rect     0 0 48 96
-        frame_size      48 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1408 1408 48 96
+        frame_size     48 32
 
         animation
         {
-            repeat      TRUE
-            fps         30
-            data        0 1 2
+            repeat     TRUE
+            fps        30
+            data       0 1 2
         }
     }
 }
@@ -3029,19 +2602,20 @@ brick 803
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask803.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick803.png"
-        source_rect     0 0 32 96
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 1408 32 96
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         30
-            data        0 1 2
+            repeat     TRUE
+            fps        30
+            data       0 1 2
         }
     }
 }
@@ -3050,19 +2624,20 @@ brick 804
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask804.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick804.png"
-        source_rect     0 0 32 96
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1664 1408 32 96
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         30
-            data        0 1 2
+            repeat     TRUE
+            fps        30
+            data       0 1 2
         }
     }
 }
@@ -3071,19 +2646,20 @@ brick 805
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask805.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick805.png"
-        source_rect     0 0 48 96
-        frame_size      48 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 1408 48 96
+        frame_size     48 32
 
         animation
         {
-            repeat      TRUE
-            fps         30
-            data        0 1 2
+            repeat     TRUE
+            fps        30
+            data       0 1 2
         }
     }
 }
@@ -3092,426 +2668,482 @@ brick 806
 {
     type                CLOUD
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask806.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick806.png"
-        source_rect     0 0 32 96
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1920 1408 32 96
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         30
-            data        0 1 2
+            repeat     TRUE
+            fps        30
+            data       0 1 2
         }
     }
 }
 
+brick 501
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.49
 
-//
-// Special bricks
-//
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 1536 128 128
+        frame_size     128 128
 
-brick 901
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 502
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 503
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 504
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 505
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 506
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.49
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 507
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.49
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 508
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 509
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 510
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1152 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 511
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1280 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 512
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1408 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 513
+{
+    type                SOLID
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 1536 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 551
+{
+    type                SOLID
+    behavior            MARKER
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.01
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 1664 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 552
+{
+    type                SOLID
+    behavior            MARKER
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.01
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 1664 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 553
+{
+    type                SOLID
+    behavior            MARKER
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.01
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 1664 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 554
+{
+    type                SOLID
+    behavior            MARKER
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.01
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 1664 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 555
+{
+    type                SOLID
+    behavior            MARKER
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.01
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 1664 128 128
+        frame_size     128 128
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 556
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask901.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick901.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 1664 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
 
-brick 902
-{
-    type                PASSABLE
-    behavior            CIRCULAR 16 16 0.25 0.25
-    mask                "images/bricks/waterworks-zone/mask902.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick902.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 903
-{
-    type                PASSABLE
-    behavior            CIRCULAR 32 32 0.25 0.25
-    mask                "images/bricks/waterworks-zone/mask903.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick903.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 904
-{
-    type                PASSABLE
-    behavior            CIRCULAR 48 48 0.25 0.25
-    mask                "images/bricks/waterworks-zone/mask904.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick904.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 905
-{
-    type                PASSABLE
-    behavior            CIRCULAR 64 64 0.25 0.25
-    mask                "images/bricks/waterworks-zone/mask905.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick905.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 906
-{
-    type                PASSABLE
-    behavior            CIRCULAR 80 80 0.25 0.25
-    mask                "images/bricks/waterworks-zone/mask906.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick906.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 907
-{
-    type                PASSABLE
-    behavior            CIRCULAR 96 96 0.25 0.25
-    mask                "images/bricks/waterworks-zone/mask907.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick907.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 908
-{
-    type                PASSABLE
-    behavior            CIRCULAR 112 112 0.25 0.25
-    mask                "images/bricks/waterworks-zone/mask908.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick908.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 909
-{
-    type                CLOUD
-    behavior            CIRCULAR 128 128 0.25 0.25
-    mask                "images/bricks/waterworks-zone/mask909.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick909.png"
-        source_rect     0 0 48 16
-        frame_size      48 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
-brick 911
+brick 557
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask911.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.51
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick911.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 1664 128 128
+        frame_size     128 128
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
-brick 912
-{
-    type                PASSABLE
-    behavior            CIRCULAR 16 16 0.25 0.25 180
-    mask                "images/bricks/waterworks-zone/mask912.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick912.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 913
-{
-    type                PASSABLE
-    behavior            CIRCULAR 32 32 0.25 0.25 180
-    mask                "images/bricks/waterworks-zone/mask913.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick913.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 914
-{
-    type                PASSABLE
-    behavior            CIRCULAR 48 48 0.25 0.25 180
-    mask                "images/bricks/waterworks-zone/mask914.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick914.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 915
-{
-    type                PASSABLE
-    behavior            CIRCULAR 64 64 0.25 0.25 180
-    mask                "images/bricks/waterworks-zone/mask915.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick915.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 916
-{
-    type                PASSABLE
-    behavior            CIRCULAR 80 80 0.25 0.25 180
-    mask                "images/bricks/waterworks-zone/mask916.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick916.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 917
-{
-    type                PASSABLE
-    behavior            CIRCULAR 96 96 0.25 0.25 180
-    mask                "images/bricks/waterworks-zone/mask917.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick917.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 918
-{
-    type                PASSABLE
-    behavior            CIRCULAR 112 112 0.25 0.25 180
-    mask                "images/bricks/waterworks-zone/mask918.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick918.png"
-        source_rect     0 0 16 16
-        frame_size      16 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-brick 919
-{
-    type                CLOUD
-    behavior            CIRCULAR 128 128 0.25 0.25 180
-    mask                "images/bricks/waterworks-zone/mask919.png"
-
-    sprite
-    {
-        source_file     "images/bricks/waterworks-zone/brick919.png"
-        source_rect     0 0 48 16
-        frame_size      48 16
-
-        animation
-        {
-            repeat      TRUE
-            fps         8
-            data        0
-        }
-    }
-}
-
-
 
 brick 921
 {
     type                CLOUD
     behavior            CIRCULAR 0 128 0 0.25
-    mask                "images/bricks/waterworks-zone/mask921.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick921.png"
-        source_rect     0 0 128 64
-        frame_size      128 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1280 1664 128 64
+        frame_size     128 32
 
         animation
         {
-            repeat      TRUE
-            fps         32
-            data        0 1
+            repeat     TRUE
+            fps        32
+            data       0 1
         }
     }
 }
@@ -3520,19 +3152,20 @@ brick 922
 {
     type                CLOUD
     behavior            CIRCULAR 0 128 0 0.25 180
-    mask                "images/bricks/waterworks-zone/mask922.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick922.png"
-        source_rect     0 0 128 64
-        frame_size      128 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1408 1664 128 64
+        frame_size     128 32
 
         animation
         {
-            repeat      TRUE
-            fps         32
-            data        0 1
+            repeat     TRUE
+            fps        32
+            data       0 1
         }
     }
 }
@@ -3541,19 +3174,20 @@ brick 923
 {
     type                CLOUD
     behavior            FLOAT
-    mask                "images/bricks/waterworks-zone/mask923.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick923.png"
-        source_rect     0 0 128 64
-        frame_size      128 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 1664 128 64
+        frame_size     128 32
 
         animation
         {
-            repeat      TRUE
-            fps         32
-            data        0 1
+            repeat     TRUE
+            fps        32
+            data       0 1
         }
     }
 }
@@ -3562,19 +3196,20 @@ brick 924
 {
     type                CLOUD
     behavior            FLOAT
-    mask                "images/bricks/waterworks-zone/mask924.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick924.png"
-        source_rect     0 0 48 32
-        frame_size      48 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1664 1664 48 32
+        frame_size     48 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
@@ -3583,63 +3218,460 @@ brick 925
 {
     type                CLOUD
     behavior            FLOAT
-    mask                "images/bricks/waterworks-zone/mask925.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick925.png"
-        source_rect     0 0 128 32
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 1664 128 128
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         12
-            data        0 0 0 0 0 0 0 0 0 0 0 0 1 2 3 2 1
+            repeat     TRUE
+            fps        12
+            data       0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
         }
     }
 }
-
 
 brick 926
 {
     type                PASSABLE
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask926.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick926.png"
-        source_rect     0 0 128 128
-        frame_size      128 128
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1920 1664 32 64
+        frame_size     32 64
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
 
+brick 901
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 902
+{
+    type                PASSABLE
+    behavior            CIRCULAR 16 16 0.25 0.25
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 903
+{
+    type                PASSABLE
+    behavior            CIRCULAR 32 32 0.25 0.25
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 904
+{
+    type                PASSABLE
+    behavior            CIRCULAR 48 48 0.25 0.25
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 905
+{
+    type                PASSABLE
+    behavior            CIRCULAR 64 64 0.25 0.25
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 906
+{
+    type                PASSABLE
+    behavior            CIRCULAR 80 80 0.25 0.25
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 907
+{
+    type                PASSABLE
+    behavior            CIRCULAR 96 96 0.25 0.25
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 908
+{
+    type                PASSABLE
+    behavior            CIRCULAR 112 112 0.25 0.25
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 909
+{
+    type                CLOUD
+    behavior            CIRCULAR 128 128 0.25 0.25
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 1792 48 16
+        frame_size     48 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 911
+{
+    type                PASSABLE
+    behavior            DEFAULT
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1152 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 912
+{
+    type                PASSABLE
+    behavior            CIRCULAR 16 16 0.25 0.25 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1280 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 913
+{
+    type                PASSABLE
+    behavior            CIRCULAR 32 32 0.25 0.25 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1408 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 914
+{
+    type                PASSABLE
+    behavior            CIRCULAR 48 48 0.25 0.25 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1536 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 915
+{
+    type                PASSABLE
+    behavior            CIRCULAR 64 64 0.25 0.25 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1664 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 916
+{
+    type                PASSABLE
+    behavior            CIRCULAR 80 80 0.25 0.25 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 917
+{
+    type                PASSABLE
+    behavior            CIRCULAR 96 96 0.25 0.25 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1920 1792 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 918
+{
+    type                PASSABLE
+    behavior            CIRCULAR 112 112 0.25 0.25 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    0 1920 16 16
+        frame_size     16 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 919
+{
+    type                CLOUD
+    behavior            CIRCULAR 128 128 0.25 0.25 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    128 1920 48 16
+        frame_size     48 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
 
 brick 931
 {
     type                SOLID
-    behavior            CIRCULAR 64 0 0.125 0
-    mask                "images/bricks/waterworks-zone/mask931.png"
+    behavior            CIRCULAR 64 0 0.15 0
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick931.png"
-        source_rect     0 0 32 32
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    256 1920 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
@@ -3647,20 +3679,21 @@ brick 931
 brick 932
 {
     type                SOLID
-    behavior            CIRCULAR 32 0 0.125 0
-    mask                "images/bricks/waterworks-zone/mask932.png"
+    behavior            CIRCULAR 32 0 0.15 0
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick932.png"
-        source_rect     0 0 32 32
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    384 1920 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
@@ -3669,19 +3702,20 @@ brick 933
 {
     type                SOLID
     behavior            DEFAULT
-    mask                "images/bricks/waterworks-zone/mask933.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick933.png"
-        source_rect     0 0 32 32
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    512 1920 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
@@ -3689,20 +3723,21 @@ brick 933
 brick 934
 {
     type                SOLID
-    behavior            CIRCULAR 32 0 0.125 0 180
-    mask                "images/bricks/waterworks-zone/mask934.png"
+    behavior            CIRCULAR 32 0 0.15 0 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick934.png"
-        source_rect     0 0 32 32
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    640 1920 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
@@ -3710,65 +3745,131 @@ brick 934
 brick 935
 {
     type                SOLID
-    behavior            CIRCULAR 64 0 0.125 0 180
-    mask                "images/bricks/waterworks-zone/mask935.png"
+    behavior            CIRCULAR 64 0 0.15 0 180
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick935.png"
-        source_rect     0 0 32 32
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    768 1920 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
 
+brick 951
+{
+    type                SOLID
+    behavior            FALL 16 4 1
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    896 1920 128 32
+        frame_size     128 32
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 961
+{
+    type                SOLID
+    behavior            SMASHABLE 2 1
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1024 1920 32 16
+        frame_size     32 16
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
+
+brick 997
+{
+    type                PASSABLE
+    behavior            MARKER
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
+
+    sprite
+    {
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1664 1920 32 32
+        frame_size     32 32
+
+        animation
+        {
+            repeat     TRUE
+            fps        8
+            data       0
+        }
+    }
+}
 
 brick 998
 {
     type                CLOUD
     behavior            MARKER
-    mask                "images/bricks/waterworks-zone/mask998.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick998.png"
-        source_rect     0 0 32 32
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1792 1920 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-
 
 brick 999
 {
     type                SOLID
     behavior            MARKER
-    mask                "images/bricks/waterworks-zone/mask999.png"
+    mask                "images/bricks/waterworks-zone-mask.png"
+    zindex              0.5
 
     sprite
     {
-        source_file     "images/bricks/waterworks-zone/brick999.png"
-        source_rect     0 0 32 32
-        frame_size      32 32
+        source_file    "images/bricks/waterworks-zone.png"
+        source_rect    1920 1920 32 32
+        frame_size     32 32
 
         animation
         {
-            repeat      TRUE
-            fps         8
-            data        0
+            repeat     TRUE
+            fps        8
+            data       0
         }
     }
 }
-

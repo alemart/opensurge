@@ -1,94 +1,121 @@
-![Open Surge](logo.png)
+# Surge Engine
 
-Welcome to **Open Surge**!
+[![Latest release](https://img.shields.io/github/v/release/alemart/opensurge?color=blue)](https://github.com/alemart/opensurge/releases)
+[![License](https://img.shields.io/github/license/alemart/opensurge?color=brightgreen)](#license)
+[![GitHub Repo stars](https://img.shields.io/github/stars/alemart/opensurge?logo=github&color=orange)](https://github.com/alemart/opensurge/stargazers)
+[![Discord server](https://img.shields.io/discord/493384707937927178?color=5662f6&logo=discord&logoColor=white)](https://discord.gg/w8JqM7m)
+[![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCqy8swP261RPePNdBdJUdHg?style=flat&logo=youtube&label=YouTube&color=ff0000)](https://youtube.com/alemart88)
 
-Download the game at [opensurge2d.org](http://opensurge2d.org)
+**Surge the Rabbit** is a fun and open source jump 'n run retro game made in the spirit of classic 16-bit Sonic platformers of the 90s. The levels are filled with challenges, gimmicks and hazards! Exciting adventures are waiting for you! You can also use it as a base to create your own amazing games!
 
-## What is Open Surge?
+**Make your dreams come true!** Surge Engine is the very flexible open source 2D game engine that powers Surge the Rabbit. Its capabilities include: level editing, artwork modding, full blown scripting, and much more! It's an open-source, cross-platform retro game engine that runs on Desktop computers and on mobile devices.
 
-Open Surge is a fun 2D retro platformer inspired by Sonic games and a game creation system that lets you unleash your creativity!
+**The fun is multiplied!** Several MODs created by the fans in the Open Surge Community can be played on the engine. For those who get involved, this project is also a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.
 
 <img src="https://opensurge2d.org/surge-demo.gif" alt="Open Surge demo" width="480">
 
-Open Surge is currently available for Microsoft Windows, GNU/Linux and macOS. It's in active development!
+## Support the project
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/opensurge.svg)](https://repology.org/project/opensurge/versions)
+Please support the development of the project:
 
-<img src="surge.png" alt="Surge" width="256" align="right">
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/alemart?style=social&logo=github%20sponsors&label=Support%20me%20on%20GitHub%20Sponsors)](https://github.com/sponsors/alemart)
 
-## About Open Surge
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J41O00K)
 
-Open Surge is two projects in one: a game and a game creation system (game engine). It is released as [free and open source software](https://en.wikipedia.org/wiki/Free_and_open-source_software).
+## Documentation
 
-Open Surge is written from the ground up in C language, using the [Allegro game programming library](http://liballeg.org). The project has been started by [Alexandre Martins](http://github.com/alemart), a computer scientist from Brazil. Nowadays, Open Surge has contributors all over the world!
+* [Open Surge Wiki](https://wiki.opensurge2d.org)
+* [Introduction to modding](https://wiki.opensurge2d.org/Introduction_to_Modding)
+* [SurgeScript documentation](https://docs.opensurge2d.org)
 
-## How do I play?
+## About
 
-You can play using a keyboard or a joystick.
+The project is written from the ground up in C language, using the [Allegro game programming library](http://liballeg.org). It has been started by [Alexandre Martins](http://github.com/alemart), a computer scientist from Brazil. Nowadays, it has contributors all over the world!
 
-| Key           | Effect          
-| --------------|------------------|
-| Arrows        | Move             |
-| Space         | Jump             |
-| Enter         | Pause            |
-| Esc           | Quit             |
-| Left Ctrl     | Switch character |
-| Equals (=)    | Take snapshot    |
-| F12           | Open the editor  |
+## Contribute
 
-## How do I create a game?
-
-Use Open Surge to create your own amazing games! Create new levels, items, bosses, gameplay mechanics, playable characters, special abilities and more!
-
-* First, learn how to create a level using the built-in editor (press F12 during gameplay)
-* Next, learn how to do [basic hacking](http://opensurge2d.org) (modify the images/sounds, create new scenery, new characters, etc.)
-* Finally, have fun with scripting! [SurgeScript](http://docs.opensurge2d.org), the scripting language featured in Open Surge, gives you ultimate power to create anything you desire and make your dreams come alive!
-
-To learn more, read the [project wiki](http://opensurge2d.org/wiki) and watch the [video tutorials](http://youtube.com/alemart88) made by the developer of the engine.
+See [CONTRIBUTING](https://github.com/alemart/opensurge/blob/master/CONTRIBUTING.md).
 
 ## Advanced users
 
-### Running from the command line
+### Command-line options
 
-Advanced features are available via the command line. For more information, run:
+Run `opensurge --help`
+
+### Running MODs
+
+Extract the MOD to your filesystem and run the game.
+
+- Windows: launch the executable.
+- Linux, macOS: run `opensurge --game /path/to/game/` on the command-line or load the game from the options screen.
+
+Linux users should extract MODs preferably to their home folder. Flatpak users may use `~/Downloads`.
+
+[Visit the wiki](https://wiki.opensurge2d.org/User-made_games) for more information on user-made MODs.
+
+### Paths
+
+Content is distributed in the following locations: (since version 0.6.1)
+
+- `bin`: executable file
+- `share`: game assets (images, audio, levels, scripts, etc.)
+- `user`: user-modifiable data (preferences, logs, screenshots, additional assets such as user-made levels)
+
+The default paths of these locations vary according to the platform:
+
+- Windows (.zip package):
+    * `bin`: `./opensurge.exe`
+    * `share`: `.`
+    * `user`: `.` or `%OPENSURGE_USER_PATH%`
+
+- Linux:
+    * `bin`: `/usr/games/opensurge`
+    * `share`: `/usr/share/games/opensurge/`
+    * `user`: `~/.local/share/opensurge/` or `$XDG_DATA_HOME/opensurge/` or `$OPENSURGE_USER_PATH`
+
+- Linux ([Flatpak](https://flathub.org/apps/details/org.opensurge2d.OpenSurge)):
+    * `bin`: `flatpak run org.opensurge2d.OpenSurge`
+    * `share`: `/var/lib/flatpak/app/org.opensurge2d.OpenSurge/current/active/files/share/opensurge/`
+    * `user`: `~/.var/app/org.opensurge2d.OpenSurge/data/opensurge/` or `$OPENSURGE_USER_PATH`
+
+    If you use `$OPENSURGE_USER_PATH`, make sure it points to a subdirectory of `~/Downloads` (`$XDG_DOWNLOAD_DIR`).
+
+- Linux ([Snap](https://snapcraft.io/opensurge)):
+    * `bin`: `snap run opensurge`
+    * `share`: `/snap/opensurge/current/share/games/opensurge/`
+    * `user`: `~/snap/opensurge/current/.local/share/opensurge/` or `$OPENSURGE_USER_PATH`
+
+    If you use `$OPENSURGE_USER_PATH`, make sure it points to a subdirectory of your home folder.
+
+- macOS:
+    * `bin`: `Contents/MacOS`
+    * `share`: `Contents/Resources`
+    * `user`: `~/Library/Application Support/opensurge/` or `$OPENSURGE_USER_PATH`
+
+If you intend to hack the game, it's easier to have all files in the same place (read-write), because some of the above folders are read-only. [Download the sources](https://github.com/alemart/opensurge/releases) (use the same engine version), extract them to your filesystem and use the `--game-folder` command-line option.
+
+Tip: since version 0.6.1, check the *Engine information* at the options screen to see where the files are. Alternatively, you can use the command-line option `--verbose`: the directories will appear at the beginning of the output.
+
+### Compiling the engine
+
+Dependencies:
+
+* [Allegro](http://liballeg.org) version 5.2.7 or later (modified 5.2.9 on Android)
+* [SurgeScript](http://github.com/alemart/surgescript) version 0.6.0
+* [PhysicsFS](https://github.com/icculus/physfs) version 3.2.0 (recommended) or 3.0.2
+
+Compile as usual:
 
 ```
-opensurge --help
-```
-
-### Compiling Open Surge
-
-To compile Open Surge from the source code, you'll need a C compiler, [CMake](http://cmake.org), and the following development libraries:
-
-* [Allegro 5](http://liballeg.org) (version 5.2.7 or higher)
-* [SurgeScript](http://github.com/alemart/surgescript) (version 0.5.5 or higher)
-
-After downloading and extracting the source code, create a build directory and compile from there:
-
-```
+cd /path/to/opensurge/
 mkdir build && cd build
 cmake ..
-make
-```
-
-To perform a system-wide installation on Linux, run:
-
-```
+make -j4
 sudo make install
 ```
 
-You may run `ccmake` or `cmake-gui` to change the build options (e.g., set the path of the installation directory). If you have installed the development libraries into non-standard paths, you need to configure their appropriate paths as well.
+Use `cmake-gui` or `ccmake` for tweaking, like installing the engine to or finding the dependencies on non-standard paths.
 
-**Note:** read the [project wiki](http://opensurge2d.org/wiki) for detailed instructions.
+## License
 
-**Linux users:** game assets (images, sounds, etc.) can be stored globally or in user-space. Assets located in user-space take precedence over assets located in system directories. Open Surge uses the XDG Base Directory specification; look for the *opensurge2d* directory.
-
-| Files         | Usual locations       |
-| --------------|-----------------------|
-| Game assets   | /usr/share/games, ~/.local/share/opensurge2d |
-| Game config.  | ~/.config/opensurge2d |
-| Logs, etc.    | ~/.cache/opensurge2d  |
-
-If you're using Flatpak, user-space files are found at `~/.var/app/org.opensurge2d.OpenSurge`. If you're using Snap, they are found at: `~/snap/opensurge/current/.local/share/opensurge2d`, `~/snap/opensurge/current/.config/opensurge2d`, and `~/snap/opensurge/common/.cache/opensurge2d`.
-
-**Portable setup:** if you haven't done a system-wide installation, Open Surge can also read files from the folder of the executable.
+Open Surge Engine Copyright 2008-present Alexandre Martins. This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. For more information, see [LICENSE](https://github.com/alemart/opensurge/blob/master/LICENSE).

@@ -1,0 +1,16 @@
+//
+// Play Classic Levels
+//
+
+name "Play classic levels?"
+author "Alexandre Martins"
+license "CC BY 4.0"
+version "1.0"
+requires "0.6.1"
+act 1
+theme "themes/none.brk"
+bgtheme "themes/scenes/play_classic_levels.bg"
+spawn_point 0 0
+setup "Play Classic Levels"
+players "None"
+readonly

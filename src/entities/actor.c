@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * actor.c - actor module
- * Copyright (C) 2008-2012, 2018-2019, 2021-2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,9 +22,11 @@
 #include <math.h>
 #include "actor.h"
 #include "brick.h"
+#include "../util/numeric.h"
+#include "../util/util.h"
+#include "../util/transform.h"
 #include "../core/global.h"
 #include "../core/input.h"
-#include "../core/util.h"
 #include "../core/logfile.h"
 #include "../core/video.h"
 #include "../core/timer.h"
@@ -32,8 +34,9 @@
 
 
 /* private stuff */
-#define is_transition_animation(anim) ((anim)->next != NULL) /* is anim a transition animation? */
 static void update_animation(actor_t *act);
+static bool can_be_clipped_out(const actor_t* act, v2d_t topleft);
+static void actor_transform(ALLEGRO_TRANSFORM* transform, const actor_t* act, v2d_t topleft);
 
 
 /*
@@ -46,19 +49,21 @@ actor_t* actor_create()
 
     act->spawn_point = v2d_new(0, 0);
     act->position = act->spawn_point;
-    act->angle = 0.0f;
     act->speed = v2d_new(0,0);
     act->input = NULL;
 
     act->animation = NULL;
-    act->animation_frame = 0.0f;
+    act->next_animation = NULL;
+    act->animation_timer = 0.0;
     act->animation_speed_factor = 1.0f;
     act->synchronized_animation = false;
+
+    act->hot_spot = v2d_new(0, 0);
     act->mirror = IF_NONE;
     act->visible = true;
-    act->alpha = 1.0f;
-    act->hot_spot = v2d_new(0, 0);
+    act->angle = 0.0f;
     act->scale = v2d_new(1.0f, 1.0f);
+    act->alpha = 1.0f;
 
     return act;
 }
@@ -83,57 +88,48 @@ void actor_destroy(actor_t *act)
  */
 void actor_render(actor_t *act, v2d_t camera_position)
 {
-    image_t *img;
-
     if(act->visible && act->animation != NULL) {
-        /* update animation */
-        update_animation(act);
+        const image_t* img = actor_image(act);
+        v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
+        bool has_keyframes = animation_has_keyframes(act->animation);
+        bool clip_out = false;
 
-        /* render */
-        img = actor_image(act);
-        if(!nearly_zero(act->angle)) {
-            if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f))
-                image_draw_scaled_rotated(img, (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->scale, act->angle, act->mirror);
-            else
-                image_draw_rotated(img, (int)(act->position.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-(camera_position.y-VIDEO_SCREEN_H/2)), (int)act->hot_spot.x, (int)act->hot_spot.y, act->angle, act->mirror);
+        /* clip out? */
+        if(!has_keyframes) {
+            if(nearly_zero(act->angle) && nearly_equal(act->scale.x, 1.0f) && nearly_equal(act->scale.y, 1.0f)) {
+                if(can_be_clipped_out(act, topleft))
+                    clip_out = true;
+            }
         }
-        else if(!nearly_equal(act->scale.x, 1.0f) || !nearly_equal(act->scale.y, 1.0f))
-            image_draw_scaled(img, (int)(act->position.x-act->hot_spot.x*act->scale.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y*act->scale.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->scale, act->mirror);
-        else if(!nearly_equal(act->alpha, 1.0f))
-            image_draw_trans(img, (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->alpha, act->mirror);
-        else
-            image_draw(img, (int)(act->position.x-act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2)), (int)(act->position.y-act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2)), act->mirror);
+
+        if(!clip_out) {
+            /* set transform */
+            ALLEGRO_TRANSFORM transform, prev_transform;
+            al_copy_transform(&prev_transform, al_get_current_transform());
+            actor_transform(&transform, act, topleft);
+            al_compose_transform(&transform, &prev_transform);
+
+            al_use_transform(&transform);
+            {
+                /* find alpha */
+                float alpha = act->alpha;
+                if(has_keyframes)
+                    alpha *= animation_interpolated_opacity(act->animation, act->animation_timer);
+
+                /* render */
+                if(nearly_equal(alpha, 1.0f))
+                    image_draw(img, 0, 0, act->mirror);
+                else
+                    image_draw_trans(img, 0, 0, alpha, act->mirror);
+            }
+            al_use_transform(&prev_transform);
+        }
+
+        /* update animation timer (next frame) */
+        update_animation(act);
     }
 }
 
-
-
-/*
- * actor_render_repeat_xy()
- * Tiled rendering
- */
-void actor_render_repeat_xy(actor_t *act, v2d_t camera_position, int repeat_x, int repeat_y)
-{
-    int i, j, w, h;
-    image_t *img = actor_image(act);
-    v2d_t final_pos;
-
-    final_pos.x = (int)act->position.x%(repeat_x?image_width(img):INT_MAX) - act->hot_spot.x-(camera_position.x-VIDEO_SCREEN_W/2) - (repeat_x?image_width(img):0);
-    final_pos.y = (int)act->position.y%(repeat_y?image_height(img):INT_MAX) - act->hot_spot.y-(camera_position.y-VIDEO_SCREEN_H/2) - (repeat_y?image_height(img):0);
-
-    if(act->visible && act->animation != NULL) {
-        /* update animation */
-        update_animation(act);
-
-        /* render */
-        w = repeat_x ? (VIDEO_SCREEN_W/image_width(img) + 3) : 1;
-        h = repeat_y ? (VIDEO_SCREEN_H/image_height(img) + 3) : 1;
-        for(i=0; i<w; i++) {
-            for(j=0; j<h; j++)
-                image_draw(img, (int)final_pos.x + i*image_width(img), (int)final_pos.y + j*image_height(img), act->mirror);
-        }
-    }
-}
 
 
 /*
@@ -146,27 +142,53 @@ void actor_change_animation(actor_t *act, const animation_t *anim)
     if(act->animation == anim || anim == NULL)
         return;
 
-    /* are we playing a transition to anim? If so,
-       we wait until the end of the transition,
-       unless anim is also a transition (in
-       which case we change the animation) */
-    if(act->animation != NULL && act->animation->next == anim) {
-        if(!(actor_animation_finished(act) || is_transition_animation(anim)))
-            return;
-    }
+    /* are we playing an animation? */
+    if(act->animation != NULL) {
 
-    /* is there a transition from act->animation to anim? */
-    animation_t* transition = sprite_get_transition(act->animation, anim);
-    if(transition != NULL) {
-        transition->next = anim; /* this may be a transition to "any" animation */
-        anim = transition;
+        /* handle transitions */
+        const animation_t* transition = animation_find_transition(act->animation, anim);
+        if(transition == NULL) {
+            /* if there is no transition and/or if the current animation is a transition */
+            if(animation_is_transition(act->animation)) {
+                /* the current animation is a transition */
+                if(anim == act->next_animation) {
+                    /* is the transition over? */
+                    if(animation_is_over(act->animation, act->animation_timer)) {
+                        /* the transition is over */
+                        /*anim = act->next_animation;*/ /* anim is already the next animation */
+                        act->next_animation = NULL;
+                    }
+                    else {
+                        /* wait for the current transition to finish */
+                        return;
+                    }
+                }
+                else {
+                    /* the current animation is a transition, but we're going
+                       to interrupt it. A new animation (anim) will show up. */
+                    act->next_animation = NULL;
+                }
+            }
+            else {
+                /* the current animation is not a transition */
+                ; /* just change the animation - there are no transitions */
+            }
+        }
+        else {
+            /* there is a transition. This means that both anim and the current
+               animation are NOT transitions. */
+            act->next_animation = anim;
+            anim = transition;
+        }
+
     }
 
     /* change & reset the animation */
     act->animation = anim;
-    act->hot_spot = anim->hot_spot;
-    act->animation_frame = 0.0f;
+    act->hot_spot = animation_hot_spot(anim);
+    act->animation_timer = 0.0;
     act->animation_speed_factor = 1.0f;
+    act->synchronized_animation = false;
 }
 
 
@@ -177,7 +199,15 @@ void actor_change_animation(actor_t *act, const animation_t *anim)
  */
 void actor_change_animation_frame(actor_t *act, int frame)
 {
-    act->animation_frame = clip(frame, 0, act->animation->frame_count - 1);
+    /* no animation */
+    if(act->animation == NULL)
+        return;
+
+    /* changing the frame won't work if the animation is synchronized */
+    act->synchronized_animation = false;
+
+    /* change the frame */
+    act->animation_timer = animation_start_time_of_frame(act->animation, frame);
 }
 
 
@@ -201,11 +231,24 @@ void actor_change_animation_speed_factor(actor_t *act, float factor)
  */
 bool actor_animation_finished(const actor_t *act)
 {
-    if(!act->animation)
+    if(act->animation == NULL)
         return false;
 
-    float frame = act->animation_frame + (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
-    return (!act->animation->repeat && (int)frame >= act->animation->frame_count);
+    return animation_is_over(act->animation, act->animation_timer);
+}
+
+
+
+/*
+ * actor_is_transition_animation_playing()
+ * Returns true if a transition animation is playing
+ */
+bool actor_is_transition_animation_playing(const actor_t *act)
+{
+    if(act->animation == NULL)
+        return false;
+
+    return animation_is_transition(act->animation);
 }
 
 
@@ -216,6 +259,7 @@ bool actor_animation_finished(const actor_t *act)
  */
 void actor_synchronize_animation(actor_t *act, bool sync)
 {
+    /* only makes sense if the currently playing animation loops */
     act->synchronized_animation = sync;
 }
 
@@ -226,21 +270,25 @@ void actor_synchronize_animation(actor_t *act, bool sync)
  */
 int actor_animation_frame(const actor_t* act)
 {
-    return (int)(act->animation_frame);
+    if(act->animation == NULL)
+        return 0;
+
+    return animation_frame_at_time(act->animation, act->animation_timer);
 }
 
 
 /*
  * actor_image()
- * Returns the current image of the
- * animation of this actor
+ * Returns the current image of the animation of this actor
  */
-image_t* actor_image(const actor_t *act)
+const image_t* actor_image(const actor_t *act)
 {
-    if(!act->animation)
+    if(act->animation == NULL) {
         fatal_error("actor_image(): no animation is playing");
+        return NULL;
+    }
 
-    return sprite_get_image(act->animation, (int)(act->animation_frame));
+    return animation_image_at_time(act->animation, act->animation_timer);
 }
 
 /*
@@ -249,18 +297,45 @@ image_t* actor_image(const actor_t *act)
  */
 v2d_t actor_action_spot(const actor_t* act)
 {
-    if(!act->animation)
+    if(act->animation == NULL)
         return v2d_new(0, 0);
 
-    v2d_t hot_spot = act->animation->hot_spot;
-    v2d_t offset = v2d_subtract(act->animation->action_spot, hot_spot);
+    v2d_t hot_spot = animation_hot_spot(act->animation);
+    v2d_t action_spot = animation_action_spot(act->animation);
+    v2d_t offset = v2d_subtract(action_spot, hot_spot);
     v2d_t sign = v2d_new(
-        act->mirror & IF_HFLIP ? -1.0f : 1.0f,
-        act->mirror & IF_VFLIP ? -1.0f : 1.0f
+        (int)((act->mirror & IF_HFLIP) == 0) * 2 - 1,
+        (int)((act->mirror & IF_VFLIP) == 0) * 2 - 1
     );
 
     /* flip the action spot relative to the hot spot */
-    return v2d_add(hot_spot, v2d_new(offset.x * sign.x, offset.y * sign.y));
+    return v2d_add(hot_spot, v2d_compmult(offset, sign));
+}
+
+/*
+ * actor_action_offset()
+ * An offset that, when added to the position of the actor in space, results
+ * in the position of the (appropriately flipped) action spot in space.
+ */
+v2d_t actor_action_offset(const actor_t* act)
+{
+    return v2d_subtract(actor_action_spot(act), act->hot_spot);
+}
+
+
+/*
+ * actor_interpolated_transform()
+ * The interpolated transform of a keyframe-based animation at the current time
+ * If no keyframe-based animation is playing, the identity transform is returned
+ */
+transform_t* actor_interpolated_transform(const actor_t* act, transform_t* out_transform)
+{
+    /* no keyframe-based animation is playing */
+    if(act->animation == NULL || !animation_has_keyframes(act->animation))
+        return transform_identity(out_transform);
+
+    /* interpolate and return */
+    return animation_interpolated_transform(act->animation, act->animation_timer, out_transform);
 }
 
 
@@ -270,34 +345,66 @@ v2d_t actor_action_spot(const actor_t* act)
 /* this logic updates the animation of an actor */
 void update_animation(actor_t *act)
 {
+    /* nothing to do */
     if(act->animation == NULL)
         return;
 
-    if(!(act->synchronized_animation) || !(act->animation->repeat)) {
-        /* the animation isn't synchronized: every object updates its animation at its own pace */
-        act->animation_frame += (act->animation->fps * act->animation_speed_factor) * timer_get_delta();
-        if((int)act->animation_frame >= act->animation->frame_count) {
-            /* the animation has finished playing */
-            if(act->animation->repeat) {
-                act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
-            }
-            else {
-                act->animation_frame = act->animation->frame_count - 1;
-
-                /* is the current animation a transition? */
-                if(is_transition_animation(act->animation))
-                    actor_change_animation(act, act->animation->next);
-            }
+    /* handle transitions with non-repeating animations */
+    if(act->next_animation != NULL) {
+        if(animation_is_over(act->animation, act->animation_timer)) {
+            /* change the animation before updating the timer, otherwise it may jitter */
+            actor_change_animation(act, act->next_animation);
+            return;
         }
     }
-    else {
-        /* the animation is synchronized: this only makes sense if the animation does repeat */
-        act->animation_frame = (act->animation->fps * act->animation_speed_factor) * (0.001f * timer_get_ticks());
-        act->animation_frame = (((int)act->animation_frame % act->animation->frame_count) + act->animation->repeat_from) % act->animation->frame_count;
-    }
+
+    /* update the animation time */
+    if(act->synchronized_animation)
+        act->animation_timer = timer_get_elapsed() * act->animation_speed_factor;
+    else
+        act->animation_timer += timer_get_delta() * act->animation_speed_factor;
 }
 
+/* Checks if the actor can be clipped out (rendering) */
+bool can_be_clipped_out(const actor_t* act, v2d_t topleft)
+{
+    int x = (int)(act->position.x - act->hot_spot.x - topleft.x);
+    int y = (int)(act->position.y - act->hot_spot.y - topleft.y);
 
+    const image_t* img = actor_image(act);
+    int w = image_width(img);
+    int h = image_height(img);
+
+    const image_t* backbuffer = video_get_backbuffer();
+    int sw = image_width(backbuffer);
+    int sh = image_height(backbuffer);
+
+    return (x + w <= 0 || x >= sw || y + h <= 0 || y >= sh);
+}
+
+/* set a transform for an actor */
+void actor_transform(ALLEGRO_TRANSFORM* transform, const actor_t* act, v2d_t topleft)
+{
+    /* find the position of the actor in screen space */
+    v2d_t position = v2d_new(
+        floorf(act->position.x - topleft.x),
+        floorf(act->position.y - topleft.y)
+    );
+
+    /* build the transform */
+    transform_t t;
+    transform_build(&t, position, -act->angle, act->scale, act->hot_spot);
+
+    /* programmatic animation */
+    if(act->animation != NULL && animation_has_keyframes(act->animation)) {
+        transform_t prog;
+        animation_interpolated_transform(act->animation, act->animation_timer, &prog);
+        transform_compose(&t, &prog);
+    }
+
+    /* convert to ALLEGRO_TRANSFORM */
+    transform_to_allegro(transform, &t);
+}
 
 
 

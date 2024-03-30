@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * object_compiler.c - compiles legacy object scripts
- * Copyright (C) 2010-2013  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,8 +26,9 @@
 #include "object_compiler.h"
 #include "object_decorators.h"
 #include "nanocalc/nanocalc.h"
-#include "../../core/util.h"
-#include "../../core/stringutil.h"
+#include "../../core/global.h"
+#include "../../util/util.h"
+#include "../../util/stringutil.h"
 
 /* expression evaluator (nanocalc) helper */
 /* given a string, makes an expression_t object */

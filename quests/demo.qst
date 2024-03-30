@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 // File: demo.qst
-// Description: a quest that plays the Demo Level
+// Description: a quest that plays the Demo Levels
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// quest data
-name            "Demo"
+// quest name
+name            "Demo levels"
 
 // level list
 level           "levels/demo-1.lev"

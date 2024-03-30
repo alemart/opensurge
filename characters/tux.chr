@@ -24,7 +24,7 @@ character "Tux"
         airacceleration             1.0
         airdrag                     1.0
     }
-    
+
     animations
     {
         sprite_name                 "Tux"
@@ -55,7 +55,67 @@ character "Tux"
         brake                       TRUE
         charge                      TRUE
     }
-    
+
+    samples
+    {
+        jump                        "samples/jump.wav"
+        roll                        "samples/roll.wav"
+        death                       "samples/death.wav"
+        brake                       "samples/brake.wav"
+        charge                      "samples/charge.wav"
+        release                     "samples/release.wav"
+    }
+}
+
+character "Tux as Player 2"
+{
+    companions                      "Player 2" "Follow the Leader AI" "Super Peel Out" "Dash Smoke" "Brake Smoke"
+
+    multipliers
+    {
+        acceleration                1.0
+        deceleration                1.0
+        friction                    1.0
+        topspeed                    1.0
+        jump                        1.0
+        gravity                     1.0
+        slope                       1.0
+        charge                      1.0
+        airacceleration             1.0
+        airdrag                     1.0
+    }
+
+    animations
+    {
+        sprite_name                 "Tux"
+        stopped                     0
+        walking                     1
+        running                     2
+        jumping                     3
+        springing                   13
+        rolling                     18
+        pushing                     14
+        gettinghit                  11
+        dead                        8
+        braking                     7
+        ledge                       10
+        drowned                     9
+        breathing                   12
+        waiting                     15
+        ducking                     4
+        lookingup                   5
+        winning                     17
+        ceiling                     16
+        charging                    6
+    }
+
+    abilities
+    {
+        roll                        TRUE
+        brake                       TRUE
+        charge                      TRUE
+    }
+
     samples
     {
         jump                        "samples/jump.wav"

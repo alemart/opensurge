@@ -1,0 +1,135 @@
+// -----------------------------------------------------------------------------
+// File: mobile_gamepad.spr
+// Description: virtual gamepad for mobile devices
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+sprite "Mobile Gamepad - Action Button"
+{
+    source_file     "images/ui/mobile_gamepad.png"
+    source_rect     0 1456 464 232
+    frame_size      232 232
+    hot_spot        116 116 // at the center
+
+    // unpressed
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}
+
+sprite "Mobile Gamepad - Directional Stick"
+{
+    source_file     "images/ui/mobile_gamepad.png"
+    source_rect     0 64 1856 1392
+    frame_size      464 464
+    hot_spot        232 232 // at the center
+
+    // center
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // right
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+
+    // up & right
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        2
+    }
+
+    // up
+    animation 3
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+
+    // up & left
+    animation 4
+    {
+        repeat      TRUE
+        fps         8
+        data        4
+    }
+
+    // left
+    animation 5
+    {
+        repeat      TRUE
+        fps         8
+        data        5
+    }
+
+    // down & left
+    animation 6
+    {
+        repeat      TRUE
+        fps         8
+        data        6
+    }
+
+    // down
+    animation 7
+    {
+        repeat      TRUE
+        fps         8
+        data        7
+    }
+
+    // down & right
+    animation 8
+    {
+        repeat      TRUE
+        fps         8
+        data        8
+    }
+}
+
+sprite "Mobile Gamepad - Directional Stick - Ball"
+{
+    source_file     "images/ui/mobile_gamepad.png"
+    source_rect     464 992 928 464
+    frame_size      464 464
+    hot_spot        232 232 // at the center
+    action_spot     260 232 // determines the length of the offset when pressed
+
+    // unpressed & at the center
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // pressed & not at the center
+    animation 1
+    {
+        repeat      TRUE
+        fps         8
+        data        1
+    }
+}

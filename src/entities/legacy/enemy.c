@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * enemy.c - baddies (legacy)
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,17 +28,18 @@
 #include "../actor.h"
 #include "../player.h"
 #include "../brick.h"
-#include "../../core/nanoparser/nanoparser.h"
+#include "../../core/nanoparser.h"
 #include "../../core/global.h"
-#include "../../core/util.h"
 #include "../../core/audio.h"
 #include "../../core/timer.h"
 #include "../../core/input.h"
 #include "../../core/logfile.h"
-#include "../../core/stringutil.h"
-#include "../../core/assetfs.h"
+#include "../../core/asset.h"
 #include "../../core/video.h"
-#include "../../core/hashtable.h"
+#include "../../util/darray.h"
+#include "../../util/util.h"
+#include "../../util/stringutil.h"
+#include "../../util/hashtable.h"
 #include "../../physics/collisionmask.h"
 #include "../../scenes/level.h"
 
@@ -71,11 +72,10 @@ static int fill_object_categories(const parsetree_statement_t *stmt, void *objec
 static int fill_lookup_table(const parsetree_statement_t *stmt, void *lookup_table);
 static int prepare_to_fill_object_categories(const parsetree_statement_t *stmt, void *object_category_data);
 static int dirfill(const char *vpath, void *param); /* file system callback */
-static int compat_dirfill(const char *vpath, void *param); /* retro-compatibility */
 static int is_hidden_object(const char *name);
 static int category_exists(const char *category);
 
-static parsetree_program_t *objects;
+STATIC_DARRAY(parsetree_program_t*,objects);
 static object_name_data_t name_table;
 static object_category_data_t category_table;
 static int allow_duplicate_scripts = FALSE;
@@ -93,27 +93,33 @@ static HASHTABLE(objectcode_t, lookup_table);
  */
 void objects_init()
 {
+    int i;
+
     logfile_message("Loading legacy scripts...");
-    objects = NULL;
+    darray_init(objects);
 
-    /* reading the parse tree */
-    assetfs_foreach_file("objects", ".obj", compat_dirfill, (void*)(&objects), true);
-    assetfs_foreach_file("scripts/legacy", ".obj", dirfill, (void*)(&objects), true);
+    /* read the legacy scripts */
+    allow_duplicate_scripts = TRUE; /* for retro-compatibility */
+    asset_foreach_file("objects", ".obj", dirfill, NULL, true);
+    asset_foreach_file("scripts/legacy", ".obj", dirfill, NULL, true);
 
-    /* creating the name table */
+    /* create the name table */
     name_table.length = 0;
-    nanoparser_traverse_program_ex(objects, (void*)(&name_table), fill_object_names);
+    for(i = 0; i < darray_length(objects); i++)
+        nanoparser_traverse_program_ex(objects[i], (void*)(&name_table), fill_object_names);
     qsort(name_table.name, name_table.length, sizeof(name_table.name[0]), object_name_table_cmp);
 
-    /* creating the category table */
+    /* create the category table */
     ROOT_CATEGORY = "*"; /* name of the root category */
     category_table.length = 1; /* the length of the table is at least one, as it contains the root category */
-    nanoparser_traverse_program_ex(objects, (void*)(&category_table), prepare_to_fill_object_categories);
+    for(i = 0; i < darray_length(objects); i++)
+        nanoparser_traverse_program_ex(objects[i], (void*)(&category_table), prepare_to_fill_object_categories);
     qsort(category_table.category, category_table.length, sizeof(category_table.category[0]), object_category_table_cmp);
 
-    /* creating a lookup table to find objects fast */
+    /* create a lookup table to quickly find objects */
     lookup_table = hashtable_objectcode_t_create();
-    nanoparser_traverse_program_ex(objects, (void*)lookup_table, fill_lookup_table);
+    for(i = 0; i < darray_length(objects); i++)
+        nanoparser_traverse_program_ex(objects[i], (void*)lookup_table, fill_lookup_table);
 
     /* done! */
     logfile_message("All legacy scripts have been loaded!");
@@ -126,9 +132,14 @@ void objects_init()
 void objects_release()
 {
     logfile_message("Releasing legacy scripts...");
+
     lookup_table = hashtable_objectcode_t_destroy(lookup_table);
     name_table.length = category_table.length = 0;
-    objects = nanoparser_deconstruct_tree(objects);
+
+    for(int i = darray_length(objects) - 1; i >= 0; i--)
+        nanoparser_deconstruct_tree(objects[i]);
+    darray_release(objects);
+
     logfile_message("All legacy scripts have been released!");
 }
 
@@ -356,15 +367,6 @@ int enemy_exists(const char* object_name)
     return NULL != hashtable_objectcode_t_find(lookup_table, object_name);
 }
 
-/*
- * enemy_allow_duplicates()
- * Allow duplicate definition of objects (scripts)
- */
-void enemy_allow_duplicates(int allow_duplicates)
-{
-    allow_duplicate_scripts = allow_duplicates;
-}
-
 
 /* ----------- private functions ----------- */
 
@@ -553,19 +555,15 @@ int object_category_table_cmp(const void *a, const void *b)
 
 int dirfill(const char *vpath, void *param)
 {
-    const char* fullpath = assetfs_fullpath(vpath);
-    parsetree_program_t** p = (parsetree_program_t**)param;
-    *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
+    (void)param;
+
+    const char* fullpath = asset_path(vpath);
+    parsetree_program_t* tree = nanoparser_construct_tree(fullpath);
+
+    darray_push(objects, tree);
+
     return 0;
 }
-
-int compat_dirfill(const char *vpath, void *param)
-{
-    enemy_allow_duplicates(TRUE);
-    return dirfill(vpath, param);
-}
-
-
 
 
 /* ------------------------------------- */

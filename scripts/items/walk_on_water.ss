@@ -25,7 +25,7 @@ using SurgeEngine.Collisions.CollisionBox;
 //
 
 // this object should be placed on the left side of the surface of the water
-object "Walk on Water Left" is "gimmick", "entity"
+object "Walk on Water Left" is "gimmick", "special", "entity"
 {
     wow = spawn("Walk on Water").setEnteringDirection(1);
 
@@ -41,7 +41,7 @@ object "Walk on Water Left" is "gimmick", "entity"
 }
 
 // this object should be placed on the right side of the surface of the water
-object "Walk on Water Right" is "gimmick", "entity"
+object "Walk on Water Right" is "gimmick", "special", "entity"
 {
     wow = spawn("Walk on Water").setEnteringDirection(-1);
 
@@ -56,7 +56,7 @@ object "Walk on Water Right" is "gimmick", "entity"
     }
 }
 
-object "Walk on Water" is "private", "gimmick", "entity"
+object "Walk on Water" is "private", "gimmick", "special", "entity"
 {
     public minSpeed = 600; // pixels per second
     collider = CollisionBox(28, 32);
@@ -115,11 +115,21 @@ object "Walk on Water Watcher" is "companion", "private", "entity"
 
     state "main"
     {
+        // keep the minimum speed if rolling or running
+        if(player.rolling || player.running) {
+            if(player.slope == 0) {
+                if(Math.abs(player.gsp) < minSpeed)
+                    player.gsp = Math.sign(player.gsp) * minSpeed;
+            }
+        }
+
+        // stop walking on water
         if(!canRemainWalkingOnWater(player)) {
             destroy();
             return;
         }
 
+        // splash
         if(timeout(1.0 / splashesPerSecond))
             state = "splash";
     }
@@ -134,9 +144,9 @@ object "Walk on Water Watcher" is "companion", "private", "entity"
     fun canRemainWalkingOnWater(player)
     {
         return (
-            !player.midair &&
+            Math.abs(player.gsp) >= minSpeed &&
             !player.underwater &&
-            Math.abs(player.gsp) >= minSpeed //&& player.slope == 0
+            (!player.midair || player.ysp >= 0)
         );
     }
 }
@@ -147,16 +157,21 @@ object "Walk on Water Brick" is "private", "awake", "entity"
     brick = Brick("Walk on Water Brick");
     transform = Transform();
 
-    state "main"
+    fun updatePosition()
     {
         dy = Level.waterlevel - transform.position.y;
         transform.translateBy(0, dy);
-        //transform.angle = 0;
+    }
+
+    fun lateUpdate()
+    {
+        updatePosition();
     }
 
     fun constructor()
     {
         brick.type = "solid";
+        updatePosition();
     }
 }
 
@@ -174,6 +189,7 @@ object "Walk on Water Splash" is "private", "disposable", "entity"
     fun constructor()
     {
         actor.zindex = 0.99;
+        actor.alpha = 0.99;
         sfx.play();
     }
 }

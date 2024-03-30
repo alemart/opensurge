@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * object_machine.h - Legacy API: Object Machine (handles the actions of this object)
- * Copyright (C) 2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 #ifndef _OBJECT_MACHINE_H
 #define _OBJECT_MACHINE_H
 
-#include "../../core/v2d.h"
+#include "../../util/v2d.h"
 #include "../player.h"
 #include "../brick.h"
 #include "../actor.h"

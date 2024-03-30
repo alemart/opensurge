@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * vector2.c - scripting system: immutable 2D Vector
- * Copyright (C) 2018-2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,18 +19,21 @@
  */
 
 #include <surgescript.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <float.h>
 #include <math.h>
-#include "../core/util.h"
-#include "../core/v2d.h"
+#include "../util/v2d.h"
+#include "../util/numeric.h"
+#include "../util/util.h"
 
 /* Vector2 structure */
 typedef struct surgescript_vector2_t surgescript_vector2_t;
 struct surgescript_vector2_t {
     double x, y;
+    bool initialized;
 };
 
 /*
@@ -63,8 +66,7 @@ static surgescript_var_t* fun_tostring(surgescript_object_t* object, const surge
 static inline surgescript_vector2_t* get_vector(const surgescript_object_t* object);
 static inline const surgescript_vector2_t* safe_get_vector(const surgescript_object_t* object);
 static inline surgescript_objecthandle_t spawn_vector(surgescript_objectmanager_t* manager, double x, double y);
-static const surgescript_vector2_t ZERO = { 0.0, 0.0 };
-static const double RAD2DEG = 57.2957795131;
+static const surgescript_vector2_t ZERO = { 0.0, 0.0, true };
 static const double EPS = DBL_EPSILON;
 static double y_axis = -1.0;
 
@@ -144,7 +146,11 @@ v2d_t scripting_vector2_to_v2d(const surgescript_object_t* object)
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+#if 1
+    surgescript_object_set_active(object, false);
+#else
     //surgescript_object_set_active(object, false); /* FIXME: GC error (spawn on state) */
+#endif
     return NULL;
 }
 
@@ -152,7 +158,8 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_vector2_t* v = ssmalloc(sizeof *v);
-    *v = ZERO;
+    v->x = v->y = 0.0;
+    v->initialized = false;
     surgescript_object_set_userdata(object, v);
     return NULL;
 }
@@ -170,8 +177,11 @@ surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescrip
 surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
     surgescript_vector2_t* v = get_vector(object);
-    v->x = surgescript_var_get_number(param[0]);
-    v->y = surgescript_var_get_number(param[1]);
+    if(!v->initialized) {
+        v->x = surgescript_var_get_number(param[0]);
+        v->y = surgescript_var_get_number(param[1]);
+        v->initialized = true;
+    }
     return surgescript_var_set_objecthandle(surgescript_var_create(), surgescript_object_handle(object));
 }
 
@@ -300,7 +310,7 @@ surgescript_var_t* fun_rotatedby(surgescript_object_t* object, const surgescript
 {
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     const surgescript_vector2_t* me = get_vector(object);
-    double angle = surgescript_var_get_number(param[0]) / RAD2DEG;
+    double angle = surgescript_var_get_number(param[0]) * DEG2RAD;
     double s = sin(angle) * y_axis, c = cos(angle);
     surgescript_objecthandle_t result = spawn_vector(manager,
         me->x * c - me->y * s,

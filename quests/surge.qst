@@ -1,0 +1,19 @@
+// -----------------------------------------------------------------------------
+// File: surge.qst
+// Description: Surge the Rabbit levels
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// quest name
+name            "Surge the Rabbit"
+
+// level list (in order of appearance)
+level           "levels/waterworks-zone-1.lev"
+level           "levels/waterworks-zone-2.lev"
+level           "levels/waterworks-zone-3.lev"
+
+level           "levels/scenes/rate_game.lev"
+
+level           "levels/scenes/end_of_demo.lev"
+quest           "quests/demo.qst"

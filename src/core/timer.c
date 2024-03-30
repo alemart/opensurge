@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * timer.c - time manager
- * Copyright (C) 2010, 2012, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,21 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "util.h"
+#include <allegro5/allegro.h>
 #include "timer.h"
 #include "logfile.h"
-
-#include <allegro5/allegro.h>
+#include "../util/util.h"
 
 /* internal data */
 static double start_time = 0.0;
 static double current_time = 0.0;
-static float delta_time = 0.0f;
+static double previous_time = 0.0;
+static double delta_time = 0.0;
+static double smooth_delta_time = 0.0;
 static int64_t frames = 0;
+
+static bool is_paused = false;
+static double pause_duration = 0.0;
+static double pause_start_time = 0.0;
+
+static const double SMOOTH_FACTOR = 0.95;
 
 /*
  * timer_init()
- * Initializes the Time Handler
+ * Initializes the time manager
  */
 void timer_init()
 {
@@ -43,46 +50,21 @@ void timer_init()
         fatal_error("Allegro is not initialized");
 
     start_time = al_get_time();
-    current_time = 0.0f;
+    current_time = 0.0;
+    previous_time = 0.0;
     delta_time = 0.0;
+    smooth_delta_time = 0.0;
     frames = 0;
-}
 
-
-/*
- * timer_update()
- * Updates the Time Handler. This routine
- * must be called at every cycle of the
- * main loop
- */
-void timer_update()
-{
-    static const float minimum_delta = 0.0166667f; /* 60 fps */
-    static const float maximum_delta = 0.017f; /* if 0.0166667f, you don't get physics with the fixed timestep; if too large (0.20f), there may be issues with collisions */
-    static double old_time = 0.0;
-
-    /* read the time at the beginning of this framestep */
-    current_time = al_get_time() - start_time;
-
-    /* compute the delta time */
-    delta_time = current_time - old_time;
-
-    if(delta_time < minimum_delta)
-        ; /* do nothing, since the framerate is controlled by Allegro */
-
-    if(delta_time > maximum_delta)
-        delta_time = maximum_delta;
-
-    old_time = current_time;
-
-    /* increment counter */
-    ++frames;
+    is_paused = false;
+    pause_duration = 0.0;
+    pause_start_time = 0.0;
 }
 
 
 /*
  * timer_release()
- * Releases the Time Handler
+ * Releases the time manager
  */
 void timer_release()
 {
@@ -91,24 +73,63 @@ void timer_release()
 
 
 /*
- * timer_get_delta()
- * Returns the time interval, in seconds, between the
- * last two cycles of the main loop
+ * timer_update()
+ * This routine must be called at every cycle of the main loop
  */
-float timer_get_delta()
+void timer_update()
 {
-    return delta_time;
+    const double minimum_delta = 1.0 / 60.0; /* 60 fps */
+    const double maximum_delta = 1.0 / 50.0; /* 50 fps */
+
+    /* paused timer? */
+    if(is_paused) {
+        delta_time = 0.0;
+        smooth_delta_time = 0.0;
+        return;
+    }
+
+    /* read the time at the beginning of this framestep */
+    current_time = timer_get_now();
+
+    /* compute the delta time */
+    delta_time = current_time > previous_time ? current_time - previous_time : 0.0;
+
+    if(delta_time < minimum_delta)
+        ; /* do nothing, since the framerate is controlled by Allegro */
+
+    if(delta_time > maximum_delta)
+        delta_time = maximum_delta;
+
+    previous_time = current_time;
+
+    /* compute the smooth delta time */
+    if(smooth_delta_time != 0.0)
+        smooth_delta_time = SMOOTH_FACTOR * delta_time + (1.0 - SMOOTH_FACTOR) * smooth_delta_time;
+    else
+        smooth_delta_time = minimum_delta;
+
+    /* increment counter */
+    ++frames;
 }
 
 
 /*
- * timer_get_ticks()
- * Elapsed milliseconds since the application has started,
- * measured at the beginning of the current framestep
+ * timer_get_delta()
+ * Returns the time interval, in seconds, between the last two cycles of the main loop
  */
-uint32_t timer_get_ticks()
+float timer_get_delta()
 {
-    return (uint32_t)(1000.0 * current_time);
+    return (float)delta_time;
+}
+
+
+/*
+ * timer_get_smooth_delta()
+ * An approximation of timer_get_delta() with variations smoothed out
+ */
+float timer_get_smooth_delta()
+{
+    return (float)smooth_delta_time;
 }
 
 
@@ -117,9 +138,9 @@ uint32_t timer_get_ticks()
  * Elapsed seconds since the application has started,
  * measured at the beginning of the current framestep
  */
-float timer_get_elapsed()
+double timer_get_elapsed()
 {
-    return (float)current_time;
+    return current_time;
 }
 
 
@@ -138,7 +159,39 @@ int64_t timer_get_frames()
  * Elapsed of seconds since the application has started
  * and at the moment of the function call
  */
-float timer_get_now()
+double timer_get_now()
 {
-    return (float)(al_get_time() - start_time);
+    return (al_get_time() - start_time) - pause_duration;
+}
+
+
+/*
+ * timer_pause()
+ * Pauses the time manager
+ */
+void timer_pause()
+{
+    if(is_paused)
+        return;
+
+    is_paused = true;
+    pause_start_time = al_get_time();
+
+    logfile_message("The time manager has been paused");
+}
+
+
+/*
+ * timer_resume()
+ * Resumes the time manager
+ */
+void timer_resume()
+{
+    if(!is_paused)
+        return;
+
+    pause_duration += al_get_time() - pause_start_time;
+    is_paused = false;
+
+    logfile_message("The time manager has been resumed");
 }

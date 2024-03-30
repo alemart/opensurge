@@ -142,12 +142,13 @@ sprite "Charge"
 	  repeat_from 80
     }
 
-    // ceiling (being carried)
+    // zipline
     animation 16
     {
         repeat      TRUE
         fps         8
         data        15
+        action_spot 26 4
     }
 
     // winning (victory)

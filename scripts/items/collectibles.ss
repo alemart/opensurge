@@ -39,7 +39,7 @@ object "Base Collectible" is "private", "entity"
             player.collectibles += value;
             sfx.play();
             actor.anim = 1;
-            actor.zindex = 0.51;
+            actor.zindex = 0.5001;
             state = "disappearing";
         }
     }
@@ -231,42 +231,72 @@ object "Lucky Collectible" is "private", "entity", "awake"
 {
     base = spawn("Base Collectible");
     transform = Transform();
-    radius = Screen.width * 0.6;
+    radius = Math.max(Screen.width, Screen.height) * 0.6;
     luckyPlayer = Player.active;
     phase = 0;
     t = 0;
 
     state "main"
     {
+        // group these lucky collectibles in the render queue
+        base.zindex = 1.00123;
+
+        // setup spiral movement
+        playerPos = luckyPlayer.transform.position;
+        transform.position = Vector2(
+            radius * -Math.cos(phase) + playerPos.x,
+            radius * -Math.sin(phase) + playerPos.y
+        );
+
+        // start movement
+        state = "moving";
+    }
+
+    state "moving"
+    {
+        // advance the timer
+        t += Time.delta;
+
         // collision check
         if(t >= 1) {
             base.pickup(luckyPlayer);
             state = "done";
-            return;
         }
 
-        // stop if dying player
-        if(luckyPlayer.dying) {
+        // stop if player is killed
+        else if(luckyPlayer.dying) {
             state = "done";
-            return;
         }
-
-        // spiral movement
-        transform.position = Vector2(
-            (radius * (1 - t)) * -Math.cos(6.283 * t + phase),
-            (radius * (1 - t)) * -Math.sin(6.283 * t + phase)
-        ).plus(luckyPlayer.transform.position);
-        t += Time.delta;
     }
 
     state "done"
     {
+        // destroy if the player is ressurrected
+        if(!luckyPlayer.dying)
+            destroy();
     }
 
-    fun constructor()
+
+    fun move(prevPos, playerPos)
     {
-        base.zindex = 1.0;
+        // spiral movement
+        r = radius * (1 - t);
+        w = 6.2832 * t + phase;
+        x = r * -Math.cos(w) + playerPos.x;
+        y = r * -Math.sin(w) + playerPos.y;
+
+        dx = x - prevPos.x;
+        dy = y - prevPos.y;
+        transform.translateBy(dx, dy);
     }
+
+    fun lateUpdate()
+    {
+        if(state == "moving")
+            move(transform.position, luckyPlayer.transform.position);
+    }
+
+
 
 
 

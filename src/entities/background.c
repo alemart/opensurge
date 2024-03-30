@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * background.c - level background/foreground
- * Copyright (C) 2010, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,88 +19,132 @@
  */
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #include "background.h"
 #include "actor.h"
 #include "../core/sprite.h"
 #include "../core/video.h"
-#include "../core/assetfs.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
+#include "../core/asset.h"
 #include "../core/logfile.h"
 #include "../core/timer.h"
-#include "../core/nanoparser/nanoparser.h"
+#include "../core/nanoparser.h"
+#include "../util/numeric.h"
+#include "../util/rect.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+
+/* FastDraw */
+#define WANT_FAST_DRAW 1
+#if WANT_FAST_DRAW
+#include "../third_party/fast_draw.h"
+#endif
 
 /* forward declarations */
-typedef struct background_t background_t;
-typedef struct bgstrategy_t bgstrategy_t;
-typedef struct bgstrategy_default_t bgstrategy_default_t;
-typedef struct bgstrategy_circular_t bgstrategy_circular_t;
-typedef struct bgstrategy_linear_t bgstrategy_linear_t;
+typedef struct bglayer_t bglayer_t;
+typedef struct bgbehavior_t bgbehavior_t;
+typedef struct bgbehavior_default_t bgbehavior_default_t;
+typedef struct bgbehavior_circular_t bgbehavior_circular_t;
+typedef struct bgbehavior_linear_t bgbehavior_linear_t;
 
-/* === bgtheme struct (an ordered set of backgrounds) === */
+/* bgtheme struct: represents a .bg file */
 struct bgtheme_t {
-    background_t **data; /* array of background_t* */
-    int length; /* length of the data vector */
+    bglayer_t **layer; /* array of bglayer_t* */
+    int layer_count; /* length of layer[] */
+    int background_count; /* number of background layers */
+    int foreground_count; /* number of foreground layers */
     char* filepath; /* filepath of the background */
+    double animation_time; /* animation time, in seconds */
+#if WANT_FAST_DRAW
+    int draw_count; /* number of draws */
+#endif
 };
 
-/* === <<abstract>> bgstrategy_t === */
-struct bgstrategy_t {
-    background_t *background; /* the background instance we're linked to */
-    void (*update)(bgstrategy_t*); /* update function */
-};
-static bgstrategy_t *bgstrategy_delete(bgstrategy_t *strategy); /* class destructor */
-
-
-/* === background struct === */
-struct background_t {
-    actor_t *actor; /* actor */
+/* bglayer struct: a background (or foreground) layer */
+struct bglayer_t {
     spriteinfo_t *data; /* this is not stored in the main hash */
-    int repeat_x, repeat_y; /* repeat background? */
+    const animation_t* animation; /* animation 0 of the sprite of the layer */
+
+    v2d_t initial_position; /* initial position */
+    v2d_t scroll_speed; /* scroll speed */
+    bool repeat_x, repeat_y; /* repeat layer? */
     float zindex; /* 0.0 (far) <= zindex <= 1.0 (near) */
-    bgstrategy_t *strategy; /* Strategy design pattern */
+
+    bgbehavior_t *behavior; /* behavior */
+    int group_index; /* for deferred drawing */
 };
-static background_t *background_new(); /* constructor */
-static background_t *background_delete(background_t *bg); /* destructor */
+static bglayer_t *bglayer_new(); /* constructor */
+static bglayer_t *bglayer_delete(bglayer_t *layer); /* destructor */
 
 
-/* === concrete strategies (background behaviors) === */
 
-/* default background strategy */
-struct bgstrategy_default_t {
-    bgstrategy_t base; /* inherits from bgstrategy_t */
+
+
+/* behaviors of layers */
+
+/* abstract behavior */
+struct bgbehavior_t {
+    v2d_t offset; /* given in pixels */
+    void (*update)(bgbehavior_t*); /* update function */
+    bgbehavior_t* (*delete)(bgbehavior_t*); /* destructor */
 };
-static bgstrategy_t *bgstrategy_default_new(background_t *background); /* class constructor */
-static void bgstrategy_default_update(bgstrategy_t *strategy); /* private class method*/
+static void bgbehavior_update(bgbehavior_t *behavior); /* update behavior */
+static bgbehavior_t *bgbehavior_delete(bgbehavior_t *behavior); /* class destructor */
 
-/* circular background strategy (elliptical trajectory) */
-struct bgstrategy_circular_t {
-    bgstrategy_t base; /* base class */
-    float timer;
-    float amplitude_x, amplitude_y;
-    float angularspeed_x, angularspeed_y;
-    float initialphase_x, initialphase_y;
+/* default behavior */
+struct bgbehavior_default_t {
+    bgbehavior_t base; /* inherits from bgbehavior_t */
 };
-static bgstrategy_t *bgstrategy_circular_new(background_t *background, float amplitude_x, float amplitude_y, float angularspeed_x, float angularspeed_y, float initialphase_x, float initialphase_y); /* class constructor */
-static void bgstrategy_circular_update(bgstrategy_t *strategy); /* private class method */
+static bgbehavior_t *bgbehavior_default_new(); /* constructor */
+static bgbehavior_t* bgbehavior_default_delete(bgbehavior_t *behavior); /* destructor */
+static void bgbehavior_default_update(bgbehavior_t *behavior); /* private method */
 
-/* linear background strategy */
-struct bgstrategy_linear_t {
-    bgstrategy_t base; /* base class */
-    float speed_x, speed_y;
+/* circular strategy (elliptical trajectory) */
+struct bgbehavior_circular_t {
+    bgbehavior_t base; /* base class */
+    float elapsed_time; /* in seconds */
+    v2d_t amplitude; /* in pixels */
+    v2d_t angular_speed; /* in radians per second */
+    v2d_t initial_phase; /* in radians */
 };
-static bgstrategy_t *bgstrategy_linear_new(background_t *background, float speed_x, float speed_y); /* class constructor */
-static void bgstrategy_linear_update(bgstrategy_t *strategy); /* private class method */
+static bgbehavior_t *bgbehavior_circular_new(float amplitude_x, float amplitude_y, float angularspeed_x, float angularspeed_y, float initialphase_x, float initialphase_y); /* constructor */
+static bgbehavior_t* bgbehavior_circular_delete(bgbehavior_t *behavior); /* destructor */
+static void bgbehavior_circular_update(bgbehavior_t *behavior); /* private method */
+
+/* linear strategy */
+struct bgbehavior_linear_t {
+    bgbehavior_t base; /* base class */
+    v2d_t speed; /* in pixels per second */
+};
+static bgbehavior_t *bgbehavior_linear_new(float speed_x, float speed_y); /* constructor */
+static bgbehavior_t* bgbehavior_linear_delete(bgbehavior_t *behavior); /* destructor */
+static void bgbehavior_linear_update(bgbehavior_t *behavior); /* private method */
 
 
-/* === internal methods === */
-static void sort_backgrounds(bgtheme_t *bgtheme);
+
+
+/* internal utilities */
+
+/* preprocessing */
+#define IS_FOREGROUND_LAYER(layer)    ((layer)->zindex > 0.5f)
+static void sort_layers(bgtheme_t *bgtheme);
 static int sort_cmp(const void *a, const void *b);
-static void render(const bgtheme_t *theme, v2d_t camera_position, int foreground);
+static void split_layers(bgtheme_t *bgtheme);
+static void group_layers(bgtheme_t *bgtheme);
+
+/* rendering */
+typedef void (*renderstrategy_t)(const image_t*,v2d_t,void*);
+static void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_position, double animation_time, void* data, renderstrategy_t render_image);
+static void render_without_cache(const image_t* image, v2d_t position, void* data);
+static void render_with_cache(const image_t* image, v2d_t position, void* data);
+
+/* .bg files */
 static int traverse(const parsetree_statement_t *stmt, void *bgtheme);
-static int traverse_background_attributes(const parsetree_statement_t *stmt, void *background);
-static void validate_background(const background_t *bg);
+static int traverse_layer_attributes(const parsetree_statement_t *stmt, void *bglayer);
+static void validate_layer(const bglayer_t* layer);
+static void validate_theme(const bgtheme_t* theme);
+
+
 
 
 /* public methods */
@@ -116,18 +160,32 @@ bgtheme_t* background_load(const char *filepath)
     const char *fullpath;
 
     logfile_message("Loading background \"%s\"...", filepath);
-    fullpath = assetfs_fullpath(filepath);
+    fullpath = asset_path(filepath);
 
+    /* create the struct */
     bgtheme = mallocx(sizeof *bgtheme);
     bgtheme->filepath = str_dup(filepath);
-    bgtheme->data = NULL;
-    bgtheme->length = 0;
+    bgtheme->layer = NULL;
+    bgtheme->layer_count = 0;
+    bgtheme->background_count = 0;
+    bgtheme->foreground_count = 0;
+    bgtheme->animation_time = 0.0;
+#if WANT_FAST_DRAW
+    bgtheme->draw_count = 1;
+#endif
 
+    /* read the .bg file */
     tree = nanoparser_construct_tree(fullpath);
     nanoparser_traverse_program_ex(tree, (void*)bgtheme, traverse);
     tree = nanoparser_deconstruct_tree(tree);
+    validate_theme(bgtheme);
 
-    sort_backgrounds(bgtheme);
+    /* prepare for rendering */
+    sort_layers(bgtheme);
+    split_layers(bgtheme);
+    group_layers(bgtheme);
+
+    /* done! */
     return bgtheme;
 }
 
@@ -139,11 +197,11 @@ bgtheme_t* background_unload(bgtheme_t *bgtheme)
 {
     logfile_message("Will unload background \"%s\"...", bgtheme->filepath);
 
-    if(bgtheme->data != NULL) {
-        for(int i = 0; i < bgtheme->length; i++)
-            bgtheme->data[i] = background_delete(bgtheme->data[i]);
+    if(bgtheme->layer != NULL) {
+        for(int i = 0; i < bgtheme->layer_count; i++)
+            bgtheme->layer[i] = bglayer_delete(bgtheme->layer[i]);
 
-        free(bgtheme->data);
+        free(bgtheme->layer);
     }
 
     free(bgtheme->filepath);
@@ -157,28 +215,71 @@ bgtheme_t* background_unload(bgtheme_t *bgtheme)
  */
 void background_update(bgtheme_t *bgtheme)
 {
-    for(int i = 0; i < bgtheme->length; i++) {
-        background_t *bg = bgtheme->data[i];
-        bg->strategy->update(bg->strategy);
+    /* update layers */
+    for(int i = 0; i < bgtheme->layer_count; i++) {
+        const bglayer_t *layer = bgtheme->layer[i];
+        bgbehavior_update(layer->behavior);
     }
+
+    /* update animation time */
+    bgtheme->animation_time += timer_get_delta();
 }
 
 /*
  * background_render_bg()
  * Renders the background
  */
-void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position)
+void background_render_bg(bgtheme_t *bgtheme, v2d_t camera_position)
 {
-    render(bgtheme, camera_position, FALSE);
+    bglayer_t** layers = bgtheme->layer;
+    int layer_count = bgtheme->background_count;
+    double animation_time = bgtheme->animation_time;
+
+#if WANT_FAST_DRAW
+    FAST_DRAW_CACHE* cache = fd_create_cache(bgtheme->draw_count, true, false);
+    int draw_count = 0;
+
+    if(cache != NULL) {
+        render_layers(layers, layer_count, camera_position, animation_time, (void*[]){ cache, &draw_count }, render_with_cache);
+        if(draw_count > bgtheme->draw_count)
+            bgtheme->draw_count = draw_count;
+
+        fd_flush_cache(cache); /* invokes al_draw_indexed_prim() */
+        fd_destroy_cache(cache);
+    }
+
+    /*
+
+    there is overhead (CPU) when invoking al_draw_prim()
+    this is meant for GPU optimization
+
+    [1] https://www.allegro.cc/forums/thread/613609
+    [2] https://www.allegro.cc/forums/thread/614949
+
+    */
+#else
+    image_hold_drawing(true);
+    render_layers(layers, layer_count, camera_position, animation_time, NULL, render_without_cache);
+    image_hold_drawing(false);
+
+    (void)render_with_cache;
+#endif
 }
 
 /*
  * background_render_fg()
  * Renders the foreground
  */
-void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position)
+void background_render_fg(bgtheme_t *bgtheme, v2d_t camera_position)
 {
-    render(bgtheme, camera_position, TRUE);
+    bglayer_t** layers = bgtheme->layer + bgtheme->background_count;
+    int layer_count = bgtheme->foreground_count;
+    double animation_time = bgtheme->animation_time;
+
+    /* foregrounds typically have few layers */
+    image_hold_drawing(true);
+    render_layers(layers, layer_count, camera_position, animation_time, NULL, render_without_cache);
+    image_hold_drawing(false);
 }
 
 /*
@@ -190,169 +291,356 @@ const char* background_filepath(const bgtheme_t *bgtheme)
     return bgtheme->filepath;
 }
 
+/*
+ * background_number_of_bg_layers()
+ * Number of background layers
+ */
+int background_number_of_bg_layers(const bgtheme_t* bgtheme)
+{
+    return bgtheme->background_count;
+}
 
+/*
+ * background_number_of_fg_layers()
+ * Number of foreground layers
+ */
+int background_number_of_fg_layers(const bgtheme_t* bgtheme)
+{
+    return bgtheme->foreground_count;
+}
 
 
 
 /* private methods */
 
-background_t *background_new()
+
+
+/* create a new layer */
+bglayer_t *bglayer_new()
 {
-    background_t *bg = mallocx(sizeof *bg);
+    bglayer_t *layer = mallocx(sizeof *layer);
 
-    bg->actor = actor_create();
-    bg->data = NULL;
-    bg->strategy = bgstrategy_default_new(bg);
-    bg->repeat_x = FALSE;
-    bg->repeat_y = FALSE;
-    bg->zindex = 0.0f;
+    layer->data = NULL;
+    layer->animation = NULL;
+    layer->initial_position = v2d_new(0.0f, 0.0f);
+    layer->scroll_speed = v2d_new(0.0f, 0.0f);
+    layer->repeat_x = false;
+    layer->repeat_y = false;
+    layer->zindex = 0.0f;
+    layer->behavior = bgbehavior_default_new(layer);
+    layer->group_index = 0;
 
-    return bg;
+    return layer;
 }
 
-background_t *background_delete(background_t *bg)
+/* destroy a layer */
+bglayer_t *bglayer_delete(bglayer_t *layer)
 {
-    if(bg->data != NULL)
-        spriteinfo_destroy(bg->data);
-    bg->strategy = bgstrategy_delete(bg->strategy);
-    actor_destroy(bg->actor);
-    free(bg);
+    if(layer->data != NULL)
+        spriteinfo_destroy(layer->data);
+
+    layer->behavior = bgbehavior_delete(layer->behavior);
+
+    free(layer);
     return NULL;
 }
 
-bgstrategy_t *bgstrategy_delete(bgstrategy_t *strategy)
+
+
+
+
+
+
+/* behaviors */
+
+bgbehavior_t *bgbehavior_delete(bgbehavior_t *behavior)
 {
-    free(strategy);
-    return NULL;
+    return behavior->delete(behavior);
 }
 
-bgstrategy_t *bgstrategy_default_new(background_t *background)
+void bgbehavior_update(bgbehavior_t *behavior)
 {
-    bgstrategy_default_t *me = mallocx(sizeof *me);
-    bgstrategy_t *base = (bgstrategy_t*)me;
+    behavior->update(behavior);
+}
 
-    base->background = background;
-    base->update = bgstrategy_default_update;
+
+/* default behavior */
+
+bgbehavior_t *bgbehavior_default_new()
+{
+    bgbehavior_default_t *me = mallocx(sizeof *me);
+    bgbehavior_t *base = (bgbehavior_t*)me;
+
+    base->offset = v2d_new(0.0f, 0.0f);
+    base->update = bgbehavior_default_update;
+    base->delete = bgbehavior_default_delete;
 
     return base;
 }
 
-void bgstrategy_default_update(bgstrategy_t *strategy)
+bgbehavior_t *bgbehavior_default_delete(bgbehavior_t *behavior)
 {
-    ; /* empty */
+    free(behavior);
+    return NULL;
+}
+
+void bgbehavior_default_update(bgbehavior_t *behavior)
+{
+    /* do nothing */
+    (void)behavior;
 }
 
 
-bgstrategy_t *bgstrategy_circular_new(background_t *background, float amplitude_x, float amplitude_y, float angularspeed_x, float angularspeed_y, float initialphase_x, float initialphase_y)
-{
-    bgstrategy_circular_t *me = mallocx(sizeof *me);
-    bgstrategy_t *base = (bgstrategy_t*)me;
 
-    base->background = background;
-    base->update = bgstrategy_circular_update;
-    me->timer = 0.0f;
-    me->amplitude_x = amplitude_x;
-    me->amplitude_y = amplitude_y;
-    me->angularspeed_x = (2.0f * PI) * angularspeed_x;
-    me->angularspeed_y = (2.0f * PI) * angularspeed_y;
-    me->initialphase_x = (initialphase_x * PI) / 180.0f;
-    me->initialphase_y = (initialphase_y * PI) / 180.0f;
+/* circular behavior */
+
+bgbehavior_t *bgbehavior_circular_new(float amplitude_x, float amplitude_y, float angularspeed_x, float angularspeed_y, float initialphase_x, float initialphase_y)
+{
+    bgbehavior_circular_t *me = mallocx(sizeof *me);
+    bgbehavior_t *base = (bgbehavior_t*)me;
+
+    base->offset = v2d_new(0.0f, 0.0f);
+    base->update = bgbehavior_circular_update;
+    base->delete = bgbehavior_circular_delete;
+
+    me->elapsed_time = 0.0f;
+    me->amplitude = v2d_new(amplitude_x, amplitude_y);
+    me->angular_speed = v2d_multiply(v2d_new(angularspeed_x, angularspeed_y), TWO_PI);
+    me->initial_phase = v2d_multiply(v2d_new(initialphase_x, initialphase_y), DEG2RAD);
 
     return base;
 }
 
-
-void bgstrategy_circular_update(bgstrategy_t *strategy)
+bgbehavior_t *bgbehavior_circular_delete(bgbehavior_t *behavior)
 {
-    bgstrategy_circular_t *me = (bgstrategy_circular_t*)strategy;
-    background_t *bg = strategy->background;
-    float dt = timer_get_delta();
-    float t, sx, cy;
+    free(behavior);
+    return NULL;
+}
 
-    t = (me->timer += dt);
-    sx = sinf(me->angularspeed_x * t + me->initialphase_x);
-    cy = cosf(me->angularspeed_y * t + me->initialphase_y);
+void bgbehavior_circular_update(bgbehavior_t *behavior)
+{
+    bgbehavior_circular_t *me = (bgbehavior_circular_t*)behavior;
+    float dt = timer_get_smooth_delta();
+    float t, s, c;
+
+    t = (me->elapsed_time += dt);
+    s = sinf(me->angular_speed.y * t + me->initial_phase.y);
+    c = cosf(me->angular_speed.x * t + me->initial_phase.x);
 
     /* elliptical trajectory */
-    bg->actor->position.x += (-me->angularspeed_x * me->amplitude_x * sx) * dt;
-    bg->actor->position.y += (me->angularspeed_y * me->amplitude_y * cy) * dt;
+    behavior->offset.x += me->amplitude.x * (me->angular_speed.x * c) * dt;
+    behavior->offset.y += me->amplitude.y * (me->angular_speed.y * s) * dt;
 }
 
 
-bgstrategy_t *bgstrategy_linear_new(background_t *background, float speed_x, float speed_y)
-{
-    bgstrategy_linear_t *me = mallocx(sizeof *me);
-    bgstrategy_t *base = (bgstrategy_t*)me;
 
-    base->background = background;
-    base->update = bgstrategy_linear_update;
-    me->speed_x = speed_x;
-    me->speed_y = speed_y;
+/* linear behavior */
+
+bgbehavior_t *bgbehavior_linear_new(float speed_x, float speed_y)
+{
+    bgbehavior_linear_t *me = mallocx(sizeof *me);
+    bgbehavior_t *base = (bgbehavior_t*)me;
+
+    base->offset = v2d_new(0.0f, 0.0f);
+    base->update = bgbehavior_linear_update;
+    base->delete = bgbehavior_linear_delete;
+
+    me->speed = v2d_new(speed_x, speed_y);
 
     return base;
 }
 
-
-void bgstrategy_linear_update(bgstrategy_t *strategy)
+bgbehavior_t *bgbehavior_linear_delete(bgbehavior_t *behavior)
 {
-    bgstrategy_linear_t *me = (bgstrategy_linear_t*)strategy;
-    background_t *bg = strategy->background;
-    float dt = timer_get_delta();
+    free(behavior);
+    return NULL;
+}
 
-    bg->actor->position.x += me->speed_x * dt;
-    bg->actor->position.y += me->speed_y * dt;
+void bgbehavior_linear_update(bgbehavior_t *behavior)
+{
+    bgbehavior_linear_t *me = (bgbehavior_linear_t*)behavior;
+    float dt = timer_get_smooth_delta();
+
+    /* linear movement */
+    behavior->offset.x += me->speed.x * dt;
+    behavior->offset.y += me->speed.y * dt;
 }
 
 
-void render(const bgtheme_t *bgtheme, v2d_t camera_position, int foreground)
+
+
+
+
+
+/* rendering */
+
+/* render layers of the background or of the foreground */
+void render_layers(bglayer_t* const *layers, int layer_count, v2d_t camera_position, double animation_time, void* data, renderstrategy_t render_image)
 {
-    int i;
-    v2d_t halfscreen = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
-    v2d_t topleft = v2d_subtract(camera_position, halfscreen);
-    background_t *bg;
+    v2d_t screen_size = video_get_screen_size();
+    v2d_t half_screen_size = v2d_multiply(screen_size, 0.5f);
+    v2d_t topleft = v2d_subtract(camera_position, half_screen_size);
+    rect_t screen_rect = rect_new(0, 0, screen_size.x, screen_size.y);
 
-    for(i=0; i<bgtheme->length; i++) {
-        bg = bgtheme->data[i];
-        if((!foreground && bg->zindex <= 0.5f) || (foreground && bg->zindex > 0.5f)) {
-            v2d_t prev = bg->actor->position;
+    for(int i = 0; i < layer_count; i++) {
+        const bglayer_t* layer = layers[i];
+        const animation_t* animation = layer->animation;
+        float frame_width = animation_frame_width(animation);
+        float frame_height = animation_frame_height(animation);
 
-            bg->actor->position.x += topleft.x * bg->actor->speed.x;
-            bg->actor->position.y += topleft.y * bg->actor->speed.y;
-            bg->actor->position.x = floorf(0.5 + bg->actor->position.x); /* round to nearest integer */
-            bg->actor->position.y = floorf(0.5 + bg->actor->position.y);
+        /* compute the position the layer in screen space */
+        v2d_t scroll = v2d_compmult(layer->scroll_speed, topleft);
+        v2d_t offset = v2d_add(layer->behavior->offset, scroll);
+        v2d_t position = v2d_add(layer->initial_position, offset);
+        position.x = floorf(0.5 + position.x); /* round to nearest integer */
+        position.y = floorf(0.5 + position.y);
 
-            actor_render_repeat_xy(bg->actor, halfscreen, bg->repeat_x, bg->repeat_y);
+        /* tiled rendering? */
+        int rows = 1, cols = 1;
+        if(layer->repeat_x) {
+            position.x = fmodf(position.x, frame_width) - frame_width;
+            cols = 3 + (int)(screen_size.x / frame_width);
+        }
+        if(layer->repeat_y) {
+            position.y = fmodf(position.y, frame_height) - frame_height;
+            rows = 3 + (int)(screen_size.y / frame_height);
+        }
 
-            bg->actor->position = prev;
+        /* render */
+        const image_t* image = animation_image_at_time(animation, animation_time);
+        for(int y = 0; y < rows; y++) {
+            for(int x = 0; x < cols; x++) {
+                v2d_t image_position = v2d_new(position.x + x * frame_width, position.y + y * frame_height);
+                rect_t image_rect = rect_new(image_position.x, image_position.y, frame_width, frame_height);
+
+                if(rect_overlaps(image_rect, screen_rect)) /* clipping */
+                    render_image(image, image_position, data);
+            }
         }
     }
 }
 
-void sort_backgrounds(bgtheme_t *bgtheme)
+/* render an image */
+void render_without_cache(const image_t* image, v2d_t position, void* data)
 {
-    /* merge_sort is a stable sorting algorithm. stdlib's qsort may not be. */
-    merge_sort(bgtheme->data, bgtheme->length, sizeof *(bgtheme->data), sort_cmp);
+    image_draw(image, position.x, position.y, IF_NONE);
 }
 
+/* render an image with FastDraw */
+void render_with_cache(const image_t* image, v2d_t position, void* data)
+{
+#if WANT_FAST_DRAW
+    FAST_DRAW_CACHE* cache = (FAST_DRAW_CACHE*)(((void**)data)[0]);
+    int* draw_count = (int*)(((void**)data)[1]);
+
+    fd_draw_bitmap(cache, IMAGE2BITMAP(image), position.x, position.y);
+    ++(*draw_count);
+#endif
+}
+
+
+
+
+
+/* preprocessing */
+
+/* sort layers by their z-indexes */
+void sort_layers(bgtheme_t *bgtheme)
+{
+    /* merge_sort is a stable sorting algorithm. stdlib's qsort may not be. */
+    merge_sort(bgtheme->layer, bgtheme->layer_count, sizeof *(bgtheme->layer), sort_cmp);
+}
+
+/* comparison function */
 int sort_cmp(const void *a, const void *b)
 {
-    const background_t *i = *((const background_t**)a);
-    const background_t *j = *((const background_t**)b);
+    const bglayer_t *i = *((const bglayer_t**)a);
+    const bglayer_t *j = *((const bglayer_t**)b);
 
     if(nearly_equal(i->zindex, j->zindex))
         return 0;
-    else if(i->zindex < j->zindex)
-        return -1;
-    else
-        return 1;
+
+    return (i->zindex > j->zindex) - (i->zindex < j->zindex);
 }
 
+/* split background & foreground layers */
+void split_layers(bgtheme_t *bgtheme)
+{
+    /*
+     * bgtheme->layer[] is partitioned into background and foreground layers:
+     *
+     * layer[0 .. background_count-1] are the background layers
+     * layer[background_count-1 .. layer_count-1] are the foreground layers
+     */
+
+    bgtheme->foreground_count = 0;
+
+    for(int i = bgtheme->layer_count - 1; i >= 0; i--) {
+        if(IS_FOREGROUND_LAYER(bgtheme->layer[i]))
+            bgtheme->foreground_count++;
+        else
+            break; /* the array is assumed to be sorted */
+    }
+
+    bgtheme->background_count = bgtheme->layer_count - bgtheme->foreground_count;
+}
+
+/* group layers for deferred drawing */
+void group_layers(bgtheme_t *bgtheme)
+{
+    #define layer_image(layer) animation_image((layer)->animation, 0)
+    bglayer_t** layer = bgtheme->layer;
+
+    /*
+     * We use the technique explained at renderqueue.c for deferred drawing:
+     * group_index is a piecewise monotonic decrease sequence: each piece
+     * identifies a group of layers. Layers are grouped if they share a parent
+     * bitmap. Grouped layers can be rendered efficiently via deferred drawing.
+     */
+
+    /* initialize indices */
+    for(int i = 0; i < bgtheme->layer_count; i++)
+        layer[i]->group_index = 1;
+
+    /* group foreground layers */
+    for(int i = bgtheme->layer_count - 2; i >= bgtheme->background_count; i--) {
+        const image_t* a = layer_image(layer[i]);
+        const image_t* b = layer_image(layer[i+1]);
+
+        if(image_texture(a) == image_texture(b))
+            layer[i]->group_index = 1 + layer[i+1]->group_index;
+    }
+
+    /* group background layers */
+    for(int i = bgtheme->background_count - 2; i >= 0; i--) {
+        const image_t* a = layer_image(layer[i]);
+        const image_t* b = layer_image(layer[i+1]);
+
+        if(image_texture(a) == image_texture(b))
+            layer[i]->group_index = 1 + layer[i+1]->group_index;
+    }
+
+    /* warn if unoptimized */
+    if(bgtheme->background_count > 0 && layer[0]->group_index < bgtheme->background_count)
+        logfile_message("BACKGROUND: unoptimized multi-atlas background \"%s\"", bgtheme->filepath);
+
+    #undef layer_image
+}
+
+
+
+
+
+
+/* .bg files */
+
+/* traverse a .bg file */
 int traverse(const parsetree_statement_t *stmt, void *bgtheme)
 {
     const char *identifier;
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1;
-    background_t *bg;
+    bglayer_t *layer;
     bgtheme_t *theme = (bgtheme_t*)bgtheme;
 
     identifier = nanoparser_get_identifier(stmt);
@@ -361,27 +649,28 @@ int traverse(const parsetree_statement_t *stmt, void *bgtheme)
     if(str_icmp(identifier, "background") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
 
-        nanoparser_expect_program(p1, "Can't read background. Missing background attributes");
+        nanoparser_expect_program(p1, "Can't read background layer: missing attributes");
 
-        bg = background_new();
-        theme->data = reallocx(theme->data, (++(theme->length)) * sizeof(*(theme->data)));
-        theme->data[theme->length-1] = bg;
-        nanoparser_traverse_program_ex(nanoparser_get_program(p1), (void*)bg, traverse_background_attributes);
-        validate_background(bg);
-        actor_change_animation(bg->actor, bg->data->animation_data[0]);
+        layer = bglayer_new();
+        theme->layer = reallocx(theme->layer, (++(theme->layer_count)) * sizeof(*(theme->layer)));
+        theme->layer[theme->layer_count - 1] = layer;
+
+        nanoparser_traverse_program_ex(nanoparser_get_program(p1), layer, traverse_layer_attributes);
+        validate_layer(layer);
     }
     else
-        fatal_error("Can't read background. Unknown identifier: '%s'", identifier);
+        fatal_error("Can't read background layer. Unknown identifier: '%s'", identifier);
 
     return 0;
 }
 
-int traverse_background_attributes(const parsetree_statement_t *stmt, void *background)
+/* traverse a layer declaration of a .bg file */
+int traverse_layer_attributes(const parsetree_statement_t *stmt, void *bglayer)
 {
     const char *identifier;
     const parsetree_parameter_t *param_list;
     const parsetree_parameter_t *p1, *p2, *p3, *p4, *p5, *p6, *p7;
-    background_t *bg = (background_t*)background;
+    bglayer_t *layer = (bglayer_t*)bglayer;
 
     identifier = nanoparser_get_identifier(stmt);
     param_list = nanoparser_get_parameter_list(stmt);
@@ -393,9 +682,8 @@ int traverse_background_attributes(const parsetree_statement_t *stmt, void *back
         nanoparser_expect_string(p1, "initial_position must be a pair of numbers");
         nanoparser_expect_string(p2, "initial_position must be a pair of numbers");
 
-        bg->actor->spawn_point.x = atof(nanoparser_get_string(p1));
-        bg->actor->spawn_point.y = atof(nanoparser_get_string(p2));
-        bg->actor->position = bg->actor->spawn_point;
+        layer->initial_position.x = atof(nanoparser_get_string(p1));
+        layer->initial_position.y = atof(nanoparser_get_string(p2));
     }
     else if(str_icmp(identifier, "scroll_speed") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
@@ -404,8 +692,8 @@ int traverse_background_attributes(const parsetree_statement_t *stmt, void *back
         nanoparser_expect_string(p1, "scroll_speed must be a pair of numbers");
         nanoparser_expect_string(p2, "scroll_speed must be a pair of numbers");
 
-        bg->actor->speed.x = atof(nanoparser_get_string(p1));
-        bg->actor->speed.y = atof(nanoparser_get_string(p2));
+        layer->scroll_speed.x = atof(nanoparser_get_string(p1));
+        layer->scroll_speed.y = atof(nanoparser_get_string(p2));
     }
     else if(str_icmp(identifier, "behavior") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
@@ -419,19 +707,16 @@ int traverse_background_attributes(const parsetree_statement_t *stmt, void *back
         nanoparser_expect_string(p1, "Background behavior must be a string");
 
         if(str_icmp(nanoparser_get_string(p1), "DEFAULT") == 0) {
-            if(bg->strategy)
-                bg->strategy = bgstrategy_delete(bg->strategy);
-            bg->strategy = bgstrategy_default_new(bg);
+            bgbehavior_delete(layer->behavior);
+            layer->behavior = bgbehavior_default_new();
         }
         else if(str_icmp(nanoparser_get_string(p1), "LINEAR") == 0) {
             nanoparser_expect_string(p2, "Linear background behavior expects a pair of numbers");
             nanoparser_expect_string(p3, "Linear background behavior expects a pair of numbers");
 
-            if(bg->strategy)
-                bg->strategy = bgstrategy_delete(bg->strategy);
-            bg->strategy = bgstrategy_linear_new(
-                bg,
-                atof(nanoparser_get_string(p2)),
+            bgbehavior_delete(layer->behavior);
+            layer->behavior = bgbehavior_linear_new(
+                atof(nanoparser_get_string(p2)), /* speed in pixels per second */
                 atof(nanoparser_get_string(p3))
             );
         }
@@ -441,15 +726,13 @@ int traverse_background_attributes(const parsetree_statement_t *stmt, void *back
             nanoparser_expect_string(p4, "Circular background behavior expects at least four numbers");
             nanoparser_expect_string(p5, "Circular background behavior expects at least four numbers");
 
-            if(bg->strategy)
-                bg->strategy = bgstrategy_delete(bg->strategy);
-            bg->strategy = bgstrategy_circular_new(
-                bg,
-                atof(nanoparser_get_string(p2)),
+            bgbehavior_delete(layer->behavior);
+            layer->behavior = bgbehavior_circular_new(
+                atof(nanoparser_get_string(p2)), /* amplitude in pixels */
                 atof(nanoparser_get_string(p3)),
-                atof(nanoparser_get_string(p4)),
+                atof(nanoparser_get_string(p4)), /* angular speed in cycles per second */
                 atof(nanoparser_get_string(p5)),
-                atof(nanoparser_get_string(p6)),
+                atof(nanoparser_get_string(p6)), /* initial phase in degrees */
                 atof(nanoparser_get_string(p7))
             );
         }
@@ -459,24 +742,26 @@ int traverse_background_attributes(const parsetree_statement_t *stmt, void *back
     else if(str_icmp(identifier, "repeat_x") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "repeat_x expects a boolean value");
-        bg->repeat_x = atob(nanoparser_get_string(p1));
+        layer->repeat_x = atob(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "repeat_y") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "repeat_y expects a boolean value");
-        bg->repeat_y = atob(nanoparser_get_string(p1));
+        layer->repeat_y = atob(nanoparser_get_string(p1));
     }
     else if(str_icmp(identifier, "zindex") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_string(p1, "Can't read background attributes: zindex expects a number between 0.0 (far) and 1.0 (near)");
-        bg->zindex = clip01(atof(nanoparser_get_string(p1)));
+        layer->zindex = clip01(atof(nanoparser_get_string(p1)));
     }
     else if(str_icmp(identifier, "sprite") == 0) {
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         nanoparser_expect_program(p1, "Can't read background attributes: sprite block expected");
-        if(bg->data != NULL)
-            spriteinfo_destroy(bg->data);
-        bg->data = spriteinfo_create(nanoparser_get_program(p1));
+
+        if(layer->data != NULL)
+            spriteinfo_destroy(layer->data);
+        layer->data = spriteinfo_create(nanoparser_get_program(p1));
+        layer->animation = spriteinfo_get_animation(layer->data, 0);
     }
     else
         fatal_error("Can't read background attributes. Unknown identifier: '%s'", identifier);
@@ -484,9 +769,16 @@ int traverse_background_attributes(const parsetree_statement_t *stmt, void *back
     return 0;
 }
 
-void validate_background(const background_t *bg)
+/* validate a layer */
+void validate_layer(const bglayer_t *layer)
 {
-    if(bg->data == NULL)
-        fatal_error("Can't read background: no sprite data given");
+    if(layer->data == NULL || layer->animation == NULL)
+        fatal_error("Can't read background layer: no sprite data given");
 }
 
+/* validate a background theme */
+void validate_theme(const bgtheme_t* theme)
+{
+    if(theme->layer == NULL || theme->layer_count == 0)
+        fatal_error("Invalid background: no layers were specified in \"%s\"", theme->filepath);
+}

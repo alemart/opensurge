@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * editorpal.c - level editor: item palette
- * Copyright (C) 2018-2020  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,16 +19,18 @@
  */
 
 #include "editorpal.h"
+#include "../util/util.h"
 #include "../core/font.h"
 #include "../core/scene.h"
 #include "../core/audio.h"
-#include "../core/util.h"
 #include "../core/color.h"
 #include "../core/video.h"
 #include "../core/image.h"
 #include "../core/sprite.h"
+#include "../core/animation.h"
 #include "../core/input.h"
 #include "../core/lang.h"
+#include "../core/global.h"
 #include "../entities/brick.h"
 #include "../entities/sfx.h"
 
@@ -44,7 +46,7 @@ static editorpal_config_t config;
 static input_t *pal_input;
 static font_t *error_font;
 static font_t *cursor_font;
-static image_t* cursor_image;
+static const image_t* cursor_image;
 static input_t* cursor_input;
 static v2d_t cursor_position;
 static image_t* background;
@@ -76,9 +78,9 @@ void editorpal_init(void *config_ptr)
         item = mallocx(item_count * sizeof(*item));
         for(i = 0; i < item_count; i++) {
             if(sprite_animation_exists(config.ssobj.name[i], 0))
-                item[i] = sprite_get_image(sprite_get_animation(config.ssobj.name[i], 0), 0);
+                item[i] = animation_image(sprite_get_animation(config.ssobj.name[i], 0), 0);
             else
-                item[i] = sprite_get_image(sprite_get_animation(NULL, 0), 0);
+                item[i] = animation_image(sprite_get_animation(NULL, 0), 0);
         }
     }
     else if(config.type == EDITORPAL_BRICK) {
@@ -88,7 +90,7 @@ void editorpal_init(void *config_ptr)
             if(brick_exists(config.brick.id[i]))
                 item[i] = brick_image_preview(config.brick.id[i]);
             else
-                item[i] = sprite_get_image(sprite_get_animation(NULL, 0), 0); /* shouldn't happen */
+                item[i] = animation_image(sprite_get_animation(NULL, 0), 0); /* shouldn't happen */
         }
     }
     else {
@@ -97,13 +99,13 @@ void editorpal_init(void *config_ptr)
     }
 
     /* configure the mouse cursor */
-    cursor_image = sprite_get_image(sprite_get_animation(CURSOR_SPRITE, 0), 0);
+    cursor_image = animation_image(sprite_get_animation(CURSOR_SPRITE, 0), 0);
     cursor_input = input_create_mouse();
     cursor_font = font_create("EditorUI");
     cursor_position = v2d_new(0, 0);
 
     /* configure the background */
-    background = image_clone(video_get_backbuffer());
+    background = video_take_snapshot();
 
     /* misc */
     selected_item = NO_ITEM;

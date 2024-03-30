@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * level.c - code for the game levels
- * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <limits.h>
 #include <string.h>
 #include <ctype.h>
@@ -30,6 +31,7 @@
 #include "gameover.h"
 #include "pause.h"
 #include "quest.h"
+#include "util/levparser.h"
 #include "util/editorgrp.h"
 #include "util/editorcmd.h"
 #include "../core/engine.h"
@@ -42,31 +44,35 @@
 #include "../core/audio.h"
 #include "../core/timer.h"
 #include "../core/sprite.h"
-#include "../core/assetfs.h"
-#include "../core/stringutil.h"
+#include "../core/asset.h"
 #include "../core/logfile.h"
 #include "../core/lang.h"
-#include "../core/nanoparser/nanoparser.h"
+#include "../core/nanoparser.h"
 #include "../core/font.h"
 #include "../core/prefs.h"
-#include "../core/modmanager.h"
+#include "../util/darray.h"
+#include "../util/numeric.h"
+#include "../util/rect.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+#include "../util/iterator.h"
+#include "../entities/mobilegamepad.h"
 #include "../entities/actor.h"
 #include "../entities/brick.h"
+#include "../entities/brickmanager.h"
 #include "../entities/player.h"
 #include "../entities/camera.h"
+#include "../entities/waterfx.h"
 #include "../entities/background.h"
-#include "../entities/entitymanager.h"
-#include "../entities/particle.h"
 #include "../entities/renderqueue.h"
 #include "../entities/sfx.h"
+#include "../entities/legacy/entitymanager.h"
 #include "../entities/legacy/item.h"
 #include "../entities/legacy/enemy.h"
 #include "../physics/obstacle.h"
+#include "../physics/obstaclemap.h"
 #include "../scripting/scripting.h"
 #include "../scenes/editorpal.h"
-
-#define FASTHASH_INLINE
-#include "../core/fasthash.h"
 
 /* ------------------------
  * Dialog Regions
@@ -97,15 +103,6 @@ static void update_dialogregions();
 /* ------------------------
  * Setup objects
  * ------------------------ */
-#define DEFAULT_SETUP_OBJECT "Default Setup"
-typedef struct setupobject_list_t setupobject_list_t;
-struct setupobject_list_t {
-    char *object_name;
-    setupobject_list_t *next;
-};
-static setupobject_list_t *setupobject_list;
-static void init_setup_object_list();
-static void release_setup_object_list();
 static void add_to_setup_object_list(const char *object_name);
 static void spawn_setup_objects();
 static bool is_setup_object_list_empty();
@@ -121,11 +118,14 @@ static bool is_setup_object(const char* object_name);
 #define MAX_POWERUPS            10
 #define DLGBOX_MAXTIME          10000
 #define TEAM_MAX                16
-#define DEFAULT_WATERLEVEL      LARGE_INT
-#define DEFAULT_WATERCOLOR()    color_rgba(0,64,255,128)
 #define DEFAULT_GRAVITY         787.5f
 #define PATH_MAXLEN             1024
 #define LINE_MAXLEN             1024
+#define MAX_ACT_NUMBER          99
+
+/* water */
+#define DEFAULT_WATERLEVEL()    waterfx_default_ypos()
+#define DEFAULT_WATERCOLOR()    waterfx_default_color()
 
 /* level attributes */
 static char file[PATH_MAXLEN];
@@ -137,12 +137,10 @@ static char name[128];
 static char author[128];
 static char version[128];
 static char license[128];
-static int act;
+static int act_number;
 static int requires[3]; /* this level requires engine version x.y.z */
 static int readonly; /* we can't activate the level editor */
 static v2d_t spawn_point;
-static int waterlevel; /* y coordinate */
-static color_t watercolor;
 
 /* player data */
 static player_t *team[TEAM_MAX]; /* players */
@@ -154,6 +152,7 @@ typedef struct levelstate_t levelstate_t;
 struct levelstate_t { /* stores attributes that can be changed during gameplay */
     bool is_valid;
     v2d_t spawn_point;
+    int act_number;
     int waterlevel;
     color_t watercolor;
     char bgtheme[PATH_MAXLEN];
@@ -163,23 +162,32 @@ static void save_level_state(levelstate_t* state);
 static void restore_level_state(const levelstate_t* state);
 static void clear_level_state(levelstate_t* state);
 
+/* region of interest */
+static rect_t create_roi(v2d_t camera, int margin);
+static const int ROI_MARGIN_UPDATE_ENTITY = 256;
+static const int ROI_MARGIN_UPDATE_BRICK = ROI_MARGIN_UPDATE_ENTITY + 64; /* bricks should use a larger margin than entities */
+static const int ROI_MARGIN_UPDATE_PLAYER = ROI_MARGIN_UPDATE_ENTITY;
+static const int ROI_MARGIN_RENDER_ENTITY = ROI_MARGIN_UPDATE_ENTITY; /* use the same ROI of the update cycle to skip updating the entity tree; we don't want to unnecessarily bubble things up and down in the entity tree, as it takes time */
+static const int ROI_MARGIN_RENDER_BRICK = 128;
+static const int ROI_MARGIN_EDITOR = 128;
+
 /* internal data */
-static int level_width;/* width of this level (in pixels) */
-static int level_height; /* height of this level (in pixels) */
-static int *height_at, height_at_count; /* level height at different sample points */
 static float level_timer;
 static music_t *music;
-static int quit_level;
-static image_t *quit_level_img;
 static bgtheme_t *backgroundtheme;
+static image_t *quit_level_img;
+static brickmanager_t* brick_manager;
+static int quit_level;
 static int must_load_another_level;
 static int must_restart_this_level;
 static int must_push_a_quest;
+static int must_quit_with_gameover;
 static char quest_to_be_pushed[PATH_MAXLEN];
 static float dead_player_timeout;
 static actor_t *camera_focus; /* camera */
 static int must_render_brick_masks;
 static int must_display_gizmos;
+static bool was_immersive;
 
 /* scripting controlled variables */
 static int level_cleared; /* display the level cleared animation */
@@ -197,61 +205,65 @@ static font_t *dlgbox_title, *dlgbox_message;
 static void level_load(const char *filepath);
 static void level_unload();
 static int level_save(const char *filepath);
-static void level_interpret_line(const char *filename, int fileline, const char *line);
-static void level_interpret_parsed_line(const char *filename, int fileline, const char *identifier, int param_count, const char **param);
+static bool level_interpret_header_line(const char *filepath, int fileline, levparser_command_t command, const char *command_name, int param_count, const char** param, void *data);
+static bool level_interpret_body_line(const char *filepath, int fileline, levparser_command_t command, const char *command_name, int param_count, const char** param, void *data);
+static bool level_save_ssobject(surgescript_object_t* object, void* param);
 
 /* internal methods */
 static int inside_screen(int x, int y, int w, int h, int margin);
 static void update_level_size();
-static void update_level_height_samples(int level_width, int level_height);
 static void restart(int preserve_level_state);
-static void render_players();
 static void update_music();
+static void render_bricks();
+static void render_bricks_debug();
+static void render_players();
 static void spawn_players();
-static void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies); /* render bricks, items, enemies, players, etc. */
+static void render_level(const item_list_t *major_items, const enemy_list_t *major_enemies); /* render bricks, items, enemies, players, etc. */
 static void render_hud(); /* gui / hud related */
 static void render_dlgbox(); /* dialog boxes */
 static void update_dlgbox(); /* dialog boxes */
 static void reconfigure_players_input_devices();
 
+/* obstacle map */
+static obstaclemap_t* obstaclemap = NULL; /* obstacle map near the camera */
+static bool is_obstaclemap_dirty = false;
+STATIC_DARRAY(obstacle_t*, mock_obstacles); /* dynamically generated obstacles */
+static void create_obstaclemap();
+static void destroy_obstaclemap();
+static void clear_obstaclemap();
+static void update_obstaclemap(const item_list_t* item_list, const object_list_t* object_list);
+static obstacle_t* item2obstacle(const item_t* item);
+static obstacle_t* object2obstacle(const object_t* object);
+static obstacle_t* bricklike2obstacle(const surgescript_object_t* object);
+static collisionmask_t* create_collisionmask_of_bricklike_object(const surgescript_object_t* object);
+static void destroy_collisionmask_of_bricklike_object(void* mask);
+
 /* Scripting */
-#define TRANSFORM_MAX_DEPTH 128
-#define BRICKLIKE_MAX_COUNT 1024
 static surgescript_object_t* cached_level_ssobject = NULL;
+static surgescript_object_t* cached_entity_manager = NULL;
+
+static inline surgescript_object_t* level_ssobject();
+static inline surgescript_object_t* entitymanager_ssobject();
 static void update_ssobjects();
-static void update_ssobject(surgescript_object_t* object, void* param);
-static void late_update_ssobject(surgescript_object_t* object, void* param);
+static void late_update_ssobjects();
 static void render_ssobjects();
-static bool render_ssobject(surgescript_object_t* object, void* param);
-static bool ssobject_exists(const char* object_name);
-static surgescript_object_t* level_ssobject();
-static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor);
-static bool save_ssobject(surgescript_object_t* object, void* param);
-typedef struct ssobj_extradata_t ssobj_extradata_t;
-struct ssobj_extradata_t {
-    surgescript_objecthandle_t handle;
-    uint64_t entity_id;
-    v2d_t spawn_point;
-    int spawned_in_the_editor;
-    int sleeping;
-};
-static v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object);
-static uint64_t get_ssobj_id(const surgescript_object_t* object);
-static int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object);
-static int is_ssobj_sleeping(const surgescript_object_t* object);
-static inline ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object);
-static void store_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata);
-static void clear_ssobj_extradata(const surgescript_object_t* object);
-static void free_ssobj_extradata(void* data);
-static bool match_ssobj_id(const void* value, void* data);
-static fasthash_t* ssobj_extradata;
-static void add_bricklike_ssobject(surgescript_object_t* object);
-static surgescript_object_t* get_bricklike_ssobject(int index);
-static inline void clear_bricklike_ssobjects();
-static surgescript_objecthandle_t bricklike_ssobject[BRICKLIKE_MAX_COUNT];
-static int bricklike_ssobject_count = 0;
-bool notify_ssobject(surgescript_object_t* object, void* param);
-void notify_ssobjects(const char* fun_name);
+static void set_entitymanager_roi(rect_t roi);
+static surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point);
+static void notify_ssobjects(const char* fun_name);
+
+static bool entity_info_exists(const surgescript_object_t* object);
+static void entity_info_remove(const surgescript_object_t* object);
+static v2d_t entity_info_spawnpoint(const surgescript_object_t* object);
+static uint64_t entity_info_id(const surgescript_object_t* object);
+static void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id);
+static bool entity_info_is_persistent(const surgescript_object_t* object);
+static void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent);
+
+/* debug mode */
+#define debug_mode_want_to_activate() (!mobilegamepad_is_available() && editorcmd_is_triggered(editor_cmd, "enter-debug-mode"))
+
+/* events */
+static void handle_switchout_event(const ALLEGRO_EVENT* event, void* data);
 
 
 
@@ -269,7 +281,6 @@ static void editor_render();
 static bool editor_is_enabled();
 static bool editor_want_to_activate();
 static void editor_update_background();
-static void editor_render_background();
 static void editor_waterline_render(int ycoord, color_t color);
 static void editor_save();
 static void editor_scroll();
@@ -290,8 +301,6 @@ enum editor_entity_type {
 
 /* internal stuff */
 static bool editor_enabled; /* is the level editor enabled? */
-static videoresolution_t editor_previous_video_resolution;
-static bool editor_previous_video_smooth;
 static editorcmd_t* editor_cmd;
 static v2d_t editor_camera, editor_cursor;
 static enum editor_entity_type editor_cursor_entity_type;
@@ -299,6 +308,7 @@ static int editor_cursor_entity_id, editor_cursor_itemid;
 static font_t *editor_cursor_font;
 static font_t *editor_properties_font; /* top bar */
 static font_t *editor_help_font; /* top bar */
+static videomode_t editor_previous_videomode = VIDEOMODE_DEFAULT;
 static const char* editor_entity_class(enum editor_entity_type objtype);
 static const char* editor_entity_info(enum editor_entity_type objtype, int objid);
 static void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t position);
@@ -343,8 +353,8 @@ static int editor_ssobj_sortfun(const void* a, const void* b);
 static void editor_ssobj_register(const char* entity_name, void* data); /* internal */
 static int editor_ssobj_index(const char* entity_name); /* an index k such that editor_ssobj[k] is entity_name */
 static const char* editor_ssobj_name(int entity_index); /* the inverse of editor_ssobj_index() */
-static bool editor_remove_ssobj(surgescript_object_t* object, void* data);
-static bool editor_pick_ssobj(surgescript_object_t* object, void* data);
+static void editor_remove_entity(uint64_t entity_id);
+static void editor_pick_entity(surgescript_object_t* object, surgescript_object_t** best_candidate);
 
 /* editor: bricks */
 static int* editor_brick; /* an array of all valid brick numbers */
@@ -358,7 +368,7 @@ static int editor_brick_id(int index); /* the index-th valid brick - at editor_b
 
 /* editor: UI */
 #define EDITOR_UI_COLOR()              color_rgb(40, 44, 52)
-#define EDITOR_UI_COLOR_TRANS(alpha)   color_rgba(40, 44, 52, (alpha))
+#define EDITOR_UI_COLOR_TRANS(alpha)   color_premul_rgba(40, 44, 52, (alpha))
 
 /* editor: grid */
 static int editor_grid_size = 1;
@@ -441,7 +451,7 @@ static void editor_action_init();
 static void editor_action_release();
 static void editor_action_undo();
 static void editor_action_redo();
-static void editor_action_commit(editor_action_t action);
+static editor_action_t editor_action_commit(editor_action_t action);
 static void editor_action_register(editor_action_t action); /* internal */
 static editor_action_list_t* editor_action_delete_list(editor_action_list_t *list); /* internal */
 
@@ -464,15 +474,10 @@ static editor_action_list_t* editor_action_delete_list(editor_action_list_t *lis
  */
 void level_load(const char *filepath)
 {
-    char line[LINE_MAXLEN];
-    const char* fullpath;
-    FILE* fp;
-
     logfile_message("Loading level \"%s\"...", filepath);
-    fullpath = assetfs_fullpath(filepath);
 
-    /* default values */
-    str_cpy(file, filepath, sizeof(file)); /* it's the relative filepath we want */
+    /* initialize fields with default values */
+    str_cpy(file, filepath, sizeof(file)); /* we want the relative filepath */
     str_cpy(name, "Untitled", sizeof(name));
     strcpy(musicfile, "");
     strcpy(theme, "");
@@ -481,72 +486,59 @@ void level_load(const char *filepath)
     strcpy(version, "");
     strcpy(license, "");
     strcpy(grouptheme, "");
-    spawn_point = v2d_new(0,0);
-    dialogregion_size = 0;
-    act = 1;
+    spawn_point = v2d_new(0, 0);
+    act_number = 0;
     requires[0] = GAME_VERSION_SUP;
     requires[1] = GAME_VERSION_SUB;
     requires[2] = GAME_VERSION_WIP;
     readonly = FALSE;
-    waterlevel = DEFAULT_WATERLEVEL;
-    watercolor = DEFAULT_WATERCOLOR();
+    dialogregion_size = 0;
+
+    /* clear pointers */
+    backgroundtheme = NULL;
+    music = NULL;
+
+    /* clear players */
+    team_size = 0;
+    for(int i = 0; i < TEAM_MAX; i++)
+        team[i] = NULL;
+
+    /* initialize the water effect */
+    waterfx_init();
 
     /* scripting: preparing a new Level... */
-    cached_level_ssobject = NULL;
-    ssobj_extradata = fasthash_create(free_ssobj_extradata, 15);
-    surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "LevelManager"), "onLevelLoad", NULL, 0, NULL);
+    surgescript_object_t* level_manager = scripting_util_surgeengine_component(surgescript_vm(), "LevelManager");
+    surgescript_object_call_function(level_manager, "onLevelLoad", NULL, 0, NULL);
 
-    /* entity manager */
-    entitymanager_init();
-
-    /* setup objects (1) */
-    init_setup_object_list();
-
-    /* traversing the level file */
-    fp = fopen_utf8(fullpath, "r");
-    if(fp != NULL) {
-        int ln = 0;
-        while(fgets(line, sizeof(line) / sizeof(char), fp)) {
-            if(*line) {
-                char *q = line + strlen(line) - 1;
-                if(*q == '\n') *q = '\0'; /* no newlines, please! */
-                level_interpret_line(fullpath, ++ln, line);
-            }
-        }
-        fclose(fp);
-    }
-    else
-        fatal_error("Can\'t open level file \"%s\".", fullpath);
+    /* read the header of the level file */
+    if(!levparser_parse(filepath, NULL, level_interpret_header_line))
+        fatal_error("Can\'t open level file \"%s\".", filepath);
 
     /* load the music */
+    music_stop(); /* stop any music that's playing */
     music = *musicfile ? music_load(musicfile) : NULL;
 
-    /* background */
+    /* load the brickset */
+    brickset_load(theme);
+
+    /* load the background */
     backgroundtheme = background_load(bgtheme);
 
-    /* level size */
-    level_width = 0;
-    level_height = 0;
-    height_at_count = 0;
-    height_at = NULL;
-    update_level_size();
-
     /* players */
-    if(team_size == 0) {
-        /* default players */
-        logfile_message("Loading the default players...");
-        team[team_size++] = player_create("Surge");
-        team[team_size++] = player_create("Neon");
-        team[team_size++] = player_create("Charge");
-    }
-    level_change_player(team[0]);
     spawn_players();
-    camera_init();
-    camera_set_position(player->actor->position);
     player_set_collectibles(0);
+    level_change_player(team[0]);
+    camera_set_position(player_position(player));
     surgescript_object_call_function(scripting_util_surgeengine_component(surgescript_vm(), "Player"), "__spawnPlayers", NULL, 0, NULL);
 
-    /* setup objects (2) */
+    /* read the body of the level file;
+       load bricks & entities */
+    levparser_parse(filepath, NULL, level_interpret_body_line);
+
+    /* recompute the level size */
+    update_level_size();
+
+    /* spawn setup objects */
     spawn_setup_objects();
 
     /* success! */
@@ -560,8 +552,6 @@ void level_load(const char *filepath)
  */
 void level_unload()
 {
-    int i;
-
     logfile_message("Unloading the level...");
 
     /* scripting */
@@ -571,47 +561,35 @@ void level_unload()
         logfile_message("The level scripts have been cleared.");
     }
 
+    /* release the players */
+    logfile_message("Unloading the players...");
+    for(int i = 0; i < team_size; i++)
+        player_destroy(team[i]);
+    team_size = 0;
+    player = NULL;
+
+    /* misc */
+    camera_unlock();
+    waterfx_release();
+
     /* music */
+    logfile_message("Stopping the music...");
     if(music != NULL) {
         music_stop();
         music_unref(music);
     }
 
-    /* destroy extradata */
-    ssobj_extradata = fasthash_destroy(ssobj_extradata);
-    cached_level_ssobject = NULL;
+    /* remove all bricks */
+    logfile_message("Removing all bricks...");
+    brickmanager_remove_all_bricks(brick_manager);
 
-    /* entity manager */
-    entitymanager_release();
-
-    /* releases the setup object list */
-    release_setup_object_list();
-
-    /* unloading the brickset */
+    /* unload the brickset */
     logfile_message("Unloading the brickset...");
     brickset_unload();
 
-    /* unloading the background */
+    /* unload the background */
     logfile_message("Unloading the background...");
     backgroundtheme = background_unload(backgroundtheme);
-
-    /* destroying the players */
-    logfile_message("Unloading the players...");
-    for(i=0; i<team_size; i++)
-        player_destroy(team[i]);
-    team_size = 0;
-    player = NULL;
-
-    /* level size */
-    level_width = 0;
-    level_height = 0;
-    if(height_at != NULL)
-        free(height_at);
-    height_at = NULL;
-    height_at_count = 0;
-
-    /* misc */
-    camera_unlock();
 
     /* success! */
     logfile_message("The level has been unloaded.");
@@ -625,319 +603,384 @@ void level_unload()
  */
 int level_save(const char *filepath)
 {
-    int i;
-    FILE *fp;
-    const char* fullpath;
-    brick_list_t *itb, *brick_list;
-    item_list_t *iti, *item_list;
-    enemy_list_t *ite, *object_list;
-    setupobject_list_t *its;
+    const char* fullpath = asset_path(filepath);
+    ALLEGRO_FILE *fp;
 
-    brick_list = entitymanager_retrieve_all_bricks();
-    item_list = entitymanager_retrieve_all_items();
-    object_list = entitymanager_retrieve_all_objects();
+    /* skip if the readonly flag is set
+       should this be moved to the scripting layer instead? */
+    if(readonly) {
+        logfile_message("Can't save read-only level \"%s\"", filepath);
+        return FALSE;
+    }
 
-    fullpath = assetfs_create_data_file(filepath, false);
+    /* skip if playing in compatibility mode (it overwrites the version) */
+    if(engine_compatibility_version_code() < VERSION_CODE_EX(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP, GAME_VERSION_FIX)) {
+        logfile_message("Can't save level \"%s\" while playing in compatibility mode!", filepath);
+        return FALSE;
+    }
 
-    /* open for writing */
+    /* open file for writing */
     logfile_message("level_save(\"%s\")", fullpath);
-    if(NULL == (fp=fopen_utf8(fullpath, "w"))) {
+    if(NULL == (fp = al_fopen(fullpath, "w"))) {
         logfile_message("Warning: could not open \"%s\" for writing.", fullpath);
         video_showmessage("Could not open \"%s\" for writing.", fullpath);
         return FALSE;
     }
 
-    /* level disclaimer */
-    fprintf(fp,
+    /* level header */
+    al_fprintf(fp,
     "// ------------------------------------------------------------\n"
     "// %s %s level\n"
-    "// This file was generated by the built-in level editor.\n"
+    "// This file was generated automatically.\n"
     "// http://%s\n"
     "// ------------------------------------------------------------\n\n",
     GAME_TITLE, GAME_VERSION_STRING, GAME_WEBSITE);
 
     /* header */
-    fprintf(fp,
+    al_fprintf(fp,
     "// header\n"
     "name \"%s\"\n",
-    str_addslashes(name));
+    str_addslashes(name, NULL, 0));
 
     /* author */
-    fprintf(fp, "author \"%s\"\n", str_addslashes(author));
+    al_fprintf(fp, "author \"%s\"\n", str_addslashes(author, NULL, 0));
     if(strcmp(license, "") != 0)
-        fprintf(fp, "license \"%s\"\n", str_addslashes(license));
+        al_fprintf(fp, "license \"%s\"\n", str_addslashes(license, NULL, 0));
 
     /* level attributes */
-    fprintf(fp, 
+    al_fprintf(fp,
     "version \"%s\"\n"
     "requires \"%d.%d.%d\"\n"
     "act %d\n"
     "theme \"%s\"\n"
     "bgtheme \"%s\"\n"
     "spawn_point %d %d\n",
-    version,
+    str_addslashes(version, NULL, 0),
     GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP,
-    act, theme, bgtheme,
+    act_number, theme, bgtheme,
     (int)spawn_point.x, (int)spawn_point.y);
 
     /* music? */
     if(strcmp(musicfile, "") != 0)
-        fprintf(fp, "music \"%s\"\n", musicfile);
+        al_fprintf(fp, "music \"%s\"\n", musicfile);
 
     /* grouptheme? */
     if(strcmp(grouptheme, "") != 0)
-        fprintf(fp, "grouptheme \"%s\"\n", grouptheme);
+        al_fprintf(fp, "grouptheme \"%s\"\n", grouptheme);
 
     /* setup objects? */
-    fprintf(fp, "setup");
-    for(its=setupobject_list; its; its=its->next)
-        fprintf(fp, " \"%s\"", str_addslashes(its->object_name));
-    fprintf(fp, "\n");
+    iterator_t* setup_iterator = scripting_level_setupobjects_iterator(level_ssobject());
+    if(iterator_has_next(setup_iterator)) {
+        al_fprintf(fp, "setup");
+        while(iterator_has_next(setup_iterator)) {
+            const char** object_name = iterator_next(setup_iterator);
+            al_fprintf(fp, " \"%s\"", str_addslashes(*object_name, NULL, 0));
+        }
+        al_fprintf(fp, "\n");
+    }
+    iterator_destroy(setup_iterator);
 
     /* players */
-    fprintf(fp, "players");
-    for(i=0; i<team_size; i++)
-        fprintf(fp, " \"%s\"", str_addslashes(team[i]->name));
-    fprintf(fp, "\n");
+    al_fprintf(fp, "players");
+    for(int i = 0; i < team_size; i++)
+        al_fprintf(fp, " \"%s\"", str_addslashes(player_name(team[i]), NULL, 0));
+    al_fprintf(fp, "\n");
 
     /* read only? */
     if(readonly)
-        fprintf(fp, "readonly\n");
+        al_fprintf(fp, "readonly\n");
 
     /* water */
-    if(waterlevel != DEFAULT_WATERLEVEL)
-        fprintf(fp, "waterlevel %d\n", waterlevel);
-    if(!color_equals(watercolor, DEFAULT_WATERCOLOR())) {
+    if(level_waterlevel() != DEFAULT_WATERLEVEL())
+        al_fprintf(fp, "waterlevel %d\n", level_waterlevel());
+    if(!color_equals(level_watercolor(), DEFAULT_WATERCOLOR())) {
         uint8_t r, g, b, a;
-        color_unmap(watercolor, &r, &g, &b, &a);
-        fprintf(fp, "watercolor %d %d %d %d\n", r, g, b, a);
+        color_unmap(level_watercolor(), &r, &g, &b, &a);
+        al_fprintf(fp, "watercolor %d %d %d %d\n", r, g, b, a);
     }
 
     /* dialog regions */
     if(dialogregion_size > 0) {
-        fprintf(fp, "\n// dialogs\n");
-        for(i=0; i<dialogregion_size; i++) {
+        al_fprintf(fp, "\n// dialogs\n");
+        for(int i = 0; i < dialogregion_size; i++) {
             char title[256], message[1024];
-            str_cpy(title, str_addslashes(dialogregion[i].title), sizeof(title));
-            str_cpy(message, str_addslashes(dialogregion[i].message), sizeof(message));
-            fprintf(fp, "dialogbox %d %d %d %d \"%s\" \"%s\"\n", dialogregion[i].rect_x, dialogregion[i].rect_y, dialogregion[i].rect_w, dialogregion[i].rect_h, title, message);
-        }
-    }
-
-    /* brick list */
-    fprintf(fp, "\n// bricks\n");
-    for(itb=brick_list; itb; itb=itb->next)  {
-        if(brick_is_alive(itb->data)) {
-            fprintf(fp,
-                "brick %d %d %d%s%s%s%s\n",
-                brick_id(itb->data),
-                (int)(brick_spawnpoint(itb->data).x), (int)(brick_spawnpoint(itb->data).y),
-                brick_layer(itb->data) != BRL_DEFAULT ? " " : "",
-                brick_layer(itb->data) != BRL_DEFAULT ? brick_util_layername(brick_layer(itb->data)) : "",
-                brick_flip(itb->data) != BRF_NOFLIP ? " " : "",
-                brick_flip(itb->data) != BRF_NOFLIP ? brick_util_flipstr(brick_flip(itb->data)) : ""
+            al_fprintf(fp,
+                "dialogbox %d %d %d %d \"%s\" \"%s\"\n",
+                dialogregion[i].rect_x,
+                dialogregion[i].rect_y,
+                dialogregion[i].rect_w,
+                dialogregion[i].rect_h,
+                str_addslashes(dialogregion[i].title, title, sizeof(title)),
+                str_addslashes(dialogregion[i].message, message, sizeof(message))
             );
         }
     }
 
+    /* brick list */
+    al_fprintf(fp, "\n// bricks\n");
+    iterator_t* brick_iterator = brickmanager_retrieve_all_bricks(brick_manager);
+    while(iterator_has_next(brick_iterator)) {
+        const brick_t* brick = iterator_next(brick_iterator);
+        v2d_t spawn_point = brick_spawnpoint(brick);
+        bricklayer_t layer = brick_layer(brick);
+        brickflip_t flip = brick_flip(brick);
+
+        al_fprintf(fp,
+            "brick %d %d %d%s%s%s%s\n",
+
+            brick_id(brick),
+            (int)(spawn_point.x), (int)(spawn_point.y),
+
+            layer != BRL_DEFAULT ? " " : "",
+            layer != BRL_DEFAULT ? brick_util_layername(layer) : "",
+
+            flip != BRF_NOFLIP ? " " : "",
+            flip != BRF_NOFLIP ? brick_util_flipstr(flip) : ""
+        );
+    }
+    iterator_destroy(brick_iterator);
+
     /* SurgeScript entity list */
-    fprintf(fp, "\n// entities\n");
-    surgescript_object_traverse_tree_ex(level_ssobject(), fp, save_ssobject);
+    al_fprintf(fp, "\n// entities\n");
+    surgescript_object_traverse_tree_ex(level_ssobject(), fp, level_save_ssobject);
 
     /* item list */
+    item_list_t* item_list = entitymanager_retrieve_all_items();
     if(item_list) {
-        fprintf(fp, "\n// legacy items\n");
-        for(iti=item_list; iti; iti=iti->next) {
+        al_fprintf(fp, "\n// legacy items\n");
+        for(item_list_t* iti = item_list; iti != NULL; iti = iti->next) {
             if(iti->data->state != IS_DEAD)
-                fprintf(fp, "item %d %d %d\n", iti->data->type, (int)iti->data->actor->spawn_point.x, (int)iti->data->actor->spawn_point.y);
+                al_fprintf(fp, "item %d %d %d\n", iti->data->type, (int)iti->data->actor->spawn_point.x, (int)iti->data->actor->spawn_point.y);
         }
     }
+    item_list = entitymanager_release_retrieved_item_list(item_list);
 
     /* legacy object list */
+    enemy_list_t* object_list = entitymanager_retrieve_all_objects();
     if(object_list) {
-        fprintf(fp, "\n// legacy objects\n");
-        for(ite=object_list; ite; ite=ite->next) {
+        al_fprintf(fp, "\n// legacy objects\n");
+        for(enemy_list_t* ite = object_list; ite != NULL; ite = ite->next) {
             if(ite->data->created_from_editor && ite->data->state != ES_DEAD)
-                fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(ite->data->name), (int)ite->data->actor->spawn_point.x, (int)ite->data->actor->spawn_point.y);
+                al_fprintf(fp, "object \"%s\" %d %d\n", str_addslashes(ite->data->name, NULL, 0), (int)ite->data->actor->spawn_point.x, (int)ite->data->actor->spawn_point.y);
         }
     }
-
-    /* done! */
-    fprintf(fp, "\n// EOF");
-    fclose(fp);
-    logfile_message("level_save() ok");
-
-    brick_list = entitymanager_release_retrieved_brick_list(brick_list);
-    item_list = entitymanager_release_retrieved_item_list(item_list);
     object_list = entitymanager_release_retrieved_object_list(object_list);
 
+    /* end of file */
+    al_fprintf(fp, "\n// EOF");
+    al_fclose(fp);
+
+    /* done! */
+    logfile_message("level_save() ok");
     return TRUE;
 }
 
 /*
- * level_interpret_line()
- * Interprets a line from the .lev file
+ * level_interpret_header_line()
+ * Interprets a line of the header of the .lev file
  */
-void level_interpret_line(const char *filename, int fileline, const char *line)
+bool level_interpret_header_line(const char* filepath, int fileline, levparser_command_t command, const char* command_name, int param_count, const char** param, void* data)
 {
-    int param_count, i;
-    char *param[16], *identifier;
-    char tmp[LINE_MAXLEN], *p, *q;
-    const int sz = (sizeof(tmp)/sizeof(*tmp))-1;
-
-    /* skip spaces */
-    for(p=(char*)line; isspace((int)*p); p++);
-    if(0 == *p) return;
-
-    /* reading the identifier */
-    for(q=tmp; *p && !isspace(*p) && q<tmp+sz; *q++ = *p++) { ; } *q=0;
-    if(strncmp(tmp, "//", 2) == 0 || *tmp == '#') return; /* comment */
-    identifier = str_dup(tmp);
-
-    /* skip spaces */
-    for(; isspace((int)*p); p++);
-
-    /* read the arguments */
-    param_count = 0;
-    if(0 != *p) {
-        int quotes;
-        while(*p && param_count<sizeof(param)/sizeof(*param)) {
-            quotes = (*p == '"') && !!(p++); /* short-circuit AND */
-            for(q=tmp; *p && ((!quotes && !isspace(*p)) || (quotes && !(*p == '"' && *(p-1) != '\\'))) && q<tmp+sz; *q++ = *p++) { ; } *q=0;
-            quotes = (*p == '"') && !!(p++);
-            param[param_count++] = str_dup(tmp);
-            for(; isspace((int)*p); p++); /* skip spaces */
-        }
-    }
-
-    /* interpret the line */
-    level_interpret_parsed_line(filename, fileline, identifier, param_count, (const char**)param);
-
-    /* free the stuff */
-    for(i=0; i<param_count; i++)
-        free(param[i]);
-    free(identifier);
-}
-
-/*
- * level_interpret_parsed_line()
- * Interprets a line parsed by level_interpret_line()
- */
-void level_interpret_parsed_line(const char *filename, int fileline, const char *identifier, int param_count, const char **param)
-{
-    /* interpreting the command */
-    if(str_icmp(identifier, "theme") == 0) {
-        if(!brickset_loaded()) {
-            if(param_count == 1) {
-                str_cpy(theme, param[0], sizeof(theme));
-                brickset_load(theme);
-            }
-            else
-                logfile_message("Level loader - command 'theme' expects one parameter: brickset filepath. Did you forget to double quote the brickset filepath?");
-        }
-        else
-            logfile_message("Level loader - duplicate command 'theme' on line %d. Ignoring...", fileline);
-    }
-    else if(str_icmp(identifier, "bgtheme") == 0) {
-        if(param_count == 1)
-            str_cpy(bgtheme, param[0], sizeof(bgtheme));
-        else
-            logfile_message("Level loader - command 'bgtheme' expects one parameter: background filepath. Did you forget to double quote the background filepath?");
-    }
-    else if(str_icmp(identifier, "grouptheme") == 0) {
-        if(param_count == 1)
-            str_cpy(grouptheme, param[0], sizeof(grouptheme));
-        else
-            logfile_message("Level loader - command 'grouptheme' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?");
-    }
-    else if(str_icmp(identifier, "music") == 0) {
-        if(param_count == 1)
-            str_cpy(musicfile, param[0], sizeof(musicfile));
-        else
-            logfile_message("Level loader - command 'music' expects one parameter: music filepath. Did you forget to double quote the music filepath?");
-    }
-    else if(str_icmp(identifier, "name") == 0) {
+    switch(command) {
+    case LEVCOMMAND_NAME: {
         if(param_count == 1)
             str_cpy(name, param[0], sizeof(name));
         else
-            logfile_message("Level loader - command 'name' expects one parameter: level name. Did you forget to double quote the level name?");
+            logfile_message("Level loader - command '%s' expects one parameter: level name. Did you forget to double quote the level name?", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "author") == 0) {
+
+    case LEVCOMMAND_AUTHOR: {
         if(param_count == 1)
             str_cpy(author, param[0], sizeof(name));
         else
-            logfile_message("Level loader - command 'author' expects one parameter: author name. Did you forget to double quote the author name?");
+            logfile_message("Level loader - command '%s' expects one parameter: author name. Did you forget to double quote the author name?", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "version") == 0) {
+
+    case LEVCOMMAND_VERSION: {
         if(param_count == 1)
             str_cpy(version, param[0], sizeof(name));
         else
-            logfile_message("Level loader - command 'version' expects one parameter: level version");
+            logfile_message("Level loader - command '%s' expects one parameter: level version", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "license") == 0) {
+
+    case LEVCOMMAND_LICENSE: {
         if(param_count == 1)
             str_cpy(license, param[0], sizeof(license));
         else
-            logfile_message("Level loader - command 'license' expects one parameter: license name. Did you forget to double quote the license parameter?");
+            logfile_message("Level loader - command '%s' expects one parameter: license name. Did you forget to double quote the license parameter?", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "requires") == 0) {
+
+    case LEVCOMMAND_REQUIRES: {
         if(param_count == 1) {
-            int i;
             requires[0] = requires[1] = requires[2] = 0;
             sscanf(param[0], "%d.%d.%d", &requires[0], &requires[1], &requires[2]);
-            for(i=0; i<3; i++) requires[i] = clip(requires[i], 0, 99);
+            for(int i = 0; i < 3; i++)
+                requires[i] = clip(requires[i], 0, 99);
+
             if(game_version_compare(requires[0], requires[1], requires[2]) < 0) {
                 fatal_error(
-                    "This level requires version %d.%d.%d or greater of the game engine.\nYours is %s\nPlease check out for new versions at %s",
+                    "This level requires version %d.%d.%d or greater of the game engine. Yours is %s. Please check out for new versions at %s",
                     requires[0], requires[1], requires[2], GAME_VERSION_STRING, GAME_WEBSITE
                 );
             }
         }
         else
-            logfile_message("Level loader - command 'requires' expects one parameter: minimum required engine version");
+            logfile_message("Level loader - command '%s' expects one parameter: minimum required engine version", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "act") == 0) {
+
+    case LEVCOMMAND_ACT: {
         if(param_count == 1)
-            act = clip(atoi(param[0]), 0, 99);
+            level_set_act(atoi(param[0]));
         else
-            logfile_message("Level loader - command 'act' expects one parameter: act number");
+            logfile_message("Level loader - command '%s' expects one parameter: act number", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "waterlevel") == 0) {
+
+    case LEVCOMMAND_READONLY: {
+        if(param_count == 0)
+            readonly = TRUE;
+        else
+            logfile_message("Level loader - command '%s' expects no parameters", command_name);
+
+        break;
+    }
+
+    case LEVCOMMAND_THEME: {
         if(param_count == 1)
-            waterlevel = atoi(param[0]);
+            str_cpy(theme, param[0], sizeof(theme));
         else
-            logfile_message("Level loader - command 'waterlevel' expects one parameter: y coordinate");
+            logfile_message("Level loader - command '%s' expects one parameter: brickset filepath. Did you forget to double quote the brickset filepath?", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "watercolor") == 0) {
+
+    case LEVCOMMAND_BGTHEME: {
+        if(param_count == 1)
+            str_cpy(bgtheme, param[0], sizeof(bgtheme));
+        else
+            logfile_message("Level loader - command '%s' expects one parameter: background filepath. Did you forget to double quote the background filepath?", command_name);
+
+        break;
+    }
+
+    case LEVCOMMAND_GROUPTHEME: /* deprecated */ {
+        if(param_count == 1)
+            str_cpy(grouptheme, param[0], sizeof(grouptheme));
+        else
+            logfile_message("Level loader - command '%s' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?", command_name);
+
+        break;
+    }
+
+    case LEVCOMMAND_MUSIC: {
+        if(param_count == 1)
+            str_cpy(musicfile, param[0], sizeof(musicfile));
+        else
+            logfile_message("Level loader - command '%s' expects one parameter: music filepath. Did you forget to double quote the music filepath?", command_name);
+
+        break;
+    }
+
+    case LEVCOMMAND_WATERLEVEL: {
+        if(param_count == 1) {
+            int waterlevel = atoi(param[0]);
+            level_set_waterlevel(waterlevel);
+        }
+        else
+            logfile_message("Level loader - command '%s' expects one parameter: y coordinate", command_name);
+
+        break;
+    }
+
+    case LEVCOMMAND_WATERCOLOR: {
         if(param_count == 3) {
-            watercolor = color_rgba(
+            level_set_watercolor(color_rgba(
                 clip(atoi(param[0]), 0, 255),
                 clip(atoi(param[1]), 0, 255),
                 clip(atoi(param[2]), 0, 255),
                 128
-            );
+            ));
         }
         else if(param_count == 4) {
-            watercolor = color_rgba(
+            level_set_watercolor(color_rgba(
                 clip(atoi(param[0]), 0, 255),
                 clip(atoi(param[1]), 0, 255),
                 clip(atoi(param[2]), 0, 255),
                 clip(atoi(param[3]), 0, 255)
-            );
+            ));
         }
         else
-            logfile_message("Level loader - command 'watercolor' expects parameters: red, green, blue [, alpha]");
+            logfile_message("Level loader - command '%s' expects parameters: red, green, blue [, alpha]", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "spawn_point") == 0) {
+
+    case LEVCOMMAND_SPAWNPOINT: {
         if(param_count == 2) {
             int x = atoi(param[0]);
             int y = atoi(param[1]);
             spawn_point = v2d_new(x, y);
         }
         else
-            logfile_message("Level loader - command 'spawn_point' expects two parameters: xpos, ypos");
+            logfile_message("Level loader - command '%s' expects two parameters: xpos, ypos", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "dialogbox") == 0) {
+
+    case LEVCOMMAND_PLAYERS: {
+        if(team_size == 0) {
+            if(param_count > 0) {
+                for(int i = 0; i < param_count; i++) {
+                    if(team_size < TEAM_MAX) {
+                        for(int j = 0; j < team_size; j++) {
+                            if(strcmp(player_name(team[j]), param[i]) == 0)
+                                fatal_error("Level loader - duplicate player entry '%s' in '%s' near line %d", param[i], filepath, fileline);
+                        }
+
+                        logfile_message("Loading player '%s'...", param[i]);
+                        team[team_size] = player_create(team_size, param[i]);
+                        team_size++;
+                    }
+                    else
+                        fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filepath, fileline);
+                }
+            }
+            else
+                logfile_message("Level loader - command '%s' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]", command_name);
+        }
+        else
+            logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring...", command_name, fileline);
+
+        break;
+    }
+
+    case LEVCOMMAND_SETUP: {
+        if(is_setup_object_list_empty()) {
+            if(param_count > 0) {
+                for(int i = 0; i < param_count; i++)
+                    add_to_setup_object_list(param[i]);
+            }
+            else
+                logfile_message("Level loader - command '%s' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]", command_name);
+        }
+        else
+            logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring...", command_name, fileline);
+
+        break;
+    }
+
+    case LEVCOMMAND_DIALOGBOX: {
         if(param_count == 6) {
             if(dialogregion_size < DIALOGREGION_MAX) {
                 dialogregion_t *d = &(dialogregion[dialogregion_size++]);
@@ -950,24 +993,40 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                 str_cpy(d->message, param[5], sizeof(d->message));
             }
             else
-                logfile_message("Level loader - command 'dialogbox' has reached %d repetitions.", dialogregion_size);
+                logfile_message("Level loader - command '%s' has reached %d repetitions.", command_name, dialogregion_size);
         }
         else
-            logfile_message("Level loader - command 'dialogbox' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?");
+            logfile_message("Level loader - command '%s' expects six parameters: rect_xpos, rect_ypos, rect_width, rect_height, title, message. Did you forget to double quote the message?", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "readonly") == 0) {
-        if(!readonly) {
-            if(param_count == 0)
-                readonly = TRUE;
-            else
-                logfile_message("Level loader - command 'readonly' expects no parameters");
-        }
-        else
-            logfile_message("Level loader - duplicate command 'readonly' on line %d. Ignoring...", fileline);
+
+    case LEVCOMMAND_BRICK:
+    case LEVCOMMAND_ENTITY:
+    case LEVCOMMAND_LEGACYOBJECT:
+    case LEVCOMMAND_LEGACYITEM:
+        /* skip the body of the file */
+        break;
+
+    default:
+        logfile_message("Level loader - unknown command '%s' in '%s' near line %d", command_name, filepath, fileline);
+        break;
     }
-    else if(str_icmp(identifier, "brick") == 0) {
-        if(param_count == 3 || param_count == 4 || param_count == 5) {
-            if(*theme != 0) {
+
+    /* continue reading */
+    return true;
+}
+
+/*
+ * level_interpret_body_line()
+ * Interprets a line of the body of the .lev file
+ */
+bool level_interpret_body_line(const char* filepath, int fileline, levparser_command_t command, const char* command_name, int param_count, const char** param, void* data)
+{
+    switch(command) {
+    case LEVCOMMAND_BRICK: {
+        if(param_count >= 3 && param_count <= 5) {
+            if(*theme != '\0') {
                 bricklayer_t layer = BRL_DEFAULT;
                 brickflip_t flip = BRF_NOFLIP;
                 int id = atoi(param[0]);
@@ -990,9 +1049,12 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                 logfile_message("Level loader - warning: cannot create a new brick if the theme is not defined");
         }
         else
-            logfile_message("Level loader - command 'brick' expects three, four or five parameters: id, xpos, ypos [, layer_name [, flip_flags]]");
+            logfile_message("Level loader - command '%s' expects three, four or five parameters: id, xpos, ypos [, layer_name [, flip_flags]]", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "entity") == 0) {
+
+    case LEVCOMMAND_ENTITY: {
         if(param_count == 3 || param_count == 4) {
             const char* name = param[0];
             int x = atoi(param[1]);
@@ -1002,76 +1064,22 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                 if(obj != NULL) {
                     if(!surgescript_object_has_tag(obj, "entity"))
                         fatal_error("Level loader - can't spawn \"%s\": object is not an entity", name);
-                    else if(param_count > 3 && get_ssobj_extradata(obj))
-                        get_ssobj_extradata(obj)->entity_id = str_to_x64(param[3]);
+                    else if(param_count > 3 && entity_info_exists(obj))
+                        entity_info_set_id(obj, str_to_x64(param[3]));
                 }
-                else
+                else {
                     logfile_message("Level loader - can't spawn \"%s\": entity doesn't exist", name);
-            }
-        }
-        else
-            logfile_message("Level loader - command 'entity' expects three or four parameters: name, xpos, ypos [, id]");
-    }
-    else if(
-        str_icmp(identifier, "setup") == 0 ||
-        str_icmp(identifier, "startup") == 0 /* retro-compatibility */
-    ) {
-        if(is_setup_object_list_empty()) {
-            if(param_count > 0) {
-                for(int i = param_count - 1; i >= 0; i--)
-                    add_to_setup_object_list(param[i]);
-            }
-            else
-                logfile_message("Level loader - command '%s' expects one or more parameters: object_name1 [, object_name2 [, ... [, object_nameN] ... ] ]", identifier);
-        }
-        else
-            logfile_message("Level loader - duplicate command '%s' on line %d. Ignoring... (note: the command accepts one or more parameters)", identifier, fileline);
-    }
-    else if(str_icmp(identifier, "players") == 0) {
-        if(team_size == 0) {
-            if(param_count > 0) {
-                for(int i = 0; i < param_count; i++) {
-                    if(team_size < TEAM_MAX) {
-                        for(int j = 0; j < team_size; j++) {
-                            if(strcmp(team[j]->name, param[i]) == 0)
-                                fatal_error("Level loader - duplicate entry of player '%s' in '%s' near line %d", param[i], filename, fileline);
-                        }
-
-                        logfile_message("Loading player '%s'...", param[i]);
-                        team[team_size++] = player_create(param[i]);
-                    }
-                    else
-                        fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filename, fileline);
+                    video_showmessage("Entity \"%s\" doesn't exist!", name);
                 }
             }
-            else
-                logfile_message("Level loader - command 'players' expects one or more parameters: character_name1 [, character_name2 [, ... [, character_nameN] ... ] ]");
         }
         else
-            logfile_message("Level loader - duplicate command 'players' on line %d. Ignoring... (note: 'players' accepts one or more parameters)", fileline);
+            logfile_message("Level loader - command '%s' expects three or four parameters: name, xpos, ypos [, id]", command_name);
+
+        break;
     }
-    else if(str_icmp(identifier, "item") == 0) {
-        if(param_count == 3) {
-            int type = atoi(param[0]);
-            int x = atoi(param[1]);
-            int y = atoi(param[2]);
-            surgescript_object_t* object = NULL;
-            const char* object_name = item2surgescript(type); /* legacy item ported to SurgeScript? */
-            if(object_name != NULL && (object = level_create_object(object_name, v2d_new(x, y))) != NULL) {
-                ssobj_extradata_t* data = get_ssobj_extradata(object);
-                if(data != NULL)
-                    data->spawned_in_the_editor = TRUE; /* force this flag, so the port gets persisted */
-            }
-            else
-                level_create_legacy_item(type, v2d_new(x, y)); /* no; create legacy item */
-        }
-        else
-            logfile_message("Level loader - command 'item' expects three parameters: type, xpos, ypos");
-    }
-    else if(
-        str_icmp(identifier, "object") == 0 ||
-        str_icmp(identifier, "enemy") == 0 /* retro-compatibility */
-    ) {
+
+    case LEVCOMMAND_LEGACYOBJECT: {
         if(param_count == 3) {
             const char* name = param[0];
             int x = atoi(param[1]);
@@ -1086,15 +1094,69 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
                     enemy_t* e = level_create_legacy_object(name, v2d_new(x, y)); /* old API */
                     e->created_from_editor = TRUE;
                 }
-                else
+                else {
                     logfile_message("Level loader - can't spawn \"%s\": object doesn't exist", name);
+                    video_showmessage("Entity \"%s\" doesn't exist!", name);
+                }
             }
         }
         else
-            logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", identifier);
+            logfile_message("Level loader - command '%s' expects three parameters: name, xpos, ypos", command_name);
+
+        break;
     }
-    else
-        logfile_message("Level loader - unknown command '%s'\nin '%s' near line %d", identifier, filename, fileline);
+
+    case LEVCOMMAND_LEGACYITEM: {
+        if(param_count == 3) {
+            int type = atoi(param[0]);
+            int x = atoi(param[1]);
+            int y = atoi(param[2]);
+            surgescript_object_t* object = NULL;
+            const char* object_name = item2surgescript(type); /* legacy item ported to SurgeScript? */
+            if(object_name != NULL && (object = level_create_object(object_name, v2d_new(x, y))) != NULL) {
+                /* force this flag, so the port gets persisted */
+                entity_info_set_persistent(object, true);
+            }
+            else
+                level_create_legacy_item(type, v2d_new(x, y)); /* no; create legacy item */
+        }
+        else
+            logfile_message("Level loader - command '%s' expects three parameters: type, xpos, ypos", command_name);
+
+        break;
+    }
+
+    default:
+        /* skip the header */
+        break;
+    }
+
+    /* continue reading */
+    return true;
+}
+
+/*
+ * level_save_ssobject()
+ * Writes an object declaration to a level file
+ */
+bool level_save_ssobject(surgescript_object_t* object, void* param)
+{
+    ALLEGRO_FILE* fp = (ALLEGRO_FILE*)param;
+
+    if(surgescript_object_is_killed(object))
+        return false;
+
+    if(surgescript_object_has_tag(object, "entity")) {
+        if(entity_info_is_persistent(object)) {
+            const char* object_name = surgescript_object_name(object);
+            v2d_t spawn_point = entity_info_spawnpoint(object);
+            uint64_t entity_id = entity_info_id(object);
+
+            al_fprintf(fp, "entity \"%s\" %d %d \"%s\"\n", str_addslashes(object_name, NULL, 0), (int)spawn_point.x, (int)spawn_point.y, x64_to_str(entity_id, NULL, 0));
+        }
+    }
+
+    return true;
 }
 
 
@@ -1108,43 +1170,37 @@ void level_interpret_parsed_line(const char *filename, int fileline, const char 
 void level_init(void *path_to_lev_file)
 {
     const char *filepath = (const char*)path_to_lev_file;
-    int i;
 
     logfile_message("level_init()");
     video_display_loading_screen();
 
-    /* main init */
-    level_width = level_height = 0;
-    level_timer = 0.0f;
-    dialogregion_size = 0;
-    quit_level = FALSE;
-    quit_level_img = NULL;
+    /* initialize variables */
+    player = NULL;
+    music = NULL;
     backgroundtheme = NULL;
+    quit_level_img = NULL;
+
+    level_timer = 0.0f;
+    quit_level = FALSE;
     must_load_another_level = FALSE;
     must_restart_this_level = FALSE;
     must_push_a_quest = FALSE;
+    must_quit_with_gameover = FALSE;
     must_render_brick_masks = FALSE;
     must_display_gizmos = FALSE;
     dead_player_timeout = 0.0f;
-    team_size = 0;
-    for(i=0; i<TEAM_MAX; i++)
-        team[i] = NULL;
-    player = NULL;
-    music = NULL;
 
-    /* scripting controlled variables */
     level_cleared = FALSE;
     jump_to_next_stage = FALSE;
+    wants_to_leave = FALSE;
+    wants_to_pause = FALSE;
 
-    /* helpers */
-    clear_level_state(&saved_state);
-    clear_bricklike_ssobjects();
-    particle_init();
-    music_stop();
+    /* cached objects */
+    cached_level_ssobject = NULL;
+    cached_entity_manager = NULL;
 
-    /* level init */
-    level_load(filepath);
-    spawn_players();
+    /* create the brick manager */
+    brick_manager = brickmanager_create();
 
     /* dialog box */
     dlgbox_active = FALSE;
@@ -1155,12 +1211,107 @@ void level_init(void *path_to_lev_file)
     dlgbox_title = font_create("dialogbox");
     dlgbox_message = font_create("dialogbox");
 
+    /* render queue */
+    bool want_depth_buffer = (video_get_quality() < VIDEOQUALITY_MEDIUM);
+    renderqueue_init(want_depth_buffer);
+
+    /* helpers */
+    clear_level_state(&saved_state);
+    mobilegamepad_fadein();
+
+    camera_init();
+    entitymanager_init();
+    create_obstaclemap();
+
+    /* load level file */
+    level_load(filepath);
+
     /* editor */
     editor_init();
+
+    /* event listeners */
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_SWITCH_OUT, NULL, handle_switchout_event);
+
+    /* immersive mode */
+    was_immersive = video_is_immersive();
+    video_set_immersive(true); /* enable immersive mode during gameplay */
 
     /* done! */
     logfile_message("level_init() ok");
 }
+
+
+
+/*
+ * level_release()
+ * Releases the scene
+ */
+void level_release()
+{
+    logfile_message("level_release()");
+
+    /* save prefs */
+    extern prefs_t* prefs;
+    prefs_save(prefs);
+
+    /* immersive mode */
+    video_set_immersive(was_immersive);
+
+    /* event listeners */
+    if(!engine_remove_event_listener(ALLEGRO_EVENT_DISPLAY_SWITCH_OUT, NULL, handle_switchout_event))
+        logfile_message("Can't remove event listener: switch out");
+
+    /* release the editor */
+    editor_release();
+
+    /* unload the level and its scripts */
+    level_unload();
+
+    /* dialog box */
+    font_destroy(dlgbox_title);
+    font_destroy(dlgbox_message);
+    actor_destroy(dlgbox);
+
+    /* release the brick manager and all bricks */
+    logfile_message("Releasing the brick manager...");
+    brick_manager = brickmanager_destroy(brick_manager);
+
+    /* quit level img */
+    if(quit_level_img != NULL)
+        image_destroy(quit_level_img);
+
+    /* release the helpers */
+    cached_level_ssobject = NULL;
+    cached_entity_manager = NULL;
+
+    destroy_obstaclemap();
+    entitymanager_release();
+    camera_release();
+
+    clear_level_state(&saved_state);
+
+    /* render queue */
+    renderqueue_release();
+
+    /* deinitialize the fields */
+    strcpy(file, "");
+    strcpy(name, ""); /* scripting: Level.name may be accessed on Application.onExit */
+    strcpy(musicfile, "");
+    strcpy(theme, "");
+    strcpy(bgtheme, "");
+    strcpy(author, "");
+    strcpy(version, "");
+    strcpy(license, "");
+    strcpy(grouptheme, "");
+    spawn_point = v2d_new(0, 0);
+    act_number = 0;
+
+    /* done! */
+    logfile_message("level_release() ok");
+}
+
+
+
 
 
 /*
@@ -1171,14 +1322,15 @@ void level_init(void *path_to_lev_file)
 void level_update()
 {
     int i, cbox;
-    int got_dying_player = FALSE;
-    int block_quit = FALSE, block_pause = FALSE;
+    bool got_dying_player = false;
     float dt = timer_get_delta();
-    brick_list_t *major_bricks, *bnode;
+    brick_list_t *major_bricks;
     item_list_t *major_items, *inode;
     enemy_list_t *major_enemies, *enode;
     v2d_t cam = level_editmode() ? editor_camera : camera_get_position();
+    (void)dt;
 
+    /* legacy: release entities */
     entitymanager_remove_dead_bricks();
     entitymanager_remove_dead_items();
     entitymanager_remove_dead_objects();
@@ -1213,17 +1365,28 @@ void level_update()
         return;
     }
 
+    /* must quit the level and show the game over screen? */
+    if(must_quit_with_gameover) {
+        must_quit_with_gameover = FALSE;
+        scenestack_pop();
+        scenestack_push(storyboard_get_scene(SCENE_GAMEOVER), NULL);
+        return;
+    }
+
+    /* got a dying player? */
+    for(i = 0; i < team_size && !got_dying_player; i++) {
+        if(player_is_dying(team[i]) && !player_is_immortal(team[i]))
+            got_dying_player = true;
+    }
+
+    /* update the brick manager */
+    brickmanager_update(brick_manager);
+
     /* music */
     update_music();
 
     /* level editor */
     if(editor_is_enabled()) {
-        entitymanager_set_active_region(
-            (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-            (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-            VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-            VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
-        );
         editor_update();
         return;
     }
@@ -1235,16 +1398,13 @@ void level_update()
     }
 
     /* displaying message: "do you really want to quit?" */
-    block_quit = FALSE;
-    for(i=0; i<team_size && !block_quit; i++)
-        block_quit = player_is_dying(team[i]);
-
+    bool block_quit = got_dying_player;
     if(wants_to_leave && !block_quit) {
         confirmboxdata_t cbd = { "$QUIT_QUESTION", "$QUIT_OPTION1", "$QUIT_OPTION2", 2 };
 
         if(quit_level_img != NULL)
             image_destroy(quit_level_img);
-        quit_level_img = image_clone(video_get_backbuffer());
+        quit_level_img = video_take_snapshot();
 
         wants_to_leave = FALSE;
         music_pause();
@@ -1270,13 +1430,9 @@ void level_update()
     }
 
     /* pause game */
-    block_pause = block_pause || (level_timer < 1.0f);
-    for(i=0; i<team_size; i++)
-        block_pause = block_pause || player_is_dying(team[i]);
-
+    bool block_pause = got_dying_player || (level_timer < 1.0f);
     if(wants_to_pause && !block_pause) {
         wants_to_pause = FALSE;
-        sound_play(SFX_PAUSE);
         scenestack_push(storyboard_get_scene(SCENE_PAUSE), NULL);
         return;
     }
@@ -1293,32 +1449,43 @@ void level_update()
         }
     }
 
+    /* enable the debug mode */
+    if(debug_mode_want_to_activate()) {
+
+        /* no readonly check */
+        level_enter_debug_mode();
+
+    }
+
     /* -------------------------------------- */
     /* updating the entities */
     /* -------------------------------------- */
 
+    /* update background */
+    background_update(backgroundtheme);
+
+    /* update water */
+    waterfx_update();
+
+    /* legacy camera code (runs before scripts) */
+    if(!level_is_in_debug_mode()) {
+        if(level_cleared)
+            camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
+        else if(!got_dying_player)
+            camera_move_to(camera_focus->position, 0.0f); /* the camera will be locked on its focus (usually, the player) */
+    }
+
     /* getting the major entities */
-    entitymanager_set_active_region(
-        (int)cam.x - VIDEO_SCREEN_W/2 - (DEFAULT_MARGIN*3)/2,
-        (int)cam.y - VIDEO_SCREEN_H/2 - (DEFAULT_MARGIN*3)/2,
-        VIDEO_SCREEN_W + (DEFAULT_MARGIN*3),
-        VIDEO_SCREEN_H + (DEFAULT_MARGIN*3)
-    );
+    rect_t brick_roi = create_roi(cam, ROI_MARGIN_UPDATE_BRICK);
+    rect_t entity_roi = create_roi(cam, ROI_MARGIN_UPDATE_ENTITY);
+
+    brickmanager_set_roi(brick_manager, brick_roi);
+    set_entitymanager_roi(entity_roi);
+    entitymanager_set_active_region(entity_roi); /* legacy */
 
     major_enemies = entitymanager_retrieve_active_objects();
     major_items = entitymanager_retrieve_active_items();
-
-    entitymanager_set_active_region(
-        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
-    );
-
-    major_bricks = entitymanager_retrieve_active_bricks();
-
-    /* update background */
-    background_update(backgroundtheme);
+    major_bricks = major_enemies != NULL || major_items != NULL ? brickmanager_retrieve_active_bricks_as_list(brick_manager) : NULL; /* for backwards compatibility only */
 
     /* update legacy items */
     for(inode = major_items; inode != NULL; inode = inode->next) {
@@ -1364,30 +1531,46 @@ void level_update()
         }
     }
 
-    /* got dying player? */
-    for(i = 0; i < team_size; i++) {
-        if(player_is_dying(team[i]))
-            got_dying_player = TRUE;
+    /* update bricks */
+    iterator_t* brick_iterator = brickmanager_retrieve_active_moving_bricks(brick_manager);
+    while(iterator_has_next(brick_iterator)) {
+        /* no need to update static bricks.
+           We won't even retrieve them! */
+        brick_t* brick = iterator_next(brick_iterator);
+        brick_update(brick, team, team_size);
+    }
+    iterator_destroy(brick_iterator);
+
+    /* early update: players */
+    if(brickmanager_number_of_bricks(brick_manager) > 0) {
+        for(i = 0; i < team_size; i++)
+            player_early_update(team[i]);
+    }
+
+    /* update the obstacle map */
+    update_obstaclemap(major_items, major_enemies);
+
+    /* update scripts */
+    update_ssobjects();
+
+    /* update the obstacle map again after updating the scripts */
+    if(is_obstaclemap_dirty) {
+        update_obstaclemap(major_items, major_enemies);
+        is_obstaclemap_dirty = false;
     }
 
     /* update players */
-    for(i=0; i<team_size; i++) {
-        float x = team[i]->actor->position.x;
-        float y = team[i]->actor->position.y;
-        float w = image_width(actor_image(team[i]->actor));
-        float h = image_height(actor_image(team[i]->actor));
+    if(brickmanager_number_of_bricks(brick_manager) > 0) {
+        for(i = 0; i < team_size; i++) {
+            v2d_t cam = camera_get_position();
+            v2d_t pos = player_position(team[i]);
+            rect_t box = player_bounding_box(team[i]);
+            rect_t roi = create_roi(cam, ROI_MARGIN_UPDATE_PLAYER);
 
-        /* somebody is hurt! show it to the user */
-        if(team[i] != player) {
-            if(player_is_getting_hit(team[i]) || player_is_dying(team[i]))
-                level_change_player(team[i]);
-        }
-
-        /* updating... */
-        if(entitymanager_get_number_of_bricks() > 0) {
-            if(inside_screen(x, y, w, h, DEFAULT_MARGIN/4) || player_is_dying(team[i]) || team[i]->actor->position.y < 0) {
+            /* updating... */
+            if(rect_overlaps(roi, box) || player_is_dying(team[i]) || pos.y < 0) {
                 if(!got_dying_player || player_is_dying(team[i]) || player_is_getting_hit(team[i]))
-                    player_update(team[i], team, team_size, major_bricks, major_items, major_enemies, get_bricklike_ssobject);
+                    player_update(team[i], obstaclemap);
             }
         }
     }
@@ -1410,63 +1593,24 @@ void level_update()
         }
     }
 
-    /* update bricks */
-    for(bnode = major_bricks; bnode != NULL; bnode = bnode->next) {
-        /* update this brick */
-        brick_update(bnode->data, team, team_size, major_bricks, major_items, major_enemies);
-    }
-
-    /* basic camera */
-    if(level_cleared)
-        camera_move_to(v2d_add(camera_focus->position, v2d_new(0, -90)), 0.17);
-    else if(!got_dying_player)
-        camera_move_to(camera_focus->position, 0.0f); /* the camera will be locked on its focus (usually, the player) */
+    /* update camera */
     camera_update();
 
-    /* update scripts */
-    clear_bricklike_ssobjects();
-    update_ssobjects();
-
-    /* update particles */
-    particle_update_all(major_bricks);
+    /* scripting: late update */
+    late_update_ssobjects();
 
     /* update dialog box */
     update_dialogregions();
     update_dlgbox();
 
-    /* someone is dying */
-    if(got_dying_player) {
-        /* fade out the music */
-        music_set_volume(music_get_volume() - 0.5*dt);
-
-        /* restart the level */
-        if(((dead_player_timeout += dt) >= 2.5f)) {
-            if(player_get_lives() > 1) {
-                /* restart the level! */
-                if(fadefx_is_over()) {
-                    player_set_lives(player_get_lives()-1);
-                    restart(TRUE);
-                    return;
-                }
-                fadefx_out(color_rgb(0,0,0), 1.0);
-            }
-            else {
-                /* game over */
-                scenestack_pop();
-                scenestack_push(storyboard_get_scene(SCENE_GAMEOVER), NULL);
-                return;
-            }
-        }
-    }
-
     /* level timer */
     if(!got_dying_player && !level_cleared)
         level_timer += timer_get_delta();
 
-    /* "ungetting" major entities */
-    entitymanager_release_retrieved_brick_list(major_bricks);
-    entitymanager_release_retrieved_item_list(major_items);
-    entitymanager_release_retrieved_object_list(major_enemies);
+    /* release major entities */
+    major_bricks = brickmanager_release_list(major_bricks);
+    major_items = entitymanager_release_retrieved_item_list(major_items);
+    major_enemies = entitymanager_release_retrieved_object_list(major_enemies);
 }
 
 
@@ -1477,7 +1621,6 @@ void level_update()
  */
 void level_render()
 {
-    brick_list_t *major_bricks;
     item_list_t *major_items;
     enemy_list_t *major_enemies;
 
@@ -1503,15 +1646,14 @@ void level_render()
        entitymanager_set_active_region() was called (i.e., via scripting).
        Let's make sure that we keep our active region updated. */
     v2d_t cam = camera_get_position(); /* we're not in editor mode */
-    entitymanager_set_active_region(
-        (int)cam.x - VIDEO_SCREEN_W/2 - DEFAULT_MARGIN,
-        (int)cam.y - VIDEO_SCREEN_H/2 - DEFAULT_MARGIN,
-        VIDEO_SCREEN_W + 2*DEFAULT_MARGIN,
-        VIDEO_SCREEN_H + 2*DEFAULT_MARGIN
-    );
+    rect_t brick_roi = create_roi(cam, ROI_MARGIN_RENDER_BRICK);
+    rect_t entity_roi = create_roi(cam, ROI_MARGIN_RENDER_ENTITY);
+
+    brickmanager_set_roi(brick_manager, brick_roi); /* this call is cheap */
+    set_entitymanager_roi(entity_roi); /* this call may be expensive if the ROI has changed */
+    entitymanager_set_active_region(entity_roi); /* legacy */
 
     /* retrieve lists of active entities */
-    major_bricks = entitymanager_retrieve_active_bricks();
     major_items = entitymanager_retrieve_active_items();
     major_enemies = entitymanager_retrieve_active_objects();
 
@@ -1519,58 +1661,16 @@ void level_render()
     image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, color_rgb(0,0,0));
 
     /* render level */
-    render_level(major_bricks, major_items, major_enemies);
+    render_level(major_items, major_enemies);
 
     /* render the built-in HUD */
     render_hud();
 
     /* release lists of active entites */
-    entitymanager_release_retrieved_brick_list(major_bricks);
-    entitymanager_release_retrieved_item_list(major_items);
-    entitymanager_release_retrieved_object_list(major_enemies);
+    major_items = entitymanager_release_retrieved_item_list(major_items);
+    major_enemies = entitymanager_release_retrieved_object_list(major_enemies);
 }
 
-
-
-/*
- * level_release()
- * Releases the scene
- */
-void level_release()
-{
-    logfile_message("level_release()");
-
-    particle_release();
-    level_unload();
-    camera_release();
-    editor_release();
-    prefs_save(modmanager_prefs());
-    clear_level_state(&saved_state);
-
-    font_destroy(dlgbox_title);
-    font_destroy(dlgbox_message);
-    actor_destroy(dlgbox);
-    if(quit_level_img != NULL)
-        image_destroy(quit_level_img);
-
-    logfile_message("level_release() ok");
-}
-
-
-/*
- * level_create_particle()
- * Creates a new particle.
- * Warning: image will be free'd internally.
- */
-void level_create_particle(image_t *image, v2d_t position, v2d_t speed, int destroy_on_brick)
-{
-    if(editor_is_enabled()) {
-        /* no, you can't create a new particle! */
-        image_destroy(image);
-    }
-    else
-        particle_add(image, position, speed, destroy_on_brick);
-}
 
 /*
  * level_file()
@@ -1623,7 +1723,7 @@ const char* level_license()
  */
 int level_act()
 {
-    return act;
+    return act_number;
 }
 
 /*
@@ -1673,9 +1773,14 @@ void level_change(const char* path_to_lev_file)
  */
 void level_change_player(player_t *new_player)
 {
-    int i, player_id = -1;
+    int player_id = -1;
 
-    for(i=0; i<team_size && player_id < 0; i++)
+    if(player != NULL) {
+        if(team_size > 1 && !player_is_focusable(new_player))
+            return;
+    }
+
+    for(int i = 0; i < team_size && player_id < 0; i++)
         player_id = (team[i] == new_player) ? i : player_id;
     
     if(player_id >= 0) {
@@ -1694,7 +1799,7 @@ player_t* level_get_player_by_name(const char* name)
 {
     /* simple search */
     for(int i = 0; i < team_size; i++) {
-        if(strcmp(team[i]->name, name) == 0)
+        if(strcmp(player_name(team[i]), name) == 0)
             return team[i];
     }
 
@@ -1704,13 +1809,15 @@ player_t* level_get_player_by_name(const char* name)
 
 /*
  * level_get_player_by_id()
- * Get a player by its ID (index on team[] array)
+ * Get a player by its ID
  * Returns NULL if there is no such player
  */
 player_t* level_get_player_by_id(int id)
 {
-    if(id >= 0 && id < team_size)
+    if(id >= 0 && id < team_size) {
+        assertx(team[id]->id == id); /* the index in team[] matches the id */
         return team[id];
+    }
     else
         return NULL;
 }
@@ -1723,7 +1830,7 @@ player_t* level_get_player_by_id(int id)
 brick_t* level_create_brick(int id, v2d_t position, bricklayer_t layer, brickflip_t flip)
 {
     brick_t *brick = brick_create(id, position, layer, flip);
-    entitymanager_store_brick(brick);
+    brickmanager_add_brick(brick_manager, brick);
     return brick;
 }
 
@@ -1740,6 +1847,11 @@ item_t* level_create_legacy_item(int id, v2d_t position)
     item->actor->spawn_point = position;
     item->actor->position = position;
     entitymanager_store_item(item);
+
+    /* deprecation warning */
+    video_showmessage("Legacy item %d will not be supported!", id);
+    logfile_message("Legacy item %d will not be supported!", id);
+
     return item;
 }
 
@@ -1757,6 +1869,11 @@ enemy_t* level_create_legacy_object(const char *name, v2d_t position)
     object->actor->position = position;
     object->created_from_editor = (name[0] != '.');
     entitymanager_store_object(object);
+
+    /* deprecation warning */
+    video_showmessage("Legacy \"%s\" will not be supported!", name);
+    logfile_message("Legacy \"%s\" will not be supported!", name);
+
     return object;
 }
 
@@ -1768,20 +1885,7 @@ enemy_t* level_create_legacy_object(const char *name, v2d_t position)
  */
 surgescript_object_t* level_create_object(const char* object_name, v2d_t position)
 {
-    if(ssobject_exists(object_name)) {
-        surgescript_vm_t* vm = surgescript_vm();
-        surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
-        int spawned_in_the_editor =
-            /* note: objects not created with this function (e.g., via scripting)
-               will not have this flag set to true */
-            surgescript_tagsystem_has_tag(tag_system, object_name, "entity") &&
-            !surgescript_tagsystem_has_tag(tag_system, object_name, "private") &&
-            !is_setup_object(object_name)
-        ;
-        return spawn_ssobject(object_name, position, spawned_in_the_editor);
-    }
-    else
-        return NULL;
+    return spawn_ssobject(object_name, position);
 }
 
 /*
@@ -1791,17 +1895,82 @@ surgescript_object_t* level_create_object(const char* object_name, v2d_t positio
  */
 surgescript_object_t* level_get_entity_by_id(const char* entity_id)
 {
+    surgescript_object_t* level = level_ssobject();
+    surgescript_objectmanager_t* manager = surgescript_object_manager(level);
+
     uint64_t id = str_to_x64(entity_id);
-    ssobj_extradata_t* data = fasthash_find(ssobj_extradata, match_ssobj_id, &id);
+    surgescript_object_t* entity_manager = entitymanager_ssobject();
+    surgescript_objecthandle_t handle = entitymanager_find_entity_by_id(entity_manager, id);
 
-    if(data != NULL) {
-        surgescript_vm_t* vm = surgescript_vm();
-        surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-        if(surgescript_objectmanager_exists(manager, data->handle)) /* the object may have been deleted */
-            return surgescript_objectmanager_get(manager, data->handle);
-    }
+    if(!surgescript_objectmanager_exists(manager, handle)) /* the object may have been deleted */
+        return NULL; /* not found */
 
-    return NULL; /* not found */
+    /* success! */
+    return surgescript_objectmanager_get(manager, handle);
+}
+
+
+/*
+ * level_get_entity_id()
+ * Gets the ID, a 64-bit hex-string, of the given entity
+ * If no ID exists, an empty string is returned
+ */
+const char* level_get_entity_id(const surgescript_object_t* entity)
+{
+    static char buf[17];
+
+    if(entity_info_exists(entity))
+        return x64_to_str(entity_info_id(entity), buf, sizeof(buf));
+
+    return "";
+}
+
+
+/*
+ * level_child_object()
+ * Get a direct child of the SurgeScript Level object with the given name
+ * Returns NULL if no such object exists
+ */
+surgescript_object_t* level_child_object(const char* object_name)
+{
+    surgescript_vm_t* vm = surgescript_vm();
+    surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
+    surgescript_object_t* level = level_ssobject();
+    surgescript_objecthandle_t child = surgescript_object_child(level, object_name);
+
+    if(surgescript_objectmanager_exists(manager, child))
+        return surgescript_objectmanager_get(manager, child);
+
+    return NULL;
+}
+
+/*
+ * level_is_setup_object()
+ * Checks if the given object name belongs to the setup list
+ */
+bool level_is_setup_object(const char* object_name)
+{
+    return is_setup_object(object_name);
+}
+
+/*
+ * level_obstaclemap()
+ * The obstacle map featuring the bricks and brick-like objects that are
+ * placed near the camera of the level.
+ */
+const obstaclemap_t* level_obstaclemap()
+{
+    assertx(obstaclemap != NULL); /* will be NULL if the level is not loaded */
+    return obstaclemap;
+}
+
+/*
+ * level_set_obstaclemap_dirty()
+ * Require another update of the obstacle map after updating the scripts
+ */
+void level_set_obstaclemap_dirty()
+{
+    is_obstaclemap_dirty = true;
 }
 
 
@@ -1849,6 +2018,10 @@ actor_t* level_get_camera_focus()
  */
 v2d_t level_size()
 {
+    int level_width, level_height;
+
+    brickmanager_world_size(brick_manager, &level_width, &level_height);
+
     return v2d_new(level_width, level_height);
 }
 
@@ -1860,27 +2033,11 @@ v2d_t level_size()
  */
 int level_height_at(int xpos)
 {
-    const int WINDOW_SIZE = VIDEO_SCREEN_W * 2;
-    int a, b, i, best, sample_width;
+    int half_window_size = VIDEO_SCREEN_W / 2;
+    int left_xpos = xpos - half_window_size;
+    int right_xpos = xpos + half_window_size;
 
-    if(height_at != NULL && xpos >= 0 && xpos < level_width) {
-        /* clipping interval indexes */
-        sample_width = max(0, level_width) / max(1, height_at_count - 1);
-        a = ((xpos - WINDOW_SIZE / 2) + ((sample_width + 1) / 2)) / sample_width;
-        b = ((xpos + WINDOW_SIZE / 2) + ((sample_width + 1) / 2)) / sample_width;
-        a = clip(a, 0, height_at_count - 1);
-        b = clip(b, 0, height_at_count - 1);
-
-        /* get the best height in [a,b] */
-        best = height_at[b];
-        for(i = a; i < b; i++) {
-            if(height_at[i] > best)
-                best = height_at[i];
-        }
-        return best;
-    }
-    
-    return level_height;
+    return brickmanager_world_height_at_interval(brick_manager, left_xpos, right_xpos);
 }
 
 
@@ -1892,7 +2049,6 @@ music_t* level_music()
 {
     return music;
 }
-
 
 
 /*
@@ -1918,30 +2074,61 @@ v2d_t level_spawnpoint()
 
 
 /*
+ * level_set_act()
+ * Changes the act number
+ */
+void level_set_act(int new_act_number)
+{
+    act_number = clip(new_act_number, 0, MAX_ACT_NUMBER);
+}
+
+
+/*
  * level_clear()
  * Call this when the player clears this level
  * If end_sign is NULL, the camera will be focused on the active player
  */
 void level_clear(actor_t *end_sign)
 {
-    int i;
-
     if(level_cleared)
         return;
 
-    /* ignore input and focus the camera on the end sign */
-    for(i=0; i<team_size; i++)
-        input_ignore(team[i]->actor->input);
+    /* disable player input */
+    for(int i = 0; i < team_size; i++)
+        input_disable(team[i]->actor->input);
 
-    /* set the focus */
+    /* focus the camera on the end sign */
     if(end_sign != NULL)
         level_set_camera_focus(end_sign);
     else
         level_set_camera_focus(player->actor);
 
-    /* success! */
+    /* hide dialog box, if any */
     level_hide_dialogbox();
+
+    /* success! */
     level_cleared = TRUE;
+}
+
+
+/*
+ * level_undo_clear()
+ * Undo a previous call to level_clear()
+ */
+void level_undo_clear()
+{
+    if(!level_cleared)
+        return;
+
+    /* re-enable player input */
+    for(int i = 0; i < team_size; i++)
+        input_enable(team[i]->actor->input);
+
+    /* restore the focus */
+    level_set_camera_focus(player->actor);
+
+    /* done! */
+    level_cleared = FALSE;
 }
 
 
@@ -1955,7 +2142,7 @@ void level_call_dialogbox(const char *title, const char *message)
         return;
 
     dlgbox_active = TRUE;
-    dlgbox_starttime = timer_get_ticks();
+    dlgbox_starttime = timer_get_elapsed() * 1000.0;
     font_set_text(dlgbox_title, "%s", title);
     font_set_text(dlgbox_message, "%s", message);
     font_set_width(dlgbox_message, image_width(actor_image(dlgbox)) - 14);
@@ -2037,7 +2224,7 @@ void level_restart()
  */
 int level_waterlevel()
 {
-    return waterlevel;
+    return waterfx_ypos();
 }
 
 /*
@@ -2046,7 +2233,7 @@ int level_waterlevel()
  */
 void level_set_waterlevel(int ycoord)
 {
-    waterlevel = ycoord;
+    waterfx_set_ypos(ycoord);
 }
 
 /*
@@ -2055,7 +2242,7 @@ void level_set_waterlevel(int ycoord)
  */
 color_t level_watercolor()
 {
-    return watercolor;
+    return waterfx_color();
 }
 
 /*
@@ -2064,7 +2251,7 @@ color_t level_watercolor()
  */
 void level_set_watercolor(color_t color)
 {
-    watercolor = color;
+    waterfx_set_color(color);
 }
 
 /*
@@ -2089,6 +2276,15 @@ void level_abort()
     /* schedules a quest pop */
     quest_abort();
     level_jump_to_next_stage();
+}
+
+/*
+ * level_quit_with_gameover()
+ * Quits the level and show the game over screen
+ */
+void level_quit_with_gameover()
+{
+    must_quit_with_gameover = TRUE;
 }
 
 /*
@@ -2168,51 +2364,67 @@ int level_is_displaying_gizmos()
 }
 
 
-
-
-
-
-/* private functions */
-
-
-/* renders the entities of the level: bricks,
- * enemies, items, players, etc. */
-void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_list_t *major_enemies)
+/*
+ * level_enter_debug_mode()
+ * Enter the Debug Mode
+ */
+void level_enter_debug_mode()
 {
-    brick_list_t *bnode;
-    item_list_t *inode;
-    enemy_list_t *enode;
+    if(!level_is_in_debug_mode()) {
+        surgescript_object_t* level = level_ssobject();
+        surgescript_var_t* tmp = surgescript_var_create();
+        const surgescript_var_t* param[] = { tmp };
 
+        surgescript_var_set_bool(tmp, true);
+        surgescript_object_call_function(level, "set_debugMode", param, 1, NULL);
+
+        surgescript_var_destroy(tmp);
+    }
+}
+
+
+/*
+ * level_is_in_debug_mode()
+ * Are we in Debug Mode?
+ */
+bool level_is_in_debug_mode()
+{
+    surgescript_object_t* level = level_ssobject();
+    surgescript_var_t* ret = surgescript_var_create();
+    bool flag = false;
+
+    surgescript_object_call_function(level, "get_debugMode", NULL, 0, ret);
+    flag = surgescript_var_get_bool(ret);
+
+    surgescript_var_destroy(ret);
+    return flag;
+}
+
+
+
+
+/*
+ * Private functions
+ */
+
+
+/* renders the entities of the level: bricks, enemies, items, players, etc. */
+void render_level(const item_list_t *major_items, const enemy_list_t *major_enemies)
+{
     /* starting up the render queue... */
     renderqueue_begin( camera_get_position() );
 
         /* render background */
-        if(!editor_is_enabled())
-            renderqueue_enqueue_background(backgroundtheme);
+        renderqueue_enqueue_background(backgroundtheme);
 
         /* render bricks */
-        for(bnode=major_bricks; bnode; bnode=bnode->next)
-            renderqueue_enqueue_brick(bnode->data);
+        if(editor_is_enabled() || level_is_in_debug_mode())
+            render_bricks_debug();
+        else
+            render_bricks();
 
-        /* render the masks of the bricks */
-        if(must_render_brick_masks) {
-            for(bnode=major_bricks; bnode; bnode=bnode->next)
-                renderqueue_enqueue_brick_mask(bnode->data);
-        }
-
-        /* render items */
-        for(inode=major_items; inode; inode=inode->next)
-            renderqueue_enqueue_item(inode->data);
-
-        /* render legacy objects */
-        for(enode=major_enemies; enode; enode=enode->next)
-            renderqueue_enqueue_object(enode->data);
-
-        /* render surgescript objects */
+        /* render SurgeScript objects */
         render_ssobjects();
-
-        /* render particles */
-        renderqueue_enqueue_particles();
 
         /* render the players */
         render_players();
@@ -2222,12 +2434,20 @@ void render_level(brick_list_t *major_bricks, item_list_t *major_items, enemy_li
             renderqueue_enqueue_water();
 
         /* render foreground */
-        if(!editor_is_enabled())
-            renderqueue_enqueue_foreground(backgroundtheme);
+        renderqueue_enqueue_foreground(backgroundtheme);
+
+        /* render legacy items */
+        for(const item_list_t* inode=major_items; inode; inode=inode->next)
+            renderqueue_enqueue_item(inode->data);
+
+        /* render legacy objects */
+        for(const enemy_list_t* enode=major_enemies; enode; enode=enode->next)
+            renderqueue_enqueue_object(enode->data);
 
     /* okay, enough! let's render */
     renderqueue_end();
 }
+
 
 /* true if a given region is inside the screen position */
 int inside_screen(int x, int y, int w, int h, int margin)
@@ -2240,85 +2460,17 @@ int inside_screen(int x, int y, int w, int h, int margin)
         cam.x+VIDEO_SCREEN_W/2 + margin,
         cam.y+VIDEO_SCREEN_H/2 + margin
     };
+
     return bounding_box(a,b);
 }
 
-/* calculates the size of the
- * current level */
+
+/* recalculates the size of the current level */
 void update_level_size()
 {
-    int max_x, max_y;
-    v2d_t bottomright;
-    brick_list_t *p, *brick_list;
-
-    /* get all bricks */
-    brick_list = entitymanager_retrieve_all_bricks();
-
-    /* compute the bounding box */
-    max_x = max_y = -LARGE_INT;
-    for(p=brick_list; p; p=p->next) {
-        bottomright = v2d_add(brick_spawnpoint(p->data), brick_size(p->data));
-        max_x = max(max_x, (int)bottomright.x);
-        max_y = max(max_y, (int)bottomright.y);
-    }
-
-    /* validation */
-    level_width = max(max_x, VIDEO_SCREEN_W);
-    level_height = max(max_y, VIDEO_SCREEN_H);
-    if(brick_list == NULL) { /* no bricks have been found */
-        /* this is probably a special scene */
-        level_width = level_height = LARGE_INT;
-        update_level_height_samples(0, LARGE_INT);
-    }
-    else
-        update_level_height_samples(level_width, level_height);
-
-    /* done! */
-    brick_list = entitymanager_release_retrieved_brick_list(brick_list);
+    brickmanager_recalculate_world_size(brick_manager);
 }
 
-/* samples the level height at different points (xpos) */
-void update_level_height_samples(int level_width, int level_height)
-{
-    const int SAMPLE_WIDTH = VIDEO_SCREEN_W / 4;
-    const int MAX_SAMPLES = 10240; /* limit memory usage */
-    int j, num_samples = 1 + (max(0, level_width) / SAMPLE_WIDTH);
-
-    /* limit the number of samples */
-    if(num_samples > MAX_SAMPLES)
-        num_samples = MAX_SAMPLES;
-
-    /* allocate the height_at vector */
-    if(height_at != NULL)
-        free(height_at);
-    height_at = mallocx(num_samples * sizeof(*height_at));
-    height_at_count = num_samples;
-
-    /* sample the height of the level at different points */
-    for(j = 0; j < num_samples; j++) {
-        brick_list_t *p, *brick_list;
-
-        entitymanager_set_active_region(
-            j * SAMPLE_WIDTH - (SAMPLE_WIDTH + 1) / 2,
-            -LARGE_INT/2,
-            SAMPLE_WIDTH,
-            LARGE_INT
-        );
-
-        brick_list = entitymanager_retrieve_active_unmoving_bricks();
-        {
-            height_at[j] = 0;
-            for(p = brick_list; p; p = p->next) {
-                int bottom = (int)(brick_spawnpoint(p->data).y + brick_size(p->data).y);
-                if(bottom > height_at[j])
-                    height_at[j] = bottom;
-            }
-            if(brick_list == NULL) /* no bricks have been found */
-                height_at[j] = (j > 0) ? height_at[j-1] : level_height;
-        }
-        brick_list = entitymanager_release_retrieved_brick_list(brick_list);
-    }
-}
 
 /* restarts the level preserving the current
  * state (spawn point, waterlevel, etc.) */
@@ -2327,11 +2479,14 @@ void restart(int preserve_level_state)
     char path[PATH_MAXLEN];
     levelstate_t state = saved_state;
 
+    /* copy the filepath before the level fields are cleared */
+    str_cpy(path, file, sizeof(path));
+
     /* restart the scene */
     scenestack_pop();
     scenestack_push(
         storyboard_get_scene(SCENE_LEVEL),
-        str_cpy(path, file, sizeof(path))
+        path
     );
 
     /* restore the saved state */
@@ -2343,22 +2498,62 @@ void restart(int preserve_level_state)
 }
 
 
-/* reconfigures the input devices of the
- * players after switching characters */
+/* updates the music */
+void update_music()
+{
+    if(music != NULL && !music_is_playing()) {
+        if(music_current() == NULL || (music_current() == music && !music_is_paused())) {
+            if(!level_cleared && !(player_is_dying(player) && !player_is_immortal(player)))
+                music_play(music, true);
+        }
+    }
+}
+
+
+/* renders the bricks */
+void render_bricks()
+{
+    iterator_t* it = brickmanager_retrieve_active_bricks(brick_manager);
+    while(iterator_has_next(it)) {
+        brick_t* brick = iterator_next(it);
+
+        renderqueue_enqueue_brick(brick);
+
+        if(must_render_brick_masks)
+            renderqueue_enqueue_brick_mask(brick);
+    }
+    iterator_destroy(it);
+}
+
+
+/* renders the bricks (level editor) */
+void render_bricks_debug()
+{
+    iterator_t* it = brickmanager_retrieve_active_bricks(brick_manager);
+    while(iterator_has_next(it)) {
+        brick_t* brick = iterator_next(it);
+
+        renderqueue_enqueue_brick_debug(brick);
+        renderqueue_enqueue_brick_path(brick);
+
+        if(must_render_brick_masks)
+            renderqueue_enqueue_brick_mask(brick);
+    }
+    iterator_destroy(it);
+}
+
+
+/* reconfigures the input devices of the players after switching characters */
 void reconfigure_players_input_devices()
 {
-    int i;
-
-    for(i=0; i<team_size; i++) {
+    for(int i = 0; i < team_size; i++) {
         if(NULL == team[i]->actor->input)
             team[i]->actor->input = input_create_user(NULL);
 
-        if(team[i] == player) {
-            input_restore(team[i]->actor->input);
-            input_simulate_button_down(team[i]->actor->input, IB_FIRE2); /* bugfix (character switching) */
-        }
+        if(team[i] == player)
+            input_unblock(team[i]->actor->input);
         else
-            input_ignore(team[i]->actor->input);
+            input_block(team[i]->actor->input);
     }
 }
 
@@ -2366,7 +2561,7 @@ void reconfigure_players_input_devices()
 /* renders the players */
 void render_players()
 {
-    for(int i=team_size-1; i>=0; i--) {
+    for(int i = team_size - 1; i >= 0; i--) {
         if(team[i] != player)
             renderqueue_enqueue_player(team[i]);
     }
@@ -2374,28 +2569,27 @@ void render_players()
 }
 
 
-/* updates the music */
-void update_music()
-{
-    if(music != NULL && !music_is_playing()) {
-        if(music_current() == NULL || (music_current() == music && !music_is_paused())) {
-            if(!level_cleared && !player_is_dying(player))
-                music_play(music, true);
-        }
-    }
-}
-
-
 /* puts the players at the spawn point */
 void spawn_players()
 {
-    int i, j;
+    int level_width = level_size().x;
+    bool at_left_side = (int)spawn_point.x <= level_width / 2;
 
-    for(i = 0; i < team_size; i++) {
-        j = ((int)spawn_point.x <= level_width/2) ? (team_size-1)-i : i;
-        team[i]->actor->mirror = ((int)spawn_point.x <= level_width/2) ? IF_NONE : IF_HFLIP;
-        team[i]->actor->spawn_point.x = team[i]->actor->position.x = spawn_point.x + 15 * j;
-        team[i]->actor->spawn_point.y = team[i]->actor->position.y = spawn_point.y;
+    /* default players */
+    if(team_size == 0) {
+        video_showmessage("No players have been specified!");
+        team[0] = player_create(0, "Surge");
+        team_size = 1;
+    }
+
+    /* set the initial position of the players */
+    for(int i = 0; i < team_size; i++) {
+        int j = at_left_side ? (team_size - 1) - i : i;
+        v2d_t offset = v2d_new(15 * j, 0);
+        v2d_t position = v2d_add(spawn_point, offset);
+
+        player_set_position(team[i], position);
+        team[i]->actor->spawn_point = position; /* legacy */
     }
 }
 
@@ -2413,6 +2607,10 @@ void render_hud()
 /* renders the dialog box */
 void render_dlgbox(v2d_t camera_position)
 {
+    /* this legacy component (dlgbox) will be removed */
+    if(video_get_mode() != VIDEOMODE_DEFAULT)
+        return;
+
     if(dlgbox->position.y < VIDEO_SCREEN_H) {
         actor_render(dlgbox, camera_position);
         font_render(dlgbox_title, camera_position);
@@ -2425,7 +2623,7 @@ void update_dlgbox()
 {
     float speed = VIDEO_SCREEN_H / 2; /* y speed */
     float dt = timer_get_delta();
-    uint32_t t = timer_get_ticks();
+    uint32_t t = timer_get_elapsed() * 1000.0;
 
     if(dlgbox_active) {
         if(t >= dlgbox_starttime + DLGBOX_MAXTIME) {
@@ -2492,77 +2690,57 @@ void update_dialogregions()
 
 /* setup objects */
 
-/* initializes the setup object list */
-void init_setup_object_list()
-{
-    setupobject_list = NULL;
-}
-
-/* releases the setup object list */
-void release_setup_object_list()
-{
-    setupobject_list_t *me, *next;
-
-    for(me=setupobject_list; me; me=next) {
-        next = me->next;
-        free(me->object_name);
-        free(me);
-    }
-}
-
 /* empty list? */
 bool is_setup_object_list_empty()
 {
-    return setupobject_list == NULL;
+    surgescript_object_t* level = level_ssobject();
+
+    iterator_t* it = scripting_level_setupobjects_iterator(level);
+    bool is_empty = !iterator_has_next(it);
+    iterator_destroy(it);
+
+    return is_empty;
 }
 
 /* adds a new object to the setup object list */
-/* (actually it inserts the new object in the first position of the linked list) */
 void add_to_setup_object_list(const char *object_name)
 {
-    setupobject_list_t *first_node = mallocx(sizeof *first_node);
-    first_node->object_name = str_dup(object_name);
-    first_node->next = setupobject_list;
-    setupobject_list = first_node;
+    surgescript_object_t* level = level_ssobject();
+
+    surgescript_var_t* arg = surgescript_var_create();
+    const surgescript_var_t* args[] = { arg };
+
+    surgescript_var_set_string(arg, object_name);
+    surgescript_object_call_function(level, "__registerSetupObjectName", args, 1, NULL);
+
+    surgescript_var_destroy(arg);
+
+    /* use the legacy API?
+       TODO: remove this */
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(level);
+    if(!surgescript_objectmanager_class_exists(manager, object_name)) {
+        if(enemy_exists(object_name)) {
+            enemy_t* e = level_create_legacy_object(object_name, v2d_new(0, 0));
+            e->created_from_editor = FALSE;
+        }
+    }
 }
 
 /* spawns the setup objects */
 void spawn_setup_objects()
 {
-    setupobject_list_t *me;
-
-    if(setupobject_list == NULL)
-        add_to_setup_object_list(DEFAULT_SETUP_OBJECT);
-
-    for(me=setupobject_list; me; me=me->next) {
-        /* try to create an object using the SurgeScript API.
-           if this is not possible, use the legacy API. */
-        if(!level_create_object(me->object_name, v2d_new(0, 0))) {
-            if(enemy_exists(me->object_name)) {
-                enemy_t* e = level_create_legacy_object(me->object_name, v2d_new(0, 0));
-                e->created_from_editor = FALSE;
-            }
-            else {
-                logfile_message("Missing setup object: %s", me->object_name);
-                video_showmessage("Missing setup object: %s", me->object_name);
-            }
-        }
-    }
+    surgescript_object_t* level = level_ssobject();
+    surgescript_object_call_function(level, "__spawnSetupObjects", NULL, 0, NULL);
 }
 
 /* check if object_name is in the setup object list */
 bool is_setup_object(const char* object_name)
 {
-    for(setupobject_list_t* me = setupobject_list; me != NULL; me = me->next) {
-        if(str_icmp(object_name, me->object_name) == 0)
-            return true;
-    }
-
-    if(str_icmp(object_name, DEFAULT_SETUP_OBJECT) == 0)
-        return true;
-
-    return false;
+    surgescript_object_t* level = level_ssobject();
+    return scripting_level_issetupobjectname(level, object_name);
 }
+
+
 
 
 /* level state */
@@ -2571,8 +2749,9 @@ bool is_setup_object(const char* object_name)
 void save_level_state(levelstate_t* state)
 {
     state->spawn_point = spawn_point;
-    state->waterlevel = waterlevel;
-    state->watercolor = watercolor;
+    state->act_number = act_number;
+    state->waterlevel = level_waterlevel();
+    state->watercolor = level_watercolor();
     str_cpy(
         state->bgtheme,
         (backgroundtheme != NULL) ? background_filepath(backgroundtheme) : bgtheme,
@@ -2586,8 +2765,9 @@ void restore_level_state(const levelstate_t* state)
 {
     if(state->is_valid) {
         spawn_point = state->spawn_point;
-        waterlevel = state->waterlevel;
-        watercolor = state->watercolor;
+        act_number = state->act_number;
+        level_set_waterlevel(state->waterlevel);
+        level_set_watercolor(state->watercolor);
         level_change_background(state->bgtheme);
     }
 }
@@ -2599,197 +2779,180 @@ void clear_level_state(levelstate_t* state)
 }
 
 
-/* scripting */
 
-/* update surgescript */
-void update_ssobjects()
+/* region of interest */
+
+/* create a region of interest */
+rect_t create_roi(v2d_t camera, int margin)
 {
-    surgescript_vm_t* vm = surgescript_vm();
+    v2d_t screen_size = video_get_screen_size();
+    int dx = (int)screen_size.x / 2 + margin;
+    int dy = (int)screen_size.y / 2 + margin;
 
-    if(surgescript_vm_is_active(vm)) {
-        v2d_t origin[TRANSFORM_MAX_DEPTH] = { [0] = v2d_new(0, 0) };
-        surgescript_vm_update_ex(vm, origin, update_ssobject, late_update_ssobject);
+    return rect_new(
+        (int)camera.x - dx,
+        (int)camera.y - dy,
+        2*dx,
+        2*dy
+    );
+}
+
+
+/* obstacle map */
+
+/* create the obstacle map */
+void create_obstaclemap()
+{
+    is_obstaclemap_dirty = false;
+    obstaclemap = obstaclemap_create();
+    darray_init(mock_obstacles);
+}
+
+/* destroy the obstacle map */
+void destroy_obstaclemap()
+{
+    for(int i = 0; i < darray_length(mock_obstacles); i++)
+        obstacle_destroy(mock_obstacles[i]);
+    darray_release(mock_obstacles);
+
+    obstaclemap_destroy(obstaclemap);
+    obstaclemap = NULL;
+
+    is_obstaclemap_dirty = false;
+}
+
+/* clear the obstacle map */
+void clear_obstaclemap()
+{
+    obstaclemap_clear(obstaclemap);
+
+    for(int i = 0; i < darray_length(mock_obstacles); i++)
+        obstacle_destroy(mock_obstacles[i]);
+    darray_clear(mock_obstacles);
+}
+
+/* update the obstacle map */
+void update_obstaclemap(const item_list_t* item_list, const object_list_t* object_list)
+{
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(level_ssobject());
+
+    /* clear the obstacle map */
+    clear_obstaclemap();
+
+    /* add bricks */
+    iterator_t* brick_iterator = brickmanager_retrieve_active_bricks(brick_manager);
+    while(iterator_has_next(brick_iterator)) {
+        const brick_t* brick = iterator_next(brick_iterator);
+        const obstacle_t* obstacle = brick_obstacle(brick);
+
+        if(obstacle != NULL)
+            obstaclemap_add(obstaclemap, obstacle);
     }
-}
+    iterator_destroy(brick_iterator);
 
-void update_ssobject(surgescript_object_t* object, void* param)
-{
-    /* initialization */
-    int depth = surgescript_object_depth(object);
-    if(depth < TRANSFORM_MAX_DEPTH) {
-        /* get the transform origin */
-        v2d_t origin = ((v2d_t*)param)[depth];
+    /* add brick-like objects */
+    iterator_t* bricklike_iterator = entitymanager_bricklike_iterator(entitymanager_ssobject());
+    while(iterator_has_next(bricklike_iterator)) {
+        surgescript_objecthandle_t* bricklike_handle = iterator_next(bricklike_iterator);
 
-        /* are we dealing with a level entity? */
-        if(surgescript_object_has_tag(object, "entity")) {
-            /* get the position of the object */
-            surgescript_transform_t transform;
-            surgescript_object_peek_transform(object, &transform);
-            surgescript_transform_apply2d(&transform, &origin.x, &origin.y);
+        if(surgescript_objectmanager_exists(manager, *bricklike_handle)) {
+            surgescript_object_t* bricklike_object = surgescript_objectmanager_get(manager, *bricklike_handle);
 
-            /* check whether the entity should be updated, disposed or what */
-            if(
-                level_inside_screen(origin.x, origin.y, 1, 1) ||
-                surgescript_object_has_tag(object, "awake") ||
-                surgescript_object_has_tag(object, "detached")
-            ) {
-                /* the entity is not sleeping */
-                ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
-                if(obj_data != NULL)
-                    obj_data->sleeping = FALSE;
+            if(scripting_brick_is_valid(bricklike_object) && scripting_brick_enabled(bricklike_object)) {
+                obstacle_t* mock_obstacle = bricklike2obstacle(bricklike_object);
 
-                /* the entity should be updated */
-                surgescript_object_set_active(object, true);
-
-                /* is it a brick-like object? */
-                if(strcmp(surgescript_object_name(object), "Brick") == 0)
-                    add_bricklike_ssobject(object);
-            }
-            else if(!surgescript_object_has_tag(object, "disposable")) {
-                /* the entity should no longer be active and
-                   should be repositioned to its spawn point */
-                ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
-                if(obj_data && obj_data->spawned_in_the_editor && !obj_data->sleeping) {
-                    v2d_t spawn_point = obj_data->spawn_point;
-                    if(!level_inside_screen(spawn_point.x, spawn_point.y, 1, 1)) {
-                        /* put it to sleep */
-                        obj_data->sleeping = TRUE;
-
-                        /* reposition the entity */
-                        if(v2d_magnitude(v2d_subtract(origin, spawn_point)) >= 1.0f)
-                            scripting_util_set_world_position(object, origin = spawn_point);
-
-                        /* notify it */
-                        notify_ssobject(object, "onReset");
-                    }
-                }
-
-                /* deactivate the object */
-                surgescript_object_set_active(object, false);
-            }
-            else {
-                /* the entity should be disposed */
-                surgescript_object_kill(object);
-                clear_ssobj_extradata(object);
-            }
-        }
-
-        /* set the transform origin for the next depth level */
-        if(1 + depth < TRANSFORM_MAX_DEPTH)
-            ((v2d_t*)param)[1 + depth] = origin;
-    }
-    else
-        scripting_error(object, "TRANSFORM_MAX_DEPTH (%d) has been exceeded by \"%s\".", TRANSFORM_MAX_DEPTH, surgescript_object_name(object));
-}
-
-void late_update_ssobject(surgescript_object_t* object, void* param)
-{
-    if(!surgescript_object_is_active(object) && surgescript_object_has_tag(object, "entity"))
-        surgescript_object_set_active(object, true); /* the object may reawaken in the future */
-}
-
-/* render objects */
-
-void render_ssobjects()
-{
-    surgescript_vm_t* vm = surgescript_vm();
-    if(surgescript_vm_is_active(vm)) {
-        surgescript_object_t* root = surgescript_vm_root_object(vm);
-        surgescript_object_traverse_tree_ex(root, surgescript_vm_programpool(vm), render_ssobject);
-    }
-}
-
-bool render_ssobject(surgescript_object_t* object, void* param)
-{
-    if(surgescript_object_is_active(object) && !surgescript_object_is_killed(object)) {
-        if(editor_is_enabled()) {
-            /* level editor */
-            if(surgescript_object_has_tag(object, "entity") && !surgescript_object_has_tag(object, "private"))
-                renderqueue_enqueue_ssobject_debug(object);
-
-            /* we're in the editor. Objects tagged "gizmo" SHOULD NOT
-               provoke any data or state changes within SurgeScript */
-            /*if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
-                renderqueue_enqueue_ssobject_gizmo(object);*/
-
-            return true;
-        }
-        else {
-            /* gameplay */
-            ssobj_extradata_t* obj_data = get_ssobj_extradata(object);
-            if(obj_data && obj_data->sleeping) {
-                /* no need to render sleeping objects */
-                return false; /* won't render their children */
-            }
-            else {
-                /* will render objects tagged "renderable" */
-                if(surgescript_object_has_tag(object, "renderable"))
-                    renderqueue_enqueue_ssobject(object);
-
-                /* will render objects tagged "gizmo" */
-                if(must_display_gizmos && surgescript_object_has_tag(object, "gizmo"))
-                    renderqueue_enqueue_ssobject_gizmo(object);
-            }
-
-            return true;
-        }
-    }
-    else
-        return false;
-}
-
-/* brick-like objects */
-void add_bricklike_ssobject(surgescript_object_t* object)
-{
-    /* add it to the bricklike_ssobject array */
-    if(bricklike_ssobject_count < BRICKLIKE_MAX_COUNT) {
-        if(!surgescript_object_is_killed(object))
-            bricklike_ssobject[bricklike_ssobject_count++] = surgescript_object_handle(object);
-    }
-}
-
-surgescript_object_t* get_bricklike_ssobject(int index)
-{
-    if(index >= 0 && index < bricklike_ssobject_count) {
-        surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(surgescript_vm());
-        surgescript_objecthandle_t handle = bricklike_ssobject[index];
-        if(surgescript_objectmanager_exists(manager, handle)) {
-            surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
-            if(!surgescript_object_is_killed(obj)) {
-                if(strcmp(surgescript_object_name(obj), "Brick") == 0) /* make sure it's a brick */
-                    return obj;
+                darray_push(mock_obstacles, mock_obstacle);
+                obstaclemap_add(obstaclemap, mock_obstacle);
             }
         }
+    }
+    iterator_destroy(bricklike_iterator);
 
-        /* quick fix */
-        return get_bricklike_ssobject(index + 1);
+    /* add legacy items */
+    for(; item_list; item_list = item_list->next) {
+        const item_t* item = item_list->data;
 
-        /* a bricklike object may have been removed between its
-           addition to the bricklike_ssobject array and its
-           retrieval by this function (who knows, maybe a parent
-           object gets destroyed).
+        if(item->obstacle && item->mask) {
+            obstacle_t* mock_obstacle = item2obstacle(item);
 
-           TODO: filter out invalid bricks before querying */
+            darray_push(mock_obstacles, mock_obstacle);
+            obstaclemap_add(obstaclemap, mock_obstacle);
+        }
     }
 
-    return NULL;
+    /* add legacy objects */
+    for(; object_list; object_list = object_list->next) {
+        const object_t* object = object_list->data;
+
+        if(object->obstacle && object->mask) {
+            obstacle_t* mock_obstacle = object2obstacle(object);
+
+            darray_push(mock_obstacles, mock_obstacle);
+            obstaclemap_add(obstaclemap, mock_obstacle);
+        }
+    }
+
+    /* build the obstacle map */
+    obstaclemap_build(obstaclemap);
 }
 
-inline void clear_bricklike_ssobjects()
+/* converts a legacy item to an obstacle */
+obstacle_t* item2obstacle(const item_t* item)
 {
-    bricklike_ssobject_count = 0;
+    const collisionmask_t* mask = item->mask;
+    v2d_t position = v2d_subtract(item->actor->position, item->actor->hot_spot);
+    return obstacle_create(mask, point2d_new(position.x, position.y), OL_DEFAULT, OF_NONSTATIC);
 }
 
-
-/* SurgeScript object utilities */
-
-/* does the specified object exist? */
-bool ssobject_exists(const char* object_name)
+/* converts a legacy object to an obstacle */
+obstacle_t* object2obstacle(const object_t* object)
 {
-    surgescript_vm_t* vm = surgescript_vm();
-    surgescript_programpool_t* pool = surgescript_vm_programpool(vm);
-    return surgescript_programpool_is_compiled(pool, object_name);
+    const collisionmask_t* mask = object->mask;
+    v2d_t position = v2d_subtract(object->actor->position, object->actor->hot_spot);
+    return obstacle_create(mask, point2d_new(position.x, position.y), OL_DEFAULT, OF_NONSTATIC);
 }
+
+/* converts a brick-like SurgeScript object to an obstacle */
+obstacle_t* bricklike2obstacle(const surgescript_object_t* object)
+{
+    v2d_t position = v2d_subtract(scripting_util_world_position(object), scripting_brick_hotspot(object));
+    bricklayer_t brick_layer = scripting_brick_layer(object);
+    obstaclelayer_t layer = ((brick_layer == BRL_GREEN) ? OL_GREEN : ((brick_layer == BRL_YELLOW) ? OL_YELLOW : OL_DEFAULT));
+    int flags = OF_NONSTATIC;
+
+    if(scripting_brick_type(object) == BRK_CLOUD)
+        flags |= OF_CLOUD;
+
+    collisionmask_t* clone = create_collisionmask_of_bricklike_object(object);
+    return obstacle_create_ex(
+        clone,
+        point2d_new(position.x, position.y),
+        layer, flags,
+        destroy_collisionmask_of_bricklike_object, clone
+    );
+}
+
+/* creates a collision mask for a brick-like SurgeScript object */
+collisionmask_t* create_collisionmask_of_bricklike_object(const surgescript_object_t* object)
+{
+    /* the following pointer is guaranteed to be valid during the lifetime of the obstacle_t,
+       regardless of what happens with the brick-like object (i.e., it may get destroyed) */
+    const collisionmask_t* mask = scripting_brick_mask(object); /* assumed to be valid */
+    return collisionmask_clone(mask); /* not very efficient, though */
+}
+
+/* destroys a collision mask created for a brick-like SurgeScript object */
+void destroy_collisionmask_of_bricklike_object(void* mask)
+{
+    collisionmask_t* clone = (collisionmask_t*)mask;
+    collisionmask_destroy(clone);
+}
+
+
+
+/*
+ * SurgeScript helpers
+ */
 
 /* get the Level object (SurgeScript) */
 surgescript_object_t* level_ssobject()
@@ -2799,92 +2962,213 @@ surgescript_object_t* level_ssobject()
     return cached_level_ssobject;
 }
 
-/* spawns a ssobject */
-surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point, int spawned_in_the_editor)
+/* get the EntityManager object (SurgeScript) */
+surgescript_object_t* entitymanager_ssobject()
 {
-    if(ssobject_exists(object_name)) {
-        /* create the object by invoking Level.spawn */
-        surgescript_vm_t* vm = surgescript_vm();
-        surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-        surgescript_transform_t* transform = NULL;
-        surgescript_object_t* object = NULL;
-        surgescript_var_t* tmp = surgescript_var_set_string(surgescript_var_create(), object_name);
+    if(cached_entity_manager == NULL)
+        cached_entity_manager = scripting_level_entitymanager(level_ssobject());
+    return cached_entity_manager;
+}
+
+/* update SurgeScript */
+void update_ssobjects()
+{
+    surgescript_vm_t* vm = surgescript_vm();
+
+    if(surgescript_vm_is_active(vm)) {
+        surgescript_vm_update(vm);
+    }
+}
+
+/* call lateUpdate() for each SurgeScript entity that implements it */
+void late_update_ssobjects()
+{
+    surgescript_vm_t* vm = surgescript_vm();
+
+    if(surgescript_vm_is_active(vm)) {
+        surgescript_object_t* entity_manager = entitymanager_ssobject();
+        surgescript_object_call_function(entity_manager, "lateUpdate", NULL, 0, NULL);
+    }
+}
+
+/* render objects */
+void render_ssobjects()
+{
+    surgescript_vm_t* vm = surgescript_vm();
+
+    if(surgescript_vm_is_active(vm)) {
+        surgescript_object_t* entity_manager = entitymanager_ssobject();
+        surgescript_object_call_function(entity_manager, "render", NULL, 0, NULL);
+    }
+}
+
+/* set the Region of Interest (ROI) of the SurgeScript Entity Manager */
+void set_entitymanager_roi(rect_t roi)
+{
+    surgescript_object_t* entity_manager = entitymanager_ssobject();
+    surgescript_var_t* args[4] = {
+        surgescript_var_set_number(surgescript_var_create(), roi.x),
+        surgescript_var_set_number(surgescript_var_create(), roi.y),
+        surgescript_var_set_number(surgescript_var_create(), roi.width),
+        surgescript_var_set_number(surgescript_var_create(), roi.height)
+    };
+
+    surgescript_object_call_function(
+        entity_manager, "setROI",
+        (const surgescript_var_t**)args, 4, NULL
+    );
+
+    surgescript_var_destroy(args[3]);
+    surgescript_var_destroy(args[2]);
+    surgescript_var_destroy(args[1]);
+    surgescript_var_destroy(args[0]);
+}
+
+/* spawns a ssobject */
+surgescript_object_t* spawn_ssobject(const char* object_name, v2d_t spawn_point)
+{
+    surgescript_object_t* level = level_ssobject();
+    surgescript_objectmanager_t* manager = surgescript_object_manager(level);
+    surgescript_tagsystem_t* tag_system = surgescript_objectmanager_tagsystem(manager);
+    surgescript_objecthandle_t new_object_handle;
+
+    /* return NULL if the class of objects doesn't exist */
+    if(!surgescript_objectmanager_class_exists(manager, object_name))
+        return NULL;
+
+    if(!surgescript_tagsystem_has_tag(tag_system, object_name, "entity")) {
+        /* call Level.spawn(object_name) */
         surgescript_var_t* ret = surgescript_var_create();
+        surgescript_var_t* tmp = surgescript_var_set_string(surgescript_var_create(), object_name);
+
         const surgescript_var_t* param[] = { tmp };
+        surgescript_object_call_function(level, "spawn", param, 1, ret);
+        new_object_handle = surgescript_var_get_objecthandle(ret);
 
-        surgescript_object_call_function(level_ssobject(), "spawn", param, 1, ret);
-        object = surgescript_objectmanager_get(manager, surgescript_var_get_objecthandle(ret));
-        surgescript_var_destroy(ret);
         surgescript_var_destroy(tmp);
-
-        /* set the spawn point */
-        transform = surgescript_object_transform(object);
-        surgescript_transform_translate2d(transform, spawn_point.x, spawn_point.y);
-
-        /* save the editor-related data (entities only) */
-        if(surgescript_object_has_tag(object, "entity")) {
-            store_ssobj_extradata(object, (ssobj_extradata_t){
-                .handle = surgescript_object_handle(object),
-                .entity_id = random64(),
-                .spawn_point = spawn_point,
-                .spawned_in_the_editor = spawned_in_the_editor,
-                .sleeping = TRUE
-            });
-
-            /* sanity check for entities */
-            if(surgescript_object_has_tag(object, "detached") && !surgescript_object_has_tag(object, "private")) {
-                surgescript_tagsystem_t* tag_system = surgescript_vm_tagsystem(vm);
-                logfile_message("WARNING: object \"%s\" is tagged detached, but not private. Fixing...", object_name);
-                surgescript_tagsystem_add_tag(tag_system, object_name, "private");
-            }
-        }
-
-        /* done! */
-        return object;
+        surgescript_var_destroy(ret);
     }
     else {
-        fatal_error("Can't spawn level object \"%s\": object does not exist.");
-        return NULL;
-    }
-}
+        /* call Level.spawnEntity(object_name, spawn_point) */
+        surgescript_objecthandle_t v2_handle = surgescript_objectmanager_spawn_temp(manager, "Vector2");
+        surgescript_object_t* v2 = surgescript_objectmanager_get(manager, v2_handle);
+        scripting_vector2_update(v2, spawn_point.x, spawn_point.y);
 
-/* writes an object declaration to a file */
-bool save_ssobject(surgescript_object_t* object, void* param)
-{
-    FILE* fp = (FILE*)param;
+        surgescript_var_t* ret = surgescript_var_create();
+        surgescript_var_t* tmp = surgescript_var_set_string(surgescript_var_create(), object_name);
+        surgescript_var_t* tmp2 = surgescript_var_set_objecthandle(surgescript_var_create(), v2_handle);
 
-    if(surgescript_object_is_killed(object))
-        return false;
+        const surgescript_var_t* param[] = { tmp, tmp2 };
+        surgescript_object_call_function(level, "spawnEntity", param, 2, ret);
+        new_object_handle = surgescript_var_get_objecthandle(ret);
 
-    if(is_ssobj_spawned_in_the_editor(object)) {
-        const char* object_name = surgescript_object_name(object);
-        v2d_t spawn_point = get_ssobj_spawnpoint(object);
-        uint64_t entity_id = get_ssobj_id(object);
-        fprintf(fp, "entity \"%s\" %d %d \"%s\"\n", str_addslashes(object_name), (int)spawn_point.x, (int)spawn_point.y, x64_to_str(entity_id, NULL, 0));
-    }
+        surgescript_var_destroy(tmp2);
+        surgescript_var_destroy(tmp);
+        surgescript_var_destroy(ret);
 
-    return true;
-}
-
-/* notify an entity: call a function (if it exists) */
-bool notify_ssobject(surgescript_object_t* object, void* param)
-{
-    const char* fun_name = (const char*)param;
-
-    if(surgescript_object_has_tag(object, "entity")) {
-        if(surgescript_object_has_function(object, fun_name))
-            surgescript_object_call_function(object, fun_name, NULL, 0, NULL);
+        surgescript_object_kill(v2);
     }
 
-    return true;
+    return surgescript_objectmanager_get(manager, new_object_handle);
 }
 
 /* notifies all SurgeScript entities of the level */
 void notify_ssobjects(const char* fun_name)
 {
-    surgescript_object_traverse_tree_ex(level_ssobject(), (void*)fun_name, notify_ssobject);
+    surgescript_vm_t* vm = surgescript_vm();
+
+    if(surgescript_vm_is_active(vm)) {
+        surgescript_object_t* entity_manager = entitymanager_ssobject();
+        surgescript_var_t* arg = surgescript_var_create();
+        const surgescript_var_t* args[] = { arg };
+
+        surgescript_var_set_string(arg, fun_name);
+        surgescript_object_call_function(entity_manager, "notifyEntities", args, 1, NULL);
+
+        surgescript_var_destroy(arg);
+    }
 }
 
+
+
+
+
+/*
+ * Additional info of SurgeScript entities
+ */
+
+bool entity_info_exists(const surgescript_object_t* object)
+{
+    return entitymanager_has_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+void entity_info_remove(const surgescript_object_t* object)
+{
+    entitymanager_remove_entity_info(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+v2d_t entity_info_spawnpoint(const surgescript_object_t* object)
+{
+    return entitymanager_get_entity_spawn_point(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+uint64_t entity_info_id(const surgescript_object_t* object)
+{
+    return entitymanager_get_entity_id(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+void entity_info_set_id(const surgescript_object_t* object, uint64_t entity_id)
+{
+    entitymanager_set_entity_id(entitymanager_ssobject(), surgescript_object_handle(object), entity_id);
+}
+
+bool entity_info_is_persistent(const surgescript_object_t* object)
+{
+    return entitymanager_is_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object));
+}
+
+void entity_info_set_persistent(const surgescript_object_t* object, bool is_persistent)
+{
+    entitymanager_set_entity_persistent(entitymanager_ssobject(), surgescript_object_handle(object), is_persistent);
+}
+
+
+
+/*
+ * Event listeners
+ */
+
+/* a switch out event takes place when the window is no longer active */
+void handle_switchout_event(const ALLEGRO_EVENT* event, void* data)
+{
+#if defined(__ANDROID__)
+    const scene_t* level_scene = storyboard_get_scene(SCENE_LEVEL);
+    const scene_t* current_scene = scenestack_top();
+
+    if(current_scene == level_scene) {
+        /*
+
+        Pause the game when the app goes out of focus.
+
+        We should implement an event system in the scripting layer in order to
+        accomplish this. Not all levels / scenes admit pausing; we should pause
+        only on the ones that do.
+
+        The solution below is not meant to be permanent.
+
+        FIXME
+
+        */
+        if(is_setup_object("Default Pause and Quit")) {
+            if(!level_is_in_debug_mode())
+                level_pause();
+        }
+    }
+#endif
+
+    (void)event;
+    (void)data;
+}
 
 
 
@@ -2938,8 +3222,6 @@ void editor_init()
     while(editor_item_list[++editor_item_list_size] >= 0);
     editor_cursor_entity_type = EDT_BRICK;
     editor_cursor_entity_id = 0;
-    /*editor_previous_video_resolution = video_get_resolution();
-    editor_previous_video_smooth = video_is_smooth();*/
     editor_enemy_name = objects_get_list_of_names(&editor_enemy_name_length);
     editor_enemy_selected_category_id = 0;
     editor_enemy_category = objects_get_list_of_categories(&editor_enemy_category_length);
@@ -3020,8 +3302,8 @@ void editor_release()
 void editor_update()
 {
     v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-    item_list_t *it, *major_items;
-    brick_list_t *major_bricks;
+    brick_list_t* major_bricks;
+    item_list_t *major_items;
     enemy_list_t *major_enemies;
     int pick_object, delete_object = FALSE;
     int selected_item;
@@ -3053,13 +3335,14 @@ void editor_update()
     if(1 == confirmbox_selected_option()) {
         char path[PATH_MAXLEN];
         logfile_message("Reloading the level via the editor...");
+        str_cpy(path, file, sizeof(path));
 
         editor_disable();
         scenestack_pop();
         scripting_reload();
         scenestack_push(
             storyboard_get_scene(SCENE_LEVEL),
-            str_cpy(path, file, sizeof(path))
+            path
         );
 
         return;
@@ -3117,13 +3400,22 @@ void editor_update()
 
     /* ----------------------------------------- */
 
-    /* getting major entities */
+    /* set the region of interest */
+    v2d_t cam = editor_camera;
+    rect_t brick_roi = create_roi(cam, ROI_MARGIN_EDITOR);
+    rect_t entity_roi = brick_roi;
+
+    brickmanager_set_roi(brick_manager, brick_roi);
+    set_entitymanager_roi(entity_roi);
+    entitymanager_set_active_region(entity_roi); /* legacy */
+
+    /* get legacy entities */
     major_enemies = entitymanager_retrieve_active_objects();
     major_items = entitymanager_retrieve_active_items();
-    major_bricks = entitymanager_retrieve_active_bricks();
+    major_bricks = major_enemies != NULL || major_items != NULL ? brickmanager_retrieve_active_bricks_as_list(brick_manager) : NULL; /* for backwards compatibility only */
 
     /* update items */
-    for(it=major_items; it!=NULL; it=it->next)
+    for(item_list_t* it=major_items; it!=NULL; it=it->next)
         item_update(it->data, team, team_size, major_bricks, major_items, major_enemies);
 
     /* change class / entity / object category */
@@ -3195,22 +3487,22 @@ void editor_update()
     if(editorcmd_is_triggered(editor_cmd, "change-spawnpoint")) {
         v2d_t nsp = editor_grid_snap(editor_cursor);
         editor_action_t eda = editor_action_spawnpoint_new(TRUE, nsp, spawn_point);
-        editor_action_commit(eda);
+        eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
 
     /* change waterlevel */
     if(editorcmd_is_triggered(editor_cmd, "change-waterlevel")) {
         v2d_t nsp = editor_grid_snap(editor_cursor);
-        editor_action_t eda = editor_action_waterlevel_new(TRUE, nsp.y, waterlevel);
-        editor_action_commit(eda);
+        editor_action_t eda = editor_action_waterlevel_new(TRUE, nsp.y, level_waterlevel());
+        eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
 
     /* put item */
     if(editorcmd_is_triggered(editor_cmd, "put-item")) {
         editor_action_t eda = editor_action_entity_new(TRUE, editor_cursor_entity_type, editor_cursor_entity_id, editor_grid_snap(editor_cursor));
-        editor_action_commit(eda);
+        eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
 
@@ -3221,33 +3513,36 @@ void editor_update()
         switch(editor_cursor_entity_type) {
             /* brick */
             case EDT_BRICK: {
-                brick_t* candidate = NULL;
-                int candidate_got_collision = FALSE;
+                const brick_t* candidate = NULL;
+                bool candidate_got_collision = false;
 
-                for(brick_list_t* itb = major_bricks; itb != NULL; itb = itb->next) {
-                    v2d_t brk_topleft = brick_position(itb->data);
-                    v2d_t brk_bottomright = v2d_add(brk_topleft, brick_size(itb->data));
+                iterator_t* it = brickmanager_retrieve_active_bricks(brick_manager);
+                while(iterator_has_next(it)) {
+                    const brick_t* brick = iterator_next(it);
+                    v2d_t brk_topleft = brick_position(brick);
+                    v2d_t brk_bottomright = v2d_add(brk_topleft, brick_size(brick));
                     float a[4] = { brk_topleft.x, brk_topleft.y, brk_bottomright.x, brk_bottomright.y };
                     float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
 
                     if(bounding_box(a,b)) {
-                        const obstacle_t* obstacle = brick_obstacle(itb->data);
+                        const obstacle_t* obstacle = brick_obstacle(brick);
 
                         /* pick the best brick that is in front of the others */
                         if(
                             (candidate == NULL) ||
                             (obstacle == NULL && !candidate_got_collision && (
-                                brick_obstacle(candidate) != NULL || brick_zindex(itb->data) >= brick_zindex(candidate)
+                                brick_obstacle(candidate) != NULL || brick_zindex(brick) >= brick_zindex(candidate)
                             )) ||
                             (obstacle != NULL && obstacle_got_collision(obstacle, b[0], b[1], b[2], b[3]) && (
-                                !candidate_got_collision || brick_zindex(itb->data) >= brick_zindex(candidate)
+                                !candidate_got_collision || brick_zindex(brick) >= brick_zindex(candidate)
                             ))
                         ) {
-                            candidate = itb->data;
+                            candidate = brick;
                             candidate_got_collision = (obstacle != NULL) && obstacle_got_collision(obstacle, b[0], b[1], b[2], b[3]);
                         }
                     }
                 }
+                iterator_destroy(it);
 
                 if(candidate != NULL) {
                     if(pick_object) {
@@ -3257,7 +3552,7 @@ void editor_update()
                     }
                     else {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_BRICK, brick_id(candidate), brick_position(candidate));
-                        editor_action_commit(eda);
+                        eda = editor_action_commit(eda);
                         editor_action_register(eda);
                     }
                 }
@@ -3289,7 +3584,7 @@ void editor_update()
                     }
                     else {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_ITEM, candidate->type, candidate->actor->position);
-                        editor_action_commit(eda);
+                        eda = editor_action_commit(eda);
                         editor_action_register(eda);
                     }
                 }
@@ -3320,7 +3615,7 @@ void editor_update()
                     }
                     else {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_ENEMY, candidate_key, candidate->actor->position);
-                        editor_action_commit(eda);
+                        eda = editor_action_commit(eda);
                         editor_action_register(eda);
                     }
                 }
@@ -3335,18 +3630,32 @@ void editor_update()
             /* SurgeScript entity */
             case EDT_SSOBJ: {
                 surgescript_object_t* ssobject = NULL;
-                surgescript_object_traverse_tree_ex(level_ssobject(), &ssobject, editor_pick_ssobj);
+                surgescript_object_t* entity_manager = entitymanager_ssobject();
+                surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
+
+                iterator_t* it = entitymanager_activeentities_iterator(entity_manager);
+                while(iterator_has_next(it)) {
+                    surgescript_var_t** var = iterator_next(it);
+                    surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(*var);
+
+                    if(surgescript_objectmanager_exists(manager, entity_handle)) {
+                        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+                        editor_pick_entity(entity, &ssobject);
+                    }
+                }
+                iterator_destroy(it);
+
                 if(ssobject != NULL) {
                     int index = editor_ssobj_index(surgescript_object_name(ssobject));
                     if(!pick_object) {
                         editor_action_t eda = editor_action_entity_new(FALSE, EDT_SSOBJ, index, scripting_util_world_position(ssobject));
-                        eda.ssobj_id = get_ssobj_id(ssobject);
-                        editor_action_commit(eda);
+                        eda.ssobj_id = entity_info_id(ssobject);
+                        eda = editor_action_commit(eda);
                         editor_action_register(eda);
                     }
                     else if(index >= 0) {
                         editor_cursor_entity_id = index;
-                        editor_ssobj_picked_entity.id = get_ssobj_id(ssobject);
+                        editor_ssobj_picked_entity.id = entity_info_id(ssobject);
                         str_cpy(editor_ssobj_picked_entity.name, surgescript_object_name(ssobject), sizeof(editor_ssobj_picked_entity.name));
                     }
                 }
@@ -3397,10 +3706,10 @@ void editor_update()
     );
     font_set_text(editor_properties_font, "$EDITOR_UI_TOOL");
 
-    /* "ungetting" major entities */
-    entitymanager_release_retrieved_brick_list(major_bricks);
-    entitymanager_release_retrieved_item_list(major_items);
-    entitymanager_release_retrieved_object_list(major_enemies);
+    /* release major entities */
+    major_bricks = brickmanager_release_list(major_bricks);
+    major_items = entitymanager_release_retrieved_item_list(major_items);
+    major_enemies = entitymanager_release_retrieved_object_list(major_enemies);
 }
 
 
@@ -3411,27 +3720,19 @@ void editor_update()
  */
 void editor_render()
 {
-    brick_list_t *major_bricks;
-    item_list_t *major_items;
-    enemy_list_t *major_enemies;
-    image_t *cursor;
+    const image_t *cursor;
     v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-
-    major_bricks = entitymanager_retrieve_active_bricks();
-    major_items = entitymanager_retrieve_active_items();
-    major_enemies = entitymanager_retrieve_active_objects();
+    item_list_t* major_items = entitymanager_retrieve_active_items();
+    enemy_list_t* major_enemies = entitymanager_retrieve_active_objects();
     
-    /* background */
-    editor_render_background();
+    /* render the level */
+    render_level(major_items, major_enemies);
 
     /* render the grid */
     editor_grid_render();
 
-    /* render level */
-    render_level(major_bricks, major_items, major_enemies);
-
     /* draw editor water line */
-    editor_waterline_render((int)(waterlevel - topleft.y), color_rgb(255, 255, 255));
+    editor_waterline_render((int)(level_waterlevel() - topleft.y), color_rgb(255, 255, 255));
 
     /* top bar */
     image_rectfill(0, 0, VIDEO_SCREEN_W, 32, EDITOR_UI_COLOR_TRANS(160));
@@ -3444,7 +3745,7 @@ void editor_render()
         editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, v2d_subtract(editor_grid_snap(editor_cursor), topleft));
 
         /* drawing the cursor arrow */
-        cursor = sprite_get_image(sprite_get_animation("Mouse Cursor", 0), 0);
+        cursor = animation_image(sprite_get_animation("Mouse Cursor", 0), 0);
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
             image_draw(cursor, (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
@@ -3455,7 +3756,7 @@ void editor_render()
     }
     else {
         /* drawing an eraser */
-        cursor = sprite_get_image(sprite_get_animation("Eraser", 0), 0);
+        cursor = animation_image(sprite_get_animation("Eraser", 0), 0);
         image_draw(cursor, (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
     }
 
@@ -3466,9 +3767,8 @@ void editor_render()
     editor_status_render();
 
     /* done */
-    entitymanager_release_retrieved_brick_list(major_bricks);
-    entitymanager_release_retrieved_item_list(major_items);
-    entitymanager_release_retrieved_object_list(major_enemies);
+    major_items = entitymanager_release_retrieved_item_list(major_items);
+    major_enemies = entitymanager_release_retrieved_object_list(major_enemies);
 }
 
 
@@ -3484,10 +3784,9 @@ void editor_enable()
     /* pause the SurgeScript VM */
     scripting_pause_vm();
 
-    /* changing the video resolution */
-    editor_previous_video_resolution = video_get_resolution();
-    editor_previous_video_smooth = video_is_smooth();
-    video_changemode(VIDEORESOLUTION_EDT, false, video_is_fullscreen());
+    /* changing the video mode */
+    editor_previous_videomode = video_get_mode();
+    video_set_mode(VIDEOMODE_FILL);
 
     /* activating the editor */
     editor_action_init();
@@ -3513,8 +3812,8 @@ void editor_disable()
     editor_action_release();
     editor_enabled = false;
 
-    /* restoring the video resolution */
-    video_changemode(editor_previous_video_resolution, editor_previous_video_smooth, video_is_fullscreen());
+    /* changing the video mode */
+    video_set_mode(editor_previous_videomode);
 
     /* updating the level size */
     update_level_size();
@@ -3554,16 +3853,6 @@ void editor_update_background()
     background_update(backgroundtheme);
 }
 
-/*
- * editor_render_background()
- * Renders the background of the level editor
- */
-void editor_render_background()
-{
-    image_rectfill(0, 0, VIDEO_SCREEN_W, VIDEO_SCREEN_H, EDITOR_UI_COLOR());
-    background_render_bg(backgroundtheme, editor_camera); /* FIXME? no render_fg */
-}
-
 
 
 /*
@@ -3572,7 +3861,7 @@ void editor_render_background()
  */
 void editor_waterline_render(int ycoord, color_t color)
 {
-    int x, x0 = 19 - (timer_get_ticks() / 25) % 20;
+    int x, x0 = 19 - (int)(timer_get_elapsed() * 40.0) % 20;
 
     for(x=x0-10; x<VIDEO_SCREEN_W; x+=20)
         image_line(x, ycoord, x+10, ycoord, color);
@@ -3707,7 +3996,7 @@ const char *editor_entity_info(enum editor_entity_type objtype, int objid)
                 static char tmp[3][128];
                 snprintf(tmp[0], sizeof(tmp[0]), "EDITOR_BRICK_TYPE_%s", brick_util_typename(brick_type_preview(objid)));
                 snprintf(tmp[1], sizeof(tmp[1]), "EDITOR_BRICK_BEHAVIOR_%s", brick_util_behaviorname(brick_behavior_preview(objid)));
-                snprintf(tmp[2], sizeof(tmp[2]), "EDITOR_BRICK_FLIP_%s", str_to_upper(brick_util_flipstr(editor_flip)));
+                snprintf(tmp[2], sizeof(tmp[2]), "EDITOR_BRICK_FLIP_%s", str_to_upper(brick_util_flipstr(editor_flip), NULL, 0));
                 snprintf(buf, sizeof(buf),
                     "%4d %10s %12s    %3dx%-3d    z=%.2f    %6s", objid,
                     lang_getstring(tmp[0], tmp[0], sizeof(tmp[0])),
@@ -4026,8 +4315,8 @@ void editor_draw_object(enum editor_entity_type obj_type, int obj_id, v2d_t posi
                 anim = sprite_get_animation(object_name, 0);
             else
                 anim = sprite_get_animation(NULL, 0);
-            cursor = sprite_get_image(anim, 0);
-            offset = anim->hot_spot;
+            cursor = animation_image(anim, 0);
+            offset = animation_hot_spot(anim);
             break;
         }
     }
@@ -4127,7 +4416,27 @@ int editor_ssobj_sortfun(const void* a, const void* b)
                     bool x_is_special = surgescript_tagsystem_has_tag(tag_system, x, "special");
                     bool y_is_special = surgescript_tagsystem_has_tag(tag_system, y, "special");
                     if(x_is_special == y_is_special) {
-                        /* then, sort alphabetically */
+                        /* then, sort alphabetically with a caveat:
+
+                           if two entities have almost equal names, differing only by a numeric
+                           suffix preceded by a space, then sort by the suffix.
+
+                           example: "Event Trigger 2" appears before "Event Trigger 10" */
+                        const char *sx, *sy;
+                        if((sx = strrchr(x, ' ')) && isdigit(sx[1]) && (sy = strrchr(y, ' ')) && isdigit(sy[1])) {
+                            ptrdiff_t x_prefix_length = sx - x;
+                            ptrdiff_t y_prefix_length = sy - y;
+                            if(x_prefix_length == y_prefix_length && 0 == strncmp(x, y, x_prefix_length)) {
+                                const char* x_suffix = sx + 1;
+                                const char* y_suffix = sy + 1;
+                                if(0 == strcspn(x_suffix, "0123456789") && 0 == strcspn(y_suffix, "0123456789")) {
+                                    /* sort by the numeric suffix */
+                                    return atoi(x_suffix) - atoi(y_suffix);
+                                }
+                            }
+                        }
+
+                        /* sort alphabetically */
                         return strcmp(x, y);
                     }
                     else
@@ -4347,23 +4656,27 @@ void editor_tooltip_update()
     font_set_visible(editor_tooltip_font, false);
     if(editor_cursor_entity_type == EDT_SSOBJ) {
         surgescript_object_t* target = NULL;
-        surgescript_object_t* level = level_ssobject();
-        surgescript_objectmanager_t* manager = surgescript_object_manager(level);
-        int n = surgescript_object_child_count(level);
+        surgescript_object_t* entity_manager = entitymanager_ssobject();
+        surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
 
         /* locate a target (onmouseover) */
-        for(int i = 0; i < n; i++) {
-            surgescript_objecthandle_t handle = surgescript_object_nth_child(level, i);
-            surgescript_object_t* child = surgescript_objectmanager_get(manager, handle);
-            if(get_ssobj_extradata(child) != NULL)
-                editor_pick_ssobj(child, &target);
+        iterator_t* it = entitymanager_activeentities_iterator(entity_manager);
+        while(iterator_has_next(it)) {
+            surgescript_var_t** var = iterator_next(it);
+            surgescript_objecthandle_t entity_handle = surgescript_var_get_objecthandle(*var);
+
+            if(surgescript_objectmanager_exists(manager, entity_handle)) {
+                surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+                editor_pick_entity(entity, &target);
+            }
         }
+        iterator_destroy(it);
 
         /* found a target */
         if(target != NULL && !surgescript_object_is_killed(target)) {
-            ssobj_extradata_t* data = get_ssobj_extradata(target);
-            const char* entity_id = data ? x64_to_str(data->entity_id, NULL, 0) : "";
-            v2d_t sp = data ? data->spawn_point : v2d_new(0, 0);
+            bool has_data = entity_info_exists(target);
+            const char* entity_id = has_data ? x64_to_str(entity_info_id(target), NULL, 0) : "";
+            v2d_t sp = has_data ? entity_info_spawnpoint(target) : v2d_new(0, 0);
             font_set_text(editor_tooltip_font, "<color=$COLOR_HIGHLIGHT>%s</color>\n%d,%d\n%s\n%s", surgescript_object_name(target), (int)sp.x, (int)sp.y, entity_id, editor_tooltip_ssproperties(target));
             font_set_position(editor_tooltip_font, scripting_util_world_position(target));
             font_set_visible(editor_tooltip_font, true);
@@ -4561,17 +4874,22 @@ editor_action_t editor_action_entity_new(int is_new_object, enum editor_entity_t
 
     /* are we removing a brick? Store its layer & flip flags */
     if(!is_new_object && obj_type == EDT_BRICK) {
-        brick_list_t *it, *brick_list = entitymanager_retrieve_all_bricks();
-        for(it=brick_list; it; it=it->next) {
-            if(brick_id(it->data) == o.obj_id) {
-                float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), o.obj_position));
+        iterator_t* it = brickmanager_retrieve_all_bricks(brick_manager);
+        while(iterator_has_next(it)) {
+            brick_t* brick = iterator_next(it);
+
+            if(brick_id(brick) == o.obj_id) {
+                v2d_t delta = v2d_subtract(brick_position(brick), o.obj_position);
+                float dist = v2d_magnitude(delta);
+
                 if(nearly_zero(dist)) {
-                    o.layer = brick_layer(it->data);
-                    o.flip = brick_flip(it->data);
-                    brick_kill(it->data);
+                    o.layer = brick_layer(brick);
+                    o.flip = brick_flip(brick);
+                    brick_kill(brick);
                 }
             }
         }
+        iterator_destroy(it);
     }
 
     return o;
@@ -4752,7 +5070,7 @@ void editor_action_redo()
 }
 
 /* commit action */
-void editor_action_commit(editor_action_t action)
+editor_action_t editor_action_commit(editor_action_t action)
 {
     if(action.type == EDA_NEWOBJECT) {
         /* new object */
@@ -4780,8 +5098,7 @@ void editor_action_commit(editor_action_t action)
                 surgescript_object_t* ssobj = level_create_object(editor_ssobj_name(action.obj_id), action.obj_position);
 
                 /* recover entity ID */
-                ssobj_extradata_t* data = get_ssobj_extradata(ssobj);
-                if(data != NULL) {
+                if(entity_info_exists(ssobj)) {
                     uint64_t recovered_id;
 
                     /* what is the ID to recover? */
@@ -4795,11 +5112,14 @@ void editor_action_commit(editor_action_t action)
                     /* enforce uniqueness */
                     if(recovered_id != 0) {
                         if(level_get_entity_by_id(x64_to_str(recovered_id, NULL, 0)) == NULL)
-                            data->entity_id = recovered_id;
+                            entity_info_set_id(ssobj, recovered_id);
                     }
                 }
                 editor_ssobj_picked_entity.id = 0;
                 editor_ssobj_picked_entity.name[0] = '\0';
+
+                /* change action.ssobj_id */
+                action.ssobj_id = entity_info_id(ssobj);
                 break;
             }
 
@@ -4833,15 +5153,19 @@ void editor_action_commit(editor_action_t action)
         switch(action.obj_type) {
             case EDT_BRICK: {
                 /* delete brick */
-                brick_list_t *brick_list = entitymanager_retrieve_all_bricks(); /* FIXME: retrieve relevant entities only? */
-                for(brick_list_t *it = brick_list; it != NULL; it = it->next) {
-                    if(brick_id(it->data) == action.obj_id) {
-                        float dist = v2d_magnitude(v2d_subtract(brick_position(it->data), action.obj_position));
+                iterator_t* it = brickmanager_retrieve_all_bricks(brick_manager);
+                while(iterator_has_next(it)) {
+                    brick_t* brick = iterator_next(it);
+
+                    if(brick_id(brick) == action.obj_id) {
+                        v2d_t delta = v2d_subtract(brick_position(brick), action.obj_position);
+                        float dist = v2d_magnitude(delta);
+
                         if(nearly_zero(dist))
-                            brick_kill(it->data);
+                            brick_kill(brick);
                     }
                 }
-                entitymanager_release_retrieved_brick_list(brick_list);
+                iterator_destroy(it);
                 break;
             }
 
@@ -4855,7 +5179,7 @@ void editor_action_commit(editor_action_t action)
                             it->data->state = IS_DEAD;
                     }
                 }
-                entitymanager_release_retrieved_item_list(item_list);
+                item_list = entitymanager_release_retrieved_item_list(item_list);
                 break;
             }
 
@@ -4869,7 +5193,7 @@ void editor_action_commit(editor_action_t action)
                             it->data->state = ES_DEAD;
                     }
                 }
-                entitymanager_release_retrieved_object_list(enemy_list);
+                enemy_list = entitymanager_release_retrieved_object_list(enemy_list);
                 break;
             }
 
@@ -4880,7 +5204,7 @@ void editor_action_commit(editor_action_t action)
 
             case EDT_SSOBJ: {
                 /* delete SurgeScript entity */
-                surgescript_object_traverse_tree_ex(level_ssobject(), &action, editor_remove_ssobj);
+                editor_remove_entity(action.ssobj_id);
                 break;
             }
         }
@@ -4903,126 +5227,49 @@ void editor_action_commit(editor_action_t action)
         /* restore waterlevel */
         level_set_waterlevel(action.obj_old_position.y);
     }
+
+    /* return a possibly changed action */
+    return action;
 }
 
-bool editor_remove_ssobj(surgescript_object_t* object, void* data)
+void editor_remove_entity(uint64_t entity_id)
 {
-    if(surgescript_object_is_active(object)) {
-        if(is_ssobj_spawned_in_the_editor(object)) {
-            const char* object_name = surgescript_object_name(object);
-            editor_action_t *action = (editor_action_t*)data;
-            if(editor_ssobj_index(object_name) == action->obj_id) {
-                v2d_t delta = v2d_subtract(scripting_util_world_position(object), action->obj_position);
-                if(nearly_zero(v2d_magnitude(delta))) {
-                    surgescript_object_kill(object);
-                    clear_ssobj_extradata(object);
-                }
-            }
+    surgescript_object_t* entity_manager = entitymanager_ssobject();
+    surgescript_objectmanager_t* manager = surgescript_object_manager(entity_manager);
+    surgescript_objecthandle_t entity_handle = entitymanager_find_entity_by_id(entity_manager, entity_id);
+
+    if(surgescript_objectmanager_exists(manager, entity_handle)) {
+        surgescript_object_t* entity = surgescript_objectmanager_get(manager, entity_handle);
+
+        surgescript_object_kill(entity);
+        entity_info_remove(entity);
+    }
+    else
+        video_showmessage("Can't remove entity %llx", entity_id);
+}
+
+void editor_pick_entity(surgescript_object_t* object, surgescript_object_t** best_candidate)
+{
+    if(entity_info_is_persistent(object) && !surgescript_object_has_tag(object, "detached")) {
+        v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+        float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x , editor_cursor.y + topleft.y };
+
+        /* find the bounding box of the entity */
+        const char* name = surgescript_object_name(object);
+        const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
+        const image_t* img = animation_image(anim, 0);
+        v2d_t worldpos = scripting_util_world_position(object);
+        v2d_t hot_spot = animation_hot_spot(anim);
+        a[0] = worldpos.x - hot_spot.x;
+        a[1] = worldpos.y - hot_spot.y;
+        a[2] = a[0] + image_width(img);
+        a[3] = a[1] + image_height(img);
+
+        /* got collision between the cursor and the entity */
+        if(bounding_box(a, b)) {
+            if(NULL == *best_candidate || scripting_util_object_zindex(object) >= scripting_util_object_zindex(*best_candidate))
+                *best_candidate = object;
         }
-
-        return true;
     }
-    else
-        return false;
-}
-
-bool editor_pick_ssobj(surgescript_object_t* object, void* data)
-{
-    if(surgescript_object_is_active(object)) {
-        if(is_ssobj_spawned_in_the_editor(object)) {
-            v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-            float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-            float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x , editor_cursor.y + topleft.y };
-
-            /* find the bounding box of the entity */
-            const char* name = surgescript_object_name(object);
-            const animation_t* anim = sprite_animation_exists(name, 0) ? sprite_get_animation(name, 0) : sprite_get_animation(NULL, 0);
-            const image_t* img = sprite_get_image(anim, 0);
-            v2d_t worldpos = scripting_util_world_position(object);
-            v2d_t hot_spot = anim->hot_spot;
-            a[0] = worldpos.x - hot_spot.x;
-            a[1] = worldpos.y - hot_spot.y;
-            a[2] = a[0] + image_width(img);
-            a[3] = a[1] + image_height(img);
-
-            /* got collision between the cursor and the entity */
-            if(bounding_box(a, b)) {
-                surgescript_object_t** result = (surgescript_object_t**)data;
-                if(NULL == *result || scripting_util_object_zindex(object) >= scripting_util_object_zindex(*result))
-                    *result = object;
-            }
-        }
-
-        return true;
-    }
-    else
-        return false;
-}
-
-
-
-/* extradata: extra metadata for SurgeScript objects */
-v2d_t get_ssobj_spawnpoint(const surgescript_object_t* object)
-{
-    ssobj_extradata_t* data = get_ssobj_extradata(object);
-    return data != NULL ? data->spawn_point : v2d_new(0, 0);
-}
-
-uint64_t get_ssobj_id(const surgescript_object_t* object)
-{
-    ssobj_extradata_t* data = get_ssobj_extradata(object);
-    return data != NULL ? data->entity_id : 0;
-}
-
-int is_ssobj_spawned_in_the_editor(const surgescript_object_t* object)
-{
-    ssobj_extradata_t* data = get_ssobj_extradata(object);
-    return data != NULL ? data->spawned_in_the_editor : FALSE;
-}
-
-int is_ssobj_sleeping(const surgescript_object_t* object)
-{
-    ssobj_extradata_t* data = get_ssobj_extradata(object);
-    return data != NULL ? data->sleeping : FALSE;
-}
-
-/* Get the editor data of a given object
-   It may return NULL (if no such data exists) */
-ssobj_extradata_t* get_ssobj_extradata(const surgescript_object_t* object)
-{
-    surgescript_objecthandle_t key = surgescript_object_handle(object);
-    return fasthash_get(ssobj_extradata, key); /* may be NULL */
-}
-
-void store_ssobj_extradata(const surgescript_object_t* object, ssobj_extradata_t extradata)
-{
-    surgescript_objecthandle_t key = surgescript_object_handle(object);
-    ssobj_extradata_t* data = fasthash_get(ssobj_extradata, key);
-
-    if(data == NULL) {
-        data = mallocx(sizeof *data);
-        *data = extradata;
-        fasthash_put(ssobj_extradata, key, data);
-    }
-    else
-        *data = extradata;
-
-    (void)is_ssobj_sleeping;
-}
-
-void clear_ssobj_extradata(const surgescript_object_t* object)
-{
-    surgescript_objecthandle_t key = surgescript_object_handle(object);
-    fasthash_delete(ssobj_extradata, key);
-}
-
-void free_ssobj_extradata(void* data)
-{
-    free(data);
-}
-
-bool match_ssobj_id(const void* value, void* data)
-{
-    ssobj_extradata_t* entry = (ssobj_extradata_t*)value;
-    return entry->entity_id == *((uint64_t*)data);
 }

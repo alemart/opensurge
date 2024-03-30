@@ -16,7 +16,7 @@ object "Spikes" is "entity", "basic"
 
     actor = Actor("Spikes");
     brick = Brick("Spikes Mask");
-    collider = CollisionBox(24, 8);
+    collider = CollisionBox(28, 10);
     sfx = Sound("samples/spikes.wav");
     appearSfx = Sound("samples/spikes_appearing.wav");
     disappearSfx = Sound("samples/spikes_disappearing.wav");
@@ -58,8 +58,10 @@ object "Spikes" is "entity", "basic"
 
     fun onOverlap(otherCollider)
     {
-        if(otherCollider.entity.hasTag("player"))
-            hit(otherCollider.entity);
+        if(otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            hit(player);
+        }
     }
 
     fun hit(player)
@@ -68,6 +70,10 @@ object "Spikes" is "entity", "basic"
             !player.blinking && !player.dying &&
             !player.invincible && !player.hit
         ) {
+            // do not hit if the player is midair
+            if(player.midair || player.ysp < 0)
+                return;
+
             // adjust player position
             if(player.collider.bottom > collider.top) {
                 dy = player.collider.bottom - player.transform.position.y;
@@ -88,7 +94,7 @@ object "Spikes Down" is "entity", "basic"
     actor = Actor("Spikes Down");
     brick = Brick("Spikes Down Mask");
     sfx = Sound("samples/spikes.wav");
-    collider = CollisionBox(24, 8);
+    collider = CollisionBox(28, 10);
     appearSfx = Sound("samples/spikes_appearing.wav");
     disappearSfx = Sound("samples/spikes_disappearing.wav");
     period = 8.0; // period of one appear-disappear cycle, in seconds
@@ -128,8 +134,10 @@ object "Spikes Down" is "entity", "basic"
 
     fun onOverlap(otherCollider)
     {
-        if(otherCollider.entity.hasTag("player"))
-            hit(otherCollider.entity);
+        if(otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            hit(player);
+        }
     }
 
     fun hit(player)

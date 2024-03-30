@@ -74,11 +74,11 @@ object "ThrowingMarmot" is "behavior"
     fun get_lockedOn() {
       return locked_player != null;
     }
-    fun throwWeapon(name) {
+    fun throwWeapon(name, position) {
       if (locked_player && activeWeapon == null) {
         target_point = locked_player.transform.position;
         locked_player = null;
-        new_weapon = Level.spawn(name);
+        new_weapon = Level.spawnEntity(name, position);
         new_weapon.target = target_point;
         activeWeapon = new_weapon;
         return new_weapon;
@@ -150,10 +150,7 @@ object "RedMarmotChain" is "entity", "private", "awake"
         }
       } else {
         /* show that the chain was deactivated */
-        explosion = Level.spawn("Explosion");
-        exp_transform = explosion.child("Transform")
-                     || explosion.spawn("Transform");
-        exp_transform.position = transform.position;
+        explosion = Level.spawnEntity("Explosion", transform.position);
         destroy();
       }
     }
@@ -259,12 +256,11 @@ object "RedMarmot" is "entity", "enemy"
     {
       // wait for end of throwing animation
       if (actor.animation.finished) {
-        new_weapon = carrythrower.throwWeapon("RedMarmotChain");
+        position = transform.position.translatedBy(0,-20);
+        new_weapon = carrythrower.throwWeapon("RedMarmotChain", position);
         if (new_weapon) {
           //Console.print("weapon away!");
           // only initialize the chain if new
-          new_weapon.transform.position =
-            transform.position.translatedBy(0,-20);
           if (platformer.direction > 0) {
             new_weapon.direction = Vector2(+1,0);
           } else {

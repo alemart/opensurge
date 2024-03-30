@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * nanocalcext.c - nanocalc extensions
- * Copyright (C) 2010-2012  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ static const struct tm* timeinfo() { time_t raw = time(NULL); return localtime(&
 static int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, object_list_t *os, v2d_t offset);
 
 /* BIFs */
-static float f_elapsed_time() { return 0.001f * timer_get_ticks(); } /* elapsed time, in seconds */
+static float f_elapsed_time() { return timer_get_elapsed(); } /* elapsed time, in seconds */
 static float f_dt() { return timer_get_delta(); } /* time difference between 2 consecutive frames */
 static float f_fps() { return (float)video_fps(); } /* frames per second */
 static float f_collectibles() { return (float)player_get_collectibles(); } /* number of collectibles */
@@ -64,12 +64,12 @@ static float f_alpha() { return target->actor->alpha; } /* alpha of the target o
 static float f_angle() { return target->actor->angle * 57.2957795131f; } /* angle of the target object */
 static float f_scale_x() { return target->actor->scale.x; } /* scale x */
 static float f_scale_y() { return target->actor->scale.y; } /* scale y */
-static float f_animation_frame() { return floor(target->actor->animation_frame); } /* animation frame */
+static float f_animation_frame() { return actor_animation_frame(target->actor); } /* animation frame */
 static float f_animation_speed_factor() { return target->actor->animation_speed_factor; }
-static float f_animation_repeats() { return target->actor->animation->repeat ? 1.0f : 0.0f; }
-static float f_animation_fps() { return (float)target->actor->animation->fps; }
-static float f_animation_frame_count() { return (float)target->actor->animation->frame_count; }
-static float f_animation_id() { return (float)target->actor->animation->id; }
+static float f_animation_repeats() { return animation_repeats(target->actor->animation) ? 1.0f : 0.0f; }
+static float f_animation_fps() { return animation_fps(target->actor->animation); }
+static float f_animation_frame_count() { return animation_frame_count(target->actor->animation); }
+static float f_animation_id() { return animation_id(target->actor->animation); }
 static float f_zindex() { return target->zindex; }
 static float f_spawnpoint_x() { return target->actor->spawn_point.x; }
 static float f_spawnpoint_y() { return target->actor->spawn_point.y; }
@@ -78,13 +78,13 @@ static float f_screen_height() { return (float)VIDEO_SCREEN_H; }
 static float f_width() { return image_width(actor_image(target->actor)); }
 static float f_height() { return image_height(actor_image(target->actor)); }
 static float f_direction() { return target->actor->mirror & IF_HFLIP ? -1.0f : 1.0f; }
-static float f_player_xpos() { return PLAYER->actor->position.x; }
-static float f_player_ypos() { return PLAYER->actor->position.y; }
+static float f_player_xpos() { return player_position(PLAYER).x; }
+static float f_player_ypos() { return player_position(PLAYER).y; }
 static float f_player_spawnpoint_x() { return PLAYER->actor->spawn_point.x; }
 static float f_player_spawnpoint_y() { return PLAYER->actor->spawn_point.y; }
-static float f_player_xspeed() { return PLAYER->actor->speed.x; }
-static float f_player_yspeed() { return PLAYER->actor->speed.y; }
-static float f_player_angle() { return PLAYER->actor->angle * 57.2957795131f; }
+static float f_player_xspeed() { return player_speed(PLAYER); }
+static float f_player_yspeed() { return player_ysp(PLAYER); }
+static float f_player_angle() { return player_angle(PLAYER) * 57.2957795131f; }
 static float f_player_direction() { return PLAYER->actor->mirror & IF_HFLIP ? -1.0f : 1.0f; }
 static float f_player_seconds_remaining_to_drown() { return player_seconds_remaining_to_drown(PLAYER); }
 static float f_music_volume() { return music_get_volume(); }
@@ -205,7 +205,7 @@ int obstacle_exists(object_t *o, brick_list_t *bs, item_list_t *is, object_list_
 {
     actor_t *me = o->actor, *other;
     v2d_t p = v2d_add(me->position, offset);
-    image_t *img;
+    const image_t *img;
 
     if(!actor_brick_at(me, bs, offset)) {
         for(; is; is = is->next) {

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * background.h - level background/foreground
- * Copyright (C) 2010, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,16 +21,19 @@
 #ifndef _BACKGROUND_H
 #define _BACKGROUND_H
 
-#include "../core/v2d.h"
+#include "../util/v2d.h"
 
 typedef struct bgtheme_t bgtheme_t;
 
 bgtheme_t* background_load(const char *filepath); /* loads a bg/fg theme from a .bg file */
 bgtheme_t* background_unload(bgtheme_t *bgtheme); /* unloads the bg/fg theme */
+
 void background_update(bgtheme_t *bgtheme); /* updates the given theme */
-void background_render_bg(const bgtheme_t *bgtheme, v2d_t camera_position); /* renders the background */
-void background_render_fg(const bgtheme_t *bgtheme, v2d_t camera_position); /* renders the foreground */
+void background_render_bg(bgtheme_t *bgtheme, v2d_t camera_position); /* renders the background */
+void background_render_fg(bgtheme_t *bgtheme, v2d_t camera_position); /* renders the foreground */
+
 const char* background_filepath(const bgtheme_t *bgtheme); /* get the filepath of the background */
+int background_number_of_bg_layers(const bgtheme_t* bgtheme); /* number of background layers */
+int background_number_of_fg_layers(const bgtheme_t* bgtheme); /* number of foreground layers */
 
 #endif
-

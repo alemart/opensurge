@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * global.h - global definitions
- * Copyright (C) 2008-2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,51 +26,85 @@
 #define GAME_TITLE              "Open Surge Engine"
 #define GAME_VERSION_SUP        0
 #define GAME_VERSION_SUB        6
-#define GAME_VERSION_WIP        0
+#define GAME_VERSION_WIP        1
 #define GAME_VERSION_FIX        0
 #define GAME_WEBSITE            "opensurge2d.org"
-#define GAME_YEAR               "2008-2022"
+#define GAME_URL                "http://" GAME_WEBSITE
+#define GAME_YEAR               "2008-2024"
 
-/* Scripting */
-#define SURGESCRIPT_MIN_VERSION "0.5.5"
-
-/* if the following is defined, this is a development build */
-/*#define GAME_BUILD_VERSION      1337-dev*/
-
-/* Data folder (game assets) */
-#if !defined(GAME_DATADIR)
-#define GAME_DATADIR            "/usr/share/games/opensurge"
+/* Build date */
+#ifndef GAME_BUILD_DATE
+#define GAME_BUILD_DATE         "undefined"
 #endif
 
+/* Build version */
+#ifdef GAME_BUILD_VERSION
+#define _GAME_BUILD_VERSION     "-" GAME_BUILD_VERSION
+#else
+#define GAME_BUILD_VERSION      ""
+#define _GAME_BUILD_VERSION     ""
+#endif
+
+/* "Fix" version */
+#if GAME_VERSION_FIX != 0
+#define _GAME_VERSION_FIX       "." STRINGIFY(GAME_VERSION_FIX)
+#else
+#define _GAME_VERSION_FIX       ""
+#endif
+
+/* Version code & string */
+#define GAME_VERSION_STRING     STRINGIFY(GAME_VERSION_SUP) "." STRINGIFY(GAME_VERSION_SUB) "." STRINGIFY(GAME_VERSION_WIP) _GAME_VERSION_FIX _GAME_BUILD_VERSION /* must include GAME_BUILD_VERSION (to help differentiate between builds at runtime) */
+#define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (to preserve compatibility) */
+#define VERSION_CODE(x,y,z)     VERSION_CODE_EX((x), (y), (z), 0)
+#define VERSION_CODE_EX(x,y,z,w) ((x) * 1000000 + (y) * 10000 + (z) * 100 + (w))
+
+/* Platform name */
+#if defined(_WIN32)
+#define GAME_PLATFORM_NAME      "Windows"
+#elif defined(__APPLE__) && defined(__MACH__)
+#define GAME_PLATFORM_NAME      "macOS"
+#elif defined(__ANDROID__)
+#define GAME_PLATFORM_NAME      "Android"
+#elif defined(__linux__) || defined(__linux)
+#define GAME_PLATFORM_NAME      "Linux"
+#elif defined(__unix__) || defined(__unix)
+#define GAME_PLATFORM_NAME      "Unix"
+#else
+#define GAME_PLATFORM_NAME      "Unknown"
+#endif
+
+/* Copyright text */
+#define GAME_COPYRIGHT "" \
+    "Open Surge Engine\n" \
+    "Copyright (C) " GAME_YEAR " Alexandre Martins " \
+    "< " GAME_URL " >"
+
+/* Minimum version of SurgeScript */
+#define SURGESCRIPT_MIN_SUP     0
+#define SURGESCRIPT_MIN_SUB     6
+#define SURGESCRIPT_MIN_WIP     0
+#define SURGESCRIPT_MIN_VERSION STRINGIFY(SURGESCRIPT_MIN_SUP) "." STRINGIFY(SURGESCRIPT_MIN_SUB) "." STRINGIFY(SURGESCRIPT_MIN_WIP)
+
+/* Minimum version of Allegro */
+#if !defined(__ANDROID__)
+#define ALLEGRO_MIN_SUP         5
+#define ALLEGRO_MIN_SUB         2
+#define ALLEGRO_MIN_WIP         7
+#else
+#define ALLEGRO_MIN_SUP         5
+#define ALLEGRO_MIN_SUB         2
+#define ALLEGRO_MIN_WIP         9
+#endif
+#define ALLEGRO_MIN_VERSION_INT ((ALLEGRO_MIN_SUP << 24) | (ALLEGRO_MIN_SUB << 16) | (ALLEGRO_MIN_WIP << 8))
+#define ALLEGRO_MIN_VERSION_STR STRINGIFY(ALLEGRO_MIN_SUP) "." STRINGIFY(ALLEGRO_MIN_SUB) "." STRINGIFY(ALLEGRO_MIN_WIP)
+
 /* Utilities */
-#define VERSION_CODE(X,Y,Z)     ((X) * 10000 + (Y) * 100 + (Z))
-#define VERSION_STRING(X,Y,Z)   STRINGIFY(X) "." STRINGIFY(Y) "." STRINGIFY(Z)
 #define STRINGIFY(x)            _STRINGIFY(x)
 #define _STRINGIFY(x)           #x
 
-/* Version code */
-#define GAME_VERSION_CODE       VERSION_CODE(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) /* must not include GAME_VERSION_FIX (preserve compatibility) */
-
-/* Version string */
-#if !defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX == 0 /* stable version */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP)
-#elif !defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX != 0 /* stable version with patch */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX)
-#elif defined(GAME_BUILD_VERSION) && GAME_VERSION_FIX == 0 /* development version */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "-" STRINGIFY(GAME_BUILD_VERSION)
-#else /* development version */
-#define GAME_VERSION_STRING     VERSION_STRING(GAME_VERSION_SUP, GAME_VERSION_SUB, GAME_VERSION_WIP) "." STRINGIFY(GAME_VERSION_FIX) "-" STRINGIFY(GAME_BUILD_VERSION)
-#endif
-
 /* Legacy constants */
-#ifdef TRUE
 #undef TRUE
-#endif
-
-#ifdef FALSE
 #undef FALSE
-#endif
-
 #define TRUE                    1
 #define FALSE                   0
 

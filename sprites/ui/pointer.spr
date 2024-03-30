@@ -10,12 +10,34 @@ sprite "UI Pointer"
     source_file     "images/core.png"
     source_rect     236 12 7 8
     frame_size      7 8
-    hot_spot        -5 -3
+    hot_spot        15 -3
 
     animation 0
     {
         repeat      TRUE
         fps         8
         data        0
+        play        "horizontal movement"
+    }
+
+    keyframes "horizontal movement"
+    {
+        duration            1.0
+        easing              "ease_in_out"
+
+        keyframe 0%
+        {
+            translation     3 0
+        }
+
+        keyframe 50%
+        {
+            translation     -3 0
+        }
+
+        keyframe 100%
+        {
+            translation     3 0
+        }
     }
 }

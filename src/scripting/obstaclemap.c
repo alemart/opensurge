@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * obstaclemap.c - scripting system: the bridge between level obstacles and SurgeScript
- * Copyright (C) 2018, 2019 Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,22 +19,17 @@
  */
 
 #include <surgescript.h>
-#include <stdbool.h>
-#include "../core/v2d.h"
-#include "../core/image.h"
-#include "../entities/brick.h"
-#include "../entities/entitymanager.h"
+#include "../core/video.h"
 #include "../physics/obstacle.h"
 #include "../physics/obstaclemap.h"
-#include "../physics/collisionmask.h"
 #include "../scenes/level.h"
-#include "../entities/player.h"
 
 /* private */
+#define STORE_EMPTY_OBSTACLEMAP 0
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object);
+const obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object);
 
 /*
  * scripting_register_obstaclemap()
@@ -52,11 +47,19 @@ void scripting_register_obstaclemap(surgescript_vm_t* vm)
  * scripting_obstaclemap_ptr()
  * Get the obstaclemap_t*
  */
-obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object)
+const obstaclemap_t* scripting_obstaclemap_ptr(const surgescript_object_t* object)
 {
-    player_t* player = level_player();
-    obstaclemap_t* emptymap = (obstaclemap_t*)surgescript_object_userdata(object);
-    return player != NULL ? player->obstaclemap : emptymap;
+    const obstaclemap_t* obstaclemap = level_obstaclemap();
+
+#if STORE_EMPTY_OBSTACLEMAP
+    /* this shouldn't happen */
+    if(obstaclemap == NULL) {
+        video_showmessage("ObstacleMap is NULL");
+        return (const obstaclemap_t*)surgescript_object_userdata(object);
+    }
+#endif
+
+    return obstaclemap;
 }
 
 /* private */
@@ -71,18 +74,28 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+#if !(STORE_EMPTY_OBSTACLEMAP)
+    /* do nothing */
+    return NULL;
+#else
     /* create an empty obstacle map */
     obstaclemap_t* obstaclemap = obstaclemap_create();
     surgescript_object_set_userdata(object, obstaclemap);
     return NULL;
+#endif
 }
 
 /* destructor */
 surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
+#if !(STORE_EMPTY_OBSTACLEMAP)
+    /* do nothing */
+    return NULL;
+#else
     /* destroy the obstacle map */
-    obstaclemap_t* obstaclemap = scripting_obstaclemap_ptr(object);
+    obstaclemap_t* obstaclemap = (obstaclemap_t*)surgescript_object_userdata(object);
     obstaclemap_destroy(obstaclemap);
     surgescript_object_set_userdata(object, NULL);
     return NULL;
+#endif
 }

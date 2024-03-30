@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * quest.h - quest module
- * Copyright (C) 2008-2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,37 +21,39 @@
 #ifndef _QUEST_H
 #define _QUEST_H
 
-struct image_t;
-#define QUEST_MAXLEVELS 1024
+#include <stdbool.h>
 
 /*
-   quest_t* contains all the data relevant to
-   a quest (including name, author and list of
-   levels), but it does nothing for itself.
 
-   The quest scene is used to dispatch the
-   player to the correct levels.
-   (see ../scenes/quest.h)
+A quest is an immutable list specified in a .qst
+file stored in the quests/ folder. An entry of such
+a list may be:
+
+a) a level, i.e., a .lev file stored in levels/
+b) another quest, i.e., a .qst file
+c) a built-in scene of the engine
+
+The quest scene is used to dispatch the player
+to the appropriate scenes (see ../scenes/quest.h).
+
 */
 
-/* quest structure */
 typedef struct quest_t quest_t;
-struct quest_t {
-    /* meta data */
-    char *file; /* quest file */
-    char *name; /* quest name */
-    char *author; /* author */
-    char *version; /* version string */
-    char *description; /* description */
-    struct image_t *image; /* thumbnail */
-    int is_hidden; /* this quest should not be shown in the custom quests menu */
 
-    /* quest data */
-    int level_count; /* how many levels? */
-    char *level_path[QUEST_MAXLEVELS]; /* relative paths of the levels */
-};
+/* instantiation */
+quest_t* quest_load(const char* filepath); /* relative filepath */
+quest_t* quest_unload(quest_t* quest);
 
-quest_t *quest_load(const char *filepath); /* relative filepath */
-quest_t *quest_unload(quest_t *qst);
+/* quest properties */
+const char* quest_name(const quest_t* quest);
+const char* quest_file(const quest_t* quest);
+
+/* entries of the quest */
+int quest_entry_count(const quest_t* quest);
+const char* quest_entry_path(const quest_t* quest, int index); /* index = 0, 1, 2... */
+int quest_index_of_entry(const quest_t* quest, const char* filepath);
+bool quest_entry_is_level(const quest_t* quest, int index);
+bool quest_entry_is_quest(const quest_t* quest, int index);
+bool quest_entry_is_builtin_scene(const quest_t* quest, int index);
 
 #endif

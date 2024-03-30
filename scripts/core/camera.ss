@@ -24,57 +24,69 @@ object "Default Camera" is "entity", "awake", "private"
 
     state "main"
     {
-        // compute the delta
-        delta = player.transform.position.minus(transform.position);
-
-        // move within a box
-        if(delta.x > 8)
-            transform.translateBy(Math.min(16, delta.x - 8), 0);
-        else if(delta.x < -8)
-            transform.translateBy(Math.max(-16, delta.x + 8), 0);
-        if(player.midair || player.frozen) {
-            if(delta.y > 32)
-                transform.translateBy(0, Math.min(16, delta.y - 32));
-            else if(delta.y < -32)
-                transform.translateBy(0, Math.max(-16, delta.y + 32));
-        }
-        else {
-            dy = Math.abs(player.gsp) >= 360 ? 16 : 6;
-            if(delta.y >= 1)
-                transform.translateBy(0, Math.min(dy, delta.y - 1));
-            else if(delta.y <= -1)
-                transform.translateBy(0, Math.max(-dy, delta.y + 1));
-        }
-
-        // switched player?
-        if(Player.active != player) {
-            player = Player.active;
-            centerCamera(player.transform.position);
-        }
-
-        // camera too far away? (e.g., player teleported)
-        if(delta.length > 2 * Screen.width)
-            centerCamera(player.transform.position);
-
-        // freeze camera
-        if(player.dying || Level.cleared)
-            state = "frozen";
-
-        // update camera
-        refresh();
     }
 
     state "frozen"
     {
-        // update camera
-        refresh();
+        // unfreeze if the player ressurrects
+        if(!player.dying)
+            state = "main";
     }
 
-    fun constructor()
+    fun lateUpdate()
     {
-        centerCamera(player.transform.position);
-        actor.zindex = 9999;
-        actor.visible = false;
+        if(state != "frozen") {
+
+            // compute the delta
+            delta = player.transform.position.minus(transform.position);
+
+            // compute a dynamic speed cap
+            // the camera will lag behind if the player is too fast
+            cap = 16; // suitable when |gsp| <= 960 px/s (default cap speed)
+            if(Math.abs(player.speed) > 960) {
+                // don't let the player move too far away from the camera (ROI)
+                if(Math.abs(delta.x - 8) >= Screen.width / 2 + 100)
+                    cap = Math.abs(player.speed) / 60;
+            }
+
+            // move within a box
+            if(delta.x > 8)
+                transform.translateBy(Math.min(cap, delta.x - 8), 0);
+            else if(delta.x < -8)
+                transform.translateBy(Math.max(-cap, delta.x + 8), 0);
+
+            if(player.midair || player.frozen) {
+                if(delta.y > 32)
+                    transform.translateBy(0, Math.min(cap, delta.y - 32));
+                else if(delta.y < -32)
+                    transform.translateBy(0, Math.max(-cap, delta.y + 32));
+            }
+            else {
+                dy = Math.abs(player.gsp) >= 480 ? cap : 6;
+                if(delta.y >= 1)
+                    transform.translateBy(0, Math.min(dy, delta.y - 1));
+                else if(delta.y <= -1)
+                    transform.translateBy(0, Math.max(-dy, delta.y + 1));
+            }
+
+            // switched player?
+            if(Player.active != player) {
+                player = Player.active;
+                centerCamera(player.transform.position);
+            }
+
+            // camera too far away? (e.g., player teleported)
+            if(delta.length > 2 * Screen.width)
+                centerCamera(player.transform.position);
+
+            // freeze camera
+            if(player.dying)
+                state = "frozen";
+
+        }
+
+        // update the camera
+        refresh();
     }
 
     fun centerCamera(position)
@@ -108,6 +120,13 @@ object "Default Camera" is "entity", "awake", "private"
         }
 
         Camera.position = transform.position.translatedBy(offset.x, offset.y + upDown.offset);
+    }
+
+    fun constructor()
+    {
+        centerCamera(player.transform.position);
+        actor.zindex = 9999;
+        actor.visible = false;
     }
 }
 

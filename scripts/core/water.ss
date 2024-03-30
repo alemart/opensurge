@@ -14,6 +14,7 @@ using SurgeEngine.Audio.Sound;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Camera;
+using SurgeEngine.Collisions.CollisionBall;
 
 // how to spawn a Water Bubble:
 // bubble = Level.spawnEntity("Water Bubble", position).setSize("xs" | "sm" | "md" | "lg");
@@ -24,8 +25,11 @@ object "Water Bubble" is "entity", "private", "disposable"
     transform = Transform();
     amplitude = 2 + Math.random() * 2;
     bubble = Actor("Water Bubble");
-    hy = 16; t = 0;
-    components = null;
+    collider = null;
+    twoPi = Math.pi * 2;
+    phi = twoPi * Math.random();
+    t = 0;
+    hy = 16;
 
     state "main"
     {
@@ -34,9 +38,12 @@ object "Water Bubble" is "entity", "private", "disposable"
 
     state "move"
     {
+        // timer
+        dt = Time.delta;
+        t += dt;
+
         // move upwards
-        dt = Time.delta; t += dt;
-        transform.translateBy((amplitude * 6.2832) * Math.cos(6.2832 * t) * dt, -30 * dt); // chain rule
+        transform.translateBy((amplitude * twoPi) * Math.cos(twoPi * t + phi) * dt, -30 * dt); // chain rule
 
         // got out of water?
         if(transform.position.y - hy < Level.waterlevel)
@@ -57,6 +64,7 @@ object "Water Bubble" is "entity", "private", "disposable"
         hy = bubble.animation.hotSpot.y / 2;
     }
 
+    // burst the bubble
     fun burst()
     {
         bubble.anim = 2;
@@ -85,14 +93,43 @@ object "Water Bubble" is "entity", "private", "disposable"
         return this;
     }
 
+    // make the bubble breathable
+    fun makeBreathable()
+    {
+        if(collider !== null)
+            return this;
+
+        collider = CollisionBall(10);
+        return this;
+    }
+
     // dynamically add components
+    // (this function is obsolete since v0.6.1. It is kept for backwards compatibility)
     fun addComponent(componentName)
     {
-        newComponent = spawn(componentName);
-        if(components == null)
-            components = [];
-        components.push(newComponent);
+        makeBreathable(); // no components other than "BreathableBubble" were available
         return this;
+    }
+
+    // breathe the bubble
+    fun onOverlap(otherCollider)
+    {
+        // wait for the bubble to grow
+        if(t < 2.0)
+            return;
+
+        // breathe
+        if(otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            if(player.shield != "water") {
+                player.breathe();
+                this.burst();
+
+                // since the bubble takes a little while to burst,
+                // two players can breathe the same bubble! Looks nice!
+                //collider.enabled = false;
+            }
+        }
     }
 }
 
@@ -142,14 +179,29 @@ object "Water Surface" is "entity", "private", "awake"
 // --------------------------------------------------------------
 
 // this object controls water behavior: bubbles, breathing timer, and so on
-object "Water Controller"
+object "Water Controller" is "private", "awake", "detached", "entity"
 {
-    breathingBehavior = spawn("WaterController.BreathingBehavior");
     underwaterTimer = spawn("WaterController.UnderwaterTimer");
-    splashListener = spawn("WaterController.SplashListener");
     surfaceAnimation = spawn("WaterController.SurfaceAnimation");
+    breathingBehaviors = [];
+    splashListeners = [];
 
     state "main"
+    {
+        for(i = Player.count - 1; i >= 0; i--) {
+            player = Player[i];
+
+            splashListener = player.spawn("WaterController.SplashListener");
+            splashListeners.push(splashListener);
+
+            breathingBehavior = player.spawn("WaterController.BreathingBehavior");
+            breathingBehaviors.push(breathingBehavior);
+        }
+
+        state = "done";
+    }
+
+    state "done"
     {
     }
 }
@@ -157,28 +209,30 @@ object "Water Controller"
 // splash listener: creates a splash whenever the player gets underwater
 object "WaterController.SplashListener"
 {
+    player = parent;
+
     state "main"
     {
-        state = Player.active.underwater ? "underwater" : "out of water";
+        state = player.underwater ? "underwater" : "out of water";
     }
 
     state "underwater"
     {
-        if(!Player.active.underwater) {
-            splash(Player.active);
+        if(!player.underwater) {
+            splash();
             state = "out of water";
         }
     }
 
     state "out of water"
     {
-        if(Player.active.underwater) {
-            splash(Player.active);
+        if(player.underwater) {
+            splash();
             state = "underwater";
         }
     }
 
-    fun splash(player)
+    fun splash()
     {
         if(player.frozen)
             return;
@@ -232,9 +286,9 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
 
             // breathing counter
             t = player.secondsToDrown;
-            if(t > 0 && t <= duration) {
+            if(t > 0 && t < duration) {
                 // show counter
-                counter.text = "<color=ff0055>" + Math.ceil(t * maxCounterValue / duration) + "</color>";
+                counter.text = "<color=ff0055>" + Math.floor(t * (1 + maxCounterValue) / duration) + "</color>";
                 counter.visible = true;
 
                 // music
@@ -267,15 +321,15 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
 // this object creates bubbles whenever the player is underwater
 object "WaterController.BreathingBehavior"
 {
+    player = parent;
     interval = 0;
 
     state "main"
     {
-        player = Player.active;
         if(player.underwater) {
             // spawn bubbles?
             if(timeout(interval) && player.shield != "water") {
-                createBubble(player);
+                createBubble();
                 state = "cooldown";
             }
 
@@ -293,13 +347,15 @@ object "WaterController.BreathingBehavior"
 
     state "drowning"
     {
-        player = Player.active;
         if(player.underwater) {
             if(timeout(0.1)) {
-                createDrownBubble(player);
+                createBiggerBubble();
                 state = "cooldownd";
             }
         }
+
+        if(!player.drowning)
+            state = "main"; // immortal player who has resurrected
     }
 
     state "cooldownd"
@@ -307,7 +363,7 @@ object "WaterController.BreathingBehavior"
         state = "drowning";
     }
 
-    fun createBubble(player)
+    fun createBubble()
     {
         position = player.transform.position;
         size = Math.random() <= 0.5 ? "xs" : "sm";
@@ -317,7 +373,7 @@ object "WaterController.BreathingBehavior"
         ).setSize(size);
     }
 
-    fun createDrownBubble(player)
+    fun createBiggerBubble()
     {
         position = player.transform.position;
         size = Math.random() <= 0.5 ? "md" : "sm";
@@ -332,9 +388,9 @@ object "WaterController.BreathingBehavior"
 object "WaterController.SurfaceAnimation"
 {
     surfaces = [
-        Level.spawn("Water Surface").setOffset(-1),
-        Level.spawn("Water Surface").setOffset(0),
-        Level.spawn("Water Surface").setOffset(1)
+        Level.spawnEntity("Water Surface", Vector2.zero).setOffset(-1),
+        Level.spawnEntity("Water Surface", Vector2.zero).setOffset(0),
+        Level.spawnEntity("Water Surface", Vector2.zero).setOffset(1)
     ];
 
     state "main"

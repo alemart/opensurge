@@ -15,10 +15,18 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2022-08-01"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_LASTUPDATE             "2023-03-11"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
+
+//
+// Modders:
+//
+// Add your strings to languages/extends/english.lng,
+// not to this file. Read languages/extends/README.txt
+// for more information.
+//
 
 //
 // Translators:
@@ -62,48 +70,72 @@ LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 //
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_TITLE>OPTIONS</color>"
-OPTIONS_YES                 "YES"
-OPTIONS_NO                  "NO"
-OPTIONS_GRAPHICS            "GRAPHICS"
+OPTIONS_TITLE               "OPTIONS"
+OPTIONS_GRAPHICS            "Graphics"
+OPTIONS_AUDIO               "Audio"
+OPTIONS_CONTROLS            "Controls"
+OPTIONS_GAME                "Game"
+OPTIONS_ENGINE              "Engine"
+OPTIONS_MODS                "MODs"
+OPTIONS_BACK                "Back"
+OPTIONS_YES                 "Yes"
+OPTIONS_NO                  "No"
+OPTIONS_ON                  "On" // alternatively: Enabled
+OPTIONS_OFF                 "Off" // alternatively: Disabled
 OPTIONS_FULLSCREEN          "Fullscreen"
 OPTIONS_RESOLUTION          "Screen size"
-OPTIONS_RESOLUTION_OPT1     "1×"
-OPTIONS_RESOLUTION_OPT2     "2×"
-OPTIONS_RESOLUTION_OPT3     "3×"
-OPTIONS_RESOLUTION_OPT4     "4×"
-OPTIONS_SMOOTHGFX           "Smooth graphics"
-OPTIONS_SMOOTHGFX_ERROR     "[32 bpp only]"
+OPTIONS_QUALITY             "Quality"
+OPTIONS_QUALITY_LOW         "Low"
+OPTIONS_QUALITY_MEDIUM      "Medium"
+OPTIONS_QUALITY_HIGH        "High"
 OPTIONS_FPS                 "Display FPS"
-OPTIONS_GAME                "GAME"
+OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Pixel scaler"
+OPTIONS_COMINGSOON          "Coming soon!"
+OPTIONS_VOLUME              "Volume"
+OPTIONS_MUTE                "Muted"
+OPTIONS_GAMEPADOPACITY      "Opacity"
 OPTIONS_GAMEPAD             "Use gamepad"
-OPTIONS_LANGUAGE            "Change language"
+OPTIONS_LANGUAGE            "Language"
 OPTIONS_STAGESELECT         "Stage select"
+OPTIONS_DEVELOPERMODE       "Developer mode"
 OPTIONS_CREDITS             "Open Surge Credits"
+OPTIONS_WEBSITE             "Visit Open Surge on the web"
 OPTIONS_DONATE              "Donate to Open Surge"
-OPTIONS_BACK                "BACK"
+OPTIONS_ABOUT               "About the engine"
+OPTIONS_SHARE               "Share the engine"
+OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
+OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
+OPTIONS_PLAYMOD             "Play a game"
+OPTIONS_PLAYMOD_NOTAGAME    "The selected item is not an Open Surge game!"
+OPTIONS_PLAYMOD_LEGACYERROR "Legacy Open Surge games are not supported."
+OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your gaming experience. Are you sure you want to disable it?"
+OPTIONS_MODSTORAGE          "Storage"
+OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
+OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
+OPTIONS_SUBMITFEEDBACK      "Submit feedback"
+OPTIONS_WRITEREVIEW         "Write a review"
+OPTIONS_RATEAPP             "Rate the app"
+OPTIONS_REPORTISSUE         "Report an issue"
+OPTIONS_BACKTOBASEGAME      "Go back to the base game"
 
 // Stage Select
-STAGESELECT_TITLE           "<color=$COLOR_TITLE>STAGE SELECT</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>DEVELOPER MODE</color>"
+STAGESELECT_TITLE           "STAGE SELECT"
+STAGESELECT_DEBUG           "DEVELOPER MODE"
 STAGESELECT_MSG             "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
 STAGESELECT_PAGE            "page $1/$2"
 STAGESELECT_ACT             "Zone"
 
-// Quest Select
-QUESTSELECT_TITLE           "<color=$COLOR_TITLE>QUEST SELECT</color>"
-QUESTSELECT_MSG             "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
-QUESTSELECT_PAGE            "page $1/$2"
-QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Version:</color> $1\n<color=$COLOR_HIGHLIGHT>Author:</color> $2\n<color=$COLOR_HIGHLIGHT>Description:</color> $3"
-
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>CREDITS</color>"
+CREDITS_TITLE               "CREDITS"
 CREDITS_BACK                "Press <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> to go back"
-CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME version $GAME_VERSION</color>\npowered by $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME version $ENGINE_VERSION</color>\npowered by $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>People</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Past members</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Thanks to</color>"
 CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
-CREDITS_JOAO                "Artist"
+CREDITS_JOAO                "Artist\nIllustrator"
 CREDITS_MATEUS              "Sound effects"
 CREDITS_CODY                "Concept artist\nEnemy designer"
 CREDITS_JOHAN               "Musician (rest in peace, friend)"
@@ -112,9 +144,9 @@ CREDITS_VICTOR              "Musician"
 CREDITS_M374LX              "Musician"
 CREDITS_COLIN               "Sprites, first story"
 CREDITS_BRIAN               "Sprite artist"
-CREDITS_LEMON               "Illustrator"
 CREDITS_TRANSLATOR          "Translator"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Translators</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Past translators</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Credits per individual resources</color>"
 CREDITS_RES_TEXT            "The files listed below are all under libre licenses. Their respective authors are presented:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Images</color>"
@@ -129,14 +161,41 @@ CREDITS_RES_SCRIPTS_TEXT    "The authors are identified within the scripts thems
 // Title Screen
 TITLESCREEN_PLAY            "START GAME"
 TITLESCREEN_OPTIONS         "OPTIONS"
-TITLESCREEN_QUIT            "QUIT"
-TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+TITLESCREEN_MOBILE          "PLAY ON MOBILE"
+TITLESCREEN_SHARE           "SHARE"
+TITLESCREEN_DONATE          "DONATE"
+TITLESCREEN_QUIT            "EXIT"
+TITLESCREEN_SUBMITFEEDBACK  "SUBMIT FEEDBACK"
+TITLESCREEN_WRITEREVIEW     "WRITE A REVIEW"
+TITLESCREEN_RATEAPP         "RATE THE APP"
+TITLESCREEN_REPORTISSUE     "REPORT AN ISSUE"
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "CONTINUE"
-ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
+ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Thanks for playing! Surge the Rabbit is in development.\n\nVisit <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> for updates!\n\nNow let's see how you too can create your own games!"
+
+// Rate the Game
+// Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+RATEGAME_TITLE              "Rate Surge the Rabbit?"
+RATEGAME_MESSAGE            "We'd love to hear from you!\nYour feedback helps this open source game & engine!" // 2 lines max.
+RATEGAME_YES                "Sure!"
+RATEGAME_NO                 "Not now"
+
+// Play classic levels
+PLAYCLASSICLEVELS_TEXT      "Play the classic levels?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+
+// Thanks for playing
+THANKSFORPLAYING_TITLE      "Thanks for playing!"
+THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile devices!"
+THANKSFORPLAYING_PARAGRAPH2 "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
+THANKSFORPLAYING_PARAGRAPH3 "Become a supporter of this open source game engine today!"
+THANKSFORPLAYING_YES        "Sure!"
+THANKSFORPLAYING_NO         "Not now"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -146,7 +205,7 @@ MAINMENU_SHARE              "SHARE"
 MAINMENU_OPTIONS            "OPTIONS"
 MAINMENU_QUIT               "QUIT"
 MAINMENU_DEVBUILD           "Development version"
-MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
 
 // (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
@@ -163,7 +222,7 @@ CONGRATULATIONS_TITLE       "THANKS FOR PLAYING"
 CONGRATULATIONS_SHARE       "SHARE"
 CONGRATULATIONS_DONATE      "DONATE"
 CONGRATULATIONS_BACK        "BACK"
-CONGRATULATIONS_TEXT        "Thanks for playing Open Surge version $GAME_VERSION.\nWanna play more? Go to $GAME_WEBSITE for updates!\n\nOpen Surge lets you play and create your own games. It's developed by people like you. Now share the joy! Tell your family, friends and pets about it and spread the word!"
+CONGRATULATIONS_TEXT        "Thanks for playing Open Surge version $ENGINE_VERSION.\nWanna play more? Go to $ENGINE_WEBSITE for updates!\n\nOpen Surge lets you play and create your own games. It's developed by people like you. Now share the joy! Tell your family, friends and pets about it and spread the word!"
 
 
 
@@ -181,10 +240,10 @@ INPUT_KEYB_FIRE1            "SPACE"
 INPUT_KEYB_FIRE2            "LEFT CTRL"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+INPUT_KEYB_FIRE5            "LEFT SHIFT"
+INPUT_KEYB_FIRE6            "RIGHT SHIFT"
+INPUT_KEYB_FIRE7            "<available>"
+INPUT_KEYB_FIRE8            "<available>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "the DIRECTIONALS"
@@ -192,12 +251,12 @@ INPUT_JOY_LEFT              "the LEFT BUTTON"
 INPUT_JOY_RIGHT             "the RIGHT BUTTON"
 INPUT_JOY_UP                "the UP BUTTON"
 INPUT_JOY_DOWN              "the DOWN BUTTON"
-INPUT_JOY_FIRE1             "JUMP"
-INPUT_JOY_FIRE2             "SWITCH"
+INPUT_JOY_FIRE1             "the ACTION BUTTON"
+INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
 INPUT_JOY_FIRE3             "PAUSE"
 INPUT_JOY_FIRE4             "BACK"
-INPUT_JOY_FIRE5             "<available>"
-INPUT_JOY_FIRE6             "<available>"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<available>"
 INPUT_JOY_FIRE8             "<available>"
 
@@ -225,8 +284,9 @@ LOADING_TEXT                "loading..."
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Create your amazing games!</color>\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Did you know...?</color>\nEverything in Open Surge is customizable. You can make levels, items, bosses, characters and more! It's a full <color=$COLOR_HIGHLIGHT>game creation system</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Unleash your creativity!</color>\nOne of the key features in Open Surge is <color=$COLOR_HIGHLIGHT>SurgeScript</color>. It's scripting for games! Use it to build anything you can imagine!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nFeeling excited yet? The sky is the limit! Visit <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> to create your own awesome games today!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nFeeling excited yet? The sky is the limit! Visit <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> to create your own awesome games today!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! <color=$COLOR_HIGHLIGHT>Press F12 to open the editor.</color> Next, open the item palette and start building your level! (use F1 for help)"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>Debug Mode</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
 
 
 
@@ -337,11 +397,8 @@ EDITOR_MESSAGE_YELLOWLAYER  "Switched to the <color=$1>yellow</color> layer"
 //
 // Translators:
 //
-// Since the game uses bitmap fonts, parts of
-// the translation don't accept special characters.
-//
-// This section doesn't accept language-specific
-// special characters.
+// This section accepts SOME language-specific
+// special characters. Please test as necessary.
 //
 // If a translation is not possible, you may
 // leave the following sentences in English.
@@ -370,6 +427,12 @@ GAMEOVER_PART2              "OVER"
 TIMEOVER_PART1              "TIME"
 TIMEOVER_PART2              "OVER"
 
+// Pause Menu
+PAUSE_TITLE                 "PAUSE"
+PAUSE_CONTINUE              "CONTINUE"
+PAUSE_RESTART               "RESTART"
+PAUSE_EXIT                  "EXIT"
+
 
 
 //
@@ -390,6 +453,8 @@ COLOR_HIGHLIGHT             "ffee11"
 COLOR_HUD                   "ffff00"
 COLOR_HUDDANGER             "ff0000"
 COLOR_EDITOR_HIGHLIGHT      "ffa060"
+PAUSE_HIGHLIGHT             "ffee11"
+PAUSE_UNHIGHLIGHT           "ffffff"
 
 // Input
 INPUT_DIRECTIONAL           "${INPUT_${INPUT_TYPE}_DIRECTIONAL}"
@@ -405,6 +470,12 @@ INPUT_FIRE5                 "${INPUT_${INPUT_TYPE}_FIRE5}"
 INPUT_FIRE6                 "${INPUT_${INPUT_TYPE}_FIRE6}"
 INPUT_FIRE7                 "${INPUT_${INPUT_TYPE}_FIRE7}"
 INPUT_FIRE8                 "${INPUT_${INPUT_TYPE}_FIRE8}"
+
+// Colored titles
+OPTIONS_COLORED_TITLE       "<color=$COLOR_TITLE>$OPTIONS_TITLE</color>"
+STAGESELECT_COLORED_TITLE   "<color=$COLOR_TITLE>$STAGESELECT_TITLE</color>"
+STAGESELECT_COLORED_DEBUG   "<color=$COLOR_TITLE>$STAGESELECT_DEBUG</color>"
+CREDITS_COLORED_TITLE       "<color=$COLOR_TITLE>$CREDITS_TITLE</color>"
 
 // Backward compatibility
 HUD_COLLECTIBLES            "$HUD_POWER"

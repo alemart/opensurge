@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * main.c - entry point
- * Copyright (C) 2008-2010, 2018, 2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,8 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <allegro5/allegro.h> /* included for cross-platform compatibility; see https://liballeg.org/a5docs/5.2.7/getting_started.html#the-main-function */
+#include <allegro5/allegro.h> /* included for cross-platform compatibility; see https://liballeg.org/a5docs/trunk/getting_started.html#the-main-function */
+#include "core/global.h"
 #include "core/engine.h"
+#include "core/commandline.h"
+
+#if defined(__ANDROID__)
+#include <setjmp.h>
+jmp_buf main_jump_buffer;
+#endif
 
 /*
  * main()
@@ -27,9 +34,23 @@
  */
 int main(int argc, char **argv)
 {
-    engine_init(argc, argv);
-    engine_mainloop();
-    engine_release();
+#if defined(__ANDROID__)
+    char* args[] = { GAME_UNIXNAME, "--mobile" };
+    argc = sizeof(args) / sizeof(args[0]);
+    argv = args;
+
+    /* exit gracefully */
+    if(setjmp(main_jump_buffer) != 0)
+        return 1;
+#endif
+
+    commandline_t cmd = commandline_parse(argc, argv);
+
+    do {
+        engine_init(&cmd);
+        engine_mainloop();
+        engine_release();
+    } while(engine_must_restart(&cmd));
 
     return 0;
 }

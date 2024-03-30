@@ -15,8 +15,8 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2022-08-03"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_LASTUPDATE             "2023-03-16"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -63,48 +63,72 @@ LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 //
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_TITLE>CONFIGURAÇÕES</color>"
-OPTIONS_YES                 "SIM"
-OPTIONS_NO                  "NÃO"
-OPTIONS_GRAPHICS            "GRÁFICOS"
+OPTIONS_TITLE               "CONFIGURAÇÕES"
+OPTIONS_GRAPHICS            "Gráficos"
+OPTIONS_CONTROLS            "Controles"
+OPTIONS_GAME                "Jogo"
+OPTIONS_ENGINE              "Engine"
+OPTIONS_MODS                "MODs"
+OPTIONS_AUDIO               "Áudio"
+OPTIONS_BACK                "Voltar"
+OPTIONS_YES                 "Sim"
+OPTIONS_NO                  "Não"
+OPTIONS_ON                  "Ativado"
+OPTIONS_OFF                 "Desativado"
 OPTIONS_FULLSCREEN          "Tela cheia"
-OPTIONS_RESOLUTION          "Tamanho"
-OPTIONS_RESOLUTION_OPT1     "1×"
-OPTIONS_RESOLUTION_OPT2     "2×"
-OPTIONS_RESOLUTION_OPT3     "3×"
-OPTIONS_RESOLUTION_OPT4     "4×"
-OPTIONS_SMOOTHGFX           "Gráficos suaves"
-OPTIONS_SMOOTHGFX_ERROR     "[só em 32 bpp]"
+OPTIONS_RESOLUTION          "Tamanho da tela"
+OPTIONS_QUALITY             "Qualidade"
+OPTIONS_QUALITY_LOW         "Baixa"
+OPTIONS_QUALITY_MEDIUM      "Média"
+OPTIONS_QUALITY_HIGH        "Alta"
 OPTIONS_FPS                 "Mostrar FPS"
-OPTIONS_GAME                "JOGO"
+OPTIONS_VSYNC               "Sincronização vertical"
+OPTIONS_PIXELSCALER         "Suavizador de píxeis"
+OPTIONS_COMINGSOON          "Em breve!"
+OPTIONS_VOLUME              "Volume"
+OPTIONS_MUTE                "Mudo"
+OPTIONS_GAMEPADOPACITY      "Opacidade"
 OPTIONS_GAMEPAD             "Usar joystick"
-OPTIONS_LANGUAGE            "Trocar idioma"
+OPTIONS_LANGUAGE            "Idioma"
 OPTIONS_STAGESELECT         "Seleção de fases"
+OPTIONS_DEVELOPERMODE       "Modo do desenvolvedor"
 OPTIONS_CREDITS             "Créditos do Open Surge"
+OPTIONS_WEBSITE             "Visite Open Surge na web"
 OPTIONS_DONATE              "Doar para o Open Surge"
-OPTIONS_BACK                "VOLTAR"
+OPTIONS_ABOUT               "Sobre a engine"
+OPTIONS_SHARE               "Compartilhar a engine"
+OPTIONS_DOWNLOAD_DESKTOP    "Baixar a engine para Desktops"
+OPTIONS_DOWNLOAD_MOBILE     "Baixar a engine para mobile"
+OPTIONS_PLAYMOD             "Jogar um game"
+OPTIONS_PLAYMOD_NOTAGAME    "O item selecionado não é um jogo do Open Surge!"
+OPTIONS_PLAYMOD_LEGACYERROR "Jogos muito antigos do Open Surge não são suportados."
+OPTIONS_PLAYMOD_COMPATWARN  "O modo de compatibilidade é um recurso projetado para melhorar a sua experiência com os jogos. Quer mesmo desativá-lo?"
+OPTIONS_MODSTORAGE          "Armazenamento"
+OPTIONS_MODSTORAGE_FOLDER   "Pasta de arquivos"
+OPTIONS_MODSTORAGE_ARCHIVE  "Arquivo .zip"
+OPTIONS_COMPATIBILITYMODE   "Modo de compatibilidade"
+OPTIONS_SUBMITFEEDBACK      "Enviar feedback"
+OPTIONS_WRITEREVIEW         "Escrever uma review"
+OPTIONS_RATEAPP             "Avaliar o app"
+OPTIONS_REPORTISSUE         "Reportar um problema"
+OPTIONS_BACKTOBASEGAME      "Voltar ao jogo base"
 
 // Stage Select
-STAGESELECT_TITLE           "<color=$COLOR_TITLE>SELEÇÃO DE FASES</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>MODO DO DESENVOLVEDOR</color>"
+STAGESELECT_TITLE           "SELEÇÃO DE FASES"
+STAGESELECT_DEBUG           "MODO DO DESENVOLVEDOR"
 STAGESELECT_MSG             "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
 STAGESELECT_PAGE            "pág. $1/$2"
 STAGESELECT_ACT             "Zona"
 
-// Quest Select
-QUESTSELECT_TITLE           "<color=$COLOR_TITLE>SELEÇÃO DE QUESTS</color>"
-QUESTSELECT_MSG             "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
-QUESTSELECT_PAGE            "pág. $1/$2"
-QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Versão:</color> $1\n<color=$COLOR_HIGHLIGHT>Autor:</color> $2\n<color=$COLOR_HIGHLIGHT>Descrição:</color> $3"
-
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>CRÉDITOS</color>"
+CREDITS_TITLE               "CRÉDITOS"
 CREDITS_BACK                "Pressione <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> para voltar"
-CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME versão $GAME_VERSION</color>\nrodando na $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versão $ENGINE_VERSION</color>\nrodando na $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Galera</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Ex-membros</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Agradecimentos</color>"
 CREDITS_ALEXANDRE           "Líder e fundador do projeto\nDesenvolvedor do projeto\nArtista"
-CREDITS_JOAO                "Artista"
+CREDITS_JOAO                "Artista\nIlustrador"
 CREDITS_MATEUS              "Efeitos sonoros"
 CREDITS_CODY                "Artista conceitual\nDesigner de inimigos"
 CREDITS_JOHAN               "Músico (descanse em paz, amigo)"
@@ -113,9 +137,9 @@ CREDITS_VICTOR              "Músico"
 CREDITS_M374LX              "Músico"
 CREDITS_COLIN               "Sprites, primeira história"
 CREDITS_BRIAN               "Sprites"
-CREDITS_LEMON               "Ilustrador"
 CREDITS_TRANSLATOR          "Tradutor"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tradutores</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Ex-tradutores</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Créditos dos assets</color>"
 CREDITS_RES_TEXT            "Todos os arquivos listados abaixo estão sob licenças livres. A seguir, apresentamos os respectivos autores:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Imagens</color>"
@@ -128,16 +152,43 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Os autores são identificados nos próprios scripts."
 
 // Title Screen
-TITLESCREEN_PLAY            "INICIAR JOGO"
+TITLESCREEN_PLAY            "JOGAR"
 TITLESCREEN_OPTIONS         "CONFIGURAR"
+TITLESCREEN_MOBILE          "JOGAR NO MOBILE"
+TITLESCREEN_SHARE           "COMPARTILHAR"
+TITLESCREEN_DONATE          "DOAR"
 TITLESCREEN_QUIT            "SAIR"
-TITLESCREEN_VERSION         "DEMO 1\n$GAME_VERSION" // bitmap font: no special characters are allowed
-TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+TITLESCREEN_SUBMITFEEDBACK  "ENVIAR FEEDBACK"
+TITLESCREEN_WRITEREVIEW     "ESCREVER UMA REVIEW"
+TITLESCREEN_RATEAPP         "AVALIAR O APP"
+TITLESCREEN_REPORTISSUE     "REPORTAR UM PROBLEMA"
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "CONTINUAR"
-ENDOFDEMO_VERSION           "DEMO 1\n20220902"
-ENDOFDEMO_TEXT              "Valeu por jogar! Surge the Rabbit está em desenvolvimento.\n\nVisite <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> para conferir as atualizações!\n\nAgora saca só como você também pode criar seus games!"
+ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Valeu por jogar! Surge the Rabbit está em desenvolvimento.\n\nVisite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> para conferir as atualizações!\n\nAgora saca só como você também pode criar seus games!"
+
+// Rate the Game
+// Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+RATEGAME_TITLE              "Avaliar Surge the Rabbit?"
+RATEGAME_MESSAGE            "A gente adoraria ouvi-lo(a)!\nSeu feedback ajuda este jogo & engine open source!" // 2 lines max.
+RATEGAME_YES                "Beleza!"
+RATEGAME_NO                 "Agora não"
+
+// Play classic levels
+PLAYCLASSICLEVELS_TEXT      "Jogar nas fases clássicas?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+
+// Thanks for playing
+THANKSFORPLAYING_TITLE      "Obrigado por jogar!"
+THANKSFORPLAYING_PARAGRAPH1 "Apóie este trabalho independente! Baixe a edição oficial da engine para mobile!"
+THANKSFORPLAYING_PARAGRAPH2 "Jogue Surge the Rabbit - e também seus próprios games - no celular e no tablet!"
+THANKSFORPLAYING_PARAGRAPH3 "Torne-se hoje mesmo um apoiador desta engine livre e de código aberto!"
+THANKSFORPLAYING_YES        "Beleza!"
+THANKSFORPLAYING_NO         "Agora não"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -147,7 +198,7 @@ MAINMENU_SHARE              "COMPARTILHAR"
 MAINMENU_OPTIONS            "CONFIGURAR"
 MAINMENU_QUIT               "SAIR"
 MAINMENU_DEVBUILD           "Versão de desenvolvimento"
-MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
 
 // (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
@@ -164,7 +215,7 @@ CONGRATULATIONS_TITLE       "OBRIGADO POR JOGAR"
 CONGRATULATIONS_SHARE       "COMPARTILHAR"
 CONGRATULATIONS_DONATE      "DOAR"
 CONGRATULATIONS_BACK        "VOLTAR"
-CONGRATULATIONS_TEXT        "Obrigado por jogar o Open Surge versão $GAME_VERSION.\nQuer jogar mais? Visite $GAME_WEBSITE p/ atualizações!\n\nCom o Open Surge, você joga e cria seus games. Sabia que ele é feito por gente como você? Conte para sua família, seus amigos e seus bichinhos e ajude a divulgar o jogo!"
+CONGRATULATIONS_TEXT        "Obrigado por jogar o Open Surge versão $ENGINE_VERSION.\nQuer jogar mais? Visite $ENGINE_WEBSITE p/ atualizações!\n\nCom o Open Surge, você joga e cria seus games. Sabia que ele é feito por gente como você? Conte para sua família, seus amigos e seus bichinhos e ajude a divulgar o jogo!"
 
 
 
@@ -182,10 +233,10 @@ INPUT_KEYB_FIRE1            "ESPAÇO"
 INPUT_KEYB_FIRE2            "o CTRL esquerdo"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+INPUT_KEYB_FIRE5            "o SHIFT esquerdo"
+INPUT_KEYB_FIRE6            "o SHIFT direito"
+INPUT_KEYB_FIRE7            "<disponível>"
+INPUT_KEYB_FIRE8            "<disponível>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "o DIRECIONAL"
@@ -193,12 +244,12 @@ INPUT_JOY_LEFT              "ESQUERDA"
 INPUT_JOY_RIGHT             "DIREITA"
 INPUT_JOY_UP                "CIMA"
 INPUT_JOY_DOWN              "BAIXO"
-INPUT_JOY_FIRE1             "PULO"
-INPUT_JOY_FIRE2             "TROCAR"
+INPUT_JOY_FIRE1             "o BOTÃO DE AÇÃO"
+INPUT_JOY_FIRE2             "o BOTÃO SECUNDÁRIO DE AÇÃO"
 INPUT_JOY_FIRE3             "PAUSE"
 INPUT_JOY_FIRE4             "VOLTAR"
-INPUT_JOY_FIRE5             "<disponível>"
-INPUT_JOY_FIRE6             "<disponível>"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<disponível>"
 INPUT_JOY_FIRE8             "<disponível>"
 
@@ -226,8 +277,9 @@ LOADING_TEXT                "carregando..."
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Crie seus jogos incríveis!</color>\nEste jogo foi criado com o <color=$COLOR_HIGHLIGHT>Open Surge</color>, uma game engine 2D muito flexível e open-source que está agora mesmo nas suas mãos!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Saca só que irado!</color>\nTudo no Open Surge é customizável. Você pode criar fases, itens, chefes, personagens e muito mais! Ele é um <color=$COLOR_HIGHLIGHT>sistema para criar jogos</color>!"
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Liberte sua criatividade!</color>\nUm dos recursos-chave do Open Surge é o <color=$COLOR_HIGHLIGHT>SurgeScript</color>: programação para games! Use-o para construir tudo o que você imaginar!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Que massa!</color>\nE aí, curtiu? Sua imaginação é o limite! Visite <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> e comece a criar seus games incríveis hoje mesmo!"
-LEV_DEMO_5                  "<color=$COLOR_TITLE>Agora é sua vez!</color>\nVamos conhecer o editor de fases. <color=$COLOR_HIGHLIGHT>Aperte F12 para abri-lo</color>. Depois, abra a palheta de itens e comece a criar sua fase! (use F1 p/ ajuda)"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Que massa!</color>\nE aí, curtiu? Sua imaginação é o limite! Visite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> e comece a criar seus games incríveis hoje mesmo!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Agora é a sua vez!</color>\n<color=$COLOR_HIGHLIGHT>Aperte F12 para abrir o editor de fases</color>. Em seguida, abra a palheta de itens e comece a criar sua fase! (aperte F1 para obter ajuda)"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Agora é a sua vez!</color>\nPause o jogo, arraste a alça na parte inferior da tela e entre no <color=$COLOR_HIGHLIGHT>Modo Debug</color> para <color=$COLOR_HIGHLIGHT>editar a fase</color>!"
 
 
 
@@ -337,11 +389,8 @@ EDITOR_MESSAGE_YELLOWLAYER  "Estamos na camada <color=$1>amarela</color>"
 //
 // Translators:
 //
-// Since the game uses bitmap fonts, parts of
-// the translation don't accept special characters.
-//
-// This section does not accept language-specific
-// special characters.
+// This section accepts SOME language-specific
+// special characters. Please test as necessary.
 //
 // If a translation is not possible, you may
 // leave the following sentences in English.
@@ -358,8 +407,8 @@ HUD_POWER                   "Poder"
 // Level Cleared animation
 CLEARED_LINE1               "VOCE ZEROU"
 CLEARED_LINE2               "A ZONA $LEVEL_ACT"
-CLEARED_POWER               "Bonus de Poder"
-CLEARED_TIME                "Bonus de Tempo"
+CLEARED_POWER               "Bônus de Poder"
+CLEARED_TIME                "Bônus de Tempo"
 CLEARED_SCORE               "Pontos"
 
 // Game Over
@@ -369,3 +418,9 @@ GAMEOVER_PART2              "JOGO"
 // Time Over
 TIMEOVER_PART1              "FIM DO"
 TIMEOVER_PART2              "TEMPO"
+
+// Pause Menu
+PAUSE_TITLE                 "PAUSA"
+PAUSE_CONTINUE              "CONTINUAR"
+PAUSE_RESTART               "REINICIAR"
+PAUSE_EXIT                  "SAIR"

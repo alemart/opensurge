@@ -15,8 +15,8 @@
 LANG_ID                     "eo"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Esperanto"                 // language name
 LANG_AUTHOR                 "Jorge Maldonado Ventura"       // translation author
-LANG_LASTUPDATE             "2021-11-16"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.0"                   // required engine version
+LANG_LASTUPDATE             "2024-03-25"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
@@ -63,48 +63,72 @@ LANG_COMPATIBILITY          "0.6.0"                   // required engine version
 //
 
 // Options
-OPTIONS_TITLE               "<color=$COLOR_TITLE>OPCIOJ</color>"
-OPTIONS_YES                 "JES"
-OPTIONS_NO                  "NE"
-OPTIONS_GRAPHICS            "GRAFIKO"
+OPTIONS_TITLE               "OPCIOJ"
+OPTIONS_GRAPHICS            "Grafikoj"
+OPTIONS_CONTROLS            "Regiloj"
+OPTIONS_GAME                "Ludo"
+OPTIONS_ENGINE              "Motoro"
+OPTIONS_MODS                "Modifoj"
+OPTIONS_AUDIO               "Sono"
+OPTIONS_BACK                "Reen"
+OPTIONS_YES                 "Jes"
+OPTIONS_NO                  "Ne"
+OPTIONS_ON                  "Ebligita" // alternatively: Enabled
+OPTIONS_OFF                 "Malebligita" // alternatively: Disabled
 OPTIONS_FULLSCREEN          "Plena ekrano"
 OPTIONS_RESOLUTION          "Ekrana grando"
-OPTIONS_RESOLUTION_OPT1     "1×"
-OPTIONS_RESOLUTION_OPT2     "2×"
-OPTIONS_RESOLUTION_OPT3     "3×"
-OPTIONS_RESOLUTION_OPT4     "4×"
-OPTIONS_SMOOTHGFX           "Glataj grafikoj"
-OPTIONS_SMOOTHGFX_ERROR     "[nur 32 bpp]"
+OPTIONS_QUALITY             "Kvalito"
+OPTIONS_QUALITY_LOW         "Malalta"
+OPTIONS_QUALITY_MEDIUM      "Meza"
+OPTIONS_QUALITY_HIGH        "Alta"
 OPTIONS_FPS                 "Montri FPS-jn"
-OPTIONS_GAME                "LUDO"
+OPTIONS_VSYNC               "Vertikala sinkronigo" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Piksela adaptigilo"
+OPTIONS_COMINGSOON          "Baldaŭ venos!"
+OPTIONS_VOLUME              "Laŭteco"
+OPTIONS_MUTE                "Silentigita"
+OPTIONS_GAMEPADOPACITY      "Opakeco"
 OPTIONS_GAMEPAD             "Uzi ludregilon"
-OPTIONS_LANGUAGE            "Ŝanĝi lingvon"
+OPTIONS_LANGUAGE            "Lingvo"
 OPTIONS_STAGESELECT         "Elekti nivelon"
+OPTIONS_DEVELOPERMODE       "Programista reĝimo"
 OPTIONS_CREDITS             "Atribuoj de Open Surge"
+OPTIONS_WEBSITE             "Viziti Open Surge en la Reto"
 OPTIONS_DONATE              "Donaci al Open Surge"
-OPTIONS_BACK                "REEN"
+OPTIONS_ABOUT               "Pri la motoro"
+OPTIONS_SHARE               "Kunhavigi la motoron"
+OPTIONS_DOWNLOAD_DESKTOP    "Akiri la motoron por komputiloj"
+OPTIONS_DOWNLOAD_MOBILE     "Akiri la motoron por poŝtelefonoj"
+OPTIONS_PLAYMOD             "Ludi ludon"
+OPTIONS_PLAYMOD_NOTAGAME    "La elektita ero ne estas ludo de Open Surge!"
+OPTIONS_PLAYMOD_LEGACYERROR "Malnovaj Open Surge ludoj ne estas subtenata."
+OPTIONS_PLAYMOD_COMPATWARN  "La kongrueca reĝimo estas funkcio kreita por plibonigi vian sperton de ludado. Ĉu vi certas, ke vi volas malebligi ĝin?"
+OPTIONS_MODSTORAGE          "Konservilo"
+OPTIONS_MODSTORAGE_FOLDER   "Dosierujo" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  ".zip dosiero"
+OPTIONS_COMPATIBILITYMODE   "Kongrueca reĝimo"
+OPTIONS_SUBMITFEEDBACK      "Sendi komentojn"
+OPTIONS_WRITEREVIEW         "Skribi recenzon"
+OPTIONS_RATEAPP             "Taksi la apon"
+OPTIONS_REPORTISSUE         "Raporti problemon"
+OPTIONS_BACKTOBASEGAME      "Iri reen al la ludo"
 
 // Stage Select
-STAGESELECT_TITLE           "<color=$COLOR_TITLE>ELEKTADO DE NIVELO</color>"
-STAGESELECT_DEBUG           "<color=$COLOR_TITLE>PROGRAMADA MODO</color>"
+STAGESELECT_TITLE           "ELEKTADO DE NIVELO"
+STAGESELECT_DEBUG           "PROGRAMISTA REĜIMO"
 STAGESELECT_MSG             "Premu <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> por iri reen"
 STAGESELECT_PAGE            "paĝo $1/$2"
 STAGESELECT_ACT             "Zono"
 
-// Quest Select
-QUESTSELECT_TITLE           "<color=$COLOR_TITLE>ELEKTADO DE AVENTURON</color>"
-QUESTSELECT_MSG             "Premu <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> por iri reen"
-QUESTSELECT_PAGE            "paĝo $1/$2"
-QUESTSELECT_INFO            "<color=$COLOR_HIGHLIGHT>Versio:</color> $1\n<color=$COLOR_HIGHLIGHT>Aŭtoro:</color> $2\n<color=$COLOR_HIGHLIGHT>Priskribo:</color> $3"
-
 // Credits
-CREDITS_TITLE               "<color=$COLOR_TITLE>ATRIBUOJ</color>"
+CREDITS_TITLE               "ATRIBUOJ"
 CREDITS_BACK                "Premu <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> por iri reen"
-CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$GAME_NAME versio $GAME_VERSION</color>\nfunciigita de $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versio $ENGINE_VERSION</color>\nfunciigita de $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Homoj</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Estintaj membroj</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Dankon al</color>"
 CREDITS_ALEXANDRE           "Projektestro kaj Fondinto\nProjekta Programisto\nArtisto"
-CREDITS_JOAO                "Artisto"
+CREDITS_JOAO                "Artisto\nIlustristo"
 CREDITS_MATEUS              "Sonefektoj"
 CREDITS_CODY                "Skiza artisto\nDezajnisto de malamikoj"
 CREDITS_JOHAN               "Muzikisto (ripozu en paco, amiko)"
@@ -113,9 +137,9 @@ CREDITS_VICTOR              "Muzikisto"
 CREDITS_M374LX              "Muzikisto"
 CREDITS_COLIN               "Bildetoj, unua historio"
 CREDITS_BRIAN               "Bildeta artisto"
-CREDITS_LEMON               "Ilustristo"
 CREDITS_TRANSLATOR          "Tradukisto"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tradukistoj</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Estintaj tradukistoj</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Atribuoj laŭ unuopaj iloj</color>"
 CREDITS_RES_TEXT            "La dosieroj listigitaj malsupre estas ĉiuj sub liberaj licencoj. Ilia respektitaj aŭtoroj estas montritaj:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Bildoj</color>"
@@ -130,14 +154,41 @@ CREDITS_RES_SCRIPTS_TEXT    "La aŭtoroj estas identigitaj en la propraj skripto
 // Title Screen
 TITLESCREEN_PLAY            "KOMENCI LUDON"
 TITLESCREEN_OPTIONS         "OPCIOJ"
+TITLESCREEN_MOBILE          "LUDI EN POŜTELEFONO"
+TITLESCREEN_SHARE           "DISKONIGI"
+TITLESCREEN_DONATE          "DONACI"
 TITLESCREEN_QUIT            "ELIRI"
-TITLESCREEN_VERSION         "1a DEMO\n$GAME_VERSION" // bitmap font: no special characters are allowed
-TITLESCREEN_WEBSITE         "$GAME_WEBSITE" // bitmap font: no special characters are allowed
+TITLESCREEN_SUBMITFEEDBACK  "SENDI KOMENTOJN"
+TITLESCREEN_WRITEREVIEW     "SKRIBI RECENZON"
+TITLESCREEN_RATEAPP         "TAKSI LA APON"
+TITLESCREEN_REPORTISSUE     "RAPORTI PROBLEMON"
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
 ENDOFDEMO_CONTINUE          "DAŬRIGI"
-ENDOFDEMO_VERSION           "1a DEMO\n20220902"
-ENDOFDEMO_TEXT              "Danko pro ludi! Surge the Rabbit disvolviĝas.\n\nVizitu <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> por ĝisdatigoj!\n\nNun ni vidu kiel vi povas krei viajn proprajn ludojn!"
+ENDOFDEMO_VERSION           "MONTRO $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Danko pro ludi! Surge the Rabbit disvolviĝas.\n\nVizitu <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> por ĝisdatigoj!\n\nNun ni vidu kiel vi povas krei viajn proprajn ludojn!"
+
+// Rate the Game
+// Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+RATEGAME_TITLE              "Taksi Surge the Rabbit?"
+RATEGAME_MESSAGE            "Ni ŝatus scii de vi!\nViaj komentoj helpas ĉi tiun malfermitkodan ludon kaj motoron!" // 2 lines max.
+RATEGAME_YES                "Jes ja!"
+RATEGAME_NO                 "Ne nun"
+
+// Play classic levels
+PLAYCLASSICLEVELS_TEXT      "Ludi la klasikajn nivelojn?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+
+// Thanks for playing
+THANKSFORPLAYING_TITLE      "Dankon pro ludi"
+THANKSFORPLAYING_PARAGRAPH1 "Subtenu ĉi tiun sendependan laboron! Akiru la oficialan eldonon de la motoro por porteblaj iloj!"
+THANKSFORPLAYING_PARAGRAPH2 "Ludi Surge the Rabbit - kaj ankaŭ viajn proprajn ludojn - en viaj poŝtelefono kaj tabulkomputiloj!"
+THANKSFORPLAYING_PARAGRAPH3 "Iĝi subtenanto de ĉi tiu malfermitkoda ludo hodiaŭ!"
+THANKSFORPLAYING_YES        "Jes ja!"
+THANKSFORPLAYING_NO         "Ne nun"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
@@ -147,7 +198,7 @@ MAINMENU_SHARE              "DISKONIGI"
 MAINMENU_OPTIONS            "OPCIOJ"
 MAINMENU_QUIT               "ELIRI"
 MAINMENU_DEVBUILD           "Programada versio"
-MAINMENU_VERSION            "v. $GAME_VERSION" // abbreviated
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
 
 // (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
@@ -164,7 +215,7 @@ CONGRATULATIONS_TITLE       "DANKE POR LUDI"
 CONGRATULATIONS_SHARE       "DISKONIGI"
 CONGRATULATIONS_DONATE      "DONACI"
 CONGRATULATIONS_BACK        "REEN"
-CONGRATULATIONS_TEXT        "Danke por ludi la version $GAME_VERSION de Open Surge.\nĈu volas ludi pli? Iru al $GAME_WEBSITE por ĝisdatigoj!\nOpen Surge lasas al vi ludi kaj krei viajn proprajn ludojn. Ĝi estas programita de homoj kiel vi. Nun diskonigu la ĝojon! Diru al via familio, amikoj kaj dombestoj kaj disvastigu la informon!"
+CONGRATULATIONS_TEXT        "Danke por ludi la version $ENGINE_VERSION de Open Surge.\nĈu volas ludi pli? Iru al $ENGINE_WEBSITE por ĝisdatigoj!\nOpen Surge lasas al vi ludi kaj krei viajn proprajn ludojn. Ĝi estas programita de homoj kiel vi. Nun diskonigu la ĝojon! Diru al via familio, amikoj kaj dombestoj kaj disvastigu la informon!"
 
 
 
@@ -184,10 +235,10 @@ INPUT_KEYB_FIRE2            "MALDEKSTRA STIRKLAVO"
 INPUT_KEYB_FIRE2__EO        "MALDEKSTRAN STIRKLAVON"
 INPUT_KEYB_FIRE3            "ENIGA KLAVO"
 INPUT_KEYB_FIRE4            "ESC"
-INPUT_KEYB_FIRE5            "W"
-INPUT_KEYB_FIRE6            "A"
-INPUT_KEYB_FIRE7            "S"
-INPUT_KEYB_FIRE8            "D"
+INPUT_KEYB_FIRE5            "MALDEKSTRA MAJUSKLIGA KL."
+INPUT_KEYB_FIRE6            "DEKSTRA MAJUSKLIGA KL."
+INPUT_KEYB_FIRE7            "<disponebla>"
+INPUT_KEYB_FIRE8            "<disponebla>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "la STIRSTANGO"
@@ -196,13 +247,13 @@ INPUT_JOY_LEFT              "the MALDEKSTRA BUTONO"
 INPUT_JOY_RIGHT             "the DEKSTRA BUTONO"
 INPUT_JOY_UP                "the SUPRA BUTONO"
 INPUT_JOY_DOWN              "the MALSUPRA BUTONO"
-INPUT_JOY_FIRE1             "SALTI"
-INPUT_JOY_FIRE2             "ŜANĜI"
+INPUT_JOY_FIRE1             "la AGA BUTONO"
+INPUT_JOY_FIRE2             "la DUAGRADA AGA BUTONO"
 INPUT_JOY_FIRE2__EO         "ŜANĜI"
 INPUT_JOY_FIRE3             "PAŬZI"
 INPUT_JOY_FIRE4             "REEN"
-INPUT_JOY_FIRE5             "<disponebla>"
-INPUT_JOY_FIRE6             "<disponebla>"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<disponebla>"
 INPUT_JOY_FIRE8             "<disponebla>"
 
@@ -232,8 +283,9 @@ LOADING_TEXT                "ŝarĝante..."
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Kreu viajn malaĉajn ludojn!</color>\nĈi tiu ludo estis kreita per <color=$COLOR_HIGHLIGHT>Open Surge</color>, tre fleksebla kaj malfermitkoda 2D-a videluda motoro, kiu estas nun en viaj manoj!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Ĉu vi sciis...?</color>\nĈio en Open Surge estas agordebla. Vi povas krei nivelojn, erojn, ĉefojn, rolulojn kaj plu! Ĝi estas plena <color=$COLOR_HIGHLIGHT>sistemo de kreado de ludoj</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Uzu vian kreemon!</color>\nUnu el la plej gravaj funkcioj en Open Surge estas <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Ĝi estas skriptado por ludoj! Uzu ĝin por konstrui ĉion, kion vi povas imagi!"
-LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$GAME_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Provu ĝin vi!</color>\nNun estas via vico! <color=$COLOR_HIGHLIGHT>Premu F12-n por malfermi la redaktilon.</color> Poste malfermu la paletron de eroj kaj komencu konstrui vian nivelon! (uzu F1-n por helpo)"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Vi provu mem!</color>\nNun estas via vico! Paŭzigi la ludon, trenu tenilon en la malsupro de la ekrano kaj eniri en la <color=$COLOR_HIGHLIGHT>PROGRAMISTAN REĜIMON</color> por <color=$COLOR_HIGHLIGHT>redakti la nivelon</color>!"
 
 
 
@@ -344,11 +396,8 @@ EDITOR_MESSAGE_YELLOWLAYER  "Ŝanĝita al la <color=$1>flava</color> tavolo"
 //
 // Translators:
 //
-// Since the game uses bitmap fonts, parts of
-// the translation don't accept special characters.
-//
-// This section doesn't accept language-specific
-// special characters.
+// This section accepts SOME language-specific
+// special characters. Please test as necessary.
 //
 // If a translation is not possible, you may
 // leave the following sentences in English.
@@ -365,8 +414,8 @@ HUD_POWER                   "Forto"
 // Level Cleared animation
 CLEARED_LINE1               "VI PLENUMIS"
 CLEARED_LINE2               "ZONON $LEVEL_ACT"
-CLEARED_POWER               "Kromajxo de Forto"
-CLEARED_TIME                "Kromajxo de Tempo"
+CLEARED_POWER               "Kromaĵo de Forto"
+CLEARED_TIME                "Kromaĵo de Tempo"
 CLEARED_SCORE               "POENTARO"
 
 // Game Over
@@ -376,3 +425,9 @@ GAMEOVER_PART2              "FINIS"
 // Time Over
 TIMEOVER_PART1              "TEMPO"
 TIMEOVER_PART2              "FINIS"
+
+// Pause Menu
+PAUSE_TITLE                 "PAŬZO"
+PAUSE_CONTINUE              "DAŬRIGI"
+PAUSE_RESTART               "REKOMENCI"
+PAUSE_EXIT                  "ELIRI"

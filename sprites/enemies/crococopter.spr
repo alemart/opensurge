@@ -8,8 +8,8 @@
 // art by squirrel
 sprite "Crococopter"
 {
-    source_file     "images/crococopter.png"
-    source_rect     0 0 256 48
+    source_file     "images/enemies/waterworks_zone.png"
+    source_rect     0 368 256 48
     frame_size      32 48
     hot_spot        16 24
 

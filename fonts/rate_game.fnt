@@ -1,0 +1,26 @@
+// -----------------------------------------------------------------------------
+// File: rate_game.fnt
+// Description: fonts used at the "Rate the Game" scene
+// Author: script by Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "Rate the Game - Text"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Medium.ttf"
+        size                    14
+        antialias
+    }
+}
+
+font "Rate the Game - Title"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    18
+        antialias
+    }
+}

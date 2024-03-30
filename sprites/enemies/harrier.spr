@@ -8,8 +8,8 @@
 // art by Cody Licorish
 sprite "SwoopHarrier"
 {
-    source_file     "images/harrier-swoop.png"
-    source_rect     0 80 160 160
+    source_file     "images/enemies/waterworks_zone.png"
+    source_rect     800 112 160 160
     frame_size      40 40
     hot_spot        20 20
 

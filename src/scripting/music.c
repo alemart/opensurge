@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * music.c - scripting system: music
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 #include <surgescript.h>
 #include <string.h>
-#include "../core/util.h"
+#include "../util/util.h"
 #include "../core/audio.h"
 
 /* private */

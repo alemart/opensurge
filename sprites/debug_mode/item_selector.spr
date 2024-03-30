@@ -1,0 +1,53 @@
+// -----------------------------------------------------------------------------
+// File: item_selector.spr
+// Description: sprite scripts of the Item Selector (Debug Mode)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+sprite "Debug Mode - Item Selector - Selection"
+{
+    source_file     "images/debug_mode/selection.png"
+    source_rect     0 0 32 32
+    frame_size      32 32
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Debug Mode - Item Selector - Trash"
+{
+    source_file     "images/debug_mode/trash.png"
+    source_rect     0 0 192 48
+    frame_size      48 48
+    hot_spot        24 24
+
+    // idle
+    animation 0
+    {
+        repeat      TRUE
+        fps         16
+        data        0
+    }
+
+    // highlighted
+    animation 1
+    {
+        repeat      FALSE
+        fps         16
+        data        0 1 2 3
+    }
+
+    // dehighlighting
+    transition 1 to 0
+    {
+        repeat      FALSE
+        fps         16
+        data        3 2 1 0
+    }
+}

@@ -8,11 +8,14 @@ using SurgeEngine.Player;
 
 object "None" is "companion"
 {
-    player = Player("None");
+    player = parent;
 
     state "main"
     {
         // disable physics
         player.frozen = true;
+
+        // make it non-focusable
+        player.focusable = false;
     }
 }

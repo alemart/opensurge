@@ -10,295 +10,1033 @@ font "HUD"
     bitmap
     {
         source_file             "fonts/good_neighbors.png"
-        spacing                 -1 1
+        spacing                 -1 -2
 
         char " " {
             source_rect         1 1 8 16
+            offset              0 -3
         }
         char "!" {
             source_rect         10 1 6 16
+            offset              0 -3
         }
         char "\"" {
             source_rect         17 1 7 16
+            offset              0 -3
         }
         char "#" {
             source_rect         25 1 10 16
+            offset              0 -3
         }
         char "$" {
             source_rect         36 1 10 16
+            offset              0 -3
         }
         char "%" {
             source_rect         47 1 11 16
+            offset              0 -3
         }
         char "&" {
             source_rect         59 1 11 16
+            offset              0 -3
         }
         char "'" {
             source_rect         71 1 4 16
+            offset              0 -3
         }
         char "(" {
             source_rect         76 1 6 16
+            offset              0 -3
         }
         char ")" {
             source_rect         83 1 6 16
+            offset              0 -3
         }
         char "*" {
             source_rect         90 1 10 16
+            offset              0 -3
         }
         char "+" {
             source_rect         101 1 8 16
+            offset              0 -3
         }
         char "," {
             source_rect         110 1 4 16
+            offset              0 -3
         }
         char "-" {
             source_rect         115 1 9 16
+            offset              0 -3
         }
         char "." {
             source_rect         125 1 4 16
+            offset              0 -3
         }
         char "/" {
             source_rect         130 1 8 16
+            offset              0 -3
         }
         char "0" {
             source_rect         139 1 8 16
+            offset              0 -3
         }
         char "1" {
             source_rect         148 1 6 16
+            offset              0 -3
         }
         char "2" {
             source_rect         155 1 8 16
+            offset              0 -3
         }
         char "3" {
             source_rect         164 1 8 16
+            offset              0 -3
         }
         char "4" {
             source_rect         173 1 9 16
+            offset              0 -3
         }
         char "5" {
             source_rect         183 1 8 16
+            offset              0 -3
         }
         char "6" {
             source_rect         192 1 8 16
+            offset              0 -3
         }
         char "7" {
             source_rect         201 1 8 16
+            offset              0 -3
         }
         char "8" {
             source_rect         210 1 8 16
+            offset              0 -3
         }
         char "9" {
             source_rect         219 1 8 16
+            offset              0 -3
         }
         char ":" {
             source_rect         228 1 4 16
+            offset              0 -3
         }
         char ";" {
             source_rect         233 1 4 16
+            offset              0 -3
         }
         char "<" {
             source_rect         238 1 9 16
+            offset              0 -3
         }
         char "=" {
             source_rect         248 1 7 16
+            offset              0 -3
         }
         char ">" {
             source_rect         256 1 9 16
+            offset              0 -3
         }
         char "?" {
             source_rect         266 1 8 16
+            offset              0 -3
         }
         char "@" {
             source_rect         275 1 10 16
+            offset              0 -3
         }
         char "A" {
             source_rect         286 1 8 16
+            offset              0 -3
         }
         char "B" {
             source_rect         295 1 8 16
+            offset              0 -3
         }
         char "C" {
             source_rect         304 1 8 16
+            offset              0 -3
         }
         char "D" {
             source_rect         313 1 9 16
+            offset              0 -3
         }
         char "E" {
             source_rect         323 1 8 16
+            offset              0 -3
         }
         char "F" {
             source_rect         332 1 8 16
+            offset              0 -3
         }
         char "G" {
             source_rect         341 1 8 16
+            offset              0 -3
         }
         char "H" {
             source_rect         350 1 8 16
+            offset              0 -3
         }
         char "I" {
             source_rect         359 1 6 16
+            offset              0 -3
         }
         char "J" {
             source_rect         366 1 9 16
+            offset              0 -3
         }
         char "K" {
             source_rect         376 1 8 16
+            offset              0 -3
         }
         char "L" {
             source_rect         385 1 8 16
+            offset              0 -3
         }
         char "M" {
             source_rect         394 1 10 16
+            offset              0 -3
         }
         char "N" {
             source_rect         405 1 9 16
+            offset              0 -3
         }
         char "O" {
             source_rect         415 1 8 16
+            offset              0 -3
         }
         char "P" {
             source_rect         424 1 8 16
+            offset              0 -3
         }
         char "Q" {
             source_rect         433 1 9 16
+            offset              0 -3
         }
         char "R" {
             source_rect         443 1 9 16
+            offset              0 -3
         }
         char "S" {
             source_rect         453 1 8 16
+            offset              0 -3
         }
         char "T" {
             source_rect         462 1 8 16
+            offset              0 -3
         }
         char "U" {
             source_rect         471 1 8 16
+            offset              0 -3
         }
         char "V" {
             source_rect         480 1 8 16
+            offset              0 -3
         }
         char "W" {
             source_rect         489 1 10 16
+            offset              0 -3
         }
         char "X" {
             source_rect         500 1 9 16
+            offset              0 -3
         }
         char "Y" {
             source_rect         510 1 8 16
+            offset              0 -3
         }
         char "Z" {
             source_rect         519 1 8 16
+            offset              0 -3
         }
         char "[" {
             source_rect         528 1 6 16
+            offset              0 -3
         }
         char "\\" {
             source_rect         535 1 8 16
+            offset              0 -3
         }
         char "]" {
             source_rect         544 1 6 16
+            offset              0 -3
         }
         char "^" {
             source_rect         551 1 11 16
+            offset              0 -3
         }
         char "_" {
             source_rect         563 1 8 16
+            offset              0 -3
         }
         char "`" {
             source_rect         572 1 8 16
+            offset              0 -3
         }
         char "a" {
             source_rect         579 1 8 16
+            offset              0 -3
         }
         char "b" {
             source_rect         588 1 8 16
+            offset              0 -3
         }
         char "c" {
             source_rect         597 1 8 16
+            offset              0 -3
         }
         char "d" {
             source_rect         606 1 8 16
+            offset              0 -3
         }
         char "e" {
             source_rect         615 1 8 16
+            offset              0 -3
         }
         char "f" {
             source_rect         624 1 7 16
+            offset              0 -3
         }
         char "g" {
             source_rect         632 1 8 16
+            offset              0 -3
         }
         char "h" {
             source_rect         641 1 8 16
+            offset              0 -3
         }
         char "i" {
             source_rect         650 1 6 16
+            offset              0 -3
         }
         char "j" {
             source_rect         657 1 6 16
+            offset              0 -3
         }
         char "k" {
             source_rect         664 1 8 16
+            offset              0 -3
         }
         char "l" {
             source_rect         673 1 5 16
+            offset              0 -3
         }
         char "m" {
             source_rect         679 1 10 16
+            offset              0 -3
         }
         char "n" {
             source_rect         690 1 8 16
+            offset              0 -3
         }
         char "o" {
             source_rect         699 1 8 16
+            offset              0 -3
         }
         char "p" {
             source_rect         708 1 8 16
+            offset              0 -3
         }
         char "q" {
             source_rect         717 1 9 16
+            offset              0 -3
         }
         char "r" {
             source_rect         727 1 8 16
+            offset              0 -3
         }
         char "s" {
             source_rect         736 1 8 16
+            offset              0 -3
         }
         char "t" {
             source_rect         745 1 8 16
+            offset              0 -3
         }
         char "u" {
             source_rect         754 1 8 16
+            offset              0 -3
         }
         char "v" {
             source_rect         763 1 8 16
+            offset              0 -3
         }
         char "w" {
             source_rect         772 1 10 16
+            offset              0 -3
         }
         char "x" {
             source_rect         783 1 8 16
+            offset              0 -3
         }
         char "y" {
             source_rect         792 1 8 16
+            offset              0 -3
         }
         char "z" {
             source_rect         801 1 8 16
+            offset              0 -3
         }
         char "{" {
             source_rect         810 1 7 16
+            offset              0 -3
         }
         char "|" {
             source_rect         818 1 4 16
+            offset              0 -3
         }
         char "}" {
             source_rect         823 1 7 16
+            offset              0 -3
         }
         char "~" {
             source_rect         831 1 9 16
+            offset              0 -3
         }
         char "\x7f" {
             source_rect         841 1 10 16
+            offset              0 -3
+        }
+
+
+        char "А" {
+            source_rect         1 18 8 18
+            offset              0 -3
+        }
+        char "Б" {
+            source_rect         10 18 8 18
+            offset              0 -3
+        }
+        char "В" {
+            source_rect         19 18 8 18
+            offset              0 -3
+        }
+        char "Г" {
+            source_rect         28 18 8 18
+            offset              0 -3
+        }
+        char "Д" {
+            source_rect         37 18 10 18
+            offset              0 -3
+        }
+        char "Е" {
+            source_rect         48 18 8 18
+            offset              0 -3
+        }
+        char "Ё" {
+            source_rect         57 18 8 18
+            offset              0 -3
+        }
+        char "Ж" {
+            source_rect         66 18 12 18
+            offset              0 -3
+        }
+        char "З" {
+            source_rect         79 18 8 18
+            offset              0 -3
+        }
+        char "И" {
+            source_rect         88 18 9 18
+            offset              0 -3
+        }
+        char "Й" {
+            source_rect         98 18 9 18
+            offset              0 -3
+        }
+        char "К" {
+            source_rect         108 18 8 18
+            offset              0 -3
+        }
+        char "Л" {
+            source_rect         117 18 9 18
+            offset              0 -3
+        }
+        char "М" {
+            source_rect         127 18 10 18
+            offset              0 -3
+        }
+        char "Н" {
+            source_rect         138 18 8 18
+            offset              0 -3
+        }
+        char "О" {
+            source_rect         147 18 8 18
+            offset              0 -3
+        }
+        char "П" {
+            source_rect         156 18 8 18
+            offset              0 -3
+        }
+        char "Р" {
+            source_rect         165 18 8 18
+            offset              0 -3
+        }
+        char "С" {
+            source_rect         174 18 8 18
+            offset              0 -3
+        }
+        char "Т" {
+            source_rect         183 18 8 18
+            offset              0 -3
+        }
+        char "У" {
+            source_rect         192 18 8 18
+            offset              0 -3
+        }
+        char "Ф" {
+            source_rect         201 18 12 18
+            offset              0 -3
+        }
+        char "Х" {
+            source_rect         214 18 9 18
+            offset              0 -3
+        }
+        char "Ц" {
+            source_rect         224 18 10 18
+            offset              0 -3
+        }
+        char "Ч" {
+            source_rect         235 18 8 18
+            offset              0 -3
+        }
+        char "Ш" {
+            source_rect         244 18 12 18
+            offset              0 -3
+        }
+        char "Щ" {
+            source_rect         257 18 14 18
+            offset              0 -3
+        }
+        char "Ъ" {
+            source_rect         272 18 10 18
+            offset              0 -3
+        }
+        char "Ы" {
+            source_rect         283 18 11 18
+            offset              0 -3
+        }
+        char "Ь" {
+            source_rect         295 18 8 18
+            offset              0 -3
+        }
+        char "Э" {
+            source_rect         304 18 8 18
+            offset              0 -3
+        }
+        char "Ю" {
+            source_rect         313 18 11 18
+            offset              0 -3
+        }
+        char "Я" {
+            source_rect         325 18 9 18
+            offset              0 -3
+        }
+        char "а" {
+            source_rect         335 18 8 18
+            offset              0 -3
+        }
+        char "б" {
+            source_rect         344 18 8 18
+            offset              0 -3
+        }
+        char "в" {
+            source_rect         353 18 8 18
+            offset              0 -3
+        }
+        char "г" {
+            source_rect         362 18 8 18
+            offset              0 -3
+        }
+        char "д" {
+            source_rect         371 18 8 18
+            offset              0 -3
+        }
+        char "е" {
+            source_rect         380 18 8 18
+            offset              0 -3
+        }
+        char "ё" {
+            source_rect         389 18 8 18
+            offset              0 -3
+        }
+        char "ж" {
+            source_rect         398 18 10 18
+            offset              0 -3
+        }
+        char "з" {
+            source_rect         409 18 8 18
+            offset              0 -3
+        }
+        char "и" {
+            source_rect         418 18 8 18
+            offset              0 -3
+        }
+        char "й" {
+            source_rect         427 18 8 18
+            offset              0 -3
+        }
+        char "к" {
+            source_rect         436 18 8 18
+            offset              0 -3
+        }
+        char "л" {
+            source_rect         445 18 9 18
+            offset              0 -3
+        }
+        char "м" {
+            source_rect         455 18 10 18
+            offset              0 -3
+        }
+        char "н" {
+            source_rect         466 18 8 18
+            offset              0 -3
+        }
+        char "о" {
+            source_rect         475 18 8 18
+            offset              0 -3
+        }
+        char "п" {
+            source_rect         484 18 8 18
+            offset              0 -3
+        }
+        char "р" {
+            source_rect         493 18 8 18
+            offset              0 -3
+        }
+        char "с" {
+            source_rect         502 18 8 18
+            offset              0 -3
+        }
+        char "т" {
+            source_rect         511 18 8 18
+            offset              0 -3
+        }
+        char "у" {
+            source_rect         520 18 8 18
+            offset              0 -3
+        }
+        char "ф" {
+            source_rect         529 18 10 18
+            offset              0 -3
+        }
+        char "х" {
+            source_rect         540 18 8 18
+            offset              0 -3
+        }
+        char "ц" {
+            source_rect         549 18 10 18
+            offset              0 -3
+        }
+        char "ч" {
+            source_rect         560 18 8 18
+            offset              0 -3
+        }
+        char "ш" {
+            source_rect         569 18 10 18
+            offset              0 -3
+        }
+        char "щ" {
+            source_rect         580 18 12 18
+            offset              0 -3
+        }
+        char "ъ" {
+            source_rect         593 18 10 18
+            offset              0 -3
+        }
+        char "ы" {
+            source_rect         604 18 11 18
+            offset              0 -3
+        }
+        char "ь" {
+            source_rect         616 18 8 18
+            offset              0 -3
+        }
+        char "э" {
+            source_rect         625 18 8 18
+            offset              0 -3
+        }
+        char "ю" {
+            source_rect         634 18 11 18
+            offset              0 -3
+        }
+        char "я" {
+            source_rect         646 18 8 18
+            offset              0 -3
+        }
+        char "Є" {
+            source_rect         655 18 8 18
+            offset              0 -3
+        }
+        char "І" {
+            source_rect         664 18 6 18
+            offset              0 -3
+        }
+        char "Ї" {
+            source_rect         671 18 8 18
+            offset              0 -3
+        }
+        char "Ў" {
+            source_rect         680 18 8 18
+            offset              0 -3
+        }
+        char "Ґ" {
+            source_rect         689 18 8 18
+            offset              0 -3
+        }
+        char "є" {
+            source_rect         698 18 8 18
+            offset              0 -3
+        }
+        char "і" {
+            source_rect         707 18 6 18
+            offset              0 -3
+        }
+        char "ї" {
+            source_rect         714 18 7 18
+            offset              0 -3
+        }
+        char "ў" {
+            source_rect         722 18 8 18
+            offset              0 -3
+        }
+        char "ґ" {
+            source_rect         731 18 8 18
+            offset              0 -3
+        }
+
+
+        char "Ä" {
+            source_rect         1 37 8 19
+            offset              0 -3
+        }
+        char "ä" {
+            source_rect         10 37 8 19
+            offset              0 -3
+        }
+        char "À" {
+            source_rect         19 37 8 19
+            offset              0 -3
+        }
+        char "à" {
+            source_rect         28 37 8 19
+            offset              0 -3
+        }
+        char "Â" {
+            source_rect         37 37 8 19
+            offset              0 -3
+        }
+        char "â" {
+            source_rect         46 37 8 19
+            offset              0 -3
+        }
+        char "Á" {
+            source_rect         55 37 8 19
+            offset              0 -3
+        }
+        char "á" {
+            source_rect         64 37 8 19
+            offset              0 -3
+        }
+        char "Ã" {
+            source_rect         73 37 8 19
+            offset              0 -3
+        }
+        char "ã" {
+            source_rect         82 37 8 19
+            offset              0 -3
+        }
+        char "Å" {
+            source_rect         91 37 8 19
+            offset              0 -3
+        }
+        char "å" {
+            source_rect         100 37 8 19
+            offset              0 -3
+        }
+        char "Æ" {
+            source_rect         109 37 12 19
+            offset              0 -3
+        }
+        char "æ" {
+            source_rect         122 37 12 19
+            offset              0 -3
+        }
+        char "È" {
+            source_rect         135 37 8 19
+            offset              0 -3
+        }
+        char "è" {
+            source_rect         144 37 8 19
+            offset              0 -3
+        }
+        char "Ê" {
+            source_rect         153 37 8 19
+            offset              0 -3
+        }
+        char "ê" {
+            source_rect         162 37 8 19
+            offset              0 -3
+        }
+        char "É" {
+            source_rect         171 37 8 19
+            offset              0 -3
+        }
+        char "é" {
+            source_rect         180 37 8 19
+            offset              0 -3
+        }
+        char "Ç" {
+            source_rect         189 37 8 19
+            offset              0 -3
+        }
+        char "ç" {
+            source_rect         198 37 8 19
+            offset              0 -3
+        }
+        char "Ğ" {
+            source_rect         207 37 8 19
+            offset              0 -3
+        }
+        char "ğ" {
+            source_rect         216 37 8 19
+            offset              0 -3
+        }
+        char "Î" {
+            source_rect         225 37 6 19
+            offset              0 -3
+        }
+        char "î" {
+            source_rect         232 37 6 19
+            offset              0 -3
+        }
+        char "Í" {
+            source_rect         239 37 6 19
+            offset              0 -3
+        }
+        char "í" {
+            source_rect         246 37 6 19
+            offset              0 -3
+        }
+        char "İ" {
+            source_rect         253 37 6 19
+            offset              0 -3
+        }
+        char "ı" {
+            source_rect         260 37 6 19
+            offset              0 -3
+        }
+        char "Ñ" {
+            source_rect         267 37 9 19
+            offset              0 -3
+        }
+        char "ñ" {
+            source_rect         277 37 8 19
+            offset              0 -3
+        }
+        char "Ö" {
+            source_rect         286 37 8 19
+            offset              0 -3
+        }
+        char "ö" {
+            source_rect         295 37 8 19
+            offset              0 -3
+        }
+        char "Ò" {
+            source_rect         304 37 8 19
+            offset              0 -3
+        }
+        char "ò" {
+            source_rect         313 37 8 19
+            offset              0 -3
+        }
+        char "Ô" {
+            source_rect         322 37 8 19
+            offset              0 -3
+        }
+        char "ô" {
+            source_rect         331 37 8 19
+            offset              0 -3
+        }
+        char "Ó" {
+            source_rect         340 37 8 19
+            offset              0 -3
+        }
+        char "ó" {
+            source_rect         349 37 8 19
+            offset              0 -3
+        }
+        char "Õ" {
+            source_rect         358 37 8 19
+            offset              0 -3
+        }
+        char "õ" {
+            source_rect         367 37 8 19
+            offset              0 -3
+        }
+        char "Œ" {
+            source_rect         376 37 12 19
+            offset              0 -3
+        }
+        char "œ" {
+            source_rect         389 37 12 19
+            offset              0 -3
+        }
+        char "Ø" {
+            source_rect         402 37 12 19
+            offset              0 -3
+        }
+        char "ø" {
+            source_rect         415 37 10 19
+            offset              0 -3
+        }
+        char "Ş" {
+            source_rect         426 37 8 19
+            offset              0 -3
+        }
+        char "ş" {
+            source_rect         435 37 8 19
+            offset              0 -3
+        }
+        char "Ü" {
+            source_rect         444 37 8 19
+            offset              0 -3
+        }
+        char "ü" {
+            source_rect         453 37 8 19
+            offset              0 -3
+        }
+        char "Ù" {
+            source_rect         462 37 8 19
+            offset              0 -3
+        }
+        char "ù" {
+            source_rect         471 37 8 19
+            offset              0 -3
+        }
+        char "Û" {
+            source_rect         480 37 8 19
+            offset              0 -3
+        }
+        char "û" {
+            source_rect         489 37 8 19
+            offset              0 -3
+        }
+        char "Ú" {
+            source_rect         498 37 8 19
+            offset              0 -3
+        }
+        char "ú" {
+            source_rect         507 37 8 19
+            offset              0 -3
+        }
+        char "Ÿ" {
+            source_rect         516 37 8 19
+            offset              0 -3
+        }
+        char "ÿ" {
+            source_rect         525 37 8 19
+            offset              0 -3
+        }
+        char "¿" {
+            source_rect         534 37 8 19
+            offset              0 -3
+        }
+        char "¡" {
+            source_rect         543 37 6 19
+            offset              0 -3
+        }
+        char "ß" {
+            source_rect         550 37 9 19
+            offset              0 -3
+        }
+
+
+        char "Ć" {
+            source_rect         560 37 8 19
+            offset              0 -3
+        }
+        char "ć" {
+            source_rect         569 37 8 19
+            offset              0 -3
+        }
+        char "Č" {
+            source_rect         578 37 8 19
+            offset              0 -3
+        }
+        char "č" {
+            source_rect         587 37 8 19
+            offset              0 -3
+        }
+        char "Đ" {
+            source_rect         596 37 10 19
+            offset              0 -3
+        }
+        char "đ" {
+            source_rect         607 37 9 19
+            offset              0 -3
+        }
+        char "Š" {
+            source_rect         617 37 8 19
+            offset              0 -3
+        }
+        char "š" {
+            source_rect         626 37 8 19
+            offset              0 -3
+        }
+        char "Ŝ" {
+            source_rect         635 37 8 19
+            offset              0 -3
+        }
+        char "ŝ" {
+            source_rect         644 37 8 19
+            offset              0 -3
+        }
+        char "Ž" {
+            source_rect         653 37 8 19
+            offset              0 -3
+        }
+        char "ž" {
+            source_rect         662 37 8 19
+            offset              0 -3
+        }
+        char "Ĉ" {
+            source_rect         671 37 8 19
+            offset              0 -3
+        }
+        char "ĉ" {
+            source_rect         680 37 8 19
+            offset              0 -3
+        }
+        char "Ĝ" {
+            source_rect         689 37 8 19
+            offset              0 -3
+        }
+        char "ĝ" {
+            source_rect         698 37 8 19
+            offset              0 -3
+        }
+        char "Ĥ" {
+            source_rect         707 37 8 19
+            offset              0 -3
+        }
+        char "ĥ" {
+            source_rect         716 37 9 19
+            offset              0 -3
+        }
+        char "Ĵ" {
+            source_rect         726 37 9 19
+            offset              0 -3
+        }
+        char "ĵ" {
+            source_rect         736 37 7 19
+            offset              0 -3
+        }
+        char "Ŭ" {
+            source_rect         744 37 8 19
+            offset              0 -3
+        }
+        char "ŭ" {
+            source_rect         753 37 8 19
+            offset              0 -3
         }
     }
 }
@@ -311,292 +1049,292 @@ font "HUD Large"
         spacing                 -2 2
 
         char " " {
-            source_rect         2 20 16 32
+            source_rect         2 94 16 32
         }
         char "!" {
-            source_rect         20 20 12 32
+            source_rect         20 94 12 32
         }
         char "\"" {
-            source_rect         34 20 14 32
+            source_rect         34 94 14 32
         }
         char "#" {
-            source_rect         50 20 20 32
+            source_rect         50 94 20 32
         }
         char "$" {
-            source_rect         72 20 20 32
+            source_rect         72 94 20 32
         }
         char "%" {
-            source_rect         94 20 22 32
+            source_rect         94 94 22 32
         }
         char "&" {
-            source_rect         118 20 22 32
+            source_rect         118 94 22 32
         }
         char "'" {
-            source_rect         142 20 8 32
+            source_rect         142 94 8 32
         }
         char "(" {
-            source_rect         152 20 12 32
+            source_rect         152 94 12 32
         }
         char ")" {
-            source_rect         166 20 12 32
+            source_rect         166 94 12 32
         }
         char "*" {
-            source_rect         180 20 20 32
+            source_rect         180 94 20 32
         }
         char "+" {
-            source_rect         202 20 16 32
+            source_rect         202 94 16 32
         }
         char "," {
-            source_rect         220 20 8 32
+            source_rect         220 94 8 32
         }
         char "-" {
-            source_rect         230 20 18 32
+            source_rect         230 94 18 32
         }
         char "." {
-            source_rect         250 20 8 32
+            source_rect         250 94 8 32
         }
         char "/" {
-            source_rect         260 20 16 32
+            source_rect         260 94 16 32
         }
         char "0" {
-            source_rect         278 20 16 32
+            source_rect         278 94 16 32
         }
         char "1" {
-            source_rect         296 20 12 32
+            source_rect         296 94 12 32
         }
         char "2" {
-            source_rect         310 20 16 32
+            source_rect         310 94 16 32
         }
         char "3" {
-            source_rect         328 20 16 32
+            source_rect         328 94 16 32
         }
         char "4" {
-            source_rect         346 20 18 32
+            source_rect         346 94 18 32
         }
         char "5" {
-            source_rect         366 20 16 32
+            source_rect         366 94 16 32
         }
         char "6" {
-            source_rect         384 20 16 32
+            source_rect         384 94 16 32
         }
         char "7" {
-            source_rect         402 20 16 32
+            source_rect         402 94 16 32
         }
         char "8" {
-            source_rect         420 20 16 32
+            source_rect         420 94 16 32
         }
         char "9" {
-            source_rect         438 20 16 32
+            source_rect         438 94 16 32
         }
         char ":" {
-            source_rect         456 20 8 32
+            source_rect         456 94 8 32
         }
         char ";" {
-            source_rect         466 20 8 32
+            source_rect         466 94 8 32
         }
         char "<" {
-            source_rect         476 20 18 32
+            source_rect         476 94 18 32
         }
         char "=" {
-            source_rect         496 20 14 32
+            source_rect         496 94 14 32
         }
         char ">" {
-            source_rect         512 20 18 32
+            source_rect         512 94 18 32
         }
         char "?" {
-            source_rect         532 20 16 32
+            source_rect         532 94 16 32
         }
         char "@" {
-            source_rect         550 20 20 32
+            source_rect         550 94 20 32
         }
         char "A" {
-            source_rect         572 20 16 32
+            source_rect         572 94 16 32
         }
         char "B" {
-            source_rect         590 20 16 32
+            source_rect         590 94 16 32
         }
         char "C" {
-            source_rect         608 20 16 32
+            source_rect         608 94 16 32
         }
         char "D" {
-            source_rect         626 20 18 32
+            source_rect         626 94 18 32
         }
         char "E" {
-            source_rect         646 20 16 32
+            source_rect         646 94 16 32
         }
         char "F" {
-            source_rect         664 20 16 32
+            source_rect         664 94 16 32
         }
         char "G" {
-            source_rect         682 20 16 32
+            source_rect         682 94 16 32
         }
         char "H" {
-            source_rect         700 20 16 32
+            source_rect         700 94 16 32
         }
         char "I" {
-            source_rect         718 20 12 32
+            source_rect         718 94 12 32
         }
         char "J" {
-            source_rect         732 20 18 32
+            source_rect         732 94 18 32
         }
         char "K" {
-            source_rect         752 20 16 32
+            source_rect         752 94 16 32
         }
         char "L" {
-            source_rect         770 20 16 32
+            source_rect         770 94 16 32
         }
         char "M" {
-            source_rect         788 20 20 32
+            source_rect         788 94 20 32
         }
         char "N" {
-            source_rect         810 20 18 32
+            source_rect         810 94 18 32
         }
         char "O" {
-            source_rect         830 20 16 32
+            source_rect         830 94 16 32
         }
         char "P" {
-            source_rect         848 20 16 32
+            source_rect         848 94 16 32
         }
         char "Q" {
-            source_rect         866 20 18 32
+            source_rect         866 94 18 32
         }
         char "R" {
-            source_rect         886 20 18 32
+            source_rect         886 94 18 32
         }
         char "S" {
-            source_rect         906 20 16 32
+            source_rect         906 94 16 32
         }
         char "T" {
-            source_rect         924 20 16 32
+            source_rect         924 94 16 32
         }
         char "U" {
-            source_rect         942 20 16 32
+            source_rect         942 94 16 32
         }
         char "V" {
-            source_rect         960 20 16 32
+            source_rect         960 94 16 32
         }
         char "W" {
-            source_rect         978 20 20 32
+            source_rect         978 94 20 32
         }
         char "X" {
-            source_rect         1000 20 18 32
+            source_rect         1000 94 18 32
         }
         char "Y" {
-            source_rect         1020 20 16 32
+            source_rect         1020 94 16 32
         }
         char "Z" {
-            source_rect         1038 20 16 32
+            source_rect         1038 94 16 32
         }
         char "[" {
-            source_rect         1056 20 12 32
+            source_rect         1056 94 12 32
         }
         char "\\" {
-            source_rect         1070 20 16 32
+            source_rect         1070 94 16 32
         }
         char "]" {
-            source_rect         1088 20 12 32
+            source_rect         1088 94 12 32
         }
         char "^" {
-            source_rect         1102 20 22 32
+            source_rect         1102 94 22 32
         }
         char "_" {
-            source_rect         1126 20 16 32
+            source_rect         1126 94 16 32
         }
         char "`" {
-            source_rect         1144 20 16 32
+            source_rect         1144 94 16 32
         }
         char "a" {
-            source_rect         1158 20 16 32
+            source_rect         1158 94 16 32
         }
         char "b" {
-            source_rect         1176 20 16 32
+            source_rect         1176 94 16 32
         }
         char "c" {
-            source_rect         1194 20 16 32
+            source_rect         1194 94 16 32
         }
         char "d" {
-            source_rect         1212 20 16 32
+            source_rect         1212 94 16 32
         }
         char "e" {
-            source_rect         1230 20 16 32
+            source_rect         1230 94 16 32
         }
         char "f" {
-            source_rect         1248 20 14 32
+            source_rect         1248 94 14 32
         }
         char "g" {
-            source_rect         1264 20 16 32
+            source_rect         1264 94 16 32
         }
         char "h" {
-            source_rect         1282 20 16 32
+            source_rect         1282 94 16 32
         }
         char "i" {
-            source_rect         1300 20 12 32
+            source_rect         1300 94 12 32
         }
         char "j" {
-            source_rect         1314 20 12 32
+            source_rect         1314 94 12 32
         }
         char "k" {
-            source_rect         1328 20 16 32
+            source_rect         1328 94 16 32
         }
         char "l" {
-            source_rect         1346 20 10 32
+            source_rect         1346 94 10 32
         }
         char "m" {
-            source_rect         1358 20 20 32
+            source_rect         1358 94 20 32
         }
         char "n" {
-            source_rect         1380 20 16 32
+            source_rect         1380 94 16 32
         }
         char "o" {
-            source_rect         1398 20 16 32
+            source_rect         1398 94 16 32
         }
         char "p" {
-            source_rect         1416 20 16 32
+            source_rect         1416 94 16 32
         }
         char "q" {
-            source_rect         1434 20 18 32
+            source_rect         1434 94 18 32
         }
         char "r" {
-            source_rect         1454 20 16 32
+            source_rect         1454 94 16 32
         }
         char "s" {
-            source_rect         1472 20 16 32
+            source_rect         1472 94 16 32
         }
         char "t" {
-            source_rect         1490 20 16 32
+            source_rect         1490 94 16 32
         }
         char "u" {
-            source_rect         1508 20 16 32
+            source_rect         1508 94 16 32
         }
         char "v" {
-            source_rect         1526 20 16 32
+            source_rect         1526 94 16 32
         }
         char "w" {
-            source_rect         1544 20 20 32
+            source_rect         1544 94 20 32
         }
         char "x" {
-            source_rect         1566 20 16 32
+            source_rect         1566 94 16 32
         }
         char "y" {
-            source_rect         1584 20 16 32
+            source_rect         1584 94 16 32
         }
         char "z" {
-            source_rect         1602 20 16 32
+            source_rect         1602 94 16 32
         }
         char "{" {
-            source_rect         1620 20 14 32
+            source_rect         1620 94 14 32
         }
         char "|" {
-            source_rect         1636 20 8 32
+            source_rect         1636 94 8 32
         }
         char "}" {
-            source_rect         1646 20 14 32
+            source_rect         1646 94 14 32
         }
         char "~" {
-            source_rect         1662 20 18 32
+            source_rect         1662 94 18 32
         }
         char "\x7f" {
-            source_rect         1682 20 20 32
+            source_rect         1682 94 20 32
         }
     }
 }

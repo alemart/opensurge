@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * editorcmd.c - level editor: commands & hotkeys
- * Copyright (C) 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 #include <string.h>
 #include "editorcmd.h"
 #include "../../core/input.h"
-#include "../../core/util.h"
+#include "../../util/util.h"
 
 /* commands */
 typedef struct command_t command_t;
@@ -46,6 +46,7 @@ static const command_t command[] = {
     { "DOWN", "Shift+S" },
     { "LEFT", "Shift+Left" },
     { "LEFT", "Shift+A" },
+    { "enter-debug-mode", "Shift+F12" },
     { "enter", "F12" },
     { "quit", "F12" },
     { "quit-alt", "ESC" },

@@ -136,57 +136,16 @@ object "End of Demo - Text" is "private", "detached", "entity"
 
 object "End of Demo - Button" is "private", "detached", "entity"
 {
-    transform = Transform();
-    label = Text("End of Demo - Text");
-    icon = spawn("End of Demo - Button - Blinking Icon");
-    sfx = Sound("samples/select.wav");
-    input = Input("default");
+    menu = spawn("Simple Menu Builder")
+           .addOption("continue", "$ENDOFDEMO_CONTINUE", Vector2.zero)
+           .setIcon("End of Demo - Pointer")
+           .setFontName("End of Demo - Text")
+           .setHighlightColor("ffffff")
+           .setPosition(Vector2(88, 208))
+           .build();
 
-    state "main"
+    fun onChooseMenuOption(optionId)
     {
-        if(input.buttonPressed("fire1") || input.buttonPressed("fire3")) {
-            sfx.play();
-            parent.goToNextLevel();
-            state = "done";
-        }
-    }
-
-    state "done"
-    {
-    }
-
-    fun constructor()
-    {
-        transform.position = Vector2(88, 208);
-        label.align = "left";
-        label.text = "$ENDOFDEMO_CONTINUE";
-    }
-}
-
-object "End of Demo - Button - Blinking Icon" is "private", "detached", "entity"
-{
-    transform = Transform();
-    label = Text("End of Demo - Text");
-    seconds = 0.25;
-
-    state "main"
-    {
-        label.visible = true;
-        if(timeout(seconds))
-            state = "alt";
-    }
-
-    state "alt"
-    {
-        label.visible = false;
-        if(timeout(seconds))
-            state = "main";
-    }
-
-    fun constructor()
-    {
-        transform.localPosition = Vector2(-10, 0);
-        label.align = "left";
-        label.text = ">";
+        parent.goToNextLevel();
     }
 }

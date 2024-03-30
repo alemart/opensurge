@@ -1,0 +1,143 @@
+// -----------------------------------------------------------------------------
+// File: play_classic_levels.spr
+// Description: sprite script - "End of Demo" scene
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Play Classic Levels - Pointer"
+{
+    source_file     "images/scenes/end_of_demo.png"
+    source_rect     432 0 22 11
+    frame_size      11 11
+    hot_spot        12 -2
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         4
+        data        0 1
+    }
+}
+
+sprite "Play Classic Levels - Zzz..."
+{
+    source_file     "images/scenes/end_of_demo.png"
+    source_rect     464 0 4 4
+    frame_size      4 4
+    hot_spot        2 2
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Play Classic Levels - Neon"
+{
+    source_file     "images/scenes/end_of_demo.png"
+    source_rect     0 250 500 150
+    frame_size      50 50
+    hot_spot        25 50
+    action_spot     22 25
+
+    // sleeping
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        3
+    }
+
+    // eyes open (sort of)
+    animation 1
+    {
+        repeat      TRUE
+        fps         12
+        data        27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 27 28 29 28
+    }
+
+    // sitting
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        4 5 6 7 8 9 10 11 12 13 14 15 15 15 14 13 12 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11
+        repeat_from 7
+    }
+
+    // awake
+    animation 3
+    {
+        repeat      FALSE
+        fps         6
+        data        11 11 11 11 11 16 17
+    }
+
+    // walking
+    animation 4
+    {
+        repeat      TRUE
+        fps         16
+        data        20 21 22 23 24 23 22 21
+    }
+
+    // disturbed
+    animation 5
+    {
+        repeat      FALSE
+        fps         8
+        data        0 0 0 3
+    }
+}
+
+sprite "Play Classic Levels - Surge"
+{
+    source_file     "images/scenes/end_of_demo.png"
+    source_rect     0 400 500 100
+    frame_size      50 50
+    hot_spot        25 50
+
+    // waiting
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+
+    // arms crossed
+    animation 1
+    {
+        repeat      FALSE
+        fps         6
+        data        0 0 0 0 0 0 0 0 0 1 2
+    }
+
+    // get up!
+    animation 2
+    {
+        repeat      TRUE
+        fps         6
+        data        2 2 2 2 2 2 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 3 0 3 3 0
+        repeat_from 8
+    }
+
+    // displeased
+    animation 3
+    {
+        repeat      FALSE
+        fps         4
+        data        0 0 0 0 0 0 0 4
+    }
+
+    // walking
+    animation 4
+    {
+        repeat      TRUE
+        fps         16
+        data        10 11 12 13 14 15 16 17
+    }
+}

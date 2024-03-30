@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * color.h - color utility
- * Copyright (C) 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,8 @@ typedef struct color_t {
 /* public API */
 color_t color_rgb(uint8_t r, uint8_t g, uint8_t b);
 color_t color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+color_t color_premul_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+color_t color_mix(color_t x, color_t y, float t);
 color_t color_hex(const char* hex_string);
 const char* color_to_hex(color_t color, char* dest, size_t dest_size);
 void color_unmap(color_t color, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a);

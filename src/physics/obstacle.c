@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * obstacle.c - physics system: obstacles
- * Copyright (C) 2011, 2018, 2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,23 +21,17 @@
 #include <stdint.h>
 #include "obstacle.h"
 #include "collisionmask.h"
-#include "../core/util.h"
-
-/* obstacle flags */
-const int OF_SOLID = 0x0;
-const int OF_CLOUD = 0x1;
-const int OF_HFLIP = 0x2;
-const int OF_VFLIP = 0x4;
+#include "../util/util.h"
 
 /* obstacle struct */
 struct obstacle_t
 {
-    int xpos;
-    int ypos;
+    point2d_t position; /* position in world space */
 
     uint16_t width;
     uint16_t height;
 
+    obstaclelayer_t layer;
     uint8_t flags;
 
     const collisionmask_t* mask;
@@ -46,29 +40,40 @@ struct obstacle_t
     void *dtor_userdata;
 };
 
-/* private utilities */
-static inline void flip(const obstacle_t* obstacle, int *local_x, int *local_y, grounddir_t *ground_direction);
-static inline grounddir_t flip_grounddir(grounddir_t ground_direction);
+/* FLIP macro: x, y are input/output parameters */
+#define FLIP(obstacle, x, y) do { \
+    if((obstacle)->flags & OF_HFLIP) \
+        x = (obstacle)->width - x - 1; \
+    if((obstacle)->flags & OF_VFLIP) \
+        y = (obstacle)->height - y - 1; \
+} while(0)
+
+
 
 /* public methods */
-obstacle_t* obstacle_create(const collisionmask_t* mask, int xpos, int ypos, int flags)
+obstacle_t* obstacle_create(const collisionmask_t* mask, point2d_t position, obstaclelayer_t layer, int flags)
 {
-    return obstacle_create_ex(mask, xpos, ypos, flags, NULL, NULL);
+    return obstacle_create_ex(mask, position, layer, flags, NULL, NULL);
 }
 
-obstacle_t* obstacle_create_ex(const collisionmask_t* mask, int xpos, int ypos, int flags, void (*dtor)(void*), void *dtor_userdata)
+obstacle_t* obstacle_create_ex(const collisionmask_t* mask, point2d_t position, obstaclelayer_t layer, int flags, void (*dtor)(void*), void *dtor_userdata)
 {
     obstacle_t *o = mallocx(sizeof *o);
 
-    o->xpos = xpos;
-    o->ypos = ypos;
+    o->position = position;
+
+    o->layer = layer;
+    o->flags = flags;
+
+    o->mask = mask;
     o->width = collisionmask_width(mask);
     o->height = collisionmask_height(mask);
-    o->flags = flags;
-    o->mask = mask;
 
     o->dtor = dtor;
     o->dtor_userdata = dtor_userdata;
+
+    if(o->mask == NULL || o->width == 0 || o->height == 0)
+        fatal_error("Obstacle with no mask / zero area"); /* this must never happen */
 
     return o;
 }
@@ -82,24 +87,24 @@ obstacle_t* obstacle_destroy(obstacle_t *obstacle)
     return NULL;
 }
 
-void obstacle_get_position(const obstacle_t *obstacle, int *xpos, int *ypos)
+point2d_t obstacle_get_position(const obstacle_t *obstacle)
 {
-    if(xpos != NULL)
-        *xpos = obstacle->xpos;
-
-    if(ypos != NULL)
-        *ypos = obstacle->ypos;
+    return obstacle->position;
 }
 
-void obstacle_set_position(obstacle_t* obstacle, int xpos, int ypos)
+void obstacle_set_position(obstacle_t* obstacle, point2d_t position)
 {
-    obstacle->xpos = xpos;
-    obstacle->ypos = ypos;
+    obstacle->position = position;
 }
 
 bool obstacle_is_solid(const obstacle_t *obstacle)
 {
     return !(obstacle->flags & OF_CLOUD);
+}
+
+bool obstacle_is_static(const obstacle_t *obstacle)
+{
+    return !(obstacle->flags & OF_NONSTATIC);
 }
 
 int obstacle_get_width(const obstacle_t *obstacle)
@@ -112,42 +117,56 @@ int obstacle_get_height(const obstacle_t *obstacle)
     return obstacle->height;
 }
 
+obstaclelayer_t obstacle_get_layer(const obstacle_t *obstacle)
+{
+    return obstacle->layer;
+}
+
 /* find the ground position, given (x,y) in world coordinates */
 /* if the ground direction is up or down, this returns the absolute y position of the ground */
 /* if the ground direction is left or right, this returns the absolute x position of the ground */
 int obstacle_ground_position(const obstacle_t* obstacle, int x, int y, grounddir_t ground_direction)
 {
     /* no need to perform any clipping */
-    x -= obstacle->xpos;
-    y -= obstacle->ypos;
-    flip(obstacle, &x, &y, &ground_direction);
+    x -= obstacle->position.x;
+    y -= obstacle->position.y;
+    FLIP(obstacle, x, y);
+
+    /* flip the ground direction */
+    bool is_vertical_ground_direction = ((ground_direction == GD_UP) || (ground_direction == GD_DOWN));
+    bool is_horizontal_ground_direction = !is_vertical_ground_direction;
+    if(
+        ((obstacle->flags & OF_HFLIP) != 0 && is_horizontal_ground_direction) ||
+        ((obstacle->flags & OF_VFLIP) != 0 && is_vertical_ground_direction)
+    )
+        ground_direction = FLIPPED_GROUNDDIR(ground_direction);
 
     /* get the absolute ground position */
     switch(ground_direction) {
         case GD_DOWN:
         case GD_UP:
             y = collisionmask_locate_ground(obstacle->mask, x, y, ground_direction);
-            flip(obstacle, &x, &y, NULL);
-            return obstacle->ypos + y;
+            FLIP(obstacle, x, y);
+            return obstacle->position.y + y;
 
         case GD_LEFT:
         case GD_RIGHT:
             x = collisionmask_locate_ground(obstacle->mask, x, y, ground_direction);
-            flip(obstacle, &x, &y, NULL);
-            return obstacle->xpos + x;
+            FLIP(obstacle, x, y);
+            return obstacle->position.x + x;
     }
 
     /* this shouldn't happen */
-    return obstacle->ypos + obstacle->height - 1;
+    return obstacle->position.y + obstacle->height - 1;
 }
 
 /* detects a pixel-perfect collision between an obstacle and a sensor
  * (x1, y1, x2, y2) are given in world-coordinates; also, x1 <= x2 and y1 <= y2 */
-int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2)
+bool obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, int y2)
 {
-    const collisionmask_t* mask = obstacle->mask;
-    int o_x1 = obstacle->xpos;
-    int o_y1 = obstacle->ypos;
+    /* this function needs to be highly performant! */
+    int o_x1 = obstacle->position.x;
+    int o_y1 = obstacle->position.y;
     int o_x2 = o_x1 + obstacle->width;
     int o_y2 = o_y1 + obstacle->height;
 
@@ -155,74 +174,66 @@ int obstacle_got_collision(const obstacle_t *obstacle, int x1, int y1, int x2, i
 
     /* bounding box collision check */
     if(x1 < o_x2 && x2 >= o_x1 && y1 < o_y2 && y2 >= o_y1) {
-        int px, py;
-        int pitch = collisionmask_pitch(mask);
+        const collisionmask_t* mask = obstacle->mask;
 
         /* pixel perfect collision check */
-        if(x1 != x2) {
-            /* horizontal sensor */
-            if(y1 >= o_y1 && y1 < o_y2) {
-                int _x1 = max(x1, o_x1);
-                int _x2 = min(x2, o_x2 - 1);
-                for(int x = _x2; x >= _x1; x--) {
-                    px = x - o_x1;
-                    py = y1 - o_y1;
-                    flip(obstacle, &px, &py, NULL);
-                    if(collisionmask_at(mask, px, py, pitch))
-                        return TRUE;
+        if(y1 != y2) {
+            /* vertical sensor */
+            if(x1 >= o_x1 && x1 < o_x2) {
+                /* change of coordinates */
+                int _y1 = max(y1, o_y1) - o_y1;
+                int _y2 = min(y2, o_y2 - 1) - o_y1;
+                int _x = x1 - o_x1;
+
+                if((obstacle->flags & OF_VHFLIP) == 0) {
+                    /* fast collision detection */
+                    return collisionmask_area_test(mask, _x, _y1, _x, _y2);
+                }
+                else {
+                    /* flip the sensor */
+                    FLIP(obstacle, _x, _y1);
+                    FLIP(obstacle, x1, _y2); /* x1 will be unused */
+                    return collisionmask_area_test(mask, _x, min(_y1,_y2), _x, max(_y1,_y2));
                 }
             }
         }
-        else if(y1 != y2) {
-            /* vertical sensor */
-            if(x1 >= o_x1 && x1 < o_x2) {
-                int _y1 = max(y1, o_y1);
-                int _y2 = min(y2, o_y2 - 1);
-                for(int y = _y2; y >= _y1; y--) {
-                    px = x1 - o_x1;
-                    py = y - o_y1;
-                    flip(obstacle, &px, &py, NULL);
-                    if(collisionmask_at(mask, px, py, pitch))
-                        return TRUE;
+        else if(x1 != x2) {
+            /* horizontal sensor */
+            if(y1 >= o_y1 && y1 < o_y2) {
+                /* change of coordinates */
+                int _x1 = max(x1, o_x1) - o_x1;
+                int _x2 = min(x2, o_x2 - 1) - o_x1;
+                int _y = y1 - o_y1;
+
+                if((obstacle->flags & OF_VHFLIP) == 0) {
+                    /* fast collision detection */
+                    return collisionmask_area_test(mask, _x1, _y, _x2, _y);
+                }
+                else {
+                    /* flip the sensor */
+                    FLIP(obstacle, _x1, _y);
+                    FLIP(obstacle, _x2, y1); /* y1 will be unused */
+                    return collisionmask_area_test(mask, min(_x1, _x2), _y, max(_x1, _x2), _y);
                 }
             }
         }
         else {
-            /* single-pixel collision check */
-            px = x1 - o_x1;
-            py = y1 - o_y1;
-            flip(obstacle, &px, &py, NULL);
-            return collisionmask_at(mask, px, py, pitch);
+            /* fast single-pixel collision check */
+            int pitch = collisionmask_pitch(mask);
+            int _x = x1 - o_x1;
+            int _y = y1 - o_y1;
+
+            FLIP(obstacle, _x, _y);
+            return collisionmask_at(mask, _x, _y, pitch) != 0;
         }
     }
 
     /* no collision */
-    return FALSE;
+    return false;
 }
 
-
-/* will flip the given output parameters according to the flip flags of the obstacle */
-/* ground_direction may be NULL */
-void flip(const obstacle_t* obstacle, int *local_x, int *local_y, grounddir_t *ground_direction)
+/* check for collision with a point in world space */
+bool obstacle_point_collision(const obstacle_t *obstacle, point2d_t point)
 {
-    if(obstacle->flags != OF_SOLID) {
-        if(obstacle->flags & OF_HFLIP)
-            *local_x = obstacle->width - (*local_x) - 1;
-        if(obstacle->flags & OF_VFLIP)
-            *local_y = obstacle->height - (*local_y) - 1;
-        if(ground_direction != NULL && (((obstacle->flags & OF_HFLIP) && (*ground_direction == GD_RIGHT || *ground_direction == GD_LEFT)) || ((obstacle->flags & OF_VFLIP) && (*ground_direction == GD_UP || *ground_direction == GD_DOWN))))
-            *ground_direction = flip_grounddir(*ground_direction);
-    }
-}
-
-/* the given ground_direction, flipped */
-grounddir_t flip_grounddir(grounddir_t ground_direction)
-{
-    switch(ground_direction) {
-        case GD_UP: return GD_DOWN;
-        case GD_RIGHT: return GD_LEFT;
-        case GD_DOWN: return GD_UP;
-        case GD_LEFT: return GD_RIGHT;
-        default: return GD_UP;
-    }
+    return obstacle_got_collision(obstacle, point.x, point.y, point.x, point.y);
 }

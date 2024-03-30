@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * sfx.h - default sounds
- * Copyright (C) 2010, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@
 #define SFX_CHOOSE              sound_load("samples/choose.wav")
 #define SFX_DENY                sound_load("samples/deny.wav")
 #define SFX_BACK                sound_load("samples/return.wav")
+#define SFX_QUESTION            sound_load("samples/pause_appear.wav")
 #define SFX_CONFIRM             sound_load("samples/select.wav")
 #define SFX_SAVE                sound_load("samples/glasses.wav")
 #define SFX_PAUSE               sound_load("samples/select_2.wav")

@@ -4,6 +4,7 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+using SurgeEngine;
 using SurgeEngine.Lang;
 using SurgeEngine.Level;
 using SurgeEngine.Player;
@@ -61,7 +62,9 @@ object "Demo Setup"
         //
         "2": {
             "Event Trigger 1": {
-                "onTrigger": FunctionEvent("Show Message").withArgument(Lang["LEV_DEMO_5"])
+                "onTrigger": FunctionEvent("Show Message").withArgument(
+                    !SurgeEngine.mobile ? Lang["LEV_DEMO_5"] : Lang["LEV_DEMO_5_MOBILE"]
+                )
             },
             "Bridge": {
                 "anim": 1

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * web.h - Web routines
- * Copyright (C) 2012, 2013, 2018, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,27 +22,37 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "web.h"
-#include "util.h"
-#include "video.h"
-#include "logfile.h"
-#include "stringutil.h"
 
 #if !defined(_WIN32)
 #include <unistd.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #else
 #include <windows.h>
 #endif
 
+#if defined(__ANDROID__)
+#define ALLEGRO_UNSTABLE /* required for al_android_get_jni_env(), al_android_get_activity() */
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_android.h>
+#endif
+
+#include "web.h"
+#include "video.h"
+#include "logfile.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+
+
 
 
 /* private stuff */
-static bool file_exists(const char *filepath);
 static inline char ch2hex(unsigned char code);
-static char *url_encode(const char *url);
+static char *encode_uri(const char *uri);
+static char *encode_uri_ex(const char *uri, const char encode_table[256]);
 
+#if defined(__ANDROID__)
+static void open_web_page(const char* safe_url);
+#endif
 
 
 
@@ -57,13 +67,24 @@ static char *url_encode(const char *url);
 bool launch_url(const char *url)
 {
     bool success = true;
-    char *safe_url = url_encode(url); /* encode the URL */
+    char *safe_url = encode_uri(url); /* encode the URL */
 
+    logfile_message("Launching URL: \"%s\"...", safe_url);
     if(video_is_fullscreen())
-        video_changemode(video_get_resolution(), video_is_smooth(), false);
+        video_set_fullscreen(false);
 
     if(strncmp(safe_url, "http://", 7) == 0 || strncmp(safe_url, "https://", 8) == 0 || strncmp(safe_url, "mailto:", 7) == 0) {
-#if defined(_WIN32)
+#if defined(__ANDROID__)
+        if(!is_tv_device()) {
+            open_web_page(safe_url);
+        }
+        else {
+            video_showmessage("Unsupported operation on TV devices");
+            success = false;
+        }
+
+        (void)file_exists;
+#elif defined(_WIN32)
         ShellExecuteA(NULL, "open", safe_url, NULL, NULL, SW_SHOWNORMAL);
         (void)file_exists;
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -83,21 +104,24 @@ bool launch_url(const char *url)
         else 
             success = false;
 #elif defined(__unix__) || defined(__unix)
-        char* argv[5] = { 0 };
+        char* argv[5] = { NULL };
 
         if(file_exists("/usr/bin/xdg-open")) {
             argv[0] = "/usr/bin/xdg-open";
             argv[1] = safe_url;
-        }
-        else if(file_exists("/usr/bin/firefox")) {
-            argv[0] = "/usr/bin/firefox";
-            argv[1] = safe_url;
+            argv[2] = NULL;
         }
         else if(file_exists("/usr/bin/python")) {
             argv[0] = "/usr/bin/python";
             argv[1] = "-m";
             argv[2] = "webbrowser";
             argv[3] = safe_url;
+            argv[4] = NULL;
+        }
+        else if(file_exists("/usr/bin/firefox")) {
+            argv[0] = "/usr/bin/firefox";
+            argv[1] = safe_url;
+            argv[2] = NULL;
         }
         else
             success = false;
@@ -125,31 +149,45 @@ bool launch_url(const char *url)
 
     if(!success)
         logfile_message("Can't launch URL: \"%s\"", safe_url);
-    else
-        logfile_message("Launching URL: \"%s\"...", safe_url);
 
     free(safe_url);
     return success;
 }
 
+/*
+ * encode_uri_component()
+ * Encodes a URI component. The destination buffer should be 1 + 3x the length
+ * of uri.
+ */
+char* encode_uri_component(const char* uri, char* dest, size_t dest_size)
+{
+    static char encode_table[256] = { 0 };
+
+    /* create an encoding table */
+    if(!encode_table[0]) {
+        for(int i = 1; i < 256; i++) {
+            encode_table[i] = !(
+                (i >= '0' && i <= '9') || /* locale independent */
+                (i >= 'a' && i <= 'z') ||
+                (i >= 'A' && i <= 'Z') ||
+                (strchr("-_.!~*'()", i) != NULL)
+            );
+        }
+        encode_table[0] = 1;
+    }
+
+    /* encode URI component */
+    char* encoded_uri_component = encode_uri_ex(uri, encode_table);
+    str_cpy(dest, encoded_uri_component, dest_size);
+    free(encoded_uri_component);
+    return dest;
+}
+
+
+
 
 
 /* private methods */
-
-/* checks if the given absolute filepath exists */
-bool file_exists(const char *filepath)
-{
-#if !defined(_WIN32)
-    struct stat st;
-    return (stat(filepath, &st) == 0);
-#else
-    FILE* fp = fopen_utf8(filepath, "rb");
-    bool valid = (fp != NULL);
-    if(fp != NULL)
-        fclose(fp);
-    return valid;
-#endif
-}
 
 /* converts to hex */
 char ch2hex(unsigned char code) {
@@ -157,39 +195,68 @@ char ch2hex(unsigned char code) {
     return hex[code & 0xF];
 }
 
-/* returns an encoded version of url */
-char* url_encode(const char* url)
+/* returns an encoded version of a URI */
+char* encode_uri(const char* uri)
 {
-    static char encode[256] = { 0 };
-    char* buf = mallocx((3 * strlen(url) + 1) * sizeof(char));
-    char* p = buf;
+    static char encode_table[256] = { 0 };
 
     /* create an encoding table */
-    if(!encode[0]) {
+    if(!encode_table[0]) {
         for(int i = 1; i < 256; i++) {
-            encode[i] = !(
+            encode_table[i] = !(
                 (i >= '0' && i <= '9') || /* locale independent */
                 (i >= 'a' && i <= 'z') ||
                 (i >= 'A' && i <= 'Z') ||
-                (strchr(":/-_.?=&~@#$,;", i) != NULL)
+                (strchr(":/-_.*'!?=&~@#$,;()+%", i) != NULL) /* include '%' (encoded URI components) */
             );
         }
-        encode[0] = 1;
+        encode_table[0] = 1;
     }
 
+    /* encode URI */
+    return encode_uri_ex(uri, encode_table);
+}
+
+/* returns an encoded version of a URI, given an encoding table */
+char* encode_uri_ex(const char* uri, const char encode_table[256])
+{
+    char* buf = mallocx((3 * strlen(uri) + 1) * sizeof(char));
+    char* p = buf;
+
     /* encode string */
-    while(*url) {
-        if(encode[(unsigned char)(*url)]) {
+    while(*uri) {
+        if(encode_table[(unsigned char)(*uri)]) {
             *p++ = '%';
-            *p++ = ch2hex((unsigned char)(*url) / 16);
-            *p++ = ch2hex((unsigned char)(*url) % 16);
-            url++;
+            *p++ = ch2hex((unsigned char)(*uri) / 16);
+            *p++ = ch2hex((unsigned char)(*uri) % 16);
+            uri++;
         }
         else
-            *p++ = *url++;
+            *p++ = *uri++;
     }
-    *p = 0;
+    *p = '\0';
 
     /* done */
     return buf;
 }
+
+#if defined(__ANDROID__)
+
+/* open a web page on Android */
+void open_web_page(const char* safe_url)
+{
+    /* See https://liballeg.org/a5docs/trunk/platform.html#al_android_get_jni_env */
+    JNIEnv* env = al_android_get_jni_env();
+    jobject activity = al_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "openWebPage", "(Ljava/lang/String;)V");
+
+    jstring jdata = (*env)->NewStringUTF(env, safe_url);
+    (*env)->CallVoidMethod(env, activity, method_id, jdata);
+    (*env)->DeleteLocalRef(env, jdata);
+
+    (*env)->DeleteLocalRef(env, class_id);
+}
+
+#endif

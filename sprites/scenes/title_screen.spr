@@ -7,10 +7,25 @@
 
 sprite "Title Screen - Logo"
 {
-    source_file     "images/scenes/title_screen_logo.png"
+    source_file     "images/scenes/title_screen.png"
     source_rect     0 0 128 240
     frame_size      128 240
     hot_spot        64 120
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}
+
+sprite "Title Screen - Pointer"
+{
+    source_file     "images/scenes/title_screen.png"
+    source_rect     0 240 16 16
+    frame_size      16 16
+    hot_spot        16 1
 
     animation 0
     {

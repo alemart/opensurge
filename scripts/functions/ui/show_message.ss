@@ -5,6 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Level;
+using SurgeEngine.Vector2;
 
 //
 // Show Message is a function object that displays a Message Box
@@ -16,7 +17,7 @@ object "Show Message"
 {
     fun call(message)
     {
-        mb = Level.spawn("Message Box");
+        mb = Level.spawnEntity("Message Box", Vector2.zero);
         mb.text = message;
     }
 }

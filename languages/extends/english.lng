@@ -1,0 +1,30 @@
+// -----------------------------------------------------------------------------
+// File: languages/extends/english.lng
+// Description: language extension - english (encoding: UTF-8)
+// Author: TYPE YOUR NAME HERE
+// License: MIT
+// -----------------------------------------------------------------------------
+
+//
+// Modders:
+//
+// Read more about language extensions:
+// languages/extens/README.txt
+//
+
+//LANG_AUTHOR                 "TYPE YOUR NAME HERE"
+
+
+//
+// EXAMPLE 1
+// Replace "Power" by "Coins" in the Heads-Up Display
+//
+//HUD_POWER                   "Coins"
+
+
+//
+// EXAMPLE 2
+// Add a new entry to the language file
+//
+MY_NEW_ENTRY                "My new entry works!!!"
+

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * resourcemanager.c - resource manager: a dictionary of resources
- * Copyright (C) 2010, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,10 +19,10 @@
  */
 
 #include "resourcemanager.h"
-#include "hashtable.h"
 #include "image.h"
 #include "audio.h"
 #include "logfile.h"
+#include "../util/hashtable.h"
 
 /* code generation */
 HASHTABLE_GENERATE_CODE(image_t, image_destroy);

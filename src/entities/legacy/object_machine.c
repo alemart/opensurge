@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * object_machine.c - Blank implementation of an Object Machine
- * Copyright (C) 2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
  */
 
 #include "object_machine.h"
-#include "../../core/util.h"
+#include "../../util/util.h"
 #include "../../scenes/level.h"
 
 /* object basic machine class */

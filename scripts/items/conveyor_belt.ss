@@ -5,6 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Level;
+using SurgeEngine.Player;
 using SurgeEngine.Collisions.CollisionBox;
 
 //
@@ -188,12 +189,22 @@ object "Conveyor Belt Controller"
     fun moveSynchronously(player)
     {
         // synchronize the movement of the player with the animation of the bricks
-        oldFrame = currentFrame;
-        currentFrame = Math.floor(Time.time * fps);// % frameCount;
+        prev = currentFrame;
+        curr = Math.floor(Time.time * fps);// % frameCount;
 
-        if(currentFrame != oldFrame) {
+        if(curr != prev) {
             dx = speed / fps;
             player.transform.translateBy(dx, 0);
+        }
+
+        // multiplayer fix
+        if(player.id == players[0].id)
+            currentFrame = curr;
+
+        // animation fix
+        if(!player.hasFocus() && Math.abs(player.gsp) < 3.75) {
+            if(Math.abs(Player.active.gsp) <= Math.abs(player.gsp))
+                player.anim = Player.active.anim; // stopped animation
         }
     }
 

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * logfile.h - logfile module
- * Copyright (C) 2010  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,9 +21,13 @@
 #ifndef _LOGFILE_H
 #define _LOGFILE_H
 
-void logfile_init(); /* initializes the logfile module */
+/* logfile flags */
+#define LOGFILE_TXT         0x1 /* requires the asset manager to be initialized */
+#define LOGFILE_CONSOLE     0x2 /* will print logs to stdout */
+
+void logfile_init(int flags); /* initializes the logfile module */
 void logfile_message(const char *fmt, ...); /* prints a message to the logfile (printf style) */
-void logfile_release(); /* releases the logfile module */
+void logfile_release(int flags); /* releases the logfile module */
 
 #endif
 

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * camera.c - camera routines
- * Copyright (C) 2010, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 #include <math.h>
 #include "camera.h"
-#include "../core/util.h"
+#include "../util/util.h"
 #include "../core/video.h"
 #include "../core/timer.h"
 #include "../scenes/level.h"
@@ -80,7 +80,7 @@ void camera_update()
     v2d_t ds;
 
     /* updating the boundaries */
-    if(level_editmode()) /* no boundaries in the editor */
+    if(level_editmode() || level_is_in_debug_mode()) /* no boundaries in the editor */
         disable_boundaries();
     else if(!camera.is_locked) /* the level size may have changed since the last frame */
         reset_boundaries();

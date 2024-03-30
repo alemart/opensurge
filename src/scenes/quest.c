@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * quest.c - quest scene
- * Copyright (C) 2010, 2012-2013  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,26 +18,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
 #include <string.h>
 #include "quest.h"
 #include "level.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
 #include "../core/scene.h"
 #include "../core/quest.h"
 #include "../core/logfile.h"
 #include "../core/storyboard.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* private data */
-#define STACK_MAX 32 /* maximum number of simultaneous quests */
+#define STACK_MAX 25 /* maximum number of active quests */
 static int top = -1;
-static struct {
-    quest_t* current_quest;
+static struct queststack_t {
+    quest_t* quest;
     int next_level;
-    int abort_quest;
-} stack[STACK_MAX]; /* one can stack quests */
+    bool abort_quest;
+} stack[STACK_MAX]; /* a stack of quests */
 
-static void push_appropriate_scene(const char *str);
+static void push_builtin_scene(const char *str);
 
 
 
@@ -52,13 +53,13 @@ void quest_init(void *path_to_qst_file)
     const char* filepath = (const char*)path_to_qst_file;
 
     if(++top >= STACK_MAX)
-        fatal_error("The quest stack can't hold more than %d quests.", STACK_MAX);
+        fatal_error("Do you have a circular dependency in your quests? The quest stack can't hold more than %d quests.", STACK_MAX);
 
-    stack[top].current_quest = quest_load(filepath);
+    stack[top].quest = quest_load(filepath);
     stack[top].next_level = 0;
-    stack[top].abort_quest = FALSE;
+    stack[top].abort_quest = false;
 
-    logfile_message("Pushed quest \"%s\" (\"%s\") onto the quest stack...", stack[top].current_quest->file, stack[top].current_quest->name);
+    logfile_message("Pushed quest \"%s\" onto the quest stack...", quest_file(stack[top].quest));
 }
 
 /*
@@ -67,13 +68,18 @@ void quest_init(void *path_to_qst_file)
  */
 void quest_release()
 {
-    quest_unload(stack[top--].current_quest);
+    if(top >= 0) {
+        logfile_message("Popping quest \"%s\" from the quest stack...", quest_file(stack[top].quest));
+        quest_unload(stack[top].quest);
+        top--;
+    }
+
     logfile_message("The quest has been released.");
 }
 
 /*
  * quest_render()
- * Actually, this function does nothing
+ * This function does nothing
  */
 void quest_render()
 {
@@ -86,35 +92,99 @@ void quest_render()
  */
 void quest_update()
 {
-    /* invalid quest */
-    if(stack[top].current_quest->level_count == 0)
-        fatal_error("Quest '%s' has no levels.", stack[top].current_quest->file);
+    if(top < 0) {
 
-    /* quest manager */
-    if(stack[top].next_level < stack[top].current_quest->level_count && !stack[top].abort_quest) {
-        /* next level... */
-        const char *path_to_lev_file = stack[top].current_quest->level_path[stack[top].next_level++];
-        push_appropriate_scene(path_to_lev_file);
+        /* empty stack: this shouldn't happen */
+        logfile_message("ERROR: empty quest stack");
+        scenestack_pop();
+        return;
+
+    }
+    else if(stack[top].abort_quest) {
+
+        /* aborted quest */
+        const quest_t* quest = stack[top].quest;
+        logfile_message("Quest \"%s\" has been aborted.", quest_file(quest));
+        scenestack_pop();
+        return;
+
+    }
+    else if(stack[top].next_level >= quest_entry_count(stack[top].quest)) {
+
+        /* cleared quest */
+        const quest_t* quest = stack[top].quest;
+        logfile_message("Quest \"%s\" has been cleared!", quest_file(quest));
+        scenestack_pop();
+        return;
+
     }
     else {
-        /* the user has cleared (or exited) the quest! */
-        logfile_message(
-            "Quest '%s' has been %s Popping...",
-            stack[top].current_quest->file,
-            (stack[top].abort_quest ? "aborted." : "cleared!")
-        );
-        scenestack_pop();
+
+        /* go to the next level */
+        const quest_t* quest = stack[top].quest;
+        int index = stack[top].next_level++;
+        const char* path = quest_entry_path(quest, index);
+
+        if(quest_entry_is_level(quest, index)) {
+
+            /* load a .lev file */
+            scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)path);
+            return;
+
+        }
+        else if(quest_entry_is_quest(quest, index)) {
+
+            /*
+               load a .qst file
+
+               There is a caveat when loading a quest: if the player aborts it
+               (via the pause menu for example), the previous quest will be
+               resumed - and in the next entry. Loading a quest within another
+               quest is not the same as loading a sequence of levels.
+
+               We do not resolve circular dependencies when loading .qst files.
+               If a circular dependency exists, the limited stack size will
+               make the program crash eventually.
+
+               What would we do if we found a circular dependency? Warn the
+               user? Crash the engine as we already do? We already have a large
+               enough stack size anyway.
+
+               Even if we search for circular dependencies by reading the .qst
+               files, we cannot guarantee that there are no such dependencies:
+               quests may also be loaded via scripting. This won't be a problem
+               in practice as long as we pick a large enough stack size.
+            */
+            scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)path);
+            return;
+
+        }
+        else if(quest_entry_is_builtin_scene(quest, index)) {
+
+            /* load a built-in scene */
+            push_builtin_scene(path);
+            return;
+
+        }
+        else {
+
+            /* this shouldn't happen. fail silently */
+            logfile_message("ERROR - unknown quest entry: %s", path);
+            scenestack_pop();
+            return;
+
+        }
     }
 }
 
 /*
  * quest_abort()
- * Aborts the current quest, popping it from the stack
+ * Aborts the current quest. It will be popped from the stack
  */
 void quest_abort()
 {
     if(top >= 0)
-        stack[top].abort_quest = TRUE;
+        stack[top].abort_quest = true;
 }
 
 /*
@@ -125,8 +195,10 @@ void quest_abort()
 void quest_set_next_level(int id)
 {
     if(top >= 0) {
-        const quest_t* quest = stack[top].current_quest;
-        stack[top].next_level = clip(id, 0, quest->level_count);
+        const quest_t* quest = stack[top].quest;
+        int n = quest_entry_count(quest);
+
+        stack[top].next_level = clip(id, 0, n);
     }
 }
 
@@ -146,31 +218,24 @@ int quest_next_level()
  */
 const quest_t* quest_current()
 {
-    return top >= 0 ? stack[top].current_quest : NULL;
+    return top >= 0 ? stack[top].quest : NULL;
 }
 
 
 
 
+/* private */
 
-/* ------ private --------- */
-void push_appropriate_scene(const char *str)
+void push_builtin_scene(const char *str)
 {
-    if(str[0] == '<' && str[strlen(str)-1] == '>') {
-        /* not a level? TODO: at the moment, the engine can't handle those scenes repeatedly on the stack */
-        if(str_icmp(str, "<options>") == 0)
-            scenestack_push(storyboard_get_scene(SCENE_OPTIONS), NULL);
-        else if(str_icmp(str, "<language_select>") == 0)
-            scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);
-        /*else if(str_icmp(str, "<quest_select>") == 0)
-            scenestack_push(storyboard_get_scene(SCENE_QUESTSELECT), NULL);*/
-        else if(str_icmp(str, "<credits>") == 0)
-            scenestack_push(storyboard_get_scene(SCENE_CREDITS), NULL);
-        else
-            fatal_error("Quest error: unrecognized symbol '%s'", str);
-    }
-    else {
-        /* just a regular level */
-        scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)str);
-    }
+    if(str_icmp(str, "<options>") == 0)
+        scenestack_push(storyboard_get_scene(SCENE_OPTIONS), NULL);
+    else if(str_icmp(str, "<language_select>") == 0)
+        scenestack_push(storyboard_get_scene(SCENE_LANGSELECT), NULL);
+    else if(str_icmp(str, "<credits>") == 0)
+        scenestack_push(storyboard_get_scene(SCENE_CREDITS), NULL);
+    else if(str_icmp(str, "<stage_select>") == 0)
+        scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), NULL);
+    else
+        fatal_error("Quest error: unrecognized symbol \"%s\"", str);
 }

@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * character.h - Character system: meta data about a playable character
- * Copyright (C) 2011, 2018, 2019 Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,10 +21,13 @@
 #ifndef _CHARACTER_H
 #define _CHARACTER_H
 
-#include "../core/darray.h"
+#include <stdbool.h>
+#include "../util/darray.h"
 
+/* forward declarations */
 struct sound_t;
 
+/* character metadata */
 typedef struct character_t character_t;
 struct character_t {
     char *name;
@@ -76,9 +79,9 @@ struct character_t {
     } sample;
 
     struct {
-        int roll;
-        int charge;
-        int brake;
+        bool roll;
+        bool charge;
+        bool brake;
     } ability;
 
     DARRAY(char*, companion_name);
@@ -87,10 +90,13 @@ struct character_t {
 /* initializes the character system */
 void charactersystem_init();
 
-/* releases the particle system */
+/* releases the character system */
 void charactersystem_release();
 
-/* gets the meta data of a character */
+/* gets a character by its name */
 const character_t* charactersystem_get(const char* character_name);
+
+/* checks if a character exists */
+bool charactersystem_exists(const char* character_name);
 
 #endif

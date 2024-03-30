@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * scripting.c - scripting system
- * Copyright (C) 2018-2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,15 +20,12 @@
 
 #include <stdarg.h>
 #include "scripting.h"
-#include "../core/logfile.h"
-#include "../core/assetfs.h"
-#include "../core/stringutil.h"
-#include "../core/util.h"
-
-/* utilities */
-#include "../core/v2d.h"
+#include "../core/global.h"
+#include "../core/asset.h"
 #include "../core/video.h"
-#include "../entities/camera.h"
+#include "../util/v2d.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
 #include "../scenes/level.h"
 
 /* private area */
@@ -37,32 +34,43 @@ static char** vm_argv = NULL;
 static int vm_argc = 0;
 static bool test_mode = false;
 static int pause_counter = 0;
-static void log_fun(const char* message);
-static void err_fun(const char* message);
 static void compile_scripts(surgescript_vm_t* vm);
 static int compile_script(const char* filepath, void* param);
+static char* read_file(const char* filepath);
 static bool found_test_script(const surgescript_vm_t* vm);
 static void check_if_compatible();
+static void parse_surgescript_options(surgescript_vm_t* vm, int argc, char** argv);
 
 /* SurgeEngine */
 static void setup_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_application(surgescript_vm_t* vm);
 extern void scripting_register_surgeengine(surgescript_vm_t* vm);
 extern void scripting_register_actor(surgescript_vm_t* vm);
+extern void scripting_register_androidplatform(surgescript_vm_t* vm);
 extern void scripting_register_animation(surgescript_vm_t* vm);
 extern void scripting_register_brick(surgescript_vm_t* vm);
+extern void scripting_register_brickparticle(surgescript_vm_t* vm);
 extern void scripting_register_camera(surgescript_vm_t* vm);
 extern void scripting_register_collisions(surgescript_vm_t* vm);
 extern void scripting_register_console(surgescript_vm_t* vm);
+extern void scripting_register_entitycontainer(surgescript_vm_t* vm);
+extern void scripting_register_entitymanager(surgescript_vm_t* vm);
+extern void scripting_register_entitytree(surgescript_vm_t* vm);
 extern void scripting_register_events(surgescript_vm_t* vm);
+extern void scripting_register_game(surgescript_vm_t* vm);
 extern void scripting_register_input(surgescript_vm_t* vm);
 extern void scripting_register_lang(surgescript_vm_t* vm);
 extern void scripting_register_level(surgescript_vm_t* vm);
 extern void scripting_register_levelmanager(surgescript_vm_t* vm);
+extern void scripting_register_levelobjectcontainer(surgescript_vm_t* vm);
+extern void scripting_register_mobilegamepad(surgescript_vm_t* vm);
 extern void scripting_register_mouse(surgescript_vm_t* vm);
 extern void scripting_register_music(surgescript_vm_t* vm);
+extern void scripting_register_object(surgescript_vm_t* vm);
 extern void scripting_register_obstaclemap(surgescript_vm_t* vm);
+extern void scripting_register_platform(surgescript_vm_t* vm);
 extern void scripting_register_player(surgescript_vm_t* vm);
+extern void scripting_register_playermanager(surgescript_vm_t* vm);
 extern void scripting_register_prefs(surgescript_vm_t* vm);
 extern void scripting_register_screen(surgescript_vm_t* vm);
 extern void scripting_register_sensor(surgescript_vm_t* vm);
@@ -71,6 +79,7 @@ extern void scripting_register_text(surgescript_vm_t* vm);
 extern void scripting_register_time(surgescript_vm_t* vm);
 extern void scripting_register_transform(surgescript_vm_t* vm);
 extern void scripting_register_vector2(surgescript_vm_t* vm);
+extern void scripting_register_video(surgescript_vm_t* vm);
 extern void scripting_register_web(surgescript_vm_t* vm);
 
 /*
@@ -80,7 +89,6 @@ extern void scripting_register_web(surgescript_vm_t* vm);
 void scripting_init(int argc, const char** argv)
 {
     /* create VM */
-    surgescript_util_set_error_functions(log_fun, err_fun);
     check_if_compatible();
     vm = surgescript_vm_create();
 
@@ -89,14 +97,14 @@ void scripting_init(int argc, const char** argv)
     while(argc-- > 0)
         vm_argv[argc] = str_dup(argv[argc]);
 
+    /* parse special command-line options that affect the SurgeScript runtime */
+    parse_surgescript_options(vm, vm_argc, vm_argv);
+
     /* register SurgeEngine builtins */
     setup_surgeengine(vm);
 
     /* compile scripts */
     compile_scripts(vm);
-
-    /* launch VM */
-    surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
 }
 
 /*
@@ -124,6 +132,18 @@ void scripting_release()
 }
 
 /*
+ * scripting_launch_vm()
+ * Launches the SurgeScript VM
+ */
+void scripting_launch_vm()
+{
+    assertx(vm);
+
+    /* launch VM */
+    surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
+}
+
+/*
  * surgescript_vm()
  * Gets the SurgeScript VM
  */
@@ -148,13 +168,16 @@ bool scripting_testmode()
  */
 void scripting_reload()
 {
-    logfile_message("Reloading scripts...");
+    surgescript_util_log("Reloading scripts...");
 
     /* reset the SurgeScript VM */
     if(!surgescript_vm_reset(vm)) {
-        logfile_message("Failed to reload the scripts");
+        surgescript_util_log("Failed to reload the scripts");
         return;
     }
+
+    /* parse special command-line options that affect the SurgeScript runtime */
+    parse_surgescript_options(vm, vm_argc, vm_argv);
 
     /* register SurgeEngine builtins */
     setup_surgeengine(vm);
@@ -166,7 +189,7 @@ void scripting_reload()
     surgescript_vm_launch_ex(vm, vm_argc, vm_argv);
 
     /* done */
-    logfile_message("The scripts have been reloaded!");
+    surgescript_util_log("The scripts have been reloaded!");
 }
 
 /*
@@ -175,14 +198,10 @@ void scripting_reload()
  */
 void scripting_pause_vm()
 {
-#ifdef SURGESCRIPT_VERSION_IS_AT_LEAST
-#if SURGESCRIPT_VERSION_IS_AT_LEAST(0,5,5,0)
     if(pause_counter++ == 0) {
-        logfile_message("Pausing the SurgeScript VM");
+        surgescript_util_log("Pausing the SurgeScript VM");
         surgescript_vm_pause(vm);
     }
-#endif
-#endif
 }
 
 /*
@@ -191,14 +210,11 @@ void scripting_pause_vm()
  */
 void scripting_resume_vm()
 {
-#ifdef SURGESCRIPT_VERSION_IS_AT_LEAST
-#if SURGESCRIPT_VERSION_IS_AT_LEAST(0,5,5,0)
     if(--pause_counter == 0) {
-        logfile_message("Resuming the SurgeScript VM");
+        surgescript_util_log("Resuming the SurgeScript VM");
         surgescript_vm_resume(vm);
     }
-#endif
-#endif
+
     pause_counter = max(pause_counter, 0); /* safeguard */
 }
 
@@ -246,27 +262,41 @@ void scripting_util_set_world_angle(surgescript_object_t* object, float angle)
     surgescript_transform_util_setworldangle2d(object, angle);
 }
 
-/* compute the proper camera position of an object (will check if it's detached or not) */
-v2d_t scripting_util_object_camera(const surgescript_object_t* object)
-{
-    bool is_detached = surgescript_object_has_tag(object, "detached");
-    return !is_detached ? camera_get_position() : v2d_new(VIDEO_SCREEN_W / 2, VIDEO_SCREEN_H / 2);
-}
-
-/* compute the camera position of the parent of an object */
-v2d_t scripting_util_parent_camera(const surgescript_object_t* object)
-{
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
-    surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
-    return scripting_util_object_camera(parent);
-}
-
 /* checks if the object is inside the visible part of the screen */
-int scripting_util_is_object_inside_screen(const surgescript_object_t* object)
+bool scripting_util_is_object_inside_screen(const surgescript_object_t* object)
 {
     v2d_t v = scripting_util_world_position(object);
     return level_inside_screen(v.x, v.y, 0, 0);
+}
+
+/* checks if an object is an effectively detached entity */
+bool scripting_util_is_effectively_detached_entity(const surgescript_object_t* object)
+{
+    /* A detached entity is effectively detached. Non-entities are not
+       effectively detached.
+
+       If an entity doesn't have the detached tag, we'll still consider it to
+       be effectively detached if any ascendant is a detached entity.
+       
+       Different instances of the same entity may or may not be effectively
+       detached.
+       
+       Effectively detached entities are rendered just like detached entities. */
+
+    const surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    surgescript_objecthandle_t root = surgescript_objectmanager_root(manager);
+    surgescript_objecthandle_t handle;
+
+    do {
+        if(!surgescript_object_has_tag(object, "entity"))
+            return false;
+        else if(surgescript_object_has_tag(object, "detached"))
+            return true;
+
+        handle = surgescript_object_parent(object);
+    } while(handle != root && (object = surgescript_objectmanager_get(manager, handle)));
+
+    return false;
 }
 
 /* get the zindex of an object */
@@ -334,7 +364,7 @@ surgescript_object_t* scripting_util_get_component(surgescript_object_t* object,
 surgescript_object_t* scripting_util_spawn_temp(surgescript_vm_t* vm, const char* object_name)
 {
     surgescript_objectmanager_t* manager = surgescript_vm_objectmanager(vm);
-    surgescript_objecthandle_t handle = surgescript_objectmanager_spawn_temp(manager, "Vector2");
+    surgescript_objecthandle_t handle = surgescript_objectmanager_spawn_temp(manager, object_name);
     return surgescript_objectmanager_get(manager, handle);
 }
 
@@ -349,7 +379,7 @@ void scripting_error(const surgescript_object_t* object, const char* fmt, ...)
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    fatal_error("A scripting error was triggered in \"%s\".\n\n%s", object_name, buf);
+    surgescript_util_fatal("A scripting error was triggered in \"%s\".\n\n%s", object_name, buf);
 }
 
 /* display a scripting error without crashing the application */
@@ -364,7 +394,7 @@ void scripting_warning(const surgescript_object_t* object, const char* fmt, ...)
     va_end(args);
 
     video_showmessage("%s: %s", object_name, buf);
-    logfile_message("A scripting warning was triggered in \"%s\": %s", object_name, buf);
+    surgescript_util_log("A scripting warning was triggered in \"%s\": %s", object_name, buf);
 }
 
 
@@ -375,19 +405,7 @@ void scripting_warning(const surgescript_object_t* object, const char* fmt, ...)
 void check_if_compatible()
 {
     if(surgescript_util_versioncode(NULL) < surgescript_util_versioncode(SURGESCRIPT_MIN_VERSION))
-        fatal_error("This build requires at least SurgeScript %s (using: %s)", SURGESCRIPT_MIN_VERSION, surgescript_util_version());
-}
-
-/* log function */
-void log_fun(const char* message)
-{
-    logfile_message("%s", message);
-}
-
-/* scripting error */
-void err_fun(const char* message)
-{
-    fatal_error("%s", message);
+        surgescript_util_fatal("This build requires at least SurgeScript %s (using: %s)", SURGESCRIPT_MIN_VERSION, surgescript_util_version());
 }
 
 /* register SurgeEngine builtins */
@@ -399,20 +417,31 @@ void setup_surgeengine(surgescript_vm_t* vm)
     /* next, we register the SurgeEngine builtins */
     scripting_register_surgeengine(vm);
     scripting_register_actor(vm);
+    scripting_register_androidplatform(vm);
     scripting_register_animation(vm);
     scripting_register_brick(vm);
+    scripting_register_brickparticle(vm);
     scripting_register_camera(vm);
     scripting_register_collisions(vm);
     scripting_register_console(vm);
+    scripting_register_entitycontainer(vm);
+    scripting_register_entitymanager(vm);
+    scripting_register_entitytree(vm);
     scripting_register_events(vm);
+    scripting_register_game(vm);
     scripting_register_input(vm);
     scripting_register_lang(vm);
     scripting_register_level(vm);
     scripting_register_levelmanager(vm);
+    scripting_register_levelobjectcontainer(vm);
+    scripting_register_mobilegamepad(vm);
     scripting_register_mouse(vm);
     scripting_register_music(vm);
+    scripting_register_object(vm);
     scripting_register_obstaclemap(vm);
+    scripting_register_platform(vm);
     scripting_register_player(vm);
+    scripting_register_playermanager(vm);
     scripting_register_prefs(vm);
     scripting_register_screen(vm);
     scripting_register_sensor(vm);
@@ -421,6 +450,7 @@ void setup_surgeengine(surgescript_vm_t* vm)
     scripting_register_time(vm);
     scripting_register_transform(vm);
     scripting_register_vector2(vm);
+    scripting_register_video(vm);
     scripting_register_web(vm);
 }
 
@@ -428,11 +458,11 @@ void setup_surgeengine(surgescript_vm_t* vm)
 void compile_scripts(surgescript_vm_t* vm)
 {
     /* compile scripts */
-    assetfs_foreach_file("scripts", ".ss", compile_script, surgescript_vm_parser(vm), true);
+    asset_foreach_file("scripts", ".ss", compile_script, NULL, true);
 
     /* if no test script is present... */
     if(found_test_script(vm)) {
-        logfile_message("Got a test script...");
+        surgescript_util_log("Got a test script...");
         test_mode = true;
     }
     else {
@@ -441,25 +471,21 @@ void compile_scripts(surgescript_vm_t* vm)
     }
 }
 
-/* compiles a script */
+/* compile a .ss script from the scripts/ folder */
 int compile_script(const char* filepath, void* param)
 {
-    surgescript_parser_t* parser = (surgescript_parser_t*)param;
-    surgescript_parser_flags_t flags = SSPARSER_DEFAULTS;
-    const char* fullpath = assetfs_fullpath(filepath);
-    bool success;
+    const char* fullpath = asset_path(filepath);
 
-    /* select flags for maximum compatibility */
-    if(!assetfs_is_primary_file(filepath))
-        flags |= SSPARSER_SKIP_DUPLICATES;
+    /* read script */
+    char* script = read_file(fullpath);
+    if(script == NULL)
+        return -1;
 
-    /* Compile script file */
-    /*logfile_message("Compiling '%s'...", filepath);*/
-    surgescript_parser_set_flags(parser, flags);
-    success = surgescript_vm_compile(vm, fullpath);
-    surgescript_parser_set_flags(parser, SSPARSER_DEFAULTS);
+    /* compile script */
+    bool success = surgescript_vm_compile_virtual_file(vm, script, fullpath);
 
-    /* done */
+    /* done! */
+    free(script);
     return success ? 0 : -1;
 }
 
@@ -468,4 +494,49 @@ bool found_test_script(const surgescript_vm_t* vm)
 {
     surgescript_programpool_t* pool = surgescript_vm_programpool(vm);
     return surgescript_programpool_exists(pool, "Application", "state:main");
+}
+
+/* reads a file using Allegro's File I/O interface */
+char* read_file(const char* filepath)
+{
+    const size_t BUFSIZE = 4096;
+    size_t read_chars = 0, data_size = 0;
+    char* data = NULL;
+
+    /* open the file in binary mode, so that offsets don't get messed up */
+    ALLEGRO_FILE* fp = al_fopen(filepath, "rb");
+    if(!fp) {
+        surgescript_util_fatal("Can't read file \"%s\". errno = %d", filepath, al_get_errno());
+        return NULL;
+    }
+
+    /* read file to data[] */
+    surgescript_util_log("Reading script %s...", filepath);
+    do {
+        data_size += BUFSIZE;
+        data = reallocx(data, data_size + 1);
+        read_chars += al_fread(fp, data + read_chars, BUFSIZE);
+        data[read_chars] = '\0';
+    } while(read_chars == data_size);
+    al_fclose(fp);
+
+    /* success! */
+    return data;
+}
+
+/* parse special command-line options that affect the SurgeScript runtime */
+void parse_surgescript_options(surgescript_vm_t* vm, int argc, char** argv)
+{
+    for(int i = 0; i < argc; i++) {
+        surgescript_util_log("Found SurgeScript option %s", argv[i]);
+
+        if(strcmp(argv[i], "--ss-allow-duplicates") == 0) {
+            surgescript_parser_t* parser = surgescript_vm_parser(vm);
+            surgescript_parser_set_flags(parser, SSPARSER_ALLOW_DUPLICATES);
+        }
+        else if(strcmp(argv[i], "--ss-skip-duplicates") == 0) {
+            surgescript_parser_t* parser = surgescript_vm_parser(vm);
+            surgescript_parser_set_flags(parser, SSPARSER_SKIP_DUPLICATES);
+        }
+    }
 }

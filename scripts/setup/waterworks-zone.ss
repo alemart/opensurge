@@ -65,12 +65,11 @@ object "Waterworks Zone" is "setup"
         // zone 2 only
         //
         "2": {
-            "Bridge": {
-                "anim": 1
+            "Background Exchanger": {
+                "background": "themes/waterworks-zone-outdoors.bg"
             },
-            "f17c6865adef838f": { // a Bridge
-                "length": 4,
-                "layer": "yellow",
+            "Bridge": {
+                "anim": 1,
             },
         },
 
@@ -78,6 +77,61 @@ object "Waterworks Zone" is "setup"
         // zone 3 only
         //
         "3": {
+            "Event Trigger 7": {
+                "onTrigger": EventList([
+                    EntityEvent("Salamander Boss").willCall("activate"),
+                    EntityEvent("Salamander Invisible Wall").willCall("activate"),
+                    FunctionEvent("Play Boss Music")
+                ])
+            },
+            "Event Trigger 5": {
+                "onTrigger": EventList([
+                    FunctionEvent("Translate Player").withArgument(Vector2(0,-3840)),
+                    EntityEvent("Salamander Boss").willCall("translate").withArgument(Vector2(0,-3840)),
+                    FunctionEvent("Translate Default Camera").withArgument(Vector2(0,-3840)),
+                    DelayedEvent(
+                        EntityEvent("Event Trigger 5").willCall("reactivate")
+                    ).willWait(2.0),
+                    EntityEvent("Collectible").willCall("destroy"),
+                    DelayedEvent(
+                      EventList([
+                        FunctionEvent("Spawn Entity") // warning mask tool
+                            .withArgument("Collectible").withArgument(Vector2(2880,700)),
+                        FunctionEvent("Spawn Entity")
+                            .withArgument("Collectible").withArgument(Vector2(2880,13776)),
+                        FunctionEvent("Spawn Entity")
+                            .withArgument("Collectible").withArgument(Vector2(2896,13808)),
+                        FunctionEvent("Spawn Entity")
+                            .withArgument("Collectible").withArgument(Vector2(2864,13808)),
+                        FunctionEvent("Spawn Entity")
+                            .withArgument("Collectible").withArgument(Vector2(3136,13776)),
+                        FunctionEvent("Spawn Entity")
+                            .withArgument("Collectible").withArgument(Vector2(3120,13808)),
+                        FunctionEvent("Spawn Entity")
+                            .withArgument("Collectible").withArgument(Vector2(3152,13808))
+                      ])
+                    ).willWait(0.25)
+                ])
+            },
+
+            "Salamander Boss": {
+                "onFirstFall": FunctionEvent("Lock Camera")
+                    .withArgument([2816,9344,3200,20224]),
+                "onDefeat": EventList([
+                    FunctionEvent("Stop Boss Music"),
+                    FunctionEvent("Unlock Camera"),
+                    EntityEvent("Salamander Invisible Wall").willCall("deactivate"),
+                    DelayedEvent(
+                      EntityEvent("Salamander Exploding Wall").willCall("explode")
+                    ).willWait(1.0)
+                ]),
+            },
+            "Bridge": {
+                "length": 24
+            },
+            "Background Exchanger": {
+                "background": "themes/waterworks-zone-boss.bg"
+            }
         }
 
     };

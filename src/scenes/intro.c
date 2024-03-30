@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * intro.c - introduction screen
- * Copyright (C) 2008-2011, 2013, 2018, 2019, 2022  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include "intro.h"
 #include "../core/global.h"
-#include "../core/v2d.h"
 #include "../core/timer.h"
 #include "../core/scene.h"
 #include "../core/storyboard.h"
@@ -33,6 +32,8 @@
 #include "../core/audio.h"
 #include "../core/input.h"
 #include "../core/font.h"
+#include "../util/v2d.h"
+#include "../entities/mobilegamepad.h"
 #include "../entities/sfx.h"
 
 /* private data */
@@ -43,7 +44,8 @@
 #define PRIMARY_COLOR       "424c6e"
 #define SECONDARY_COLOR     "657392"
 static float elapsed_time;
-static int debug_mode;
+static bool developer_mode;
+static int counter;
 static font_t* fnt;
 static input_t* in;
 static image_t* box;
@@ -62,15 +64,17 @@ void intro_init(void *foo)
 
     /* initialize variables */
     elapsed_time = 0.0f;
-    debug_mode = FALSE;
+    developer_mode = false;
+    counter = 0;
     in = input_create_user(NULL);
 
     /* create box */
-    box = image_create(VIDEO_SCREEN_W * 3 / 2, VIDEO_SCREEN_H * 9 / 10);
     target = image_drawing_target();
+    box = image_create(VIDEO_SCREEN_W * 3 / 2, VIDEO_SCREEN_H * 9 / 10);
     image_set_drawing_target(box);
     image_clear(color_hex(SECONDARY_COLOR));
     image_set_drawing_target(target);
+    video_use_default_shader();
 
     /* create font */
     fnt = font_create(INTRO_FONT);
@@ -85,7 +89,6 @@ void intro_init(void *foo)
 
     /* misc */
     fadefx_in(color_rgb(0,0,0), INTRO_FADETIME);
-    music_stop();
 }
 
 /*
@@ -94,6 +97,7 @@ void intro_init(void *foo)
  */
 void intro_release()
 {
+    mobilegamepad_fadein();
     font_destroy(fnt);
     image_destroy(box);
     input_destroy(in);
@@ -105,7 +109,9 @@ void intro_release()
  */
 void intro_update()
 {
-    static int cnt = 0;
+    /* reset state */
+    mobilegamepad_fadeout();
+    music_stop();
 
     /* elapsed time */
     elapsed_time += timer_get_delta();
@@ -118,8 +124,11 @@ void intro_update()
     if(elapsed_time >= INTRO_TIMEOUT) {
         if(fadefx_is_over()) {
             scenestack_pop();
-            if(debug_mode)
-                scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &debug_mode);
+            if(developer_mode)
+                scenestack_push(storyboard_get_scene(SCENE_STAGESELECT), &developer_mode);
+
+            counter = 0;
+            mobilegamepad_fadein();
             return;
         }
         fadefx_out(color_rgb(0,0,0), INTRO_FADETIME);
@@ -127,15 +136,15 @@ void intro_update()
 
     /* secret */
     if(input_button_pressed(in, IB_RIGHT)) {
-        if(!debug_mode && ++cnt == 3) {
+        if(!developer_mode && ++counter == 3) {
             sound_play(SFX_SECRET);
             elapsed_time += INTRO_TIMEOUT;
-            debug_mode = TRUE;
-            cnt = 0;
+            developer_mode = true;
+            counter = 0;
         }
     }
-    else if(any_button_pressed(in) && cnt < 3)
-        cnt = 0;
+    else if(any_button_pressed(in) && counter < 3)
+        counter = 0;
 }
 
 /*

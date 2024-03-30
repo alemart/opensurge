@@ -5,14 +5,14 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
+// art by Alexandre
 sprite "Fish"
 {
-    source_file     "images/fish.png"
-    source_rect     0 16 240 32
+    source_file     "images/enemies/waterworks_zone.png"
+    source_rect     16 448 96 32
     frame_size      48 32
     hot_spot        24 16
 
-    // Fishburne (art by Alexandre)
     animation 0
     {
         repeat      TRUE

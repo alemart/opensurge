@@ -205,6 +205,142 @@ object "Event Trigger 8" is "entity", "special"
     }
 }
 
+// Event Trigger 9
+object "Event Trigger 9" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(9);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
+}
+
+// Event Trigger 10
+object "Event Trigger 10" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(10);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
+}
+
+// Event Trigger 11
+object "Event Trigger 11" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(11);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
+}
+
+// Event Trigger 12
+object "Event Trigger 12" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(12);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
+}
+
+// Event Trigger 13
+object "Event Trigger 13" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(13);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
+}
+
+// Event Trigger 14
+object "Event Trigger 14" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(14);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
+}
+
+// Event Trigger 15
+object "Event Trigger 15" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(15);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
+}
+
+// Event Trigger 16
+object "Event Trigger 16" is "entity", "special"
+{
+    public onTrigger = Event();
+    base = spawn("Event Trigger Base").setGroup(16);
+
+    fun trigger()
+    {
+        onTrigger();
+    }
+
+    fun reactivate()
+    {
+        base.reactivate();
+    }
+}
+
 //  --------------------
 
 object "Event Trigger Base" is "private", "entity", "special"
@@ -238,9 +374,15 @@ object "Event Trigger Base" is "private", "entity", "special"
     }
 }
 
-object "Event Trigger Manager" is "private", "awake", "entity"
+object "Event Trigger Manager"
 {
-    triggers = [ null, null, null, null, null, null, null, null, null ];
+    triggers = [
+        null, null, null, null,
+        null, null, null, null,
+        null, null, null, null,
+        null, null, null, null,
+        null
+    ];
 
     state "main"
     {
@@ -265,7 +407,7 @@ object "Event Trigger Manager" is "private", "awake", "entity"
     fun trigger(groupId, player)
     {
         if(groupId >= 0 && groupId < triggers.length)
-            triggers[groupId] = player.name;
+            triggers[groupId] = player.id;
     }
 
     fun reactivate(groupId)

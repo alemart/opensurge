@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * character.c - Character system: meta data about a playable character
- * Copyright (C) 2011, 2018, 2019  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,12 +19,12 @@
  */
 
 #include "character.h"
-#include "../core/hashtable.h"
-#include "../core/nanoparser/nanoparser.h"
-#include "../core/assetfs.h"
-#include "../core/util.h"
-#include "../core/stringutil.h"
+#include "../core/nanoparser.h"
+#include "../core/asset.h"
 #include "../core/audio.h"
+#include "../util/util.h"
+#include "../util/stringutil.h"
+#include "../util/hashtable.h"
 
 /* private functions */
 static character_t *character_new(const char *name); /* creates a new character_t instance */
@@ -34,7 +34,7 @@ static int dirfill(const char *vpath, void *param); /* file system callback */
 static void register_character(character_t *c); /* adds c to the hash table */
 static void validate_character(character_t *c); /* validates c */
 
-static int traverse(const parsetree_statement_t *stmt);
+static int traverse(const parsetree_statement_t *stmt, void* character_count);
 static int traverse_character(const parsetree_statement_t *stmt, void *character);
 static int traverse_multipliers(const parsetree_statement_t *stmt, void *character);
 static int traverse_animations(const parsetree_statement_t *stmt, void *character);
@@ -46,33 +46,46 @@ HASHTABLE_GENERATE_CODE(character_t, character_delete);
 static HASHTABLE(character_t, characters);
 
 
-/* public */
+
+/*
+ * public
+ */
+
+
+/*
+ * charactersystem_init()
+ * Initializes the character system
+ */
 void charactersystem_init()
 {
-    parsetree_program_t *prog = NULL;
+    int character_count = 0;
 
     logfile_message("Loading characters...");
     characters = hashtable_character_t_create();
 
-    /* Reading the parse tree */
-    assetfs_foreach_file("characters", ".chr", dirfill, (void*)(&prog), true);
-    if(prog == NULL)
+    /* read the character scripts */
+    asset_foreach_file("characters", ".chr", dirfill, &character_count, true);
+    if(character_count == 0)
         fatal_error("FATAL ERROR: no characters have been found. Please reinstall the game.");
 
-    /* reading the characters */
-    nanoparser_traverse_program(prog, traverse);
-
     /* we're done! */
-    prog = nanoparser_deconstruct_tree(prog);
-    logfile_message("All characters have been loaded!");
+    logfile_message("All %d characters have been loaded!", character_count);
 }
 
+/*
+ * charactersystem_release()
+ * Releases the character system
+ */
 void charactersystem_release()
 {
     logfile_message("Releasing characters...");
     characters = hashtable_character_t_destroy(characters);
 }
 
+/*
+ * charactersystem_get()
+ * Gets a character by its name. Crashes on error
+ */
 const character_t* charactersystem_get(const char* character_name)
 {
     const character_t *c = hashtable_character_t_find(characters, character_name);
@@ -83,7 +96,23 @@ const character_t* charactersystem_get(const char* character_name)
     return c;
 }
 
-/* private */
+/*
+ * charactersystem_exists()
+ * Checks if a character exists
+ */
+bool charactersystem_exists(const char* character_name)
+{
+    const character_t *c = hashtable_character_t_find(characters, character_name);
+    return c != NULL;
+}
+
+
+
+
+/*
+ * private
+ */
+
 character_t *character_new(const char *name)
 {
     character_t *c = mallocx(sizeof *c);
@@ -130,9 +159,9 @@ character_t *character_new(const char *name)
     c->sample.release = NULL;
     c->sample.charge_pitch = 1.5f;
 
-    c->ability.roll = TRUE;
-    c->ability.charge = TRUE;
-    c->ability.brake = TRUE;
+    c->ability.roll = true;
+    c->ability.charge = true;
+    c->ability.brake = true;
 
     return c;
 }
@@ -149,9 +178,10 @@ void character_delete(character_t* c)
 
 int dirfill(const char *vpath, void *param)
 {
-    const char* fullpath = assetfs_fullpath(vpath);
-    parsetree_program_t** p = (parsetree_program_t**)param;
-    *p = nanoparser_append_program(*p, nanoparser_construct_tree(fullpath));
+    const char* fullpath = asset_path(vpath);
+    parsetree_program_t* p = nanoparser_construct_tree(fullpath);
+    nanoparser_traverse_program_ex(p, param, traverse);
+    nanoparser_deconstruct_tree(p);
     return 0;
 }
 
@@ -170,7 +200,7 @@ void validate_character(character_t *c)
         fatal_error("You must specify the sprite name of the character '%s'", c->name);
 }
 
-int traverse(const parsetree_statement_t *stmt)
+int traverse(const parsetree_statement_t *stmt, void* character_count)
 {
     const char *identifier;
     const parsetree_parameter_t *param_list;
@@ -195,6 +225,7 @@ int traverse(const parsetree_statement_t *stmt)
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), (void*)c, traverse_character);
             validate_character(c);
             register_character(c);
+            ++(*((int*)character_count));
         }
         else
             fatal_error("Can't redefine character \"%s\" in\"%s\" near line %d", s, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));

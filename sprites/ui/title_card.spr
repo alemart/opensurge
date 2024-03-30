@@ -12,10 +12,15 @@
 // phase 1: appearing
 // phase 2: sustaining
 // phase 3: disappearing
-// phase 4: finishing up
+// phase 4: finishing
 //
 // These phases are played sequentially. The level name and zone number (act)
 // appear during phases 1, 2 and 3. After phase 4, the title card disappears.
+//
+// The title card is created using layers. Layers are animated independently.
+// Layer 1 is displayed in front of all others. Layer 2 is displayed behind
+// Layer 1 and in front of all others (3, 4, 5...), and so on. The Default
+// Title Card sprite controls all layers, as well as the duration of each phase.
 //
 // Creating a new title card can be done simply: provide a new spritesheet and
 // override this script with sprites/overrides/. Be mindful of the above phases.
@@ -23,62 +28,111 @@
 
 sprite "Default Title Card"
 {
+    // display an invisible pixel
     source_file     "images/ui/title_card.png"
-    source_rect     0 0 1704 1920
-    frame_size      426 240
+    source_rect     426 0 1 1
+    frame_size      1 1
     hot_spot        0 0
 
-    // where should the level info appear?
-    action_spot     261 64
+    custom_properties
+    {
+        // how many layers do you want?
+        number_of_layers        6
+ 
+        // which layer displays the number of the zone?
+        level_zone_layer        2
+
+        // which layer displays the name of the level?
+        level_name_layer        1
+
+        // the font used to display the name of the level
+        level_name_font         "GoodNeighborsLarge"
+    }
 
     // warming up
     animation 0
     {
         repeat      FALSE
-        fps         32
-        data        0 1 2 3
+        fps         8
+        data        0
+        play        "warming up"
     }
 
     // appearing
     animation 1
     {
         repeat      FALSE
-        fps         32
-        data        4 5 6 7 8 9 10 11
+        fps         8
+        data        0
+        play        "appearing"
     }
 
     // sustaining
     animation 2
     {
         repeat      FALSE
-        fps         32
-        data        12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15          16 17 18 19         20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23 20 21 22 23
+        fps         8
+        data        0
+        play        "sustaining"
     }
 
     // disappearing
     animation 3
     {
         repeat      FALSE
-        fps         32
-        data        24 25 26 27 28 29 30 31
+        fps         8
+        data        0
+        play        "disappearing"
     }
 
-    // finishing up
+    // finishing
     animation 4
     {
         repeat      FALSE
-        fps         32
-        data        31
+        fps         8
+        data        0
+        play        "finishing"
+    }
+
+
+
+    // ------------------------------------------------------------------------
+    // here we just set the duration of each phase.
+    // this sprite controls all layers.
+    // ------------------------------------------------------------------------
+
+    keyframes "warming up"
+    {
+        duration 0.125
+    }
+
+    keyframes "appearing"
+    {
+        duration 0.25
+    }
+
+    keyframes "sustaining"
+    {
+        duration 2.5
+    }
+
+    keyframes "disappearing"
+    {
+        duration 0.25
+    }
+
+    keyframes "finishing"
+    {
+        duration 0.03125
     }
 }
 
 sprite "Default Title Card - Zone Number"
 {
-
-    source_file     "images/ui/title_card_zone_numbers.png"
-    source_rect     0 0 426 640
-    frame_size      426 64
-    hot_spot        40 0
+    source_file     "images/ui/title_card.png"
+    source_rect     432 0 240 64
+    frame_size      48 32
+    hot_spot        24 32
 
     // zone 0
     animation 0
@@ -158,5 +212,725 @@ sprite "Default Title Card - Zone Number"
         repeat      TRUE
         fps         8
         data        9
+    }
+}
+
+
+
+
+// ----------------------------------------------------------------------------
+//                                  LAYERS
+// ----------------------------------------------------------------------------
+
+//
+// Layer 1
+// The layer that displays the Level Name
+//
+sprite "Default Title Card - Layer 1"
+{
+    // display an invisible pixel
+    source_file     "images/ui/title_card.png"
+    source_rect     426 0 1 1
+    frame_size      1 1
+    hot_spot        0 0
+
+    // the hot spot of the Level Name font will
+    // be aligned to the action spot of this layer
+    action_spot     0 0
+
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      464 64
+    }
+
+    // warming up
+    animation 0
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "warming up"
+    }
+
+    // appearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "appearing"
+    }
+
+    // sustaining
+    animation 2
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "sustaining"
+    }
+
+    // disappearing
+    animation 3
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "disappearing"
+    }
+
+    // finishing
+    animation 4
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "finishing"
+    }
+
+
+
+    keyframes "warming up"
+    {
+    }
+
+    keyframes "appearing"
+    {
+        duration 0.25
+        easing "ease_out"
+
+        keyframe 0%
+        {
+            translation 0 0
+        }
+
+        keyframe 100%
+        {
+            translation -200 0
+        }
+    }
+
+    keyframes "sustaining"
+    {
+        duration 2.5
+
+        keyframe 0%
+        {
+            translation -200 0
+        }
+    }
+
+    keyframes "disappearing"
+    {
+        duration 0.25
+        easing "ease_in"
+
+        keyframe 0%
+        {
+            translation -200 0
+        }
+
+        keyframe 100%
+        {
+            translation 0 0
+        }
+    }
+
+    keyframes "finishing"
+    {
+    }
+}
+
+
+
+//
+// Layer 2
+// The layer that displays the Zone Number
+//
+sprite "Default Title Card - Layer 2"
+{
+    source_file     "images/ui/title_card.png"
+    source_rect     640 208 240 16
+    frame_size      240 16
+    hot_spot        0 0
+
+    // the hot spot of the Zone Number graphic will
+    // be aligned to the action spot of this layer
+    action_spot     32 16
+
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      432 112
+    }
+
+    // warming up
+    animation 0
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "warming up"
+    }
+
+    // appearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "appearing"
+    }
+
+    // sustaining
+    animation 2
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "sustaining"
+    }
+
+    // disappearing
+    animation 3
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "disappearing"
+    }
+
+    // finishing
+    animation 4
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "finishing"
+    }
+
+
+
+    keyframes "warming up"
+    {
+    }
+
+    keyframes "appearing"
+    {
+        duration 0.25
+        easing "ease_out"
+
+        keyframe 0%
+        {
+            translation 0 0
+        }
+
+        keyframe 100%
+        {
+            translation -200 0
+        }
+    }
+
+    keyframes "sustaining"
+    {
+        duration 2.5
+
+        keyframe 0%
+        {
+            translation -200 0
+        }
+    }
+
+    keyframes "disappearing"
+    {
+        duration 0.25
+        easing "ease_in"
+
+        keyframe 0%
+        {
+            translation -200 0
+        }
+
+        keyframe 100%
+        {
+            translation 0 0
+        }
+    }
+
+    keyframes "finishing"
+    {
+    }
+}
+
+
+
+//
+// Layer 3
+// "Surge the Rabbit" title
+//
+sprite "Default Title Card - Layer 3"
+{
+    source_file     "images/ui/title_card.png"
+    source_rect     688 0 192 192
+    frame_size      48 192
+    hot_spot        24 0
+
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      -24 0
+    }
+
+    // warming up
+    animation 0
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "warming up"
+    }
+
+    // appearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "appearing"
+    }
+
+    // sustaining
+    animation 2
+    {
+        repeat      TRUE
+        fps         20
+        data        0 1 2 3
+        play        "sustaining"
+    }
+
+    // disappearing
+    animation 3
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "disappearing"
+    }
+
+    // finishing
+    animation 4
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "finishing"
+    }
+
+
+
+    keyframes "warming up"
+    {
+    }
+
+    keyframes "appearing"
+    {
+        duration 0.25
+        easing "ease_out"
+
+        keyframe 0%
+        {
+            translation 0 0
+            scale 1.25 1.25
+        }
+
+        keyframe 100%
+        {
+            translation 96 0
+            scale 1.0 1.0
+        }
+    }
+
+    keyframes "sustaining"
+    {
+        duration 2.5
+
+        keyframe 0%
+        {
+            translation 96 0
+        }
+    }
+
+    keyframes "disappearing"
+    {
+        duration 0.25
+        easing "ease_in"
+
+        keyframe 0%
+        {
+            translation 96 0
+            scale 1.0 1.0
+        }
+
+        keyframe 100%
+        {
+            translation 0 0
+            scale 1.25 1.25
+        }
+    }
+
+    keyframes "finishing"
+    {
+    }
+}
+
+
+
+//
+// Layer 4
+// Effect at the top
+//
+sprite "Default Title Card - Layer 4"
+{
+    source_file     "images/ui/title_card.png"
+    source_rect     0 272 880 32
+    frame_size      880 32
+    hot_spot        0 32
+
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      0 0
+    }
+
+    // warming up
+    animation 0
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "warming up"
+    }
+
+    // appearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "appearing"
+    }
+
+    // sustaining
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+        play        "sustaining"
+    }
+
+    // disappearing
+    animation 3
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "disappearing"
+    }
+
+    // finishing
+    animation 4
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "finishing"
+    }
+
+
+
+    keyframes "warming up"
+    {
+    }
+
+    keyframes "appearing"
+    {
+        duration 0.25
+
+        keyframe 0%
+        {
+            translation -440 0
+        }
+
+        keyframe 100%
+        {
+            translation -400 32
+        }
+    }
+
+    keyframes "sustaining"
+    {
+        duration 2.5
+
+        keyframe 0%
+        {
+            translation -400 32
+        }
+
+        keyframe 100%
+        {
+            translation 0 32
+        }
+    }
+
+    keyframes "disappearing"
+    {
+        duration 0.25
+
+        keyframe 0%
+        {
+            translation -40 32
+        }
+
+        keyframe 100%
+        {
+            translation 0 0
+        }
+    }
+
+    keyframes "finishing"
+    {
+    }
+}
+
+
+
+//
+// Layer 5
+// Effect at the bottom
+//
+sprite "Default Title Card - Layer 5"
+{
+    source_file     "images/ui/title_card.png"
+    source_rect     0 240 880 32
+    frame_size      880 32
+    hot_spot        0 0
+
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      0 240
+    }
+
+    // warming up
+    animation 0
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "warming up"
+    }
+
+    // appearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "appearing"
+    }
+
+    // sustaining
+    animation 2
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+        play        "sustaining"
+    }
+
+    // disappearing
+    animation 3
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "disappearing"
+    }
+
+    // finishing
+    animation 4
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "finishing"
+    }
+
+
+    keyframes "warming up"
+    {
+    }
+
+    keyframes "appearing"
+    {
+        duration 0.25
+
+        keyframe 0%
+        {
+            translation 0 0
+        }
+
+        keyframe 100%
+        {
+            translation -40 -32
+        }
+    }
+
+    keyframes "sustaining"
+    {
+        duration 2.5
+
+        keyframe 0%
+        {
+            translation -40 -32
+        }
+
+        keyframe 100%
+        {
+            translation -440 -32
+        }
+    }
+
+    keyframes "disappearing"
+    {
+        duration 0.25
+
+        keyframe 0%
+        {
+            translation 0 -32
+        }
+
+        keyframe 100%
+        {
+            translation -40 0
+        }
+    }
+
+    keyframes "finishing"
+    {
+    }
+}
+
+
+
+//
+// Layer 6
+// Dark overlay
+//
+sprite "Default Title Card - Layer 6"
+{
+    source_file     "images/ui/title_card.png"
+    source_rect     0 0 426 240
+    frame_size      426 240
+    hot_spot        0 0
+
+    custom_properties
+    {
+        // the position of this layer in screen space
+        layer_position      0 0
+    }
+
+    // warming up
+    animation 0
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "visible"
+    }
+
+    // appearing
+    animation 1
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "visible"
+    }
+
+    // sustaining
+    animation 2
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "fade out"
+    }
+
+    // disappearing
+    animation 3
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "invisible"
+    }
+
+    // finishing
+    animation 4
+    {
+        repeat      FALSE
+        fps         8
+        data        0
+        play        "invisible"
+    }
+
+
+
+    keyframes "visible"
+    {
+        duration 0.25
+
+        keyframe 0%
+        {
+            opacity 100%
+        }
+    }
+
+    keyframes "invisible"
+    {
+        duration 0.25
+
+        keyframe 0%
+        {
+            opacity 0%
+        }
+    }
+
+    keyframes "fade out"
+    {
+        duration 2.5
+
+        keyframe 0%
+        {
+            opacity 100%
+        }
+
+        keyframe 45%
+        {
+            opacity 100%
+        }
+
+        keyframe 55%
+        {
+            opacity 0%
+        }
+
+        keyframe 100%
+        {
+            opacity 0%
+        }
     }
 }

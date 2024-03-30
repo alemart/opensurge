@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * confirmbox.c - confirm box
- * Copyright (C) 2008-2010, 2019-2021  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@
 #include "../core/audio.h"
 #include "../core/timer.h"
 #include "../core/scene.h"
-#include "../core/stringutil.h"
+#include "../util/stringutil.h"
 #include "../scripting/scripting.h"
 
 
@@ -43,7 +43,8 @@
 #define OPTION_2      1
 #define MAX_OPTIONS   2
 
-static image_t *box, *background;
+static image_t *background;
+static const image_t *box;
 static v2d_t boxpos;
 static font_t *textfnt;
 static font_t *optionfnt[MAX_OPTIONS][2];
@@ -69,8 +70,8 @@ void confirmbox_init(void *confirmbox)
     setup_message((confirmboxdata_t*)confirmbox);
 
     /* setup gfx */
-    background = image_clone(video_get_backbuffer());
-    box = sprite_get_image(sprite_get_animation("Confirm Box", 0), 0);
+    background = video_take_snapshot();
+    box = animation_image(sprite_get_animation("Confirm Box", 0), 0);
     boxpos = v2d_new( (VIDEO_SCREEN_W - image_width(box))/2 , VIDEO_SCREEN_H );
     arrow = actor_create();
     actor_change_animation(arrow, sprite_get_animation("UI Pointer", 0));
@@ -162,10 +163,7 @@ void confirmbox_update()
         ));
         font_set_position(optionfnt[i][1], font_get_position(optionfnt[i][0]));
     }
-    arrow->position = v2d_subtract(
-        v2d_add(font_get_position(optionfnt[current_option][0]), arrow->hot_spot),
-        v2d_new(image_width(actor_image(arrow)) * 1.4f, -image_height(actor_image(arrow)) * 0.5f)
-    );
+    arrow->position = font_get_position(optionfnt[current_option][0]);
 
     /* input */
     if(!fxfade_in && !fxfade_out) {

@@ -1,0 +1,22 @@
+// -----------------------------------------------------------------------------
+// File: mouse_cursor.spr
+// Description: sprite script of the mouse cursor (Debug Mode)
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// ----------------------------------------------------------------------------
+
+// art by qubodup (opengameart.org)
+sprite "Debug Mode - Mouse Cursor"
+{
+    source_file     "images/debug_mode/mouse_cursor.png"
+    source_rect     0 0 16 16
+    frame_size      16 16
+    hot_spot        0 0
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+    }
+}

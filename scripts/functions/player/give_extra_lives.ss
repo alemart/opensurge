@@ -33,7 +33,7 @@ object "Give Extra Lives"
 
 // This object is used to reduce the volume
 // of the level music while we play the 1up jingle
-object "Reduce Music Volume Temporarily" is "awake"
+object "Reduce Music Volume Temporarily"
 {
     //
     // We'll set the volume of the level music

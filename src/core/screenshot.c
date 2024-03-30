@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * screenshot.c - screenshots module
- * Copyright (C) 2008-2010, 2018  Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include "screenshot.h"
-#include "assetfs.h"
+#include "asset.h"
 #include "logfile.h"
 #include "image.h"
 #include "video.h"
@@ -42,7 +42,7 @@ void screenshot_init()
     in = input_create_user("screenshots");
 
     /* What's the next screenshot? */
-    while(assetfs_exists(screenshot_filename(next_screenshot_id)) &&
+    while(asset_exists(screenshot_filename(next_screenshot_id)) &&
     ++next_screenshot_id < MAX_SCREENSHOTS);
 }
 
@@ -60,7 +60,7 @@ void screenshot_update()
     if(input_button_pressed(in, IB_FIRE1) || input_button_pressed(in, IB_FIRE2)) {
         const char *filename = screenshot_filename(next_screenshot_id++);
         logfile_message("New screenshot: \"%s\"", filename);
-        snapshot = image_snapshot();
+        snapshot = video_take_snapshot();
         image_save(snapshot, filename);
         image_destroy(snapshot);
         video_showmessage("New screenshot: %s", filename);
