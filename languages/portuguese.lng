@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-03-16"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2023-03-30"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -405,7 +405,7 @@ HUD_TIME                    "Tempo"
 HUD_POWER                   "Poder"
 
 // Level Cleared animation
-CLEARED_LINE1               "VOCE ZEROU"
+CLEARED_LINE1               "VOCÊ ZEROU"
 CLEARED_LINE2               "A ZONA $LEVEL_ACT"
 CLEARED_POWER               "Bônus de Poder"
 CLEARED_TIME                "Bônus de Tempo"
