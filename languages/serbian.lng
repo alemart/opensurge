@@ -399,34 +399,28 @@ LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Пробајте сами!</col
 // sentences as necessary.
 //
 
-//
-// NOTE BY TRANSLATOR:
-// Pretty much the whole Cyrillic alphabet is incompatible, I've resorted to using Latin since Serbian uses both formats side-by-side everywhere in the country (all of the people can read both). It's almost completely like Bosnian, but with a slight dialect variation.
-//
-
 // Heads-Up Display
-HUD_SCORE                   "Poeni"
-HUD_TIME                    "Vreme"
-HUD_POWER                   "Snaga"
+HUD_SCORE                   "Поени"
+HUD_TIME                    "Време"
+HUD_POWER                   "Снага"
 
 // Level Cleared animation
-// NOTE BY TRANSLATOR: string below should be "DOVRŠILI STE"
-CLEARED_LINE1               "DOVRSILI STE"
-CLEARED_LINE2               "$LEVEL_ACT ZONU"
-CLEARED_POWER               "Bonus za Snagu"
-CLEARED_TIME                "Bonus za Vreme"
-CLEARED_SCORE               "Poeni"
+CLEARED_LINE1               "ДОВРШИЛИ СТЕ"
+CLEARED_LINE2               "$LEVEL_ACT ЗОНУ"
+CLEARED_POWER               "Бонус за Снагу"
+CLEARED_TIME                "Бонус за Време"
+CLEARED_SCORE               "Поени"
 
 // Game Over
-GAMEOVER_PART1              "KRAJ"
-GAMEOVER_PART2              "IGRE"
+GAMEOVER_PART1              "КРАЈ"
+GAMEOVER_PART2              "ИГРЕ"
 
 // Time Over
-TIMEOVER_PART1              "VREME"
-TIMEOVER_PART2              "JE ISTEKLO"
+TIMEOVER_PART1              "ВРЕМЕ"
+TIMEOVER_PART2              "ЈЕ ИСТЕКЛО"
 
 // Pause Menu
-PAUSE_TITLE                 "PAUZA"
-PAUSE_CONTINUE              "NASTAVI"
-PAUSE_RESTART               "RESETUJ"
-PAUSE_EXIT                  "IZAĐI"
+PAUSE_TITLE                 "ПАУЗА"
+PAUSE_CONTINUE              "НАСТАВИ"
+PAUSE_RESTART               "РЕССЕТУЈ"
+PAUSE_EXIT                  "ИЗАЂИ"
