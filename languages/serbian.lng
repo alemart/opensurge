@@ -15,7 +15,7 @@
 LANG_ID                     "sr_RS"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Српски"                  // language name
 LANG_AUTHOR                 "SecularSteve"            // translation author
-LANG_LASTUPDATE             "2022-08-26"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-03-20"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -64,54 +64,54 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 // Options
 OPTIONS_TITLE               "ПОСТАВКЕ"
-FIXME OPTIONS_GRAPHICS            "Graphics"
-FIXME OPTIONS_CONTROLS            "Controls"
-FIXME OPTIONS_GAME                "Game"
-FIXME OPTIONS_ENGINE              "Engine"
-FIXME OPTIONS_MODS                "MODs"
-FIXME OPTIONS_AUDIO               "Audio"
-FIXME OPTIONS_BACK                "Back"
-FIXME OPTIONS_YES                 "Yes"
-FIXME OPTIONS_NO                  "No"
-FIXME OPTIONS_ON                  "On" // alternatively: Enabled
-FIXME OPTIONS_OFF                 "Off" // alternatively: Disabled
+OPTIONS_GRAPHICS            "Графике"
+OPTIONS_CONTROLS            "Контроле"
+OPTIONS_GAME                "Игра"
+OPTIONS_ENGINE              "Мотор"
+OPTIONS_MODS                "МОДови"
+OPTIONS_AUDIO               "Аудио"
+OPTIONS_BACK                "Назад"
+OPTIONS_YES                 "Да"
+OPTIONS_NO                  "Не"
+OPTIONS_ON                  "Укључено" // alternatively: Enabled
+OPTIONS_OFF                 "Искључено" // alternatively: Disabled
 OPTIONS_FULLSCREEN          "Цели екран"
 OPTIONS_RESOLUTION          "Величина екрана"
-FIXME OPTIONS_QUALITY             "Quality"
-FIXME OPTIONS_QUALITY_LOW         "Low"
-FIXME OPTIONS_QUALITY_MEDIUM      "Medium"
-FIXME OPTIONS_QUALITY_HIGH        "High"
+OPTIONS_QUALITY             "Квалитет"
+OPTIONS_QUALITY_LOW         "Низак"
+OPTIONS_QUALITY_MEDIUM      "Средњи"
+OPTIONS_QUALITY_HIGH        "Висок"
 OPTIONS_FPS                 "Прикажи FPS"
-FIXME OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
-FIXME OPTIONS_PIXELSCALER         "Pixel scaler"
-FIXME OPTIONS_COMINGSOON          "Coming soon!"
-FIXME OPTIONS_VOLUME              "Volume"
-FIXME OPTIONS_MUTE                "Muted"
-FIXME OPTIONS_GAMEPADOPACITY      "Opacity"
+OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Скалер за пикселе"
+OPTIONS_COMINGSOON          "Долази ускоро!"
+OPTIONS_VOLUME              "Гласнина"
+OPTIONS_MUTE                "Пригушено"
+OPTIONS_GAMEPADOPACITY      "Непрозирност"
 OPTIONS_GAMEPAD             "Користи Џојстик"
-FIXME OPTIONS_LANGUAGE            "Language"
+OPTIONS_LANGUAGE            "Језик"
 OPTIONS_STAGESELECT         "Изабери ниво"
-FIXME OPTIONS_DEVELOPERMODE       "Developer mode"
+OPTIONS_DEVELOPERMODE       "Програмерски мод"
 OPTIONS_CREDITS             "Open Surge Заслуге"
-FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
+OPTIONS_WEBSITE             "Посетите Open Surge на вебу"
 OPTIONS_DONATE              "Донирај Open Surge-u"
-FIXME OPTIONS_ABOUT               "About the engine"
-FIXME OPTIONS_SHARE               "Share the engine"
-FIXME OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
-FIXME OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
-FIXME OPTIONS_PLAYMOD             "Play a game"
-FIXME OPTIONS_PLAYMOD_NOTAGAME    "The selected item is not an Open Surge game!"
-FIXME OPTIONS_PLAYMOD_LEGACYERROR "Legacy Open Surge games are not supported."
-FIXME OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your gaming experience. Are you sure you want to disable it?"
-FIXME OPTIONS_MODSTORAGE          "Storage"
-FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
-FIXME OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
-FIXME OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
-FIXME OPTIONS_SUBMITFEEDBACK      "Submit feedback"
-FIXME OPTIONS_WRITEREVIEW         "Write a review"
-FIXME OPTIONS_RATEAPP             "Rate the app"
-FIXME OPTIONS_REPORTISSUE         "Report an issue"
-FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
+OPTIONS_ABOUT               "О мотору"
+OPTIONS_SHARE               "Поделите мотор"
+OPTIONS_DOWNLOAD_DESKTOP    "Набавите мотор за рачунаре"
+OPTIONS_DOWNLOAD_MOBILE     "Набавите мотор за мобителе"
+OPTIONS_PLAYMOD             "Ирграјте игру"
+OPTIONS_PLAYMOD_NOTAGAME    "Изабрана ставка није Open Surge игра!"
+OPTIONS_PLAYMOD_LEGACYERROR "Застареле Open Surge игре нису подржане."
+OPTIONS_PLAYMOD_COMPATWARN  "Мод за компатибилност је функција дизајнирана да побољша ваше искуство играња. Да ли сте сигурни да желите да га онемогућите?"
+OPTIONS_MODSTORAGE          "Складиште"
+OPTIONS_MODSTORAGE_FOLDER   "Фасцикла" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  ".zip архива"
+OPTIONS_COMPATIBILITYMODE   "Мод за компатибилност"
+OPTIONS_SUBMITFEEDBACK      "Пошаљите повратне информације"
+OPTIONS_WRITEREVIEW         "Напишите рецензију"
+OPTIONS_RATEAPP             "Оцените апликацију"
+OPTIONS_REPORTISSUE         "Пријавите проблем"
+OPTIONS_BACKTOBASEGAME      "Вратите се у главну игру"
 
 // Stage Select
 STAGESELECT_TITLE           "ИЗАБЕРИ НИВО"
@@ -125,7 +125,7 @@ CREDITS_TITLE               "Кредити"
 CREDITS_BACK                "Притисни <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> да идеш назад"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME верзија $ENGINE_VERSION</color>\nпокренуто помоћу $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Људи</color>"
-FIXME CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Past members</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Претходни чланови</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Захваљујући</color>"
 CREDITS_ALEXANDRE           "Водитељ и оснивач пројекта\nПројект програмер\nУметник"
 CREDITS_JOAO                "Уметник\nИлустратор"
@@ -139,7 +139,7 @@ CREDITS_COLIN               "Спрајти, прва прича"
 CREDITS_BRIAN               "Уметник спрајта"
 CREDITS_TRANSLATOR          "Преводилац"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Преводиоци</color>"
-FIXME CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Past translators</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Претходни преводиоци</color>"
 CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Кредити по појединачним ресурсима</color>"
 CREDITS_RES_TEXT            "Све наведене датотеке испод су под либре лиценцама. Њихови аутори су представљени:"
 CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Слике</color>"
@@ -154,14 +154,14 @@ CREDITS_RES_SCRIPTS_TEXT    "Аутори су препознати у сами�
 // Title Screen
 TITLESCREEN_PLAY            "ЗАПОЧНИ ИГРУ"
 TITLESCREEN_OPTIONS         "ОПЦИЈЕ"
-FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
+TITLESCREEN_MOBILE          "ИГРАЈ НА МОБИЛНОМ"
 TITLESCREEN_SHARE           "PODELITE"
 TITLESCREEN_DONATE          "DONIRAJTE"
 TITLESCREEN_QUIT            "НАПУСТИТИ"
-FIXME TITLESCREEN_SUBMITFEEDBACK  "SUBMIT FEEDBACK"
-FIXME TITLESCREEN_WRITEREVIEW     "WRITE A REVIEW"
-FIXME TITLESCREEN_RATEAPP         "RATE THE APP"
-FIXME TITLESCREEN_REPORTISSUE     "REPORT AN ISSUE"
+TITLESCREEN_SUBMITFEEDBACK  "ДОСТАВИТЕ ПОВРАТНЕ ИНФОРМАЦИЈЕ"
+TITLESCREEN_WRITEREVIEW     "НАПИШИТЕ РЕЦЕНЗИЈУ"
+TITLESCREEN_RATEAPP         "ОЦЕНИТЕ АПЛИКАЦИЈУ"
+TITLESCREEN_REPORTISSUE     "ПРИЈАВИТЕ ПРОБЛЕМ"
 TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
@@ -172,23 +172,23 @@ ENDOFDEMO_TEXT              "Хвала што сте играли! Surge the Ra
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
-FIXME RATEGAME_TITLE              "Rate Surge the Rabbit?"
-FIXME RATEGAME_MESSAGE            "We'd love to hear from you!\nYour feedback helps this open source game & engine!" // 2 lines max.
-FIXME RATEGAME_YES                "Sure!"
-FIXME RATEGAME_NO                 "Not now"
+RATEGAME_TITLE              "Оцените Surge the Rabbit?"
+RATEGAME_MESSAGE            "Волели бисмо да чујемо од вас!\nВаше повратне информације помажу овој игри и мотору отвореног кода!" // 2 lines max.
+RATEGAME_YES                "Може!"
+RATEGAME_NO                 "Не сад"
 
 // Play classic levels
-FIXME PLAYCLASSICLEVELS_TEXT      "Play the classic levels?"
-FIXME PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
-FIXME PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+PLAYCLASSICLEVELS_TEXT      "Играјте класичне нивое?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-FIXME THANKSFORPLAYING_TITLE      "Thanks for playing!"
-FIXME THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile devices!"
-FIXME THANKSFORPLAYING_PARAGRAPH2 "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
-FIXME THANKSFORPLAYING_PARAGRAPH3 "Become a supporter of this open source game engine today!"
-FIXME THANKSFORPLAYING_YES        "Sure!"
-FIXME THANKSFORPLAYING_NO         "Not now"
+THANKSFORPLAYING_TITLE      "Хвала што сте играли!"
+THANKSFORPLAYING_PARAGRAPH1 "Подржите овај самостални рад! Набавите званично издање мотора за мобилне уређаје!"
+THANKSFORPLAYING_PARAGRAPH2 "Играјте Surge the Rabbit - и такође властите игре - на свом телефону и таблету!"
+THANKSFORPLAYING_PARAGRAPH3 "Постаните присталица овог отвореног кода за игру данас!"
+THANKSFORPLAYING_YES        "Може!"
+THANKSFORPLAYING_NO         "Не сад"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENI"
@@ -233,10 +233,10 @@ INPUT_KEYB_FIRE1            "РАЗМАК"
 INPUT_KEYB_FIRE2            "ЛЕВИ CTRL"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
-FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
-FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
-FIXME INPUT_KEYB_FIRE7            "<available>"
-FIXME INPUT_KEYB_FIRE8            "<available>"
+INPUT_KEYB_FIRE5            "ЛЕВИ SHIFT"
+INPUT_KEYB_FIRE6            "ДЕСНИ SHIFT"
+INPUT_KEYB_FIRE7            "<dostupno>"
+INPUT_KEYB_FIRE8            "<dostupno>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "ДУГМАДИ"
@@ -244,12 +244,12 @@ INPUT_JOY_LEFT              "ЛЕВО ДУГМЕ"
 INPUT_JOY_RIGHT             "ДЕСНО ДУГМЕ"
 INPUT_JOY_UP                "ГОРЊЕ ДУГМЕ"
 INPUT_JOY_DOWN              "ДОЊЕ ДУГМЕ"
-FIXME INPUT_JOY_FIRE1             "the ACTION BUTTON"
-FIXME INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
+INPUT_JOY_FIRE1             "ДУГМЕ ЗА АКЦИЈУ"
+INPUT_JOY_FIRE2             "ДРУГО ДУГМЕ ЗА АКЦИЈУ"
 INPUT_JOY_FIRE3             "ПАУЗИРАЈ"
 INPUT_JOY_FIRE4             "НАЗАД"
-FIXME INPUT_JOY_FIRE5             "L1"
-FIXME INPUT_JOY_FIRE6             "R1"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<dostupno>"
 INPUT_JOY_FIRE8             "<dostupno>"
 
@@ -378,7 +378,7 @@ LEV_DEMO_2                  "<color=$COLOR_TITLE>Јесте ли знали...?<
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Ослободите своју креативност!</color>\nЈедна од кључних карактеристика у Open Surge-у је <color=$COLOR_HIGHLIGHT>SurgeScript</color>. То је скриптовање за игре! Користите то да направите било што шта можете замислити!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Кул!</color>\nЈесте ли већ узбуђени? Небо је граница! Идите на <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> да направите своје невероватне игре данас!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Пробајте сами!</color>\nСад је ваш ред! <color=$COLOR_HIGHLIGHT>Притисните F12 да бисте отворили креатор.</color> Онда отворите палету предмета и започните градити свој ниво! (за помоћ користите F1)"
-FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Пробајте сами!</color>\nСада је на вас ред! Паузирајте игру, превуците ручицу на дну екрана и унесите <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> да <color=$COLOR_HIGHLIGHT>бисте ниво уредили</color>!"
 
 
 
@@ -401,21 +401,23 @@ FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\
 
 //
 // NOTE BY TRANSLATOR:
-// Pretty much the whole Cyrillic alphabet is incompatible, I've resorted to using Latin since Serbian uses both formats side-by-side everywhere in the country (all of the people can read both). It's almost completely like Bosnian, but with a slight dialect variation.
+//  The following letters are missing from and for Serbian:
+// Ћћ Ђђ Џџ
+// Latin equivalent
+// Ćć Đđ Dždž
 //
 
 // Heads-Up Display
-HUD_SCORE                   "Poeni"
-HUD_TIME                    "Vreme"
-HUD_POWER                   "Snaga"
+HUD_SCORE                   "Поени"
+HUD_TIME                    "Време"
+HUD_POWER                   "Снага"
 
 // Level Cleared animation
-// NOTE BY TRANSLATOR: string below should be "DOVRŠILI STE"
-CLEARED_LINE1               "DOVRSILI STE"
+CLEARED_LINE1               "DOVRŠILI STE"
 CLEARED_LINE2               "$LEVEL_ACT ZONU"
-CLEARED_POWER               "Bonus za Snagu"
-CLEARED_TIME                "Bonus za Vreme"
-CLEARED_SCORE               "Poeni"
+CLEARED_POWER               "Бонус за Снагу"
+CLEARED_TIME                "Бонус за Време"
+CLEARED_SCORE               "Поени"
 
 // Game Over
 GAMEOVER_PART1              "KRAJ"
@@ -426,7 +428,7 @@ TIMEOVER_PART1              "VREME"
 TIMEOVER_PART2              "JE ISTEKLO"
 
 // Pause Menu
-FIXME PAUSE_TITLE                 "PAUSE"
-FIXME PAUSE_CONTINUE              "CONTINUE"
-FIXME PAUSE_RESTART               "RESTART"
-FIXME PAUSE_EXIT                  "EXIT"
+PAUSE_TITLE                 "PAUZA"
+PAUSE_CONTINUE              "NASTAVI"
+PAUSE_RESTART               "RESETUJ"
+PAUSE_EXIT                  "IZAĐI"
