@@ -405,22 +405,22 @@ HUD_TIME                    "Время"
 HUD_POWER                   "Энергия"
 
 // Level Cleared animation
-CLEARED_LINE1               "YOU HAVE" //ВЫ ПРОШЛИ
-CLEARED_LINE2               "CLEARED ZONE $LEVEL_ACT" //ЗОНУ $LEVEL_ACT
+CLEARED_LINE1               "ВЫ ПРОШЛИ"
+CLEARED_LINE2               "ЗОНУ $LEVEL_ACT"
 CLEARED_POWER               "Бонус за Энергию"
 CLEARED_TIME                "Бонус за Время"
 CLEARED_SCORE               "Общий Счёт"
 
 // Game Over
-GAMEOVER_PART1              "GAME" //КОНЕЦ
-GAMEOVER_PART2              "OVER" //ИГРЫ
+GAMEOVER_PART1              "КОНЕЦ"
+GAMEOVER_PART2              "ИГРЫ"
 
 // Time Over
-TIMEOVER_PART1              "TIME" //ВРЕМЯ
-TIMEOVER_PART2              "OVER" //ВЫШЛО
+TIMEOVER_PART1              "ВРЕМЯ"
+TIMEOVER_PART2              "ВЫШЛО"
 
 // Pause Menu
-PAUSE_TITLE                 "PAUSE" //ПАУЗА
+PAUSE_TITLE                 "ПАУЗА"
 PAUSE_CONTINUE              "ПРОДОЛЖИТЬ"
 PAUSE_RESTART               "НАЧАТЬ ЗАНОВО"
 PAUSE_EXIT                  "ВЫХОД"
