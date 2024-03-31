@@ -413,22 +413,22 @@ HUD_TIME                    "Време"
 HUD_POWER                   "Снага"
 
 // Level Cleared animation
-CLEARED_LINE1               "DOVRŠILI STE"
-CLEARED_LINE2               "$LEVEL_ACT ZONU"
+CLEARED_LINE1               "ДОВРШИЛИ СТЕ" // "DOVRŠILI STE"
+CLEARED_LINE2               "$LEVEL_ACT ЗОНУ" // "$LEVEL_ACT ZONU"
 CLEARED_POWER               "Бонус за Снагу"
 CLEARED_TIME                "Бонус за Време"
 CLEARED_SCORE               "Поени"
 
 // Game Over
-GAMEOVER_PART1              "KRAJ"
-GAMEOVER_PART2              "IGRE"
+GAMEOVER_PART1              "КРАЈ" // "KRAJ"
+GAMEOVER_PART2              "ИГРЕ" // "IGRE"
 
 // Time Over
-TIMEOVER_PART1              "VREME"
-TIMEOVER_PART2              "JE ISTEKLO"
+TIMEOVER_PART1              "ВРЕМЕ" // "VREME"
+TIMEOVER_PART2              "ЈЕ ИСТЕКЛО" // "JE ISTEKLO"
 
 // Pause Menu
-PAUSE_TITLE                 "PAUZA"
-PAUSE_CONTINUE              "NASTAVI"
-PAUSE_RESTART               "RESETUJ"
-PAUSE_EXIT                  "IZAĐI"
+PAUSE_TITLE                 "ПАУЗА" // "PAUZA"
+PAUSE_CONTINUE              "НАСТАВИ" // "NASTAVI"
+PAUSE_RESTART               "РЕССЕТУЈ" // "RESETUJ"
+PAUSE_EXIT                  "ИЗАДјИ" // "IZAĐI"
