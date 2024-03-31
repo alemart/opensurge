@@ -398,6 +398,272 @@ font "gameover"
         }
 
 
+        char "А" {
+            source_rect         2 128 16 36
+            offset              0 -6
+        }
+        char "Б" {
+            source_rect         20 128 16 36
+            offset              0 -6
+        }
+        char "В" {
+            source_rect         38 128 16 36
+            offset              0 -6
+        }
+        char "Г" {
+            source_rect         56 128 16 36
+            offset              0 -6
+        }
+        char "Д" {
+            source_rect         74 128 20 36
+            offset              0 -6
+        }
+        char "Е" {
+            source_rect         96 128 16 36
+            offset              0 -6
+        }
+        char "Ё" {
+            source_rect         114 128 16 36
+            offset              0 -6
+        }
+        char "Ж" {
+            source_rect         132 128 24 36
+            offset              0 -6
+        }
+        char "З" {
+            source_rect         158 128 16 36
+            offset              0 -6
+        }
+        char "И" {
+            source_rect         176 128 18 36
+            offset              0 -6
+        }
+        char "Й" {
+            source_rect         196 128 18 36
+            offset              0 -6
+        }
+        char "К" {
+            source_rect         216 128 16 36
+            offset              0 -6
+        }
+        char "Л" {
+            source_rect         234 128 18 36
+            offset              0 -6
+        }
+        char "М" {
+            source_rect         254 128 20 36
+            offset              0 -6
+        }
+        char "Н" {
+            source_rect         276 128 16 36
+            offset              0 -6
+        }
+        char "О" {
+            source_rect         294 128 16 36
+            offset              0 -6
+        }
+        char "П" {
+            source_rect         312 128 16 36
+            offset              0 -6
+        }
+        char "Р" {
+            source_rect         330 128 16 36
+            offset              0 -6
+        }
+        char "С" {
+            source_rect         348 128 16 36
+            offset              0 -6
+        }
+        char "Т" {
+            source_rect         366 128 16 36
+            offset              0 -6
+        }
+        char "У" {
+            source_rect         384 128 16 36
+            offset              0 -6
+        }
+        char "Ф" {
+            source_rect         402 128 24 36
+            offset              0 -6
+        }
+        char "Х" {
+            source_rect         428 128 18 36
+            offset              0 -6
+        }
+        char "Ц" {
+            source_rect         448 128 20 36
+            offset              0 -6
+        }
+        char "Ч" {
+            source_rect         470 128 16 36
+            offset              0 -6
+        }
+        char "Ш" {
+            source_rect         488 128 24 36
+            offset              0 -6
+        }
+        char "Щ" {
+            source_rect         514 128 28 36
+            offset              0 -6
+        }
+        char "Ъ" {
+            source_rect         544 128 20 36
+            offset              0 -6
+        }
+        char "Ы" {
+            source_rect         566 128 22 36
+            offset              0 -6
+        }
+        char "Ь" {
+            source_rect         590 128 16 36
+            offset              0 -6
+        }
+        char "Э" {
+            source_rect         608 128 16 36
+            offset              0 -6
+        }
+        char "Ю" {
+            source_rect         626 128 22 36
+            offset              0 -6
+        }
+        char "Я" {
+            source_rect         650 128 18 36
+            offset              0 -6
+        }
+        char "а" {
+            source_rect         670 128 16 36
+            offset              0 -6
+        }
+        char "б" {
+            source_rect         688 128 16 36
+            offset              0 -6
+        }
+        char "в" {
+            source_rect         706 128 16 36
+            offset              0 -6
+        }
+        char "г" {
+            source_rect         724 128 16 36
+            offset              0 -6
+        }
+        char "д" {
+            source_rect         742 128 16 36
+            offset              0 -6
+        }
+        char "е" {
+            source_rect         760 128 16 36
+            offset              0 -6
+        }
+        char "ё" {
+            source_rect         778 128 16 36
+            offset              0 -6
+        }
+        char "ж" {
+            source_rect         796 128 20 36
+            offset              0 -6
+        }
+        char "з" {
+            source_rect         818 128 16 36
+            offset              0 -6
+        }
+        char "и" {
+            source_rect         836 128 16 36
+            offset              0 -6
+        }
+        char "й" {
+            source_rect         854 128 16 36
+            offset              0 -6
+        }
+        char "к" {
+            source_rect         872 128 16 36
+            offset              0 -6
+        }
+        char "л" {
+            source_rect         890 128 18 36
+            offset              0 -6
+        }
+        char "м" {
+            source_rect         910 128 20 36
+            offset              0 -6
+        }
+        char "н" {
+            source_rect         932 128 16 36
+            offset              0 -6
+        }
+        char "о" {
+            source_rect         950 128 16 36
+            offset              0 -6
+        }
+        char "п" {
+            source_rect         968 128 16 36
+            offset              0 -6
+        }
+        char "р" {
+            source_rect         986 128 16 36
+            offset              0 -6
+        }
+        char "с" {
+            source_rect         1004 128 16 36
+            offset              0 -6
+        }
+        char "т" {
+            source_rect         1022 128 16 36
+            offset              0 -6
+        }
+        char "у" {
+            source_rect         1040 128 16 36
+            offset              0 -6
+        }
+        char "ф" {
+            source_rect         1058 128 20 36
+            offset              0 -6
+        }
+        char "х" {
+            source_rect         1080 128 16 36
+            offset              0 -6
+        }
+        char "ц" {
+            source_rect         1098 128 20 36
+            offset              0 -6
+        }
+        char "ч" {
+            source_rect         1120 128 16 36
+            offset              0 -6
+        }
+        char "ш" {
+            source_rect         1138 128 20 36
+            offset              0 -6
+        }
+        char "щ" {
+            source_rect         1160 128 24 36
+            offset              0 -6
+        }
+        char "ъ" {
+            source_rect         1186 128 20 36
+            offset              0 -6
+        }
+        char "ы" {
+            source_rect         1208 128 22 36
+            offset              0 -6
+        }
+        char "ь" {
+            source_rect         1232 128 16 36
+            offset              0 -6
+        }
+        char "э" {
+            source_rect         1250 128 16 36
+            offset              0 -6
+        }
+        char "ю" {
+            source_rect         1268 128 22 36
+            offset              0 -6
+        }
+        char "я" {
+            source_rect         1292 128 16 36
+            offset              0 -6
+        }
+
+
         char "Ê" {
             source_rect         306 166 16 38
             offset              0 -6

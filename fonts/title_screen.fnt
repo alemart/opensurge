@@ -1098,19 +1098,6 @@ font "Title Screen - Menu Item"
     }
 }
 
-font "Title Screen - Menu Item" for "ru_RU"
-{
-    truetype
-    {
-        source_file             "fonts/Roboto-Black.ttf"
-        size                    15
-        shadow
-        antialias
-    }
-}
-
-
-
 
 // BoxyBold font by Clint Bellanger with additions of lowecase letters by devurandom
 font "Title Screen - Tiny Text"
