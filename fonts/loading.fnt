@@ -702,6 +702,14 @@ font "Loading"
             source_rect         731 18 8 18
             offset              0 -3
         }
+        char "Ј" {
+            source_rect         740 18 9 18
+            offset              0 -3
+        }
+        char "ј" {
+            source_rect         750 18 6 18
+            offset              0 -3
+        }
 
 
         char "Ä" {

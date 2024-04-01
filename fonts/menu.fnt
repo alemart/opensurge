@@ -719,6 +719,15 @@ font "MenuButton" for "en_US"
             offset              0 -6
         }
 
+        char "Ј" {
+            source_rect         1480 128 18 36
+            offset              0 -6
+        }
+        char "ј" {
+            source_rect         1500 128 12 36
+            offset              0 -6
+        }
+
 
         char "Ê" {
             source_rect         306 166 16 38

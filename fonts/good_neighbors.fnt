@@ -729,6 +729,14 @@ font "GoodNeighbors"
             source_rect         731 18 8 18
             offset              0 -3
         }
+        char "Ј" {
+            source_rect         740 18 9 18
+            offset              0 -3
+        }
+        char "ј" {
+            source_rect         750 18 6 18
+            offset              0 -3
+        }
 
 
         char "Ä" {
@@ -1779,6 +1787,15 @@ font "GoodNeighborsLarge"
         }
         char "я" {
             source_rect         1292 128 16 36
+            offset              0 -6
+        }
+
+        char "Ј" {
+            source_rect         1480 128 18 36
+            offset              0 -6
+        }
+        char "ј" {
+            source_rect         1500 128 12 36
             offset              0 -6
         }
 
