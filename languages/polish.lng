@@ -406,9 +406,9 @@ HUD_TIME                    "Czas"
 HUD_POWER                   "Energia"
 
 // Level Cleared animation
-CLEARED_LINE1               "UKONCZONO"
+CLEARED_LINE1               "UKOŃCZONO"
 CLEARED_LINE2               "ETAP $LEVEL_ACT"
-CLEARED_POWER               "Bonus za energie" // No "ę" in the font
+CLEARED_POWER               "Bonus za energię"
 CLEARED_TIME                "Bonus za czas"
 CLEARED_SCORE               "Wynik"
 
@@ -424,4 +424,4 @@ TIMEOVER_PART2              "CZASU"
 PAUSE_TITLE                 "PAUZA"
 PAUSE_CONTINUE              "KONTYNUUJ"
 PAUSE_RESTART               "ZRESTARTUJ"
-PAUSE_EXIT                  "WYJDZ" // No "Ź" in the font
+PAUSE_EXIT                  "WYJDŹ"
