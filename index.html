@@ -11,13 +11,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://opensurge2d.org/">
     <meta property="og:image" content="https://opensurge2d.org/img/surge.png">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120511928-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-120511928-1');
-    </script>
+    <script async src="//gc.zgo.at/count.js" data-goatcounter="https://opensurge.goatcounter.com/count"></script>
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css">
@@ -285,7 +279,7 @@
     </style>
     <script>
     /* reveal on scroll */
-    window.onload = function() {
+    window.addEventListener('load', function() {
         if(typeof IntersectionObserver === "undefined")
             return;
 
@@ -301,7 +295,7 @@
         document.querySelectorAll(".reveal").forEach(function(reveal) {
             observer.observe(reveal);
         });
-    };
+    });
     </script>
   </head>
   <body>
@@ -406,25 +400,25 @@
           </div>
           <div class="pure-g">
             <div class="pure-u-1 pure-u-lg-1-4">
-              <a href="https://wiki.opensurge2d.org/Introduction_to_Modding" target="_blank" class="card">
+              <a href="https://wiki.opensurge2d.org/Introduction_to_Modding" target="_blank" class="card" id="learn-intro" data-goatcounter-click>
                 <h4><span class="icon">&#x1F4D9;</span> Get started</h4>
                 <p>The written tutorials for beginners guide you step-by-step on how to use the engine!</p>
               </a>
             </div>
             <div class="pure-u-1 pure-u-lg-1-4">
-              <a href="https://docs.opensurge2d.org" target="_blank" class="card">
+              <a href="https://docs.opensurge2d.org" target="_blank" class="card" id="learn-surgescript" data-goatcounter-click>
                 <h4><span class="icon">&#x26A1;</span> SurgeScript</h4>
                 <p>The SurgeScript documentation is the reference for all your scripting needs!</p>
               </a>
             </div>
             <div class="pure-u-1 pure-u-lg-1-4">
-              <a href="https://youtube.com/alemart88" target="_blank" class="card">
+              <a href="https://youtube.com/alemart88" target="_blank" class="card" id="learn-videos" data-goatcounter-click>
                 <h4><span class="icon">&#x1F3A5;</span> Video lessons</h4>
                 <p>Learn with a hands-on approach with video lessons that cover various subjects.</p>
               </a>
             </div>
             <div class="pure-u-1 pure-u-lg-1-4">
-              <a href="https://discord.gg/w8JqM7m" target="_blank" class="card">
+              <a href="https://discord.gg/w8JqM7m" target="_blank" class="card" id="learn-discord" data-goatcounter-click>
                 <h4><span class="icon">&#x1F4AC;</span> Need help?</h4>
                 <p>Ask questions and get direct help from our friendly community on Discord!</p>
               </a>
@@ -440,24 +434,24 @@
             <div class="pure-u-1 pure-u-lg-1-3">
             <div class="h-padding">
               <img src="img/windows.png" alt="Microsoft Windows" class="platform"><br>
-              <a href="https://alemart7.gamejolt.io/surge-the-rabbit" target="_blank" class="pure-button">Download for Windows</a>
+              <a href="https://alemart7.gamejolt.io/surge-the-rabbit" target="_blank" class="pure-button" id="download-windows" data-goatcounter-click>Download for Windows</a>
             </div>
             </div>
             <div class="pure-u-1 pure-u-lg-1-3">
             <div class="h-padding">
               <img src="img/linux.png" alt="GNU/Linux" class="platform"><br>
-              <a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" target="_blank" class="pure-button">Download for GNU/Linux</a>
+              <a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" target="_blank" class="pure-button" id="download-linux" data-goatcounter-click>Download for GNU/Linux</a>
             </div>
             </div>
             <div class="pure-u-1 pure-u-lg-1-3">
             <div class="h-padding">
               <img src="img/android.png" alt="Android" class="platform"><br>
-              <a href="https://forms.gle/BRArRjgfw1Bs59ii7" target="blank" class="pure-button">Very soon for Android</a>
+              <a href="https://forms.gle/BRArRjgfw1Bs59ii7" target="blank" class="pure-button" id="download-android" data-goatcounter-click>Very soon for Android</a>
             </div>
             </div>
           </div>
           <div class="h-padding v-padding">
-            <p class="text-center text-note">The Android edition is available as a means to support development. Please show your support! You can also support this work on <a href="https://github.com/sponsors/alemart" target="_blank">GitHub Sponsors</a>.</p>
+            <p class="text-center text-note">The Android edition is available as a donation version to support development. Please show your support!</p>
           </div>
         </section>
 
@@ -490,7 +484,6 @@
                 <li><a href="https://wiki.opensurge2d.org" target="_blank">Open Surge Wiki</a></li>
                 <li><a href="https://github.com/alemart/opensurge/blob/master/CONTRIBUTING.md" target="_blank">How to contribute</a></li>
                 <li><a href="https://wiki.opensurge2d.org/How_to_make_a_level" target="_blank">How to create a level</a></li>
-
               </ul>
             </div>
             <div class="pure-u-1 pure-u-lg-1-4">
@@ -506,7 +499,7 @@
             <div class="pure-u-1 pure-u-lg-1-4">
               <h5>Misc</h5>
               <ul>
-                <li><a href="https://github.com/sponsors/alemart" target="_blank">Support the project</a></li>
+                <li><a href="https://ko-fi.com/alemart" target="_blank">Support the project</a></li>
                 <li><a href="feedback/" target="_blank">Submit feedback</a></li>
                 <li><a href="issues/" target="_blank">Report an issue</a></li>
                 <li><a href="https://github.com/alemart/opensurge" target="_blank">Source code</a></li>
