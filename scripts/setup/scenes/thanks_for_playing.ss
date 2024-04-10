@@ -84,11 +84,6 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     fun constructor()
     {
         fader.fadeIn();
-
-        if(Platform.isAndroid) {
-            if(SurgeTheRabbit.isBuild("googleplay"))
-                Level.loadNext();
-        }
     }
 }
 

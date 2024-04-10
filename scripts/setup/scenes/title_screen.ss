@@ -310,8 +310,8 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
         if(SurgeTheRabbit.canAcceptDonations())
             items.push(spawn("Title Screen - Menu Item - Donate"));
 
-        if(SurgeEngine.mobile)
-            items.push(spawn("Title Screen - Menu Item - Report Issue"));
+        /*if(SurgeEngine.mobile)
+            items.push(spawn("Title Screen - Menu Item - Report Issue"));*/
 
         items.push(spawn("Title Screen - Menu Item - Submit Feedback"));
         items.push(spawn("Title Screen - Menu Item - Quit"));

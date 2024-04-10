@@ -114,12 +114,6 @@ object "SurgeTheRabbit"
 
     fun canAcceptDonations()
     {
-        if(Platform.isAndroid) {
-            /* no external donation page */
-            if(isBuild("googleplay"))
-                return false;
-        }
-
         return isBaseGame();
     }
 
