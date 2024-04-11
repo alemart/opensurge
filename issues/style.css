@@ -1,5 +1,5 @@
 body {
-  background-color: #1e2226;
+  background-color: #3d5afe;
   color: white;
   margin: 0;
   padding: 0;
@@ -25,7 +25,7 @@ p {
 .loading-animation {
   display: inline-block;
   transform-origin: center;
-  transform: scale(5);
+  transform: scale(2);
 }
 
 .lds-ellipsis {
