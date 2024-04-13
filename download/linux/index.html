@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Surge Engine for Linux</title>
+    <meta name="author" content="Alexandre Martins">
+    <meta name="description" content="Home of Surge the Rabbit, Open Surge Engine and SurgeScript">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="Surge Engine: 2D retro game engine">
+    <meta property="og:description" content="Make your dreams come true!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://opensurge2d.org/">
+    <meta property="og:image" content="https://opensurge2d.org/img/surge.png">
+    <script async src="//gc.zgo.at/count.js" data-goatcounter="https://opensurge.goatcounter.com/count"></script>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&amp;display=swap" rel="stylesheet">
+    <style>
+      body {
+        background-color: #fff;
+        color: #26272a;
+        font-family: 'Nunito', sans-serif;
+        font-weight: 400;
+        text-align: center;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      a:any-link {
+        font-weight: bold;
+        color: #26272a;
+      }
+
+      a:hover {
+        color: #3ddb85;
+      }
+
+      .button-success {
+        background-color: #3ddb85;
+        color: #fff !important;
+        margin: 32px 0 32px 0;
+      }
+
+      .button-success:hover {
+        color: #fff;
+      }
+
+      section {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 1024px;
+        font-size: 1.47em;
+      }
+
+      .note {
+        max-width: 768px;
+      }
+
+      #amounts {
+        font-size: 0.7em;
+        border: 1px solid #0000000d;
+        padding: 8px;
+        border-radius: 8px;
+        background-color: #f7f7f7;
+      }
+
+      .decline {
+        font-size: 0.65em;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      footer {
+        display: block;
+        margin: 40px auto 16px auto;
+        max-width: 768px;
+        color: #aaa;
+      }
+
+      footer a:any-link {
+        color: #aaa;
+      }
+
+      img.icon {
+        display: inline-block;
+        height: 64px;
+        padding-top: 32px;
+      }
+
+      ul, ol {
+        list-style-position: inside;
+        padding: 0;
+      }
+
+      ol li {
+        padding-bottom: 4px;
+      }
+
+      ul li {
+        list-style-type: none;
+        padding: 10px 0 10px 0;
+      }
+
+      ul li:before {
+        content: '\2714';
+        display: inline-block;
+        color: #3ddb85;
+        padding: 0 5px 0 0;
+        font-size: 0.75em;
+      }
+    </style>
+    <script>
+    function mail()
+    {
+        const code = [109,97,105,108,116,111,58,97,108,101,109,97,114,116,102,64,103,109,97,105,108,46,99,111,109];
+        const addr = code.map(function(c) { return String.fromCharCode(c); }).join('');
+
+        return addr + '?subject=' + document.title;
+    }
+
+    function updateLinks()
+    {
+        const href = mail();
+
+        document.querySelectorAll('a.contact').forEach(function(link) {
+            link.setAttribute('href', href);
+        });
+
+        document.removeEventListener('mousemove', updateLinks);
+    }
+
+    window.onload = function() {
+        document.addEventListener('mousemove', updateLinks);
+    };
+
+    function toggle(className)
+    {
+        document.querySelectorAll('.' + className).forEach(function(node) {
+            node.classList.toggle('hidden');
+        });
+    }
+    </script>
+  </head>
+  <body>
+    <header>
+      <img src="/img/linux.png" alt="Linux" class="icon">
+      <h1>Surge Engine for Linux</h1>
+    </header>
+    <section class="content">
+      <p>Surge Engine is an open-source engine for retro games. It has brought joy to many people, including you! Help to expand this work and to inspire more people! Become a supporter!</p>
+      <p>Here's a sample of what you get with the engine:</p>
+      <ul>
+        <li>Play Surge the Rabbit on your Linux PC!</li>
+        <li>Create your own games and share them with your friends!</li>
+        <li>Get a safe and trusted <a href="https://github.com/alemart/opensurge" rel="external" target="_blank">open-source</a> software that respects you.</li>
+        <li>Learn gamedev and get entertained &ndash; possibly for years!</li>
+        <li>Play freely, with no ads and no microtransactions!</li>
+      </ul>
+      <p>I'm Alexandre, the developer of the engine. I've been making this engine freely available over the years &ndash; for your joy. However, writing open-source has been a difficult journey. I'm now asking for support to help maintain it. Thank you to all the generous fans who are supporting this work!</p>
+      <p>Donations are secure and powered by <a href="https://ko-fi.com" rel="external" target="_blank">Ko-fi</a>. A big thank you if you increase the amount!</p>
+      <iframe id='kofiframe' src='https://ko-fi.com/alemart/?widget=true&embed=true&preview=true' style='border:none;width:100%;padding:4px;background:#f9f9f9;' height='712' title='Donation widget'></iframe>
+    </section>
+    <section class="note">
+      <p><a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" rel="external" target="_blank" id="download-link-linux" data-goatcounter-click>Proceed to the download</a></p>
+    </section>
+    <footer>
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-md-1-6"></div>
+        <div class="pure-u-1 pure-u-md-1-3">Powered by <a href="https://ko-fi.com" rel="external" target="_blank">Ko-fi</a></div>
+        <div class="pure-u-1 pure-u-md-1-6"><a href="https://more.ko-fi.com/terms" rel="external" target="_blank">Terms</a></div>
+        <div class="pure-u-1 pure-u-md-1-6"><a href="https://more.ko-fi.com/privacy" rel="external" target="_blank">Privacy</a></div>
+        <div class="pure-u-1 pure-u-md-1-6"></div>
+      </div>
+    </footer>
+  </body>
+</html>
