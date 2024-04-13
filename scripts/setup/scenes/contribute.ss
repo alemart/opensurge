@@ -36,6 +36,9 @@ object "Open Contribute web page"
         if(!SurgeTheRabbit.canAcceptDonations())
             return;
 
+        if(Platform.isAndroid)
+            return;
+
         asked = Prefs[key] || false;
         if(!asked) {
             Prefs[key] = true;
