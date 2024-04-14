@@ -1443,7 +1443,7 @@ void level_update()
             video_showmessage("No way!");
             sound_play(SFX_DENY);
         }
-        else {
+        else if(!level_is_in_debug_mode()) {
             editor_enable();
             return;
         }
