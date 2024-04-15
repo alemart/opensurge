@@ -115,29 +115,6 @@
       }
     </style>
     <script>
-    function mail()
-    {
-        const code = [109,97,105,108,116,111,58,97,108,101,109,97,114,116,102,64,103,109,97,105,108,46,99,111,109];
-        const addr = code.map(function(c) { return String.fromCharCode(c); }).join('');
-
-        return addr + '?subject=' + document.title;
-    }
-
-    function updateLinks()
-    {
-        const href = mail();
-
-        document.querySelectorAll('a.contact').forEach(function(link) {
-            link.setAttribute('href', href);
-        });
-
-        document.removeEventListener('mousemove', updateLinks);
-    }
-
-    window.onload = function() {
-        document.addEventListener('mousemove', updateLinks);
-    };
-
     function toggle(className)
     {
         document.querySelectorAll('.' + className).forEach(function(node) {
