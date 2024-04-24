@@ -1,7 +1,7 @@
 #
 # Open Surge Engine
 # CMakeLists.txt - CMake script
-# Copyright (C) 2008-2023  Alexandre Martins <alemartf@gmail.com>
+# Copyright (C) 2008-2024  Alexandre Martins <alemartf@gmail.com>
 # http://opensurge2d.org
 #
 # This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 PROJECT(opensurge)
 SET(CMAKE_C_STANDARD 99)
-SET(GAME_UNIXNAME "${CMAKE_PROJECT_NAME}")
+SET(GAME_UNIXNAME "opensurge")
 SET(GAME_NAME "Open Surge Engine")
 
 FUNCTION(READ_VERSION OUT_GAME_VERSION_STRING OUT_GAME_VERSION_MAJOR OUT_GAME_VERSION_MINOR OUT_GAME_VERSION_PATCH OUT_GAME_VERSION_BUILD)
@@ -70,10 +70,6 @@ IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 ENDIF()
 
-IF(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-  SET(GAME_DEBUG_INFO 1)
-ENDIF()
-
 # #define'd stuff
 SET(DEFS "")
 
@@ -81,7 +77,7 @@ SET(DEFS "")
 OPTION(SURGESCRIPT_STATIC "Link SurgeScript statically" OFF)
 OPTION(ALLEGRO_STATIC "Use the static version of Allegro 5 (Windows only)" OFF)
 OPTION(ALLEGRO_MONOLITH "Use the monolith version of Allegro 5" OFF)
-IF(UNIX)
+IF(UNIX AND NOT ANDROID)
   OPTION(DESKTOP_INSTALL "Add Open Surge to the Desktop menu when installing" ON)
 ENDIF()
 
@@ -110,16 +106,18 @@ SET(SURGESCRIPT_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look f
 SET(SURGESCRIPT_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of SurgeScript")
 SET(PHYSFS_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for PhysicsFS")
 SET(PHYSFS_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of PhysicsFS")
-IF(UNIX AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  SET(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "Install path prefix (prepended onto install directories)" FORCE)
-ENDIF()
 IF(UNIX)
-  SET(GAME_BINDIR "games" CACHE PATH "Directory in which the game executable will be stored when installing")
-  SET(GAME_DATADIR "share/games/${GAME_UNIXNAME}" CACHE PATH "Directory in which the game data will be stored when installing")
+  IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    SET(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "Install path prefix (prepended onto install directories)" FORCE)
+  ENDIF()
+  SET(GAME_BINDIR "games" CACHE PATH "Directory in which the game executable will installed")
+  SET(GAME_DATADIR "share/games/${GAME_UNIXNAME}" CACHE PATH "Directory in which the game data will be installed")
   SET(GAME_USERDIRNAME "${GAME_UNIXNAME}" CACHE PATH "Name of the user-modifiable asset directory")
-  SET(DESKTOP_ICON_PATH "/usr/share/pixmaps" CACHE PATH "Where to store the icon file when installing")
-  SET(DESKTOP_ENTRY_PATH "/usr/share/applications" CACHE PATH "Where to store the .desktop file when installing")
-  SET(DESKTOP_METAINFO_PATH "/usr/share/metainfo" CACHE PATH "Where to store the metainfo file. You shouldn't change this (check the AppStream spec).")
+  IF(NOT ANDROID)
+    SET(DESKTOP_ICON_PATH "/usr/share/pixmaps" CACHE PATH "Where to install the icon file")
+    SET(DESKTOP_ENTRY_PATH "/usr/share/applications" CACHE PATH "Where to install the .desktop file")
+    SET(DESKTOP_METAINFO_PATH "/usr/share/metainfo" CACHE PATH "Where to install the metainfo file. You shouldn't change this (check the AppStream spec).")
+  ENDIF()
 ENDIF()
 
 # Run in place? (i.e., read assets from the directory of the executable)
@@ -177,6 +175,7 @@ SET(REQUIRED_A5_LIBS
   allegro_main
   allegro_image
   allegro_primitives
+  allegro_color
   allegro_font
   allegro_ttf
   allegro_acodec
@@ -580,26 +579,36 @@ IF(WIN32)
 
   # Windows executable
   IF(MINGW)
+
     IF(NOT CMAKE_RC_COMPILER)
       SET(CMAKE_RC_COMPILER windres)
     ENDIF(NOT CMAKE_RC_COMPILER)
+
+    FIND_LIBRARY(LM m)
     ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS})
-    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LPHYSFS} ${LALLEGRO5})
+    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${LM} ${LSURGESCRIPT} ${LPHYSFS} ${LALLEGRO5})
     TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${PHYSFS_INCDIR} ${ALLEGRO_INCDIR})
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")
     EXECUTE_PROCESS(COMMAND ${CMAKE_RC_COMPILER} -O coff -o "${CMAKE_CURRENT_BINARY_DIR}/opensurge.res" -i "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.rc" -I "${CMAKE_CURRENT_SOURCE_DIR}/src/misc")
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++ \"${CMAKE_CURRENT_BINARY_DIR}/opensurge.res\"")
+
   ELSEIF(MSVC)
+
     ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS} ${GAME_HEADERS})
     TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${LSURGESCRIPT} ${LPHYSFS} ${LALLEGRO5})
     TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${PHYSFS_INCDIR} ${ALLEGRO_INCDIR})
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "/D_CRT_SECURE_NO_DEPRECATE /D_CRT_SECURE_NO_WARNINGS ${CMAKE_C_FLAGS}")
+
   ELSE()
+
     MESSAGE("*** Unrecognized compiler ***") # e.g., clang?
+
+    FIND_LIBRARY(LM m)
     ADD_EXECUTABLE(${GAME_UNIXNAME} WIN32 ${GAME_SRCS})
-    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LPHYSFS} ${LALLEGRO5})
+    TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${LM} ${LSURGESCRIPT} ${LPHYSFS} ${LALLEGRO5})
     TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${PHYSFS_INCDIR} ${ALLEGRO_INCDIR})
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")     
+
   ENDIF()
 
   # Bugfix
@@ -607,13 +616,26 @@ IF(WIN32)
     SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES LINKER_LANGUAGE CXX)
   ENDIF()
 
+ELSEIF(ANDROID)
+
+  # shared library
+  FIND_LIBRARY(LM m)
+  FIND_LIBRARY(LLOG log)
+  ADD_LIBRARY(${GAME_UNIXNAME} SHARED ${GAME_SRCS})
+  TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${LM} ${LSURGESCRIPT} ${LPHYSFS} ${LALLEGRO5} ${LLOG})
+  TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${PHYSFS_INCDIR} ${ALLEGRO_INCDIR})
+  SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")
+  INSTALL(TARGETS "${GAME_UNIXNAME}" LIBRARY DESTINATION "${GAME_BINDIR}")
+
 ELSEIF(UNIX)
 
   # *nix executable
+  FIND_LIBRARY(LM m)
   ADD_EXECUTABLE(${GAME_UNIXNAME} ${GAME_SRCS})
-  TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} m ${LSURGESCRIPT} ${LPHYSFS} ${LALLEGRO5})
+  TARGET_LINK_LIBRARIES(${GAME_UNIXNAME} ${LM} ${LSURGESCRIPT} ${LPHYSFS} ${LALLEGRO5})
   TARGET_INCLUDE_DIRECTORIES(${GAME_UNIXNAME} PUBLIC ${SURGESCRIPT_INCDIR} ${PHYSFS_INCDIR} ${ALLEGRO_INCDIR})
   SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES COMPILE_FLAGS "-Wall")
+  INSTALL(TARGETS "${GAME_UNIXNAME}" RUNTIME DESTINATION "${GAME_BINDIR}")
 
 ENDIF()
 
@@ -629,22 +651,20 @@ TARGET_COMPILE_DEFINITIONS(${GAME_UNIXNAME} PUBLIC ${DEFS})
 SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES PROJECT_LABEL "${GAME_NAME}")
 SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
-# Installing on *nix
+# Installing assets on *nix
 IF(UNIX)
-  INSTALL(CODE "MESSAGE(\"Installing ${GAME_NAME} ${GAME_VERSION}... Make sure that you have the appropriate privileges.\")")
+
+  # Game assets
   INSTALL(FILES LICENSE README.md CHANGES.md CONTRIBUTING.md logo.png surge.png surge.rocks surge.cfg DESTINATION "${GAME_DATADIR}")
   INSTALL(DIRECTORY characters scripts sprites images levels musics quests samples themes languages fonts inputs licenses DESTINATION "${GAME_DATADIR}" PATTERN ".git" EXCLUDE)
-  INSTALL(FILES src/misc/opensurge.png DESTINATION "${DESKTOP_ICON_PATH}")
-  INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.appdata.xml" DESTINATION "${DESKTOP_METAINFO_PATH}")
-  IF(DESKTOP_INSTALL)
-    INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.desktop" DESTINATION "${DESKTOP_ENTRY_PATH}")
-  ENDIF()
-  INSTALL(TARGETS "${GAME_UNIXNAME}" RUNTIME DESTINATION "${GAME_BINDIR}")
 
-  # Success!
-  IF(IS_ABSOLUTE "${GAME_BINDIR}")
-    INSTALL(CODE "MESSAGE(\"Installed ${GAME_UNIXNAME} to ${GAME_BINDIR}.\")")
-  ELSE()
-    INSTALL(CODE "MESSAGE(\"Installed ${GAME_UNIXNAME} to ${CMAKE_INSTALL_PREFIX}/${GAME_BINDIR}.\")")
+  # AppStream / freedesktop.org
+  IF(DEFINED DESKTOP_ICON_PATH)
+    INSTALL(FILES src/misc/opensurge.png DESTINATION "${DESKTOP_ICON_PATH}")
+    INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.appdata.xml" DESTINATION "${DESKTOP_METAINFO_PATH}")
+    IF(DESKTOP_INSTALL)
+      INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.desktop" DESTINATION "${DESKTOP_ENTRY_PATH}")
+    ENDIF()
   ENDIF()
+
 ENDIF()
