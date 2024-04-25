@@ -10,7 +10,6 @@
 set -e
 
 echo "Staging the Java part..."
-source "$(dirname "$0")/set_sdk.sh" "$@"
 
 # Stage
 cp -v build/parts/java/build/classes.dex build/stage/

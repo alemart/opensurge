@@ -61,7 +61,7 @@ signed: apk
 	scripts/sign_apk.sh -K "$(DEBUG_KEYSTORE)"
 
 run: apk
-	scripts/run_apk.sh -S "$(SDK)" -c "$(COMPILE_SDK_VERSION)" -b "$(BUILD_TOOLS_VERSION)"
+	scripts/run_apk.sh -S "$(SDK)" -b "$(BUILD_TOOLS_VERSION)"
 
 clean: .clean
 
@@ -120,7 +120,7 @@ clean: .clean
 	$(FINISH_TASK)
 
 .stage_java: .build_java
-	scripts/stage_java.sh -S "$(SDK)" -c "$(COMPILE_SDK_VERSION)" -b "$(BUILD_TOOLS_VERSION)"
+	scripts/stage_java.sh
 	$(FINISH_TASK)
 
 
