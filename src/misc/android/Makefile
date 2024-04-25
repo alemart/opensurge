@@ -44,8 +44,8 @@ VERSION_CODE := $(shell expr "$(GAME_VERSION_MAJOR)" \* 4096 + "$(GAME_VERSION_M
 VERSION_NAME := $(GAME_VERSION_MAJOR).$(GAME_VERSION_MINOR).$(GAME_VERSION_PATCH).$(GAME_VERSION_BUILD)-$(GAME_VERSION_SUFFIX)
 
 # Helpers
-CLEAN_TASK = rm -f ./$(subst .clean_,.,$@)
 FINISH_TASK = @touch $@
+CLEAN_TASK = rm -f ./$(subst .clean_,.,$@)
 
 
 
@@ -75,7 +75,7 @@ clean: .clean
 	@echo "The APK is available at the build/ folder"
 	@echo "Sign the APK with a debug key: make signed"
 	@echo "Run the engine: make run (sign it first)"
-	@echo "Remove the build: make clean"
+	@echo "Cleanup: make clean"
 	$(FINISH_TASK)
 
 .assemble_prepare: .stage

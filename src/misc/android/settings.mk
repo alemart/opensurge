@@ -28,8 +28,8 @@ GAME_VERSION_SUFFIX ?= unofficial
 
 
 # Leave these blank to autodetect
-COMPILE_SDK_VERSION := # must be greater than or equal to the targetSdkVersion declared in the manifest
-BUILD_TOOLS_VERSION := # a directory name in $ANDROID_HOME/build-tools
+COMPILE_SDK_VERSION ?= # must be greater than or equal to the targetSdkVersion declared in the manifest
+BUILD_TOOLS_VERSION ?= # a directory name in $ANDROID_HOME/build-tools
 
 
 
