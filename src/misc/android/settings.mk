@@ -7,8 +7,8 @@
 # a.b.c.d is such that a,b,c,d >= 0; b,c < 8; d < 64
 GAME_VERSION_MAJOR := 6
 GAME_VERSION_MINOR := 0
-GAME_VERSION_PATCH := 11
-GAME_VERSION_BUILD := 0
+GAME_VERSION_PATCH := 7
+GAME_VERSION_BUILD := 1
 
 
 

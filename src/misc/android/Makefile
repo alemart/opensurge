@@ -39,6 +39,10 @@ include settings.mk
 VERSION_CODE := $(shell expr "$(GAME_VERSION_MAJOR)" \* 4096 + "$(GAME_VERSION_MINOR)" \* 512 + "$(GAME_VERSION_PATCH)" \* 64 + "$(GAME_VERSION_BUILD)")
 VERSION_NAME := $(GAME_VERSION_MAJOR).$(GAME_VERSION_MINOR).$(GAME_VERSION_PATCH).$(GAME_VERSION_BUILD)-$(GAME_VERSION_SUFFIX)
 
+ifneq ($(shell test "$(GAME_VERSION_MINOR)" -lt 8 || echo x)$(shell test "$(GAME_VERSION_PATCH)" -lt 8 || echo x)$(shell test "$(GAME_VERSION_BUILD)" -lt 64 || echo x),)
+$(error Invalid version: $(VERSION_NAME))
+endif
+
 # Helpers
 FINISH_TASK = @touch $@
 CLEAN_TASK = rm -f ./$(subst .clean_,.,$@)
