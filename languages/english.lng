@@ -185,7 +185,7 @@ RATEGAME_YES                "Sure!"
 RATEGAME_NO                 "Not now"
 
 // Play classic levels
-PLAYCLASSICLEVELS_TEXT      "Play the classic levels?"
+PLAYCLASSICLEVELS_TEXT      "Play on the classic levels?"
 PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
 PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
