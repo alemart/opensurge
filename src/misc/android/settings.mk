@@ -19,11 +19,18 @@ ABI_LIST ?= arm64-v8a armeabi-v7a
 
 
 
-# Package name
+# Application ID
 # Do not use "org.opensurge2d.surgeengine" - this is reserved for official builds
 # Do not use "org.opensurge2d" - this points to the official domain
-GAME_PACKAGE_NAME ?= org.opensurge2d.surgeengine.unofficial
+# https://developer.android.com/build/configure-app-module#set-application-id
+GAME_APPLICATION_ID ?= org.opensurge2d.surgeengine.unofficial
 GAME_VERSION_SUFFIX ?= unofficial
+
+
+
+# Android SDK
+SDK := $(ANDROID_HOME)
+NDK := $(ANDROID_NDK_ROOT)
 
 
 

@@ -29,14 +29,10 @@
 #
 # ------------------------------------------------------------------------------
 
-.PHONY: all apk signed run clean
+.PHONY: all apk signed run clean version
 
 -include .rebuild_trigger
 include settings.mk
-
-# Android SDK
-SDK := $(ANDROID_HOME)
-NDK := $(ANDROID_NDK_ROOT)
 
 # Compute the version code and the version name
 # Version a.b.c.d is such that a,b,c,d >= 0; b,c < 8; d < 64
@@ -65,6 +61,9 @@ run: apk
 
 clean: .clean
 
+version:
+	@echo "$(VERSION_CODE)" "$(VERSION_NAME)"
+
 
 
 #
@@ -83,7 +82,7 @@ clean: .clean
 	$(FINISH_TASK)
 
 .assemble_package: .assemble_prepare
-	scripts/assemble_package.sh -v "$(VERSION_CODE)" -x "$(VERSION_NAME)" -p "$(GAME_PACKAGE_NAME)"
+	scripts/assemble_package.sh -v "$(VERSION_CODE)" -x "$(VERSION_NAME)" -p "$(GAME_APPLICATION_ID)"
 	$(FINISH_TASK)
 
 
