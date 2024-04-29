@@ -21,7 +21,7 @@ if [[ ! -d "$src_dir" ]]; then
     # remote copy
     "$git_pull" \
         --repository https://github.com/alemart/opensurge.git \
-        --commit 95e629d5a8667b36444d2539ba6564f060c5ae22 \
+        --commit 4dda3eb06688844343f872453fa52b59559f3424 \
         `# --tag v0.6.1` \
     ;
 
