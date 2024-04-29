@@ -84,6 +84,9 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     fun constructor()
     {
         fader.fadeIn();
+
+        if(SurgeEngine.mobile)
+            Level.loadNext();
     }
 }
 
