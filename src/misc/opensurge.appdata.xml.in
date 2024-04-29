@@ -4,76 +4,18 @@
   <name>Surge Engine</name>
   <developer_name>alemart</developer_name>
   <metadata_license>MIT</metadata_license>
-  <project_license>GPL-3.0+</project_license>
+  <project_license>GPL-3.0-or-later</project_license>
   <!-- summary: max len 78 chars -->
-  <summary>Open source retro game engine with a fun platformer inspired by 16-bit Sonic</summary>
+  <summary>A 2D retro game engine with a fun platformer inspired by 16-bit Sonic games.</summary>
   <description>
-    <p>Surge the Rabbit is a fun and open source jump 'n' run retro game made in the spirit of classic 16-bit Sonic platformers of the 90s. The levels are filled with challenges, gimmicks and hazards! Exciting adventures are waiting for you! You can also use it as a base to create your own amazing games!</p>
-    <p>Make your dreams come true! Surge Engine is the very flexible open source 2D game engine that powers Surge the Rabbit. Its capabilities include: level editing, artwork modding, full blown scripting, and much more! It's an open-source, cross-platform retro game engine that runs on Desktop computers and on mobile devices.</p>
-    <p>The fun is multiplied! Several MODs created by the fans in the Open Surge Community can be played on the engine. For those who get involved, this project is also a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.</p>
+    <p>Make your dreams come true! Open Surge Engine is an open-source 2D retro game engine for making your dreams come true.</p>
+    <p>It's a ton of fun! Surge the Rabbit is a featured jump 'n' run created with the Open Surge Engine. It's made in the spirit of classic 16-bit retro platformers of the 1990s. Play as Surge in fun and exciting levels filled with challenges!</p>
+    <p>Unleash your creativity! Create your own amazing indie games and play them on your PC and on your mobile device! Share the games that you create with your friends and have them play using the engine. It's limitless fun!</p>
+    <p>A powerful engine for retro games! One of the core elements of the engine is SurgeScript, a scripting language for games. Use it to create new gameplay mechanics, characters with special abilities, bosses, and much more! The sky is the limit!</p>
+    <p>Open Surge Engine is a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.</p>
   </description>
-  <keywords>
-    <keyword>surge the rabbit</keyword>
-    <keyword>opensurge</keyword>
-    <keyword>open surge</keyword>
-    <keyword>surgeengine</keyword>
-    <keyword>surge engine</keyword>
-    <keyword>surgescript</keyword>
-    <keyword>surge script</keyword>
-    <keyword>games</keyword>
-    <keyword>gaming</keyword>
-    <keyword>gamedev</keyword>
-    <keyword>game dev</keyword>
-    <keyword>game development</keyword>
-    <keyword>game engine</keyword>
-    <keyword>game creator</keyword>
-    <keyword>game maker</keyword>
-    <keyword>video game</keyword>
-    <keyword>retro game</keyword>
-    <keyword>mobile game</keyword>
-    <keyword>open source game</keyword>
-    <keyword>libre game</keyword>
-    <keyword>free game</keyword>
-    <keyword>indie game</keyword>
-    <keyword>fan game</keyword>
-    <keyword>platform game</keyword>
-    <keyword>platformer</keyword>
-    <keyword>side scroller</keyword>
-    <keyword>jump and run</keyword>
-    <keyword>jump 'n' run</keyword>
-    <keyword>action game</keyword>
-    <keyword>arcade</keyword>
-    <keyword>free and open source</keyword>
-    <keyword>foss</keyword>
-    <keyword>floss</keyword>
-    <keyword>awesome</keyword>
-    <keyword>amazing</keyword>
-    <keyword>epic</keyword>
-    <keyword>cool</keyword>
-    <keyword>fun</keyword>
-    <keyword>joy</keyword>
-    <keyword>joyful</keyword>
-    <keyword>happy</keyword>
-    <keyword>happiness</keyword>
-    <keyword>c</keyword>
-    <keyword>c language</keyword>
-    <keyword>opengl</keyword>
-    <keyword>allegro</keyword>
-    <keyword>allegro5</keyword>
-    <keyword>allegro library</keyword>
-    <keyword>liballegro</keyword>
-    <keyword>liballeg</keyword>
-    <keyword>16 bit</keyword>
-    <keyword>surge</keyword>
-    <keyword>sonic</keyword>
-    <keyword>mods</keyword>
-    <keyword>modding</keyword>
-    <keyword>homebrew</keyword>
-    <keyword>hobby</keyword>
-    <keyword>hobbyist</keyword>
-  </keywords>
   <url type="homepage">https://opensurge2d.org</url>
-  <url type="donation">https://github.com/sponsors/alemart</url>
+  <url type="donation">https://opensurge2d.org/contribute</url>
   <url type="help">https://wiki.opensurge2d.org</url>
   <url type="bugtracker">https://github.com/alemart/opensurge/issues</url>
   <url type="translate">https://opensurge2d.org/appdata/translate.html</url>

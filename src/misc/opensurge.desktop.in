@@ -4,7 +4,6 @@ Name=Surge Engine
 GenericName=Game Engine
 GenericName[de]=Spiel-Engine
 Comment=Open source 2D retro game engine
-Keywords=opensurge;games;gaming;gamedev;game-engine;game-creator;game-maker;game-development;video-game;retro-game;mobile-game;open-source-game;libre-game;free-game;indie-game;platformer;side-scroller;jump-'n-run;action;arcade;cool;fun;c;opengl;allegro;allegro5;surgescript;surge;sonic;mods;modding;homebrew
 Exec=opensurge
 Icon=@DESKTOP_ICON_FULLPATH@
 Terminal=false

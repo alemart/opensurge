@@ -6,13 +6,17 @@
 [![Discord server](https://img.shields.io/discord/493384707937927178?color=5662f6&logo=discord&logoColor=white)](https://discord.gg/w8JqM7m)
 [![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCqy8swP261RPePNdBdJUdHg?style=flat&logo=youtube&label=YouTube&color=ff0000)](https://youtube.com/alemart88)
 
-**Surge the Rabbit** is a fun and open source jump 'n run retro game made in the spirit of classic 16-bit Sonic platformers of the 90s. The levels are filled with challenges, gimmicks and hazards! Exciting adventures are waiting for you! You can also use it as a base to create your own amazing games!
+**Make your dreams come true!** Open Surge Engine is an open-source 2D retro game engine for making your dreams come true.
 
-**Make your dreams come true!** Surge Engine is the very flexible open source 2D game engine that powers Surge the Rabbit. Its capabilities include: level editing, artwork modding, full blown scripting, and much more! It's an open-source, cross-platform retro game engine that runs on Desktop computers and on mobile devices.
+**It's a ton of fun!** Surge the Rabbit is a featured jump 'n' run created with the Open Surge Engine. It's made in the spirit of classic 16-bit retro platformers of the 1990s. Play as Surge in fun and exciting levels filled with challenges!
 
-**The fun is multiplied!** Several MODs created by the fans in the Open Surge Community can be played on the engine. For those who get involved, this project is also a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.
+**Unleash your creativity!** Create your own amazing indie games and play them on your PC and on your mobile device! Share the games that you create with your friends and have them play using the engine. It's limitless fun!
 
-<img src="https://opensurge2d.org/surge-demo.gif" alt="Open Surge demo" width="480">
+**A powerful engine for retro games!** One of the core elements of the engine is SurgeScript, a scripting language for games. Use it to create new gameplay mechanics, characters with special abilities, bosses, and much more! The sky is the limit!
+
+Open Surge Engine is a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.
+
+<img src="https://opensurge2d.org/surge-demo.gif" alt="Demo" width="480">
 
 ## Support the project
 
