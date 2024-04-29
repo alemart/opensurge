@@ -48,5 +48,6 @@ git pull origin ${git_branch:-master}
 if [[ -n "$git_commit" ]]; then
     git checkout "$git_commit"
 elif [[ -n "$git_tag" ]]; then
+    git fetch --tags
     git checkout "tags/$git_tag"
 fi
