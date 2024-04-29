@@ -1,0 +1,8 @@
+#
+# F-Droid version
+# new releases must be tagged
+#
+
+CurrentVersion: 6.1.0.0-prerelease-fdroid
+CurrentVersionCode: 25025
+
