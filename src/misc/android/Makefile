@@ -70,7 +70,7 @@ run: apk
 clean: .clean
 
 version:
-	@echo "$(VERSION_NAME)"
+	@echo "$(VERSION_CODE)" "$(VERSION_NAME)"
 
 
 
