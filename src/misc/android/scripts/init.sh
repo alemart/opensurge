@@ -71,4 +71,3 @@ mkdir -p parts/java/src
 mkdir -p parts/java/build
 
 popd
-tree build
