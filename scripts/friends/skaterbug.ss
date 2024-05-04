@@ -76,8 +76,10 @@ object "Skaterbug" is "entity", "friend", "gimmick"
     fun onCollision(otherCollider)
     {
         // detect player
-        if(otherCollider.entity.hasTag("player"))
-            player = otherCollider.entity;
+        if(otherCollider.entity.hasTag("player")) {
+            if(otherCollider.entity.hasFocus())
+                player = otherCollider.entity;
+        }
     }
 
     fun move()
