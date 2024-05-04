@@ -1248,6 +1248,7 @@ void preprocess_split(fonttext_t* out, const fontdrv_t* drv, fontalign_t align)
     darray_clear(out->text_segment);
     darray_clear(out->color);
     darray_clear(out->offset);
+    darray_clear(out->size);
     out->total_size = v2d_new(0, 0);
 
     color = out->color_sequence[0];
@@ -1355,6 +1356,7 @@ void preprocess_text(fonttext_t* out, const fontdrv_t* drv, const char* text, in
     darray_clear(out->text_segment);
     darray_clear(out->color);
     darray_clear(out->offset);
+    darray_clear(out->size);
     darray_clear(out->line_width);
     darray_clear(out->color_sequence);
     darray_clear(out->buffer);
