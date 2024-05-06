@@ -141,9 +141,6 @@ public class MainActivity extends AllegroActivity
         super.onCreate(savedInstanceBundle);
         Window win = this.getWindow();
 
-        // Set background color
-        win.getDecorView().setBackgroundColor(Color.BLACK);
-
         // Android TV: auto low latency mode
         if(Build.VERSION.SDK_INT >= 30)
             win.setPreferMinimalPostProcessing(true);

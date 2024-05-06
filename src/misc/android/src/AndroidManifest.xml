@@ -21,7 +21,7 @@
         android:description="@string/app_description"
         android:icon="@mipmap/ic_launcher"
         android:banner="@mipmap/ic_banner"
-        android:theme="@android:style/Theme.NoTitleBar"
+        android:theme="@style/AppTheme"
         android:hardwareAccelerated="true"
         android:enableOnBackInvokedCallback="true"
         android:requestLegacyExternalStorage="true"
