@@ -17,7 +17,7 @@ GAME_VERSION_SUFFIX ?= unofficial
 
 # override the major.minor.patch.build prefix of the version name of the APK
 # This should generally be left empty. It may be used for pre-releases
-FORCE_VERSION_NAME := 6.1.0.0
+FORCE_VERSION_NAME :=
 
 
 
