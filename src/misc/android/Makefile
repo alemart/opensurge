@@ -35,11 +35,11 @@
 include settings.mk
 
 # Compute the version code and the version name
-# Version a.b.c.d is such that a,b,c,d >= 0; b,c < 8; d < 64
-VERSION_CODE := $(shell expr "$(GAME_VERSION_MAJOR)" \* 4096 + "$(GAME_VERSION_MINOR)" \* 512 + "$(GAME_VERSION_PATCH)" \* 64 + "$(GAME_VERSION_BUILD)")
+# Version a.b.c.d is such that a,b,c,d >= 0; b,c < 10; d < 50
+VERSION_CODE := $(shell expr "$(GAME_VERSION_MAJOR)" \* 5000 + "$(GAME_VERSION_MINOR)" \* 500 + "$(GAME_VERSION_PATCH)" \* 50 + "$(GAME_VERSION_BUILD)")
 VERSION_NAME := $(GAME_VERSION_MAJOR).$(GAME_VERSION_MINOR).$(GAME_VERSION_PATCH).$(GAME_VERSION_BUILD)-$(GAME_VERSION_SUFFIX)
 
-ifneq ($(shell test "$(GAME_VERSION_MINOR)" -ge 8 -o "$(GAME_VERSION_PATCH)" -ge 8 -o "$(GAME_VERSION_BUILD)" -ge 64 && echo x),)
+ifneq ($(shell test "$(GAME_VERSION_MINOR)" -ge 10 -o "$(GAME_VERSION_PATCH)" -ge 10 -o "$(GAME_VERSION_BUILD)" -ge 50 && echo x),)
 $(error Invalid version: $(VERSION_NAME))
 endif
 
