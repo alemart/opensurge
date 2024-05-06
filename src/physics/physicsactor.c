@@ -1276,8 +1276,10 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
                     pa->gsp = pa->topspeed;
                     pa->state = PAS_RUNNING;
                 }
-                else if(!(pa->state == PAS_PUSHING && pa->facing_right))
-                    pa->state = PAS_WALKING;
+                else if(!(pa->state == PAS_PUSHING && pa->facing_right)) {
+                    if(pa->state != PAS_SPRINGING) /* sensitive springs hidden on the ground */
+                        pa->state = PAS_WALKING;
+                }
             }
         }
         else if(input_button_down(pa->input, IB_LEFT) && pa->gsp <= 0.0) {
@@ -1287,8 +1289,10 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
                     pa->gsp = -pa->topspeed;
                     pa->state = PAS_RUNNING;
                 }
-                else if(!(pa->state == PAS_PUSHING && !pa->facing_right))
-                    pa->state = PAS_WALKING;
+                else if(!(pa->state == PAS_PUSHING && !pa->facing_right)) {
+                    if(pa->state != PAS_SPRINGING)
+                        pa->state = PAS_WALKING;
+                }
             }
         }
 
@@ -1365,7 +1369,6 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
      * springing
      *
      */
-
     if(pa->state == PAS_SPRINGING) {
         if(pa->midair && pa->ysp > 0.0)
             pa->state = PAS_WALKING;
