@@ -157,7 +157,7 @@ static const char* const COMPATIBILITY_LIST[] = {
 };
 
 enum { COMPATIBILITY_PACK_MAX_FILE_COUNT = (sizeof(COMPATIBILITY_LIST) / sizeof(char* const*)) / 2 - 1 };
-typedef char __compatibility_list_check[1 - 2 * ((sizeof(COMPATIBILITY_LIST) / sizeof(char* const*)) % 2 != 0)];
+STATIC_ASSERTX(0 == (sizeof(COMPATIBILITY_LIST) / sizeof(char* const*)) % 2, compatibility_list_check);
 
 static bool falls_within_version_range(const char* version, const char* range);
 static int scan_required_engine_version(const char* vpath, void* context);

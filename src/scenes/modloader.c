@@ -267,7 +267,7 @@ bool download_to_cache(ALLEGRO_FILE* f, const char* destination_path, void (*on_
     /* since we're operating on the application cache, we have
        write permissions to open the destination path for writing */
     enum { BUFFER_SIZE = 4096, MEGABYTE = 1048576, PROGRESS_CHUNK = 1 * MEGABYTE };
-    typedef char __chunksize_assertion[-1 + 2 * (!!(PROGRESS_CHUNK % BUFFER_SIZE == 0))];
+    STATIC_ASSERTX(PROGRESS_CHUNK % BUFFER_SIZE == 0, validate_progress_chunk);
 
     uint8_t buffer[BUFFER_SIZE];
     size_t n;

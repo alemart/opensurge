@@ -169,14 +169,14 @@ much more than enough for practical use!
 
 */
 #define MASK_MAXSIZE 4096 /* reliable max texture size */ /* masks cannot be larger than this */
-typedef char _masksize_assert[ !!(MASK_MAXSIZE <= 32767) * 2 - 1 ]; /* will not cause overflow */
+STATIC_ASSERTX(MASK_MAXSIZE <= 32767, validate_collisionmask_maxsize); /* will not cause overflow */
 
 /* Memory alignment utility (deprecated?) */
 #if 0
 #define MEM_ALIGNMENT               sizeof(void*) /* must be a power of two */
 #define IS_POWER_OF_TWO(n)          (((n) & ((n) - 1)) == 0)
-typedef char _mask_assert[ !!(IS_POWER_OF_TWO(MEM_ALIGNMENT)) * 2 - 1 ]; /* is MEM_ALIGNMENT a power of two? */
 #define MASK_ALIGN(x)               (((x) + (MEM_ALIGNMENT - 1)) & ~(MEM_ALIGNMENT - 1)) /* make x a multiple of MEM_ALIGNMENT */
+STATIC_ASSERTX(IS_POWER_OF_TWO(MEM_ALIGNMENT), validate_collisionmask_memalignment); /* is MEM_ALIGNMENT a power of two? */
 #else
 #define MASK_ALIGN(x)               (x) /* identity function */
 #endif
