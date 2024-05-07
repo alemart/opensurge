@@ -12,28 +12,6 @@ set -e
 echo "Building the Java part..."
 source "$(dirname "$0")/set_sdk.sh" "$@"
 
-# Usage
-function usage()
-{
-    echo "Usage: build_java.sh [-j <java-source-compatibility-version>] [-t <java-target-compatibility-version>]"
-}
-
-# Read positional arguments
-unset JAVA_SOURCE_COMPATIBILITY
-unset JAVA_TARGET_COMPATIBILITY
-while getopts "j:t:c:b:S:" OPTION; do
-    case $OPTION in
-        j) JAVA_SOURCE_COMPATIBILITY="$OPTARG";;
-        t) JAVA_TARGET_COMPATIBILITY="$OPTARG";;
-        c|b|S) ;;
-        ?) echo "Invalid argument"; usage; exit 1;;
-    esac
-done
-
-# Default to Java 7
-JAVA_SOURCE_COMPATIBILITY=${JAVA_SOURCE_COMPATIBILITY:-1.7}
-JAVA_TARGET_COMPATIBILITY=${JAVA_TARGET_COMPATIBILITY:-1.7}
-
 # Extract classes.jar from the Allegro AAR
 echo "Obtaining classes.jar from Allegro..."
 pushd build/stage/libs
@@ -60,8 +38,8 @@ mkdir -p build/parts/java/build/src
 echo "Compiling Java files..."
 "$JAVA_HOME/bin/javac" \
     -d build/parts/java/build/obj \
-    -source "$JAVA_SOURCE_COMPATIBILITY" \
-    -target "$JAVA_TARGET_COMPATIBILITY" \
+    -source 1.7 \
+    -target 1.7 \
     -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar" \
     -sourcepath build/parts/java/src/java/org/opensurge2d/surgeengine \
     build/parts/java/build/src/org/opensurge2d/surgeengine/R.java \

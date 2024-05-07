@@ -20,7 +20,7 @@ unset SDK_PLATFORM
 unset SDK_BUILD_TOOLS
 unset PLATFORM_VERSION
 unset BUILD_TOOLS_VERSION
-while getopts "c:b:S:v:x:p:j:t:K:P:" OPTION ; do
+while getopts "c:b:S:v:x:p:K:P:" OPTION ; do
     case $OPTION in
         c) PLATFORM_VERSION="$OPTARG";;
         b) BUILD_TOOLS_VERSION="$OPTARG";;
