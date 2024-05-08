@@ -206,20 +206,28 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
 {
     actor_t *act = player->actor;
     physicsactor_t *pa = player->pa;
+    v2d_t position = v2d_new(0,0);
     float padding = 16.0f, eps = 1e-5;
     float dt = timer_get_delta();
 
-    /* if the player movement is enabled... */
-    if(!player->disable_movement) {
-
-        /* run physics simulation */
+    /* run physics simulation */
+    if(!player->disable_movement)
         physics_adapter(player, obstaclemap);
 
-        /* read new position */
-        v2d_t position = player_position(player);
+    /* read new position */
+    position = player_position(player);
 
-        /* enter / leave water */
-        update_underwater_status(player);
+    /* enter / leave water
+       updating the underwater status must not depend on whether or not the
+       player is frozen, because a frozen player (for example, an AI-controlled
+       character) may be teleported in and out of water. The underwater status
+       should be changed as soon as possible. It should not be delayed to the
+       moment in which the player is no longer frozen, because this would cause
+       undesirable side-effects such as creating spurious water splashes. */
+    update_underwater_status(player);
+
+    /* if the player movement is enabled... */
+    if(!player->disable_movement) {
 
         /* underwater logic */
         if(player_is_underwater(player)) {
@@ -332,14 +340,9 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
             player_focus(player);
 
     }
-#if 0
-    else {
-        /* if the player is frozen...? */
-    }
-#endif
 
     /* can't leave the world */
-    v2d_t position = player_position(player);
+    position = player_position(player);
 
     if(position.x < padding - eps) {
         player_set_speed(player, player_speed(player) * 0.5f);
@@ -610,7 +613,6 @@ void player_enter_water(player_t *player)
         player->underwater = TRUE;
 
         set_underwater_multipliers(player->pa, true);
-        sound_play(SFX_WATERIN);
     }
 }
 
@@ -629,7 +631,6 @@ void player_leave_water(player_t *player)
         player->underwater = FALSE;
 
         set_underwater_multipliers(player->pa, false);
-        sound_play(SFX_WATEROUT);
     }
 }
 
