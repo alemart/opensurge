@@ -8,9 +8,9 @@
 # a.b.c.d is such that a,b,c,d >= 0; b,c < 10; d < 50
 #
 GAME_VERSION_MAJOR := 6
-GAME_VERSION_MINOR := 0
-GAME_VERSION_PATCH := 9
-GAME_VERSION_BUILD := 1
+GAME_VERSION_MINOR := 1
+GAME_VERSION_PATCH := 0
+GAME_VERSION_BUILD := 0
 
 # suffix
 GAME_VERSION_SUFFIX ?= unofficial
