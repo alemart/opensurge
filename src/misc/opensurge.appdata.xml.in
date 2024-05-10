@@ -3,21 +3,21 @@
   <id>org.opensurge2d.OpenSurge</id>
   <name>Surge Engine</name>
   <developer_name>alemart</developer_name>
-  <metadata_license>MIT</metadata_license>
+  <metadata_license>GPL-3.0-or-later</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <!-- summary: max len 78 chars -->
   <summary>A 2D retro game engine with a fun platformer inspired by 16-bit Sonic games.</summary>
   <description>
-    <p>Make your dreams come true! Open Surge Engine is an open-source 2D retro game engine for making your dreams come true.</p>
+    <p>Make your dreams come true! Open Surge Engine is an open-source 2D retro game engine for making your dreams come true!</p>
     <p>It's a ton of fun! Surge the Rabbit is a featured jump 'n' run created with the Open Surge Engine. It's made in the spirit of classic 16-bit retro platformers of the 1990s. Play as Surge in fun and exciting levels filled with challenges!</p>
-    <p>Unleash your creativity! Create your own amazing indie games and play them on your PC and on your mobile device! Share the games that you create with your friends and have them play using the engine. It's limitless fun!</p>
+    <p>Unleash your creativity! Create your own amazing games and play them on your PC and on your mobile device! Share your games with your friends! It's limitless fun!</p>
     <p>A powerful engine for retro games! One of the core elements of the engine is SurgeScript, a scripting language for games. Use it to create new gameplay mechanics, characters with special abilities, bosses, and much more! The sky is the limit!</p>
-    <p>Open Surge Engine is a valuable tool for learning game development, programming, artistic skills, and the nature of free and open-source software in a playful way.</p>
+    <p>Open Surge Engine is an amazing tool for learning game development, programming, digital art, and the nature of free and open-source software in a playful way.</p>
   </description>
   <url type="homepage">https://opensurge2d.org</url>
   <url type="donation">https://opensurge2d.org/contribute</url>
   <url type="help">https://wiki.opensurge2d.org</url>
-  <url type="bugtracker">https://github.com/alemart/opensurge/issues</url>
+  <url type="bugtracker">https://opensurge2d.org/issues</url>
   <url type="translate">https://opensurge2d.org/appdata/translate.html</url>
   <screenshots>
     <screenshot type="default">
