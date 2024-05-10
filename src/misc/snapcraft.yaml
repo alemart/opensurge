@@ -31,7 +31,7 @@ parts:
   opensurge:
     after: [libphysfs, liballegro5, surgescript]
     source: https://github.com/alemart/opensurge.git
-    #source-tag: v0.6.1
+    source-tag: v0.6.1
     plugin: cmake
     parse-info: [usr/share/metainfo/opensurge.appdata.xml]
     cmake-parameters:
@@ -99,7 +99,7 @@ parts:
 
   surgescript:
     source: https://github.com/alemart/surgescript.git
-    #source-tag: v0.6.0
+    source-tag: v0.6.0
     plugin: cmake
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
