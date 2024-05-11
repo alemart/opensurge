@@ -208,7 +208,7 @@ object "Debug Mode - Camera - Free Look Mode" is "debug-mode-camera-strategy"
     scrollSpeed = 400;
     gridSize = 8; //16;
     input = spawn("Debug Mode - Input");
-    turboButton = "secondary-action";
+    turboButton = SurgeEngine.mobile ? "action" : "secondary-action";
 
     fun move(transform, grid)
     {
