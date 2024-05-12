@@ -7,6 +7,7 @@
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Level;
+using SurgeEngine.Lang;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Platform;
@@ -23,17 +24,17 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     textA = spawn("Thanks for Playing - Text")
             .setPosition(Vector2(34, 48))
             .setMaxWidth(Screen.width - 34 * 2)
-            .setText("$THANKSFORPLAYING_PARAGRAPH1");
+            .setText(paragraph(1));
 
     textB = spawn("Thanks for Playing - Text")
             .setPosition(Vector2(34, 87))
             .setMaxWidth(Screen.width - 34 * 2)
-            .setText("$THANKSFORPLAYING_PARAGRAPH2");
+            .setText(paragraph(2));
 
     textC = spawn("Thanks for Playing - Text")
             .setPosition(Vector2(234, 128))
             .setMaxWidth(160)
-            .setText("$THANKSFORPLAYING_PARAGRAPH3");
+            .setText(paragraph(3));
 
     menu = spawn("Simple Menu Builder")
            .addOption("yes", "$THANKSFORPLAYING_YES",  Vector2.zero)
@@ -74,19 +75,46 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     fun onChooseMenuOption(optionId)
     {
         if(optionId == "yes") {
-            SurgeTheRabbit.download();
+
+            if(!SurgeEngine.mobile)
+                SurgeTheRabbit.download();
+            else
+                SurgeTheRabbit.donate();
+
             state = "waiting";
         }
         else
             quit();
     }
 
+    fun paragraph(p)
+    {
+        if(SurgeEngine.mobile) {
+            if(p == 1) {
+                text = Lang["LEV_DEMO_1"];
+                if((j = text.indexOf("\n")) >= 0)
+                    text = text.substr(j, text.length-j);
+            }
+            else if(p == 3)
+                text = "$THANKSFORPLAYING_PARAGRAPH3";
+            else
+                text = "";
+
+            return text;
+        }
+        else if(p == 1)
+            return "$THANKSFORPLAYING_PARAGRAPH1";
+        else if(p == 2)
+            return "$THANKSFORPLAYING_PARAGRAPH2";
+        else if(p == 3)
+            return "$THANKSFORPLAYING_PARAGRAPH3";
+        else
+            return "";
+    }
+
     fun constructor()
     {
         fader.fadeIn();
-
-        if(SurgeEngine.mobile)
-            Level.loadNext();
     }
 }
 
