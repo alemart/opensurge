@@ -7,13 +7,11 @@
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Level;
-using SurgeEngine.Lang;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Platform;
 using SurgeEngine;
 using SurgeTheRabbit;
-
 
 object "Thanks for Playing" is "setup", "private", "detached", "entity"
 {
@@ -24,17 +22,17 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     textA = spawn("Thanks for Playing - Text")
             .setPosition(Vector2(34, 48))
             .setMaxWidth(Screen.width - 34 * 2)
-            .setText(paragraph(1));
+            .setText(1);
 
     textB = spawn("Thanks for Playing - Text")
             .setPosition(Vector2(34, 87))
             .setMaxWidth(Screen.width - 34 * 2)
-            .setText(paragraph(2));
+            .setText(2);
 
     textC = spawn("Thanks for Playing - Text")
             .setPosition(Vector2(234, 128))
             .setMaxWidth(160)
-            .setText(paragraph(3));
+            .setText(3);
 
     menu = spawn("Simple Menu Builder")
            .addOption("yes", "$THANKSFORPLAYING_YES",  Vector2.zero)
@@ -87,31 +85,6 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
             quit();
     }
 
-    fun paragraph(p)
-    {
-        if(SurgeEngine.mobile) {
-            if(p == 1) {
-                text = Lang["LEV_DEMO_1"];
-                if((j = text.indexOf("\n")) >= 0)
-                    text = text.substr(j, text.length-j);
-            }
-            else if(p == 3)
-                text = "$THANKSFORPLAYING_PARAGRAPH3";
-            else
-                text = "";
-
-            return text;
-        }
-        else if(p == 1)
-            return "$THANKSFORPLAYING_PARAGRAPH1";
-        else if(p == 2)
-            return "$THANKSFORPLAYING_PARAGRAPH2";
-        else if(p == 3)
-            return "$THANKSFORPLAYING_PARAGRAPH3";
-        else
-            return "";
-    }
-
     fun constructor()
     {
         fader.fadeIn();
@@ -144,9 +117,13 @@ object "Thanks for Playing - Text" is "private", "detached", "entity"
         label.align = "left";
     }
 
-    fun setText(text)
+    fun setText(p)
     {
-        label.text = text;
+        if(SurgeEngine.mobile)
+            label.text = "$THANKSFORPLAYING_TEXT" + p + "M";
+        else
+            label.text = "$THANKSFORPLAYING_TEXT" + p;
+
         return this;
     }
 

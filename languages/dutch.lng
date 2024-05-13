@@ -183,9 +183,12 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Bedankt voor het spelen!"
-THANKSFORPLAYING_PARAGRAPH1 "Steun dit onafhankelijke werk! Koop de officiële editie van de engine voor mobiele apparaten!"
-THANKSFORPLAYING_PARAGRAPH2 "Speel Surge the Rabbit - en ook je eigen spellen - op je telefoon en tablet!"
-THANKSFORPLAYING_PARAGRAPH3 "Word vandaag nog supporter van deze open source game module!"
+THANKSFORPLAYING_TEXT1      "Steun dit onafhankelijke werk! Koop de officiële editie van de engine voor mobiele apparaten!"
+THANKSFORPLAYING_TEXT2      "Speel Surge the Rabbit - en ook je eigen spellen - op je telefoon en tablet!"
+THANKSFORPLAYING_TEXT3      "Word vandaag nog supporter van deze open source game module!"
+THANKSFORPLAYING_TEXT1M     "\nDeze spel is gemaakt met <color=$COLOR_HIGHLIGHT>Open Surge</color>, een zeer flexibele en open-source 2D-game-engine die je nu in jouw handen hebt!"
+THANKSFORPLAYING_TEXT2M     ""
+THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
 THANKSFORPLAYING_YES        "Natuurlijk!"
 THANKSFORPLAYING_NO         "Niet nu"
 

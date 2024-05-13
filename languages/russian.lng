@@ -184,9 +184,12 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Спасибо за игру!"
-THANKSFORPLAYING_PARAGRAPH1 "Поддержите эту независимую разработку! Скачайте официальную версию на мобильные устройства!"
-THANKSFORPLAYING_PARAGRAPH2 "Сыграйте в Surge the Rabbit - а также в ваши игры - на телефоне или планшете!"
-THANKSFORPLAYING_PARAGRAPH3 "Поддержите этот движок с открытым исходным кодом сегодня!" // slightly redundant, since there's no word for "supporter"
+THANKSFORPLAYING_TEXT1      "Поддержите эту независимую разработку! Скачайте официальную версию на мобильные устройства!"
+THANKSFORPLAYING_TEXT2      "Сыграйте в Surge the Rabbit - а также в ваши игры - на телефоне или планшете!"
+THANKSFORPLAYING_TEXT3      "Поддержите этот движок с открытым исходным кодом сегодня!" // slightly redundant, since there's no word for "supporter"
+THANKSFORPLAYING_TEXT1M     "\nЭта игра создана с использованием <color=$COLOR_HIGHLIGHT>Open Surge</color>, очень гибкого 2D движка с открытым исходным кодом, который теперь в ваших руках!"
+THANKSFORPLAYING_TEXT2M     ""
+THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
 THANKSFORPLAYING_YES        "Конечно!"
 THANKSFORPLAYING_NO         "Не сейчас"
 

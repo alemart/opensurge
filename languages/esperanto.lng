@@ -184,9 +184,12 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Dankon pro ludi"
-THANKSFORPLAYING_PARAGRAPH1 "Subtenu ĉi tiun sendependan laboron! Akiru la oficialan eldonon de la motoro por porteblaj iloj!"
-THANKSFORPLAYING_PARAGRAPH2 "Ludi Surge the Rabbit - kaj ankaŭ viajn proprajn ludojn - en viaj poŝtelefono kaj tabulkomputiloj!"
-THANKSFORPLAYING_PARAGRAPH3 "Iĝi subtenanto de ĉi tiu malfermitkoda ludo hodiaŭ!"
+THANKSFORPLAYING_TEXT1      "Subtenu ĉi tiun sendependan laboron! Akiru la oficialan eldonon de la motoro por porteblaj iloj!"
+THANKSFORPLAYING_TEXT2      "Ludi Surge the Rabbit - kaj ankaŭ viajn proprajn ludojn - en viaj poŝtelefono kaj tabulkomputiloj!"
+THANKSFORPLAYING_TEXT3      "Iĝi subtenanto de ĉi tiu malfermitkoda ludo hodiaŭ!"
+THANKSFORPLAYING_TEXT1M     "\nĈi tiu ludo estis kreita per <color=$COLOR_HIGHLIGHT>Open Surge</color>, tre fleksebla kaj malfermitkoda 2D-a videluda motoro, kiu estas nun en viaj manoj!"
+THANKSFORPLAYING_TEXT2M     ""
+THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
 THANKSFORPLAYING_YES        "Jes ja!"
 THANKSFORPLAYING_NO         "Ne nun"
 

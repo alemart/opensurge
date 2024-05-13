@@ -184,9 +184,12 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Grazie per aver giocato!"
-THANKSFORPLAYING_PARAGRAPH1 "Sostieni questo lavoro indipendente! Ottieni l'edizione ufficiale dell'engine per dispositivi mobili!"
-THANKSFORPLAYING_PARAGRAPH2 "Giocate a Surge the Rabbit - e anche ai vostri giochi - sul vostro telefono e tablet!"
-THANKSFORPLAYING_PARAGRAPH3 "Diventa un sostenitore di questo engine di gioco open source oggi stesso!"
+THANKSFORPLAYING_TEXT1      "Sostieni questo lavoro indipendente! Ottieni l'edizione ufficiale dell'engine per dispositivi mobili!"
+THANKSFORPLAYING_TEXT2      "Giocate a Surge the Rabbit - e anche ai vostri giochi - sul vostro telefono e tablet!"
+THANKSFORPLAYING_TEXT3      "Diventa un sostenitore di questo engine di gioco open source oggi stesso!"
+THANKSFORPLAYING_TEXT1M     "\nQuesto gioco è stato creato con <color=$COLOR_HIGHLIGHT>Open Surge</color>, un engine di gioco 2D molto flessibile e open-source che ora è nelle vostre mani.!"
+THANKSFORPLAYING_TEXT2M     ""
+THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
 THANKSFORPLAYING_YES        "Sicuro!"
 THANKSFORPLAYING_NO         "Non ora"
 

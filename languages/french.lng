@@ -183,9 +183,12 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Merci d'avoir joué !"
-THANKSFORPLAYING_PARAGRAPH1 "Soutenez ce travail indépendant ! Obtenez l'édition officielle du moteur pour les appareils mobiles !"
-THANKSFORPLAYING_PARAGRAPH2 "Jouez à Surge the Rabbit - et aussi à vos propres jeux - sur votre téléphone et votre tablette !"
-THANKSFORPLAYING_PARAGRAPH3 "Devenez un supporter de ce moteur de jeu open source dès aujourd'hui !"
+THANKSFORPLAYING_TEXT1      "Soutenez ce travail indépendant ! Obtenez l'édition officielle du moteur pour les appareils mobiles !"
+THANKSFORPLAYING_TEXT2      "Jouez à Surge the Rabbit - et aussi à vos propres jeux - sur votre téléphone et votre tablette !"
+THANKSFORPLAYING_TEXT3      "Devenez un supporter de ce moteur de jeu open source dès aujourd'hui !"
+THANKSFORPLAYING_TEXT1M     "\nCe jeu est créé avec <color=$COLOR_HIGHLIGHT>Open Surge</color>, un moteur de jeu 2D très flexible et open-source qui est maintenant entre vos mains !"
+THANKSFORPLAYING_TEXT2M     ""
+THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
 THANKSFORPLAYING_YES        "Bien sûr !"
 THANKSFORPLAYING_NO         "Pas maintenant"
 
@@ -274,10 +277,10 @@ LOADING_TEXT             "chargement..."
 
 // Demo Level
 LEV_DEMO_1                  "<color=$COLOR_TITLE>Créez vos propres jeux !</color>\nCe jeu est créé avec <color=$COLOR_HIGHLIGHT>Open Surge</color>, un moteur de jeu 2D très flexible et open-source qui est maintenant entre vos mains !"
-LEV_DEMO_2               "<color=$COLOR_TITLE>Saviez-vous que...</color>\nTout dans Open Surge est personnalisable. Vous pouvez créer des niveaux, des objets, des boss, des personnages et plus encore ! C'est un <color=$COLOR_HIGHLIGHT>système de création de jeu</color>."
-LEV_DEMO_3               "<color=$COLOR_TITLE>Libérez votre créativité !</color>\nL'une des principales caractéristiques d'Open Surge est <color=$COLOR_HIGHLIGHT>SurgeScript</color>. C'est un langage de script pour les jeux ! Utilisez-le pour construire tout ce que vous pouvez imaginer !"
-LEV_DEMO_4               "<color=$COLOR_TITLE>Cool !</color>\nÊtes-vous déjà excité ? Le ciel est la limite ! Visitez <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> pour créer vos propres jeux géniaux dès aujourd'hui !"
-LEV_DEMO_5               "<color=$COLOR_TITLE>Essayez vous-même !</color>\nMaintenant, c'est ton tour ! <color=$COLOR_HIGHLIGHT>Appuyer sur F12 pour ouvrir l'éditeur de stage</color>. Ensuite, ouvrez la palette d'objets et commencez à construire votre stage ! (utilisez F1 pour l'aide)"
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Saviez-vous que...</color>\nTout dans Open Surge est personnalisable. Vous pouvez créer des niveaux, des objets, des boss, des personnages et plus encore ! C'est un <color=$COLOR_HIGHLIGHT>système de création de jeu</color>."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Libérez votre créativité !</color>\nL'une des principales caractéristiques d'Open Surge est <color=$COLOR_HIGHLIGHT>SurgeScript</color>. C'est un langage de script pour les jeux ! Utilisez-le pour construire tout ce que vous pouvez imaginer !"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool !</color>\nÊtes-vous déjà excité ? Le ciel est la limite ! Visitez <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> pour créer vos propres jeux géniaux dès aujourd'hui !"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Essayez vous-même !</color>\nMaintenant, c'est ton tour ! <color=$COLOR_HIGHLIGHT>Appuyer sur F12 pour ouvrir l'éditeur de stage</color>. Ensuite, ouvrez la palette d'objets et commencez à construire votre stage ! (utilisez F1 pour l'aide)"
 LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Essayez-le vous-même !</color>\nMettez le jeu en pause, faites glisser la poignée en bas de l'écran et entrez dans le <color=$COLOR_HIGHLIGHT>MODE DEBUG</color> pour <color=$COLOR_HIGHLIGHT>modifier le niveau</color> !"
 
 

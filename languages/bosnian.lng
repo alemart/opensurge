@@ -184,9 +184,12 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Hvala što ste igrali!"
-THANKSFORPLAYING_PARAGRAPH1 "Podržite ovaj samostalan rad! Nabavite službeno izdanje motora za mobilne uređaje!"
-THANKSFORPLAYING_PARAGRAPH2 "Igrajte Surge the Rabbit - i također vlastite igre - na svom telefonu i tabletu!"
-THANKSFORPLAYING_PARAGRAPH3 "Postanite pobornik ovog otvorenog koda igara danas!"
+THANKSFORPLAYING_TEXT1      "Podržite ovaj samostalan rad! Nabavite službeno izdanje motora za mobilne uređaje!"
+THANKSFORPLAYING_TEXT2      "Igrajte Surge the Rabbit - i također vlastite igre - na svom telefonu i tabletu!"
+THANKSFORPLAYING_TEXT3      "Postanite pobornik ovog otvorenog koda igara danas!"
+THANKSFORPLAYING_TEXT1M     "\nOva igra je kreirana sa <color=$COLOR_HIGHLIGHT>Open Surge-om</color>, vrlo fleksibilnim i otvorenim kodom za 2D igre koji je sada u vašim rukama!"
+THANKSFORPLAYING_TEXT2M     ""
+THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
 THANKSFORPLAYING_YES        "Može!"
 THANKSFORPLAYING_NO         "Ne sad"
 
