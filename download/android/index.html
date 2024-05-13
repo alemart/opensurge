@@ -38,42 +38,12 @@
         color: #3ddb85;
       }
 
-      .button-success {
-        background-color: #3ddb85;
-        color: #fff !important;
-        margin: 32px 0 32px 0;
-      }
-
-      .button-success:hover {
-        color: #fff;
-      }
-
       section {
         display: block;
         margin-left: auto;
         margin-right: auto;
         max-width: 1024px;
-        font-size: 1.47em;
-      }
-
-      .note {
-        max-width: 768px;
-      }
-
-      #amounts {
-        font-size: 0.7em;
-        border: 1px solid #0000000d;
-        padding: 8px;
-        border-radius: 8px;
-        background-color: #f7f7f7;
-      }
-
-      .decline {
-        font-size: 0.65em;
-      }
-
-      .hidden {
-        display: none;
+        font-size: 1.2em;
       }
 
       footer {
@@ -92,26 +62,8 @@
         height: 64px;
       }
 
-      ul, ol {
-        list-style-position: inside;
-        padding: 0;
-      }
-
-      ol li {
-        padding-bottom: 4px;
-      }
-
-      ul li {
-        list-style-type: none;
-        padding: 10px 0 10px 0;
-      }
-
-      ul li:before {
-        content: '\2714';
-        display: inline-block;
-        color: #3ddb85;
-        padding: 0 5px 0 0;
-        font-size: 0.75em;
+      .hidden {
+        display: none;
       }
     </style>
     <script>
@@ -127,38 +79,15 @@
     <header>
       <img src="/img/android.png" alt="Android" class="icon">
       <h1>Surge Engine for Android</h1>
-      <h2>Pre-release for early adopters</h2>
     </header>
     <section class="content">
-      <p>Surge Engine is an open-source engine for retro games. It has brought joy to many people, including you. Here's a sample of what you're getting with the engine:</p>
-      <ul>
-        <li>Play Surge the Rabbit on your phone, tablet and Smart TV!</li>
-        <li>Create your own games on a PC and play them on mobile!</li>
-        <li>Get a safe and trusted <a href="https://github.com/alemart/opensurge" rel="external" target="_blank">open-source</a> software that respects you.</li>
-        <li>Learn gamedev and get entertained &ndash; possibly for years!</li>
-        <li>Play freely, with no ads and no microtransactions!</li>
-      </ul>
-      <p>Help to expand this work and to inspire more people! Please show your support with a donation! Donations are secure and powered by <a href="https://ko-fi.com" rel="external" target="_blank">Ko-fi</a>. A big thank you if you increase the amount!</p>
+      <p><b>A message from the developer of the engine</b></p>
+      <p>You are part of an open-source journey that gives incalculable joy to its fans. Do you appreciate it? Become a supporter today! Donations are secure, handled via PayPal or Stripe, and are powered by <a href="https://ko-fi.com/alemart" rel="external" target="_blank">Ko-fi</a>. You can set the amount.</p>
       <p>Thank you to all the generous fans who support this work!</p>
-      <iframe id='kofiframe' src='https://ko-fi.com/alemart/?widget=true&embed=true&preview=true' style='border:none;width:100%;padding:4px;background:#f9f9f9;' height='712' title='Donation widget'></iframe>
+      <iframe id='kofiframe' src='https://ko-fi.com/alemart/?widget=true&embed=true&preview=true' style='border:none;width:100%;padding:4px;background:#ffffff;' height='712' title='Donation widget'></iframe>
     </section>
     <section class="note">
-      <p class="instructions"><a href="javascript:toggle('instructions')" id="really-download-android" data-goatcounter-click>Proceed to the download</a></p>
-      <div class="instructions hidden">
-        <h2>Instructions (pre-release)</h2>
-        <ol>
-          <li>Scan or tap the QR code</li>
-          <li>Download and install the APK</li>
-          <li><a href="#kofiframe">Support the project</a> :)</li>
-        </ol>
-        <a rel="external" target="_blank" href="https://download.tuxfamily.org/opensurge/builds/opensurge-0.6.1.0-android-prerelease2-dev.apk">
-          <img style="padding:32px 0 32px 0" alt="QR code" src="data:image/png;base64,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">
-        </a>
-        <h3>How do I install the APK?</h3>
-        <p>Tap <strong>Settings &gt; Allow from this source &gt; Install</strong>.</p>
-        <p>When downloading from your mobile device, make sure to allow your web browser to install APKs.</p>
-        <p>Tap <strong>Settings &gt; Apps &gt; Menu &gt; Special access &gt; Install unknown apps</strong>.</p>
-      </div>
+      <p><a href="https://f-droid.org/packages/org.opensurge2d.surgeengine" rel="external" target="_blank" id="really-download-android" data-goatcounter-click>Proceed to the download</a></p>
     </section>
     <footer>
       <div class="pure-g">
