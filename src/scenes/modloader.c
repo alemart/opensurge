@@ -43,6 +43,7 @@
 #include "../core/logfile.h"
 #include "../entities/sfx.h"
 
+#define SHOW_EXIT_SCENE 0
 static const char EXIT_LEVEL[] = "levels/scenes/thanks_for_playing.lev";
 static commandline_t args;
 
@@ -69,6 +70,7 @@ void modloader_init(void* ctx)
     else
         args = commandline_parse(0, NULL);
 
+#if SHOW_EXIT_SCENE
     /* show the exit scene */
     if(asset_exists(EXIT_LEVEL) && args.gamedir[0] != '\0') {
 #if !defined(__ANDROID__)
@@ -79,6 +81,9 @@ void modloader_init(void* ctx)
             scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)EXIT_LEVEL);
         }
     }
+#else
+    (void)EXIT_LEVEL;
+#endif
 }
 
 
