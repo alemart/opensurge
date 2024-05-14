@@ -34,16 +34,16 @@
         color: #26272a;
       }
 
-      a:hover {
-        color: #3ddb85;
-      }
-
       section {
         display: block;
         margin-left: auto;
         margin-right: auto;
         max-width: 1024px;
         font-size: 1.2em;
+      }
+
+      header {
+        margin-bottom: 2em;
       }
 
       footer {
@@ -63,32 +63,34 @@
         padding-top: 32px;
       }
 
-      .hidden {
-        display: none;
+     .badges {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .badges img {
+        height: 125px;
       }
     </style>
-    <script>
-    function toggle(className)
-    {
-        document.querySelectorAll('.' + className).forEach(function(node) {
-            node.classList.toggle('hidden');
-        });
-    }
-    </script>
   </head>
   <body>
     <header>
       <img src="/img/linux.png" alt="Linux" class="icon">
       <h1>Surge Engine for Linux</h1>
     </header>
-    <section class="content">
-      <p><b>A message from the developer of the engine</b></p>
+    <section id="download">
+      <h3>Download</h3>
+      <div class="badges">
+        <a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" rel="external" target="_blank" id="download-linux-flathub" data-goatcounter-click><img src="/img/badge_flathub.png" alt="Get it on Flathub"></a>
+        <a href="https://snapcraft.io/opensurge" rel="external" target="_blank" id="download-linux-snapcraft" data-goatcounter-click><img src="/img/badge_snapcraft.png" alt="Get it from the Snap Store"></a>
+      </div>
+    </section>
+    <section id="donate">
+      <h3>A message from the developer of the engine</h3>
       <p>You are part of an open-source journey that gives incalculable joy to its fans. Do you appreciate it? Become a supporter today! Donations are secure, handled via PayPal or Stripe, and are powered by <a href="https://ko-fi.com/alemart" rel="external" target="_blank">Ko-fi</a>. You can set the amount.</p>
       <p>Thank you to all the generous fans who support this work!</p>
-      <iframe id='kofiframe' src='https://ko-fi.com/alemart/?widget=true&embed=true&preview=true' style='border:none;width:100%;padding:4px;background:#ffffff;' height='712' title='Donation widget'></iframe>
-    </section>
-    <section class="note">
-      <p><a href="https://flathub.org/apps/details/org.opensurge2d.OpenSurge" rel="external" target="_blank" id="really-download-linux" data-goatcounter-click>Proceed to the download</a></p>
+      <iframe id="kofiframe" src="https://ko-fi.com/alemart/?widget=true&embed=true&preview=true" style="border:none;width:100%;padding:4px;background:#ffffff;" height="712" title="Donation widget"></iframe>
     </section>
     <footer>
       <div class="pure-g">
