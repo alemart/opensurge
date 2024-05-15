@@ -18,7 +18,7 @@ window.addEventListener('load', function() {
 });
 
 /* carousel */
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
     const glider = new Glider(document.querySelector('.glider'), {
         slidesToShow: 1,
         dots: '#dots',
