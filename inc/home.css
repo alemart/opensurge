@@ -1,0 +1,257 @@
+/* general */
+body {
+  background-color: #1e2226;
+  color: #b2bcc7;
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 300;
+}
+
+a:any-link:not(.pure-button,.card) {
+  color: #b2bcc7;
+  text-decoration: underline;
+  text-decoration-color: #707883;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-note {
+  font-size: 0.75em;
+}
+
+.h-padding {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.v-padding {
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.bound-layout {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pure-button {
+  background-color: #ffee11;
+  font-weight: 400;
+}
+
+/* sections */
+#content {
+  overflow-x: hidden; /* .reveal causes scrollbars to appear */
+}
+
+#content section {
+  margin-top: 2em;
+  font-size: 1.2em;
+}
+
+#content section h2 {
+  color: #ffee11;
+  font-weight: 300;
+}
+
+#content section .picture-container {
+  order: 2;
+}
+
+#content section .picture-container img.picture {
+  max-width: 80%;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+#content section ul > li::marker {
+  content: '\26A1';
+}
+
+@media screen and (min-width: 1024px) {
+  #content section .picture-container {
+    order: inherit;
+    padding-top: 3em;
+  }
+
+  /* perspective effect */
+  #content section .picture-container {
+    perspective: 512px;
+    perspective-origin: right center;
+  }
+
+  #content section .picture-container.picture-reverse {
+    perspective-origin: left center;
+  }
+
+  #content section .picture-container img.picture {
+    max-width: 90%;
+    transform: rotateY(-16.875deg);
+  }
+ 
+  #content section .picture-container.picture-reverse img.picture {
+    transform: rotateY(16.875deg);
+  }
+}
+
+/* splash area */
+#splash {
+  font-size: 1.5em;
+  background-color: #9063ff;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-image: url("/img/waterworks_1.png");
+}
+
+#splash > div {
+  background-color: rgba(144, 99, 255, 0.61);
+}
+
+#splash .bound-layout {
+  position: relative;
+  padding-bottom: 2em;
+}
+
+#splash h1, #splash h2 {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#splash h1 {
+  color: #ffee11;
+  font-weight: 900;
+  font-size: 3em;
+  -webkit-text-stroke: 1px #000;
+  text-shadow:
+    3px 3px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+#splash h2 {
+  max-width: 512px;
+  color: #fff;
+  font-weight: 900;
+  font-size: 1em;
+  text-shadow:
+    2px 2px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+#surge-cartoon {
+  display: none;
+}
+
+@media screen and (min-width: 1280px) {
+  #surge-cartoon {
+    display: inline-block;
+    position: absolute;
+    right: 3em;
+    bottom: 0;
+    max-width: 100%;
+  }
+}
+
+/* download area */
+#download img.platform {
+  width: auto;
+  height: 64px;
+  padding: 8px;
+}
+
+/* learning area */
+.card {
+  display: block;
+  text-align: center;
+  background-color: #282c31;
+  border-radius: 16px;
+  padding: 1em;
+  margin: 1em;
+  border: 2px solid #1e2226;
+  transition: transform .2s ease-in-out;
+}
+
+.card:any-link {
+  color: #b2bcc7;
+  text-decoration: none;
+}
+
+.card:hover, .card:active {
+  border: 2px solid #ffee11;
+}
+
+@media screen and (min-width: 1024px) {
+  .card {
+    min-height: 224px;
+  }
+
+  .card:hover {
+    transform: scale(1.1);
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  .card {
+    min-height: 192px;
+  }
+}
+
+.card span.icon {
+  margin-right: 0.25em;
+}
+
+.card p {
+  font-size: 0.9em;
+}
+
+/* footer */
+footer {
+  background-color: #282c31;
+  padding: 0 2em 0 2em;
+}
+
+footer ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9em;
+}
+
+footer ul > li {
+  margin-bottom: 0.1em;
+}
+
+footer p {
+  margin-top: 1.25em;
+}
+
+footer h5 {
+  margin: 1.25em 0 1.25em 0;
+}
+
+/* reveal on scroll */
+.reveal {
+  opacity: 1;
+  transition: all 0.5s ease-out;
+}
+
+.reveal.unrevealed.picture-reverse {
+  opacity: 0;
+  transform: translateX(-5em);
+}
+
+.reveal.unrevealed:not(.picture-reverse) {
+  opacity: 0;
+  transform: translateX(5em);
+}
