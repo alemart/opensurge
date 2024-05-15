@@ -255,3 +255,27 @@ footer h5 {
   opacity: 0;
   transform: translateX(5em);
 }
+
+/* testimonials */
+#testimonials {
+  padding: 0.5em 0 0.5em 0;
+}
+
+.testimonial {
+  text-align: center;
+  margin-bottom: 1.5em;
+}
+
+.testimonial .review {
+  padding: 0 3.5em 0 3.5em;
+  font-style: italic;
+}
+
+.testimonial .author {
+  margin-top: 1em;
+  font-weight: bold;
+}
+
+.testimonial .rating {
+  margin-top: 0.5em;
+}

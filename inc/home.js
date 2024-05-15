@@ -16,3 +16,16 @@ window.addEventListener('load', function() {
         observer.observe(reveal);
     });
 });
+
+/* carousel */
+window.addEventListener('load', function() {
+    const glider = new Glider(document.querySelector('.glider'), {
+        slidesToShow: 1,
+        dots: '#dots',
+        draggable: true,
+        arrows: {
+            prev: '.glider-prev',
+            next: '.glider-next'
+        }
+    });
+});
