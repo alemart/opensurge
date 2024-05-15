@@ -1,7 +1,8 @@
-<div align="center">
+<div align="center"><br>
+<img src="https://opensurge2d.org/img/surge_profile.webp" height="256">
 <h1>Surge Engine</h1>
 
-A 2D retro game engine for making your dreams come true!
+A 2D retro game engine with a fun platformer for making your dreams come true!
 
 [![Latest release](https://img.shields.io/github/v/release/alemart/opensurge?color=blue)](https://github.com/alemart/opensurge/releases)
 [![License](https://img.shields.io/github/license/alemart/opensurge?color=brightgreen)](#license)
@@ -14,9 +15,9 @@ A 2D retro game engine for making your dreams come true!
 
 ## It's cool!
 
-**Make your dreams come true!** Open Surge Engine is an open-source 2D retro game engine for making your dreams come true!
+**Make your dreams come true!** Open Surge Engine is an open-source 2D retro game engine for creating games and making your dreams come true!
 
-**It's a ton of fun!** Surge the Rabbit is a featured jump 'n' run created with the Open Surge Engine. It's made in the spirit of classic 16-bit retro platformers of the 1990s. Play as Surge in fun and exciting levels filled with challenges!
+**It's a ton of fun!** Surge the Rabbit is a featured jump 'n' run created with the Open Surge Engine. It's made in the spirit of classic 16-bit Sonic platformers of the 1990s. Play as Surge in fun and exciting levels filled with challenges!
 
 **Unleash your creativity!** Create your own amazing games and play them on your PC and on your mobile device! Share your games with your friends! It's limitless fun!
 

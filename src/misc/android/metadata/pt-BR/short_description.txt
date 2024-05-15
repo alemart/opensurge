@@ -1,1 +1,1 @@
-Realize seus sonhos com uma game engine incrível que inclui jogo estilo 16-bits!
+Uma engine 2D incrível com um platformer retrô para você realizar seus sonhos!
