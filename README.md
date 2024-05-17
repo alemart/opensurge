@@ -25,6 +25,8 @@ A 2D retro game engine with a fun platformer for making your dreams come true!
 
 Open Surge Engine is an amazing tool for learning game development, programming, digital art, and the nature of free and open-source software in a playful way.
 
+Official website: http://opensurge2d.org
+
 ## Download
 
 [<img src="https://opensurge2d.org/img/badge_github.png" height="120" alt="Get it on GitHub">](https://github.com/alemart/opensurge/releases)
