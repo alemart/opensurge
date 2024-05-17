@@ -2,7 +2,9 @@
 <component type="desktop-application">
   <id>org.opensurge2d.OpenSurge</id>
   <name>Surge Engine</name>
-  <developer_name>alemart</developer_name>
+  <developer id="org.opensurge2d">
+    <name>alemart</name>
+  </developer>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <!-- summary: max len 78 chars -->
@@ -13,7 +15,6 @@
     <p>Unleash your creativity! Create your own amazing games and play them on your PC and on your mobile device! Share your games with your friends! It's limitless fun!</p>
     <p>A powerful engine for retro games! One of the core elements of the engine is SurgeScript, a scripting language for games. Use it to create new gameplay mechanics, characters with special abilities, bosses, and much more! The sky is the limit!</p>
     <p>Open Surge Engine is an amazing tool for learning game development, programming, digital art, and the nature of free and open-source software in a playful way.</p>
-    <p>Official website: http://opensurge2d.org</p>
   </description>
   <url type="homepage">https://opensurge2d.org</url>
   <url type="donation">https://opensurge2d.org/contribute</url>
@@ -43,7 +44,7 @@
       <image>https://opensurge2d.org/appdata/0_6_0/screenshot7.png</image>
     </screenshot>
     <screenshot>
-      <video>https://opensurge2d.org/appdata/0_6_0/trailer.webm</video>
+      <video codec="vp9">https://opensurge2d.org/appdata/0_6_0/trailer-vp9.webm</video>
     </screenshot>
   </screenshots>
   <categories>
@@ -138,39 +139,43 @@
       </description>
     </release>
     <release version="0.5.2.1" date="2021-04-15">
-      <ul>
-        <li>Fix sprites/overrides/ detection bug on Windows</li>
-        <li>Include LMMS source files (1up, speed, drowning, gameover)</li>
-        <li>Player: reduce jump_lock_timer after charging</li>
-        <li>Small fixes &amp; adjustments</li>
-      </ul>
+      <description>
+        <ul>
+          <li>Fix sprites overrides detection bug on Windows</li>
+          <li>Include LMMS source files (1up, speed, drowning, gameover)</li>
+          <li>Player: reduce jump_lock_timer after charging</li>
+          <li>Small fixes &amp; adjustments</li>
+        </ul>
+      </description>
     </release>
     <release version="0.5.2" date="2021-01-25">
-      <ul>
-        <li>Improved joystick support</li>
-        <li>New translations: Polish, Russian</li>
-        <li>New musics</li>
-        <li>Updated the Giant Wolf Boss</li>
-        <li>Added new little animals - different animals will appear in different levels</li>
-        <li>Increased the drowning time to 12 seconds</li>
-        <li>Updated the turbo/invincibility time to 20 seconds</li>
-        <li>Improved the springs: they now behave as expected when the player is running on the walls or on the ceiling</li>
-        <li>Level Editor: users can now create levels in fullscreen mode</li>
-        <li>Level Editor: users can now display collision gizmos by pressing a key</li>
-        <li>Level Editor: the interface has been translated into multiple languages</li>
-        <li>Fix: the engine will pause the SurgeScript VM when the game is paused</li>
-        <li>Fix: consistent physics in slow computers</li>
-        <li>Fix: the player can be smashed by solid moving platforms</li>
-        <li>Improvements to the SurgeScript API</li>
-        <li>Updated the credits screen: it now extracts data from a csv file</li>
-        <li>Introduced CONTRIBUTING file with guidelines for contributors</li>
-        <li>Introduced special folder sprites/overrides/ to ease sprite hacking</li>
-        <li>Input maps are now read from the (new) inputs/ folder</li>
-        <li>The HUD is now entirely controlled via scripting</li>
-        <li>The 1up jingle no longer stops the level music</li>
-        <li>Increased the maximum supported image size to 4096x4096 pixels</li>
-        <li>Bugfixes and general improvements</li>
-      </ul>
+      <description>
+        <ul>
+          <li>Improved joystick support</li>
+          <li>New translations: Polish, Russian</li>
+          <li>New musics</li>
+          <li>Updated the Giant Wolf Boss</li>
+          <li>Added new little animals - different animals will appear in different levels</li>
+          <li>Increased the drowning time to 12 seconds</li>
+          <li>Updated the turbo/invincibility time to 20 seconds</li>
+          <li>Improved the springs: they now behave as expected when the player is running on the walls or on the ceiling</li>
+          <li>Level Editor: users can now create levels in fullscreen mode</li>
+          <li>Level Editor: users can now display collision gizmos by pressing a key</li>
+          <li>Level Editor: the interface has been translated into multiple languages</li>
+          <li>Fix: the engine will pause the SurgeScript VM when the game is paused</li>
+          <li>Fix: consistent physics in slow computers</li>
+          <li>Fix: the player can be smashed by solid moving platforms</li>
+          <li>Improvements to the SurgeScript API</li>
+          <li>Updated the credits screen: it now extracts data from a csv file</li>
+          <li>Introduced CONTRIBUTING file with guidelines for contributors</li>
+          <li>Introduced special folder sprites/overrides/ to ease sprite hacking</li>
+          <li>Input maps are now read from the (new) inputs/ folder</li>
+          <li>The HUD is now entirely controlled via scripting</li>
+          <li>The 1up jingle no longer stops the level music</li>
+          <li>Increased the maximum supported image size to 4096x4096 pixels</li>
+          <li>Bugfixes and general improvements</li>
+        </ul>
+      </description>
     </release>
     <release version="0.5.1.2" date="2020-02-02">
       <description>
