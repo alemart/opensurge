@@ -133,7 +133,6 @@ parts:
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - -DCMAKE_INSTALL_PREFIX=/usr
-      - -DWANT_GLES3=ON
       - -DWANT_DEMO=OFF
       - -DWANT_DOCS=OFF
       - -DWANT_EXAMPLES=OFF
