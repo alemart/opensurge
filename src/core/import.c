@@ -160,6 +160,8 @@ static const char* BLACKLIST[] = {
     /* deleted files from previous builds */
     EXACT("preferences.dat"), /* 0.2.0 => 0.5.0 */
     EXACT("images/allegro.png"), /* 0.2.0 => 0.6.1 */
+    EXACT("levels/scenes/contrib.lev"), /* 0.5.0 => 0.5.2 */
+    EXACT("scripts/setup/scenes/contrib.ss"), /* 0.5.0 => 0.5.2 */
     EXACT("scripts/core/motd.ss"), /* 0.5.0 => 0.6.1 */
     PREFIX("images/backgrounds/waterworks-zone/"), /* 0.6.0 => 0.6.1 */
     PREFIX("images/bricks/waterworks-zone/"), /* 0.6.0 => 0.6.1 */
