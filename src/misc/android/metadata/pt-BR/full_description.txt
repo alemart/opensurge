@@ -1,10 +1,10 @@
-<b>Torne seus sonhos realidade!</b> A Open Surge Engine é uma game engine livre e de código-aberto focada em jogos retrô 2D. Ela é feita para criar jogos e tornar seus sonhos realidade!
+<b>Torne seus sonhos realidade!</b> A Open Surge Engine é uma game engine livre e de código-aberto focada em jogos retrô 2D. Ela foi feita para criar jogos e para tornar seus sonhos realidade!
 
 <b>É muito da hora!</b> Surge the Rabbit é o jogo base da engine. Ele foi desenvolvido tendo como inspiração jogos de plataforma de 16-bits do Sonic, dos anos 1990. Jogue como Surge em fases incríveis, divertidas e cheias de desafios!
 
 <b>Dê asas à sua imaginação!</b> Invente tudo do seu jeito! Crie seus próprios jogos incríveis e jogue-os no PC e no mobile! Compartilhe seus games com seus amigos! É diversão garantida!
 
-<b>Uma engine poderosa para jogos retrô 2D!</b> Um dos principais recursos da engine é o SurgeScript, um sistema de scripting para games. Use-o para inventar novas mecânicas de gameplay, personagens com habilidades especiais, chefões e muito mais! O céu é o limite!
+<b>Uma engine poderosa para jogos retrô 2D!</b> Um dos principais recursos da engine é o SurgeScript, um sistema de programação (scripting) para games. Use-o para inventar novas mecânicas de gameplay, personagens com habilidades especiais, chefões e muito mais! O céu é o limite!
 
 A Open Surge Engine é uma ferramenta incrível para aprender desenvolvimento de games, programação, arte digital e a natureza do software livre de forma lúdica e criativa.
 
