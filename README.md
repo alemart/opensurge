@@ -48,6 +48,7 @@ You can play MODs provided by other users.
 1. Download the MOD.
     - Linux users: preferably download it to your home folder.
     - Flatpak users: download it to `~/Downloads`.
+    - Snap users: download it to your home folder.
 2. Load the game.
     - Windows users: extract the MOD and launch the executable.
     - Other platforms: load the game from the options screen.
