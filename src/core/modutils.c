@@ -145,6 +145,12 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/items/profiler.ss",                        ":",                        /* always use own Profiler */
 #endif
 
+#if 1
+    /* removed files */
+    "levels/scenes/contrib.lev<levels/scenes/contribute.lev",":",                   /* renamed contrib.lev to contribute.lev in 0.5.2 */
+    "-scripts/scenes/setup/contrib.ss",                 ":",                        /* removed on 0.5.2 */
+#endif
+
 #if 0
     /* removed changes */
     "scripts/core/cleared.ss",                          ":0.6.1",                   /* mobile: show and hide the mobile gamepad; need special exception */

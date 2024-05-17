@@ -1616,6 +1616,14 @@ void setup_compatibility_pack(const char* shared_dirpath, const char* engine_ver
         file_size = reallocx(file_size, file_count * sizeof(*file_size));
         file_size[last] = 0;
 
+        char* actual_vpath = file_vpath[last], *p;
+        if((p = strchr(actual_vpath, '<')) != NULL) {
+            /* file_vpath[last] will be added to the pack, but its contents are at actual_vpath */
+            *p = '\0';
+            actual_vpath = p+1;
+            LOG("Will use \"%s\" as a replacement of \"%s\"", actual_vpath, file_vpath[last]);
+        }
+
         if(file_vpath[last][0] == '-') {
             LOG("Will ignore file \"%s\"...", file_vpath[last] + 1);
             free(file_vpath[last]);
@@ -1625,7 +1633,7 @@ void setup_compatibility_pack(const char* shared_dirpath, const char* engine_ver
             file_data[last] = NULL;
             file_size[last] = 0;
         }
-        else if(!read_file(file_vpath[last], (void**)&file_data[last], &file_size[last])) {
+        else if(!read_file(actual_vpath, (void**)&file_data[last], &file_size[last])) {
             WARN("Can't add file \"%s\" to the compatibility pack!", file_vpath[last]);
 
             /* the file probably no longer exists. Make it blank,
