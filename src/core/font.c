@@ -782,7 +782,7 @@ int expand_vars(char* dest, const char* src, size_t dest_size, const char* (*cal
         number_of_substitutions++; \
     } while(0);
 
-    for(i = j = 0; '\0' != src[i] && j < m; i++) {
+    for(a = i = j = 0; '\0' != src[i] && j < m; i++) {
         char curr_char = src[i], next_char = src[i+1];
 
         switch(state) {
