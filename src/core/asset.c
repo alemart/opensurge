@@ -156,7 +156,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
 #endif
 
     /* permit symbolic links. this is used by some Linux distros to de-duplicate .ttf fonts */
-    PHYSFS_permitSymbolicLinks(1);
+    PHYSFS_permitSymbolicLinks(TRUE);
 
     /* set the default name of the user-modifiable asset sub-directory */
     str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
