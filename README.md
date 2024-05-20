@@ -2,7 +2,7 @@
 <img src="https://opensurge2d.org/img/surge_profile.webp" height="256">
 <h1>Surge Engine</h1>
 
-A 2D retro game engine with a fun platformer for making your dreams come true!
+A retro game engine with a fun platformer for making your dreams come true!
 
 [![Latest release](https://img.shields.io/github/v/release/alemart/opensurge?color=blue)](https://github.com/alemart/opensurge/releases)
 [![License](https://img.shields.io/github/license/alemart/opensurge?color=brightgreen)](#license)

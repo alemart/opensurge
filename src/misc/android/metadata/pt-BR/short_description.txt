@@ -1,1 +1,1 @@
-Uma engine 2D incrível com um platformer retrô para você realizar seus sonhos!
+Uma game engine incrível com um platformer retrô para você realizar seus sonhos!
