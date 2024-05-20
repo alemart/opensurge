@@ -4,7 +4,7 @@
 
 <b>Dê asas à sua imaginação!</b> Invente tudo do seu jeito! Crie seus próprios jogos incríveis e jogue-os no PC e no mobile! Compartilhe seus games com seus amigos! É diversão garantida!
 
-<b>Uma engine poderosa para jogos retrô 2D!</b> Um dos principais recursos da engine é o SurgeScript, um sistema de programação (scripting) para games. Use-o para inventar novas mecânicas de gameplay, personagens com habilidades especiais, chefões e muito mais! O céu é o limite!
+<b>Uma engine poderosa para jogos retrô!</b> Um dos principais recursos da engine é o SurgeScript, uma linguagem de script para games. Use-o para inventar novas mecânicas de gameplay, personagens com habilidades especiais, chefões e muito mais! O céu é o limite!
 
 A Open Surge Engine é uma ferramenta incrível para aprender desenvolvimento de games, programação, arte digital e a natureza do software livre de forma lúdica e criativa.
 
