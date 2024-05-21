@@ -85,8 +85,8 @@ static const char watershader_glsl[] = ""
         /* faster version */
     "   int w = wanted_y & 63;\n"
     "   int k = int(w >= 20) + int(w >= 32) * int(w <= 51);\n" /* waveform (k = 0, 1, 2) */
-    "   vec3 indicator = vec3(float(k == 0), float(k == 1), float(k == 2));\n"
-    "   vec3 wanted_pixel = mat3(pixel) * indicator;\n"
+    "   bvec3 indicator = bvec3((k == 0), (k == 1), (k == 2));\n"
+    "   vec3 wanted_pixel = mat3(pixel) * vec3(indicator);\n"
 #endif
 
     "   vec3 blended_pixel = mix(wanted_pixel, watercolor.rgb, watercolor.a);\n"
