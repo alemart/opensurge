@@ -8,6 +8,6 @@
 
 Open Surge Engine ist ein großartiges Werkzeug, um Spieleentwicklung, Programmierung, digitale Kunst und die Natur von freier und quelloffener Software auf spielerische Weise zu lernen.
 
-Hinweis: Es wird empfohlen, einen PC zu benutzen, um deine Spiele zu entwickeln. You can play them on PCs and on mobile devices. Android-TV-Nutzer benötigen ein Gamepad zum Spielen und eine Maus, um den Leveleditor zu verwenden.
+Hinweis: Es wird empfohlen, einen PC zu benutzen, um deine Spiele zu entwickeln. Sie können sie auf PCs und auf mobilen Geräten spielen. Android-TV-Nutzer benötigen ein Gamepad zum Spielen und eine Maus, um den Leveleditor zu verwenden.
 
 Offizielle Website: http://opensurge2d.org
