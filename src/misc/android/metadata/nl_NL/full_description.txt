@@ -1,0 +1,13 @@
+<b>Maak je dromen waar!</b> Open Surge Engine is een open-source 2D retro game engine om spellen te maken en je dromen waar te maken!
+
+<b>Het is ontzettend leuk!</b> Surge de Konijn is een jump 'n' run gemaakt met de Open Surge Engine. Het is gemaakt in de geest van klassieke 16-bit Sonic-platformers uit de jaren 90. Speel als Surge in leuke en spannende levels vol uitdagingen!
+
+<b>Laat je creativiteit de vrije loop!</b> Maak je eigen verbazingwekkende spellen en speel ze op je pc en op je mobiele apparaat! Deel je spellen met je vrienden! Het is grenzeloos plezier!
+
+<b>Een krachtige engine voor retrospellen!</b> Een van de kernelementen van de engine is SurgeScript, een scripttaal voor spellen. Gebruik het om nieuwe spelmechanismen, personages met speciale vaardigheden, eindbazen en nog veel meer te creëren! De hemel is de limiet!
+
+Open Surge Engine is een geweldig hulpmiddel om spelenderwijs te leren spellen ontwikkelen, programmeren, digitale kunst en de aard van vrije en open-source software.
+
+Opmerking: het wordt aanbevolen om een pc te gebruiken om je spellen te maken. Je kunt ze op pc's en mobiele apparaten spelen. Gebruikers van Android TV hebben een gamepad nodig om te spelen en een muis om de level-editor te gebruiken.
+
+Officiële website: http://opensurge2d.org

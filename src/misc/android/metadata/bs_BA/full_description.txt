@@ -1,0 +1,13 @@
+<b>Ostvarite svoje snove!</b> Open Surge Motor je 2D retro igrica otvorenog koda za kreiranje igara i ostvarenje vaših snova!
+
+<b>Mnogo je zabave!</b> Zec Surge je istaknuto skok-i-trk kreiran sa Open Surge Motorom. Napravljen je u duhu klasičnih 16-bitnih Sonic platformera iz 1990-ih. Igrajte kao Surge na zabavnim i uzbudljivim nivoima ispunjenim izazovima!
+
+<b>Oslobodite svoju kreativnost!</b> Kreirajte vlastite nevjerovatne igre i igrajte ih na svom računaru i na mobilnom uređaju! Podijelite svoje igre sa prijateljima! To je neograničena zabava!
+
+<b>Moćan motor za retro igre!</b> Jedan od ključnih elemenata motora je SurgeScript, skriptni jezik za igre. Koristite ga za kreiranje nove mehanike igranja, likova sa posebnim sposobnostima, šefova i još mnogo toga! Nebo je granica!
+
+Open Surge Engine je nevjerovatan alat za učenje razvoja igara, programiranja, digitalne umjetnosti i prirode besplatnog softvera otvorenog koda na razigran način.
+
+Napomena: preporučeno je da se koristi računar za kreiranje igara. Možete ih reprodukovati na računarima i mobilnim uređajima. Korisnicima Android TV-a je potreban džojstik za igranje i miš za korištenje uređivača nivoa.
+
+Službena web stranica: http://opensurge2d.org
