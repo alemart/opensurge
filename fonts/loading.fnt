@@ -702,6 +702,14 @@ font "Loading"
             source_rect         731 18 8 18
             offset              0 -3
         }
+        char "Ј" {
+            source_rect         740 18 9 18
+            offset              0 -3
+        }
+        char "ј" {
+            source_rect         750 18 6 18
+            offset              0 -3
+        }
 
 
         char "Ä" {
@@ -1036,6 +1044,62 @@ font "Loading"
         }
         char "ŭ" {
             source_rect         753 37 8 19
+            offset              0 -3
+        }
+        char "Ą" {
+            source_rect         762 37 8 19
+            offset              0 -3
+        }
+        char "ą" {
+            source_rect         771 37 8 19
+            offset              0 -3
+        }
+        char "Ę" {
+            source_rect         780 37 8 19
+            offset              0 -3
+        }
+        char "ę" {
+            source_rect         789 37 8 19
+            offset              0 -3
+        }
+        char "Ł" {
+            source_rect         798 37 9 19
+            offset              0 -3
+        }
+        char "ł" {
+            source_rect         808 37 6 19
+            offset              0 -3
+        }
+        char "Ń" {
+            source_rect         815 37 9 19
+            offset              0 -3
+        }
+        char "ń" {
+            source_rect         825 37 8 19
+            offset              0 -3
+        }
+        char "Ś" {
+            source_rect         834 37 8 19
+            offset              0 -3
+        }
+        char "ś" {
+            source_rect         843 37 8 19
+            offset              0 -3
+        }
+        char "Ź" {
+            source_rect         852 37 8 19
+            offset              0 -3
+        }
+        char "ź" {
+            source_rect         861 37 8 19
+            offset              0 -3
+        }
+        char "Ż" {
+            source_rect         870 37 8 19
+            offset              0 -3
+        }
+        char "ż" {
+            source_rect         879 37 8 19
             offset              0 -3
         }
     }

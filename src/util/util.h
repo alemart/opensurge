@@ -27,34 +27,30 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/* redefinitions */
-#ifdef min
-#undef min
-#endif
-
-#ifdef max
-#undef max
-#endif
-
-#ifndef STRINGIFY
+/* Useful macros */
 #define STRINGIFY(x)            _STRINGIFY(x)
 #define _STRINGIFY(x)           #x
-#endif
-
+#define CONCATENATE(x, y)       _CONCATENATE(x, y)
+#define _CONCATENATE(x, y)      x##y
 #define LARGE_INT               (1 << 30)
 
-/* Useful macros */
-#define random(n)               (int)(rand()/(((double)RAND_MAX+1)/(n)))
+#undef min
+#undef max
 #define min(a,b)                ((a)<(b)?(a):(b))
 #define max(a,b)                ((a)>(b)?(a):(b))
 #define clip(val,a,b)           (((val)<(a))?(a):(((val)>(b))?(b):(val))) /* we assume a <= b */
 #define clip01(val)             ((val) - ((val)<0.0f)*(val) + ((val)>1.0f)*(1.0f-(val))) /* clip((val), 0.0f, 1.0f) */
+#define random(n)               (int)(rand()/(((double)RAND_MAX+1)/(n)))
 #define bounding_box(a,b)       ((a)[0]<(b)[2] && (a)[2]>(b)[0] && (a)[1]<(b)[3] && (a)[3]>(b)[1]) /* legacy macro; a[4],b[4] = (x,y,x+w,y+h) */
-#define mallocx(bytes)          __mallocx((bytes), __FILE__, __LINE__)
-#define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__, __LINE__)
+
+/* Assertions */
 #define assertx(expr, ...)      do { if(!(expr)) fatal_error("In %s:%d (%s): assertion `%s` failed. %s", __FILE__, __LINE__, __func__, STRINGIFY(expr), STRINGIFY(__VA_ARGS__)); } while(0)
+#define STATIC_ASSERTX(expr, ...) \
+    struct CONCATENATE(static_assert_at_ ## __VA_ARGS__ ## _line, __LINE__) { int x: !!(expr); }
 
 /* Memory management */
+#define mallocx(bytes)          __mallocx((bytes), __FILE__, __LINE__)
+#define reallocx(ptr,bytes)     __reallocx((ptr), (bytes), __FILE__, __LINE__)
 void* __mallocx(size_t bytes, const char* location, int line);
 void* __reallocx(void *ptr, size_t bytes, const char* location, int line);
 

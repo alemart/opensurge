@@ -108,7 +108,7 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/players/lock_angle.ss",                    ":0.6.1",                   /* changes to the update cycle in 0.6.1; now using lateUpdate() */
     "scripts/friends/skaterbug.ss",                     ":0.6.1",                   /* changes to the update cycle in 0.6.1; now using player.moveBy() */
 
-    "scripts/core/water.ss",                            ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/core/water.ss",                            ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings; play water splash sounds */
     "scripts/items/bubbles.ss",                         ":0.6.1",                   /* changes to the Water Bubble entity (at scripts/core/water.ss) in 0.6.1; remove function addComponent() */
     "scripts/items/bg_xchg.ss",                         ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/enemies/marmotred.ss",                     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
@@ -145,6 +145,12 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/items/profiler.ss",                        ":",                        /* always use own Profiler */
 #endif
 
+#if 1
+    /* removed files */
+    "levels/scenes/contrib.lev<levels/scenes/contribute.lev",":",                   /* renamed contrib.lev to contribute.lev in 0.5.2 */
+    "-scripts/scenes/setup/contrib.ss",                 ":",                        /* removed on 0.5.2 */
+#endif
+
 #if 0
     /* removed changes */
     "scripts/core/cleared.ss",                          ":0.6.1",                   /* mobile: show and hide the mobile gamepad; need special exception */
@@ -157,7 +163,7 @@ static const char* const COMPATIBILITY_LIST[] = {
 };
 
 enum { COMPATIBILITY_PACK_MAX_FILE_COUNT = (sizeof(COMPATIBILITY_LIST) / sizeof(char* const*)) / 2 - 1 };
-typedef char __compatibility_list_check[1 - 2 * ((sizeof(COMPATIBILITY_LIST) / sizeof(char* const*)) % 2 != 0)];
+STATIC_ASSERTX(0 == (sizeof(COMPATIBILITY_LIST) / sizeof(char* const*)) % 2, compatibility_list_check);
 
 static bool falls_within_version_range(const char* version, const char* range);
 static int scan_required_engine_version(const char* vpath, void* context);

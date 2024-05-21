@@ -64,7 +64,9 @@ image;src/misc/icon_base.png;CC0-1.0;João Victor (Race the Hedgehog);;Edited by
 image;src/misc/icon_old.png;CC0-1.0;João Victor (Race the Hedgehog);;Edited by Alexandre Martins (alemart)
 image;src/misc/opensurge.ico;CC-BY-3.0;Alexandre Martins (alemart), João Victor (Race the Hedgehog), TopHatter;;
 image;src/misc/opensurge.png;CC0-1.0;Alexandre Martins (alemart);;Special thanks to João Victor (Race the Hedgehog)
-image;src/misc/tv_banner.png;CC-BY-4.0;Alexandre Martins (alemart);;
+image;src/misc/android/metadata/en-US/images/featureGraphic.png;CC0-1.0;Alexandre Martins (alemart);;Special thanks to João Victor (Race the Hedgehog)
+image;src/misc/android/metadata/en-US/images/icon.png;CC0-1.0;Alexandre Martins (alemart);;Special thanks to João Victor (Race the Hedgehog)
+image;src/misc/android/metadata/en-US/images/tvBanner.png;CC0-1.0;Alexandre Martins (alemart);;
 image;images/charge.png;CC-BY-3.0;Colin Beard (SilverstepP);;Additional thanks to Felicia_Val
 image;images/more_shields.png;CC-BY-3.0;Colin Beard (SilverstepP);;
 image;images/even_more_shields.png;CC-BY-3.0;Colin Beard (SilverstepP);;
@@ -151,7 +153,7 @@ image;images/debug_mode/trash.png;CC-BY-4.0;Alexandre Martins (alemart);;
 image;images/debug_mode/selection.png;CC0-1.0;Alexandre Martins (alemart);;
 image;images/debug_mode/mouse_cursor.png;CC0-1.0;qubodup;opengameart.org;
 font;fonts/default.png;CC0-1.0;Clint Bellanger;opengameart.org;
-font;fonts/good_neighbors.png;CC0-1.0;Clint Bellanger;opengameart.org;Expanded by usr_share / devurandom, PROWNE and Alexandre Martins (alemart)
+font;fonts/good_neighbors.png;CC0-1.0;Clint Bellanger;opengameart.org;Expanded by usr_share / devurandom, PROWNE, Alexandre Martins (alemart) and Halatnikov
 font;fonts/boxy_bold.png;CC0-1.0;Clint Bellanger;opengameart.org;Lowercase letters added by devurandom
 font;fonts/tiny.png;CC0-1.0;Robey Pointer;opengameart.org;
 font;fonts/Roboto-Medium.ttf;Apache-2.0;Christian Robertson;;

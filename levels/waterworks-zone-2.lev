@@ -4519,6 +4519,7 @@ brick 277 10640 7808
 brick 277 10640 7872
 brick 202 8704 7808
 brick 183 10624 9936
+brick 997 9088 9344
 
 // entities
 entity "Layer Green" 1136 9808 "3b5ddd2c5dc6316f"

@@ -43,6 +43,7 @@
 #include "../core/logfile.h"
 #include "../entities/sfx.h"
 
+#define SHOW_EXIT_SCENE 0
 static const char EXIT_LEVEL[] = "levels/scenes/thanks_for_playing.lev";
 static commandline_t args;
 
@@ -69,6 +70,7 @@ void modloader_init(void* ctx)
     else
         args = commandline_parse(0, NULL);
 
+#if SHOW_EXIT_SCENE
     /* show the exit scene */
     if(asset_exists(EXIT_LEVEL) && args.gamedir[0] != '\0') {
 #if !defined(__ANDROID__)
@@ -79,6 +81,9 @@ void modloader_init(void* ctx)
             scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)EXIT_LEVEL);
         }
     }
+#else
+    (void)EXIT_LEVEL;
+#endif
 }
 
 
@@ -267,7 +272,7 @@ bool download_to_cache(ALLEGRO_FILE* f, const char* destination_path, void (*on_
     /* since we're operating on the application cache, we have
        write permissions to open the destination path for writing */
     enum { BUFFER_SIZE = 4096, MEGABYTE = 1048576, PROGRESS_CHUNK = 1 * MEGABYTE };
-    typedef char __chunksize_assertion[-1 + 2 * (!!(PROGRESS_CHUNK % BUFFER_SIZE == 0))];
+    STATIC_ASSERTX(PROGRESS_CHUNK % BUFFER_SIZE == 0, validate_progress_chunk);
 
     uint8_t buffer[BUFFER_SIZE];
     size_t n;

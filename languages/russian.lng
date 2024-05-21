@@ -1,13 +1,11 @@
 // -----------------------------------------------------------------------------
 // File: languages/russian.lng
-// Description: russian translation (version 5) (encoding: UTF-8)
-// Author: Halatnikov (halatnikov.github.io)
+// Description: russian translation (revision 6) (encoding: UTF-8)
+// Author: Halatnikov <https://halatnikov.github.io>
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// Translation fixes look like "//v5: fix reason"
-
-// 
+//
 // Section: generic
 //
 
@@ -16,7 +14,7 @@
 LANG_ID                     "ru_RU"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Русский"                 // language name
 LANG_AUTHOR                 "Halatnikov"              // translation author
-LANG_LASTUPDATE             "2022-08-04"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-03-31"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -66,54 +64,54 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 // Options
 OPTIONS_TITLE               "НАСТРОЙКИ"
-FIXME OPTIONS_GRAPHICS            "Graphics"
-FIXME OPTIONS_CONTROLS            "Controls"
-FIXME OPTIONS_GAME                "Game"
-FIXME OPTIONS_ENGINE              "Engine"
-FIXME OPTIONS_MODS                "MODs"
-FIXME OPTIONS_AUDIO               "Audio"
-FIXME OPTIONS_BACK                "Back"
-FIXME OPTIONS_YES                 "Yes"
-FIXME OPTIONS_NO                  "No"
-FIXME OPTIONS_ON                  "On" // alternatively: Enabled
-FIXME OPTIONS_OFF                 "Off" // alternatively: Disabled
-OPTIONS_FULLSCREEN          "На весь экран"
+OPTIONS_GRAPHICS            "Графика"
+OPTIONS_AUDIO               "Звук"
+OPTIONS_CONTROLS            "Управление"
+OPTIONS_GAME                "Игра"
+OPTIONS_ENGINE              "Движок"
+OPTIONS_MODS                "МОДы"
+OPTIONS_BACK                "Назад"
+OPTIONS_YES                 "Да"
+OPTIONS_NO                  "Нет"
+OPTIONS_ON                  "Вкл" // alternatively: Enabled
+OPTIONS_OFF                 "Выкл" // alternatively: Disabled
+OPTIONS_FULLSCREEN          "Во весь экран"
 OPTIONS_RESOLUTION          "Размер окна"
-FIXME OPTIONS_QUALITY             "Quality"
-FIXME OPTIONS_QUALITY_LOW         "Low"
-FIXME OPTIONS_QUALITY_MEDIUM      "Medium"
-FIXME OPTIONS_QUALITY_HIGH        "High"
+OPTIONS_QUALITY             "Качество"
+OPTIONS_QUALITY_LOW         "Низкое"
+OPTIONS_QUALITY_MEDIUM      "Среднее"
+OPTIONS_QUALITY_HIGH        "Высокое"
 OPTIONS_FPS                 "Отображать FPS"
-FIXME OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
-FIXME OPTIONS_PIXELSCALER         "Pixel scaler"
-FIXME OPTIONS_COMINGSOON          "Coming soon!"
-FIXME OPTIONS_VOLUME              "Volume"
-FIXME OPTIONS_MUTE                "Muted"
-FIXME OPTIONS_GAMEPADOPACITY      "Opacity"
+OPTIONS_VSYNC               "Вертикальная синхронизация" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Масштабирование пикселей"
+OPTIONS_COMINGSOON          "Скоро будет!"
+OPTIONS_VOLUME              "Громкость"
+OPTIONS_MUTE                "Заглушить"
+OPTIONS_GAMEPADOPACITY      "Прозрачность джойстика"
 OPTIONS_GAMEPAD             "Геймпад"
-FIXME OPTIONS_LANGUAGE            "Language"
+OPTIONS_LANGUAGE            "Язык"
 OPTIONS_STAGESELECT         "Выбор уровня"
-FIXME OPTIONS_DEVELOPERMODE       "Developer mode"
-OPTIONS_CREDITS             "Авторы Open Surge"  //v2
-FIXME OPTIONS_WEBSITE             "Visit Open Surge on the web"
+OPTIONS_DEVELOPERMODE       "Режим разработчика"
+OPTIONS_CREDITS             "Авторы Open Surge"
+OPTIONS_WEBSITE             "Посетить веб-сайт Open Surge"
 OPTIONS_DONATE              "Поддержать Open Surge"
-FIXME OPTIONS_ABOUT               "About the engine"
-FIXME OPTIONS_SHARE               "Share the engine"
-FIXME OPTIONS_DOWNLOAD_DESKTOP    "Get the engine for Desktops"
-FIXME OPTIONS_DOWNLOAD_MOBILE     "Get the engine for mobile"
-FIXME OPTIONS_PLAYMOD             "Play a game"
-FIXME OPTIONS_PLAYMOD_NOTAGAME    "The selected item is not an Open Surge game!"
-FIXME OPTIONS_PLAYMOD_LEGACYERROR "Legacy Open Surge games are not supported."
-FIXME OPTIONS_PLAYMOD_COMPATWARN  "The compatibility mode is a feature designed to improve your gaming experience. Are you sure you want to disable it?"
-FIXME OPTIONS_MODSTORAGE          "Storage"
-FIXME OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
-FIXME OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
-FIXME OPTIONS_COMPATIBILITYMODE   "Compatibility mode"
-FIXME OPTIONS_SUBMITFEEDBACK      "Submit feedback"
-FIXME OPTIONS_WRITEREVIEW         "Write a review"
-FIXME OPTIONS_RATEAPP             "Rate the app"
-FIXME OPTIONS_REPORTISSUE         "Report an issue"
-FIXME OPTIONS_BACKTOBASEGAME      "Go back to the base game"
+OPTIONS_ABOUT               "Информация о движке"
+OPTIONS_SHARE               "Поделиться движком"
+OPTIONS_DOWNLOAD_DESKTOP    "Скачать настольную версию"
+OPTIONS_DOWNLOAD_MOBILE     "Скачать мобильную версию"
+OPTIONS_PLAYMOD             "Играть в МОД"
+OPTIONS_PLAYMOD_NOTAGAME    "Выбранный предмет не является игрой на Open Surge!"
+OPTIONS_PLAYMOD_LEGACYERROR "Игры на устаревших версиях Open Surge не поддерживаются."
+OPTIONS_PLAYMOD_COMPATWARN  "Режим совместимости был создан чтобы улучшить ваш игровый опыт. Вы уверены что хотите отключить его?"
+OPTIONS_MODSTORAGE          "Тип хранения"
+OPTIONS_MODSTORAGE_FOLDER   "Папка" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  ".zip архив"
+OPTIONS_COMPATIBILITYMODE   "Режим совместимости"
+OPTIONS_SUBMITFEEDBACK      "Оставить отзыв"
+OPTIONS_WRITEREVIEW         "Написать обзор"
+OPTIONS_RATEAPP             "Оценить приложение"
+OPTIONS_REPORTISSUE         "Сообщить о проблеме"
+OPTIONS_BACKTOBASEGAME      "Вернуться в базовую версию игры"
 
 // Stage Select
 STAGESELECT_TITLE           "ВЫБОР УРОВНЯ"
@@ -123,16 +121,16 @@ STAGESELECT_PAGE            "страница $1/$2"
 STAGESELECT_ACT             "Зона"
 
 // Credits
-CREDITS_TITLE               "АВТОРЫ"  //v2
+CREDITS_TITLE               "АВТОРЫ"
 CREDITS_BACK                "Нажмите <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> чтобы вернуться"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME версия $ENGINE_VERSION</color>\nиспользует $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Активные участники</color>"
-FIXME CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Past members</color>"
-CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Прочие участники</color>"
-CREDITS_ALEXANDRE           "Лидер и основатель проекта\nРазработчик проекта\nХудожник"  //v5
-CREDITS_JOAO                "Художник\nИллюстратор"  // v5
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Прошлые участники</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Благодарность</color>"
+CREDITS_ALEXANDRE           "Лидер и основатель проекта\nРазработчик проекта\nХудожник"
+CREDITS_JOAO                "Художник\nИллюстратор"
 CREDITS_MATEUS              "Звуковые эффекты"
-CREDITS_CODY                "Художник концепт-артов\nДизайнер врагов"  //v5
+CREDITS_CODY                "Художник концепт-артов\nДизайнер врагов"
 CREDITS_JOHAN               "Композитор (покойся с миром, друг)"
 CREDITS_DI                  "Композитор"
 CREDITS_VICTOR              "Композитор"
@@ -141,10 +139,10 @@ CREDITS_COLIN               "Художник спрайтов, первый в�
 CREDITS_BRIAN               "Художник спрайтов"
 CREDITS_TRANSLATOR          "Переводчик"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Переводчики</color>"
-FIXME CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Past translators</color>"
-CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Авторы каждого ресурса</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Прошлые переводчики</color>"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Авторы отдельных ресурсов</color>"
 CREDITS_RES_TEXT            "Все перечисленные ниже файлы находятся под свободными лицензиями. Представлены их соответствующие авторы:"
-CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Изображения</color>"  //v5
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Изображения</color>"
 CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Музыка</color>"
 CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Звуковые эффекты</color>"
 CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Шрифты</color>"
@@ -154,45 +152,46 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипты</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Авторы указаны внутри самих скриптов."
 
 // Title Screen
-// v5
 TITLESCREEN_PLAY            "НАЧАТЬ ИГРУ"
 TITLESCREEN_OPTIONS         "НАСТРОЙКИ"
-FIXME TITLESCREEN_MOBILE          "PLAY ON MOBILE"
+TITLESCREEN_MOBILE          "ИГРАТЬ НА ТЕЛЕФОНЕ"
 TITLESCREEN_SHARE           "ПОДЕЛИТЬСЯ"
 TITLESCREEN_DONATE          "ПОДДЕРЖАТЬ"
 TITLESCREEN_QUIT            "ВЫХОД"
-FIXME TITLESCREEN_SUBMITFEEDBACK  "SUBMIT FEEDBACK"
-FIXME TITLESCREEN_WRITEREVIEW     "WRITE A REVIEW"
-FIXME TITLESCREEN_RATEAPP         "RATE THE APP"
-FIXME TITLESCREEN_REPORTISSUE     "REPORT AN ISSUE"
+TITLESCREEN_SUBMITFEEDBACK  "ОСТАВИТЬ ОТЗЫВ"
+TITLESCREEN_WRITEREVIEW     "НАПИСАТЬ ОБЗОР"
+TITLESCREEN_RATEAPP         "ОЦЕНИТЬ ПРИЛОЖЕНИЕ"
+TITLESCREEN_REPORTISSUE     "СООБЩИТЬ О ПРОБЛЕМЕ"
 TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
 TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
 
 // End of Demo
-// v5
 ENDOFDEMO_CONTINUE          "ПРОДОЛЖИТЬ"
 ENDOFDEMO_VERSION           "ДЕМО $GAME_VERSION\n"
 ENDOFDEMO_TEXT              "Спасибо за игру! Surge the Rabbit находится в разработке.\n\nСледите за обновлениями на <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> !\n\nТеперь посмотрим как вы тоже можете создать свою игру!"
 
 // Rate the Game
 // Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
-FIXME RATEGAME_TITLE              "Rate Surge the Rabbit?"
-FIXME RATEGAME_MESSAGE            "We'd love to hear from you!\nYour feedback helps this open source game & engine!" // 2 lines max.
-FIXME RATEGAME_YES                "Sure!"
-FIXME RATEGAME_NO                 "Not now"
+RATEGAME_TITLE              "Нравится Surge the Rabbit?"
+RATEGAME_MESSAGE            "Мы бы хотели услышать о вашем опыте! Ваш отклик помогает этой игре с открытым исходным кодом расти!" // 2 lines max.
+RATEGAME_YES                "Конечно!"
+RATEGAME_NO                 "Не сейчас"
 
 // Play classic levels
-FIXME PLAYCLASSICLEVELS_TEXT      "Play the classic levels?"
-FIXME PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
-FIXME PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+PLAYCLASSICLEVELS_TEXT      "Сыграть в классические уровни?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-FIXME THANKSFORPLAYING_TITLE      "Thanks for playing!"
-FIXME THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile devices!"
-FIXME THANKSFORPLAYING_PARAGRAPH2 "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
-FIXME THANKSFORPLAYING_PARAGRAPH3 "Become a supporter of this open source game engine today!"
-FIXME THANKSFORPLAYING_YES        "Sure!"
-FIXME THANKSFORPLAYING_NO         "Not now"
+THANKSFORPLAYING_TITLE      "Спасибо за игру!"
+THANKSFORPLAYING_TEXT1      "Поддержите эту независимую разработку! Скачайте официальную версию на мобильные устройства!"
+THANKSFORPLAYING_TEXT2      "Сыграйте в Surge the Rabbit - а также в ваши игры - на телефоне или планшете!"
+THANKSFORPLAYING_TEXT3      "Поддержите этот движок с открытым исходным кодом сегодня!" // slightly redundant, since there's no word for "supporter"
+THANKSFORPLAYING_TEXT1M     "\nЭта игра создана с использованием <color=$COLOR_HIGHLIGHT>Open Surge</color>, очень гибкого 2D движка с открытым исходным кодом, который теперь в ваших руках!"
+THANKSFORPLAYING_TEXT2M     ""
+THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
+THANKSFORPLAYING_YES        "Конечно!"
+THANKSFORPLAYING_NO         "Не сейчас"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "МЕНЮ"
@@ -211,7 +210,7 @@ CREATEMENU_PLAY             "ДЕМО УРОВЕНЬ"
 CREATEMENU_LEARN            "ПОСЕТИТЬ САЙТ"
 CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "НАЗАД"
-CREATEMENU_TEXT             "Open Surge позволяет вам создавать свои собственные игры! Выпустите свою креативность!\n\nНачните свой проект! Создавайте новые уровни, предметы, боссов, персонажей и многое другое! Попробуйте редактор уровней, изучите движок и окунитесь в SurgeScript для максимальной мощности!"  //v2
+CREATEMENU_TEXT             "Open Surge позволяет вам создавать свои собственные игры! Выпустите свою креативность!\n\nНачните свой проект! Создавайте новые уровни, предметы, боссов, персонажей и многое другое! Попробуйте редактор уровней, изучите движок и окунитесь в SurgeScript для максимальной мощности!"
 
 // (legacy) Congratulations Screen
 // Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
@@ -219,7 +218,7 @@ CONGRATULATIONS_TITLE       "СПАСИБО ЗА ИГРУ"
 CONGRATULATIONS_SHARE       "ПОДЕЛИТЬСЯ"
 CONGRATULATIONS_DONATE      "ПОДДЕРЖАТЬ"
 CONGRATULATIONS_BACK        "НАЗАД В МЕНЮ"
-CONGRATULATIONS_TEXT        "Спасибо что сыграли в Open Surge версии $ENGINE_VERSION!\nХотите ещё? Следите за обновлениями на $ENGINE_WEBSITE\n\nOpen Surge позволяет вам играть и создавать свои собственные игры. Он разработан такими же как и вы! Теперь расскажите остальным!"  //v5
+CONGRATULATIONS_TEXT        "Спасибо что сыграли в Open Surge версии $ENGINE_VERSION!\nХотите ещё? Следите за обновлениями на $ENGINE_WEBSITE\n\nOpen Surge позволяет вам играть и создавать свои собственные игры. Он разработан такими же как и вы! Теперь расскажите остальным!"
 
 
 
@@ -228,19 +227,19 @@ CONGRATULATIONS_TEXT        "Спасибо что сыграли в Open Surge 
 //
 
 // keyboard
-INPUT_KEYB_DIRECTIONAL      "КЛАВИШИ НАПРАВЛЕНИЙ"  //v5
+INPUT_KEYB_DIRECTIONAL      "КЛАВИШИ НАПРАВЛЕНИЙ"
 INPUT_KEYB_LEFT             "ВЛЕВО"
 INPUT_KEYB_RIGHT            "ВПРАВО"
 INPUT_KEYB_UP               "ВВЕРХ"
 INPUT_KEYB_DOWN             "ВНИЗ"
 INPUT_KEYB_FIRE1            "ПРОБЕЛ"
 INPUT_KEYB_FIRE2            "ЛЕВЫЙ CTRL"
-INPUT_KEYB_FIRE3            "ENTER"  //v2: i don't think anyone actually calls this key ВВОД, so i untranslated it
+INPUT_KEYB_FIRE3            "ENTER"  //i don't think anyone actually calls this key ВВОД
 INPUT_KEYB_FIRE4            "ESC"
-FIXME INPUT_KEYB_FIRE5            "LEFT SHIFT"
-FIXME INPUT_KEYB_FIRE6            "RIGHT SHIFT"
-FIXME INPUT_KEYB_FIRE7            "<available>"
-FIXME INPUT_KEYB_FIRE8            "<available>"
+INPUT_KEYB_FIRE5            "ЛЕВЫЙ SHIFT"
+INPUT_KEYB_FIRE6            "ПРАВЫЙ SHIFT"
+INPUT_KEYB_FIRE7            "<доступно>"
+INPUT_KEYB_FIRE8            "<доступно>"
 
 // joystick
 INPUT_JOY_DIRECTIONAL       "КНОПКИ НАПРАВЛЕНИЙ"
@@ -248,12 +247,12 @@ INPUT_JOY_LEFT              "ВЛЕВО"
 INPUT_JOY_RIGHT             "ВПРАВО"
 INPUT_JOY_UP                "ВВЕРХ"
 INPUT_JOY_DOWN              "ВНИЗ"
-FIXME INPUT_JOY_FIRE1             "the ACTION BUTTON"
-FIXME INPUT_JOY_FIRE2             "the SECONDARY ACTION BUTTON"
+INPUT_JOY_FIRE1             "ПРЫЖОК"
+INPUT_JOY_FIRE2             "ДОП. ДЕЙСТВИЕ"
 INPUT_JOY_FIRE3             "ПАУЗА"
 INPUT_JOY_FIRE4             "НАЗАД"
-FIXME INPUT_JOY_FIRE5             "L1"
-FIXME INPUT_JOY_FIRE6             "R1"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
 INPUT_JOY_FIRE7             "<доступно>"
 INPUT_JOY_FIRE8             "<доступно>"
 
@@ -264,9 +263,9 @@ INPUT_JOY_FIRE8             "<доступно>"
 //
 
 // Quit game? confirm box
-QUIT_QUESTION               "Вы уверены что хотите выйти?"  //v2: it looks a bit too "intimidating" if all caps lol
-QUIT_OPTION1                "Да"  //v5
-QUIT_OPTION2                "Нет"  //v5
+QUIT_QUESTION               "Вы уверены что хотите выйти?"
+QUIT_OPTION1                "Да"
+QUIT_OPTION2                "Нет"
 
 // Loading Screen
 LOADING_TEXT                "Загрузка..."
@@ -278,18 +277,17 @@ LOADING_TEXT                "Загрузка..."
 //
 
 // Demo Level
-// v5
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Создайте свою удивительную игру!</color>\nЭта игра создана с использованием <color=$COLOR_HIGHLIGHT>Open Surge</color>, очень гибкий 2D движок с открытым исходным кодом, который теперь в ваших руках!"
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Создайте свою удивительную игру!</color>\nЭта игра создана с использованием <color=$COLOR_HIGHLIGHT>Open Surge</color>, очень гибкого 2D движка с открытым исходным кодом, который теперь в ваших руках!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>А вы знали...?</color>\nВсё в Open Surge можно изменить. Вы можете создавать уровни, предметы, боссов, персонажей и многое другое! Это полноценная <color=$COLOR_HIGHLIGHT>система для создания игр</color>."
-LEV_DEMO_3                  "<color=$COLOR_TITLE>Выпустите свою креативность!</color>\nОдна из главных возможностей Open Surge это <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Это скриптинг для игр! Используйте его чтобы сделать всё что можете представить!"
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Выпустите свою креативность!</color>\nОдна из ключевых возможностей Open Surge это <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Это скриптинг для игр! Используйте его чтобы воплотить всё что можете представить!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Круто!</color>\nУже заинтересованы? Предел - только небо! Посетите <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> чтобы начать создавать свои собственные игры уже сегодня!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! <color=$COLOR_HIGHLIGHT>Нажмите F12 чтобы открыть редактор.</color> Затем, откройте список предметов и начните собирать свой уровень! (нажмите F1 для справки)"
-FIXME LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>DEBUG MODE</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! Поставьте игру на паузу, потяните за ручку внизу экрана и нажмите <color=$COLOR_HIGHLIGHT>DEBUG</color> чтобы <color=$COLOR_HIGHLIGHT>изменить уровень</color>!"
 
 
 //
 // Section: level editor
-// v3
+//
 
 // Main UI
 EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: справка"
@@ -305,7 +303,7 @@ EDITOR_UI_MISSING           "<отсутствует>"
 // Translators: please keep the names below succint. See the comments for their meaning.
 EDITOR_BRICK_TYPE_SOLID     "ТВЁРДОЕ"     // a solid brick (you can't get inside them)
 EDITOR_BRICK_TYPE_CLOUD     "ПЛАТФОРМА"     // "jump-through" platforms (you can step on top of them)
-EDITOR_BRICK_TYPE_PASSABLE  "ПРОХОДИМОЕ"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_PASSABLE  "СКВОЗНОЕ"  // a brick with no effect on collisions (decorative elements)
 EDITOR_BRICK_TYPE_UNKNOWN   "НЕИЗВЕСТНО"
 
 EDITOR_BRICK_BEHAVIOR_DEFAULT    "БЕЗ ПОВЕДЕНИЯ"   // a brick that stands still
@@ -319,8 +317,8 @@ EDITOR_BRICK_BEHAVIOR_MARKER     "МАРКЕР"    // special brick only rendere
 EDITOR_BRICK_BEHAVIOR_UNKNOWN    "НЕИЗВЕСТНО"
 
 EDITOR_BRICK_FLIP_NOFLIP    "не повёрнуто"            // the brick is not flipped (this is the default)
-EDITOR_BRICK_FLIP_HFLIP     "повёрнуто горизонтально" // flip horizontally
-EDITOR_BRICK_FLIP_VFLIP     "повёрнуто вертикально"   // flip vertically
+EDITOR_BRICK_FLIP_HFLIP     "отражено горизонтально" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "отражено вертикально"   // flip vertically
 EDITOR_BRICK_FLIP_VHFLIP    "повёрнуто на 180°"      // flip horizontally & vertically
 
 // Palette
@@ -333,20 +331,20 @@ EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Основное</co
 EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Размещение предметов</color>"
 EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Система слоёв</color>"
 EDITOR_HELP_BACK            "Нажмите <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> чтобы вернуться"
-EDITOR_HELP_TINYWINDOW      "Недостаточно места чтобы показать справку. Увеличьте размер окна в настройках игры.\n\nНажмите <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> чтобы вернуться."
-EDITOR_HELP_LAYERSTUTORIAL  "Игрок поменяет текущий слой, если прикоснётся\nк зелёным/жёлтым L объектам (смотрите палитру сущностей).\nЗелёный L объект включает зелёный слой и выключает жёлтый\nЖёлтый L объект включает жёлтый слой и выключает зелёный\nНажмите L чтобы поменять слой с которым вы размещаете детали\nЗелёный слой находится поверх жёлтого"
+EDITOR_HELP_TINYWINDOW      "Недостаточно места чтобы отобразить справку. Увеличьте размер окна в настройках игры.\n\nНажмите <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> чтобы вернуться."
+EDITOR_HELP_LAYERSTUTORIAL  "Игрок сменит текущий слой, если прикоснётся\nк зелёным/жёлтым L объектам (смотрите палитру сущностей).\nЗелёный L объект включает зелёный слой и выключает жёлтый\nЖёлтый L объект включает жёлтый слой и выключает зелёный\nНажмите клавишу L чтобы поменять слой с которым вы размещаете детали\nЗелёный слой находится поверх жёлтого"
 
 EDITOR_HELP_CMD_RETURN      "Вернуться в игру"
 EDITOR_HELP_CMD_PALETTE     "Открыть палитру деталей | сущностей"
 EDITOR_HELP_CMD_SAVE        "Сохранить уровень"
 EDITOR_HELP_CMD_RELOAD      "Перезагрузить уровень"
-EDITOR_HELP_CMD_MOVE        "Управлять камерой"
-EDITOR_HELP_CMD_MOVEFASTER  "Управлять камерой (быстрее)"
+EDITOR_HELP_CMD_MOVE        "Двигать обзор"
+EDITOR_HELP_CMD_MOVEFASTER  "Двигать обзор (быстрее)"
 EDITOR_HELP_CMD_UNDO        "Отменить действие"
 EDITOR_HELP_CMD_REDO        "Вернуть действие"
 EDITOR_HELP_CMD_HELP        "Показать справку"
 EDITOR_HELP_CMD_GRID        "Выровнять по сетке"
-EDITOR_HELP_CMD_MASKS       "Показать коллизии"
+EDITOR_HELP_CMD_MASKS       "Показать маски коллизий"
 EDITOR_HELP_CMD_PUTITEM     "Разместить предмет"
 EDITOR_HELP_CMD_PICKITEM    "Выбрать предмет"
 EDITOR_HELP_CMD_DELETEITEM  "Удалить предмет (удержание: ластик)"
@@ -358,25 +356,25 @@ EDITOR_HELP_CMD_BRICKLAYER  "Изменить слой размещения де
 EDITOR_HELP_CMD_FLIPBRICK   "Повернуть текущую деталь"
 
 // Input keys
-EDITOR_INPUT_ARROWS         "Клавиши направлений" //v5
+EDITOR_INPUT_ARROWS         "Клавиши направлений"
 EDITOR_INPUT_SHIFT          "Shift" // Shift key
 EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
 EDITOR_INPUT_ESC            "ESC"   // ESC key
 EDITOR_INPUT_LEFTCLICK      "Левая кнопка мыши"
 EDITOR_INPUT_RIGHTCLICK     "Правая кнопка мыши"
 EDITOR_INPUT_MIDDLECLICK    "Средняя кнопка мыши"
-EDITOR_INPUT_MOUSEWHEEL     "Колёсико мыши"
+EDITOR_INPUT_MOUSEWHEEL     "Колесо мыши"
 
 // Confirm boxes
 EDITOR_CONFIRM_RELOAD       "Перезагрузить уровень?"
-EDITOR_CONFIRM_YES          "Да"  //v5
-EDITOR_CONFIRM_NO           "Нет"  //v5
+EDITOR_CONFIRM_YES          "Да"
+EDITOR_CONFIRM_NO           "Нет"
 
 // Messages
 EDITOR_MESSAGE_WELCOME      "Добро пожаловать в редактор уровней!"
 EDITOR_MESSAGE_SAVED        "Сохранено в <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
-EDITOR_MESSAGE_SAVEERROR    "Не удалось сохранить уровень. Смотрите logfile.txt" //v5
-EDITOR_MESSAGE_RELOADED     "Уровень был перезагружен"  //v5
+EDITOR_MESSAGE_SAVEERROR    "Не удалось сохранить уровень. Смотрите logfile.txt"
+EDITOR_MESSAGE_RELOADED     "Уровень был перезагружен"
 EDITOR_MESSAGE_UNDOERROR    "Невозможно отменить дальше"
 EDITOR_MESSAGE_REDOERROR    "Невозможно вернуть дальше"
 EDITOR_MESSAGE_SNAP2GRIDON  "Выровнять по сетке: используется сетка $1 × $2"
@@ -389,7 +387,7 @@ EDITOR_MESSAGE_YELLOWLAYER  "Слой изменён на <color=$1>ЖЁЛТЫЙ
 
 //
 // Section: bitmap fonts
-// v5
+//
 
 //
 // Translators:
@@ -404,33 +402,30 @@ EDITOR_MESSAGE_YELLOWLAYER  "Слой изменён на <color=$1>ЖЁЛТЫЙ
 // sentences as necessary.
 //
 
-// Soon enough (maybe) i'll make a edit to the fonts to include russian characters
-// For now i'll just leave translation in comments
-
 // Heads-Up Display
-HUD_SCORE                   "Score" //Счёт СЧЁТ
-HUD_TIME                    "Time" //Время ВРЕМЯ
-HUD_POWER                   "Power" //Энергия ЭНЕРГИЯ
+HUD_SCORE                   "Счёт"
+HUD_TIME                    "Время"
+HUD_POWER                   "Энергия"
 
 // Level Cleared animation
-CLEARED_LINE1               "YOU HAVE" //ВЫ ПРОШЛИ
-CLEARED_LINE2               "CLEARED ZONE $LEVEL_ACT" //ЗОНУ $LEVEL_ACT
-CLEARED_POWER               "Power Bonus" //Бонус за Энергию БОНУС ЗА ЭНЕРГИЮ
-CLEARED_TIME                "Time Bonus" //Бонус за Время БОНУС ЗА ВРЕМЯ
-CLEARED_SCORE               "Score" //Общий Счёт ОБЩИЙ СЧЁТ
+CLEARED_LINE1               "ВЫ ПРОШЛИ"
+CLEARED_LINE2               "ЗОНУ $LEVEL_ACT"
+CLEARED_POWER               "Бонус за Энергию"
+CLEARED_TIME                "Бонус за Время"
+CLEARED_SCORE               "Общий Счёт"
 
 // Game Over
-GAMEOVER_PART1              "GAME" //КОНЕЦ
-GAMEOVER_PART2              "OVER" //ИГРЫ
+GAMEOVER_PART1              "КОНЕЦ"
+GAMEOVER_PART2              "ИГРЫ"
 
 // Time Over
-TIMEOVER_PART1              "TIME" //ВРЕМЯ
-TIMEOVER_PART2              "OVER" //ВЫШЛО
+TIMEOVER_PART1              "ВРЕМЯ"
+TIMEOVER_PART2              "ВЫШЛО"
 
 // Pause Menu
-FIXME PAUSE_TITLE                 "PAUSE"
-FIXME PAUSE_CONTINUE              "CONTINUE"
-FIXME PAUSE_RESTART               "RESTART"
-FIXME PAUSE_EXIT                  "EXIT"
+PAUSE_TITLE                 "ПАУЗА"
+PAUSE_CONTINUE              "ПРОДОЛЖИТЬ"
+PAUSE_RESTART               "НАЧАТЬ ЗАНОВО"
+PAUSE_EXIT                  "ВЫХОД"
 
 // EOF

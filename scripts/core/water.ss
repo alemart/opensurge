@@ -136,6 +136,8 @@ object "Water Bubble" is "entity", "private", "disposable"
 object "Water Splash" is "entity", "private", "disposable"
 {
     actor = Actor("Water Splash");
+    inSfx = Sound("samples/water_in.wav");
+    outSfx = Sound("samples/water_out.wav");
 
     state "main"
     {
@@ -147,6 +149,18 @@ object "Water Splash" is "entity", "private", "disposable"
     {
         actor.zindex = 0.99;
         actor.alpha = 0.7;
+    }
+
+    fun setPlayer(player)
+    {
+        assert(player !== null);
+
+        if(player.underwater)
+            inSfx.play();
+        else
+            outSfx.play();
+
+        return this;
     }
 }
 
@@ -238,7 +252,7 @@ object "WaterController.SplashListener"
             return;
 
         position = Vector2(player.transform.position.x, Level.waterlevel);
-        Level.spawnEntity("Water Splash", position);
+        Level.spawnEntity("Water Splash", position).setPlayer(player);
     }
 }
 

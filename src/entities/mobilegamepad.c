@@ -71,7 +71,7 @@ static const int MAX_TOUCHES = (sizeof(((ALLEGRO_TOUCH_INPUT_STATE*)0)->touches)
 #define LOG(...)            logfile_message("Mobile Gamepad - " __VA_ARGS__)
 #define FATAL(...)          fatal_error("Mobile Gamepad - " __VA_ARGS__)
 #define IS_POWER_OF_TWO(n)  (((n) & ((n) - 1)) == 0)
-#define VALIDATE_MASK(x)    typedef char _assert_ ## x [ IS_POWER_OF_TWO(1+(x)) * 2 - 1 ]
+#define VALIDATE_MASK(x)    STATIC_ASSERTX(IS_POWER_OF_TWO(1+(x)), validate_mobilegamepad_mask)
 
 
 

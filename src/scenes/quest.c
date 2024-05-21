@@ -26,6 +26,8 @@
 #include "../core/quest.h"
 #include "../core/logfile.h"
 #include "../core/storyboard.h"
+#include "../core/asset.h"
+#include "../core/video.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
 
@@ -37,6 +39,11 @@ static struct queststack_t {
     int next_level;
     bool abort_quest;
 } stack[STACK_MAX]; /* a stack of quests */
+
+#define WARN(fmt, ...) do { \
+    video_showmessage(fmt, __VA_ARGS__); \
+    logfile_message("[Quest scene] " fmt, __VA_ARGS__); \
+} while(0)
 
 static void push_builtin_scene(const char *str);
 
@@ -128,7 +135,11 @@ void quest_update()
         if(quest_entry_is_level(quest, index)) {
 
             /* load a .lev file */
-            scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)path);
+            if(asset_exists(path))
+                scenestack_push(storyboard_get_scene(SCENE_LEVEL), (void*)path);
+            else
+                WARN("Can't load \"%s\"", path);
+
             return;
 
         }
@@ -155,7 +166,11 @@ void quest_update()
                quests may also be loaded via scripting. This won't be a problem
                in practice as long as we pick a large enough stack size.
             */
-            scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)path);
+            if(asset_exists(path))
+                scenestack_push(storyboard_get_scene(SCENE_QUEST), (void*)path);
+            else
+                WARN("Can't load \"%s\"", path);
+
             return;
 
         }

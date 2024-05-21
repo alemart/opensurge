@@ -13,7 +13,6 @@ using SurgeEngine.Platform;
 using SurgeEngine;
 using SurgeTheRabbit;
 
-
 object "Thanks for Playing" is "setup", "private", "detached", "entity"
 {
     fader = spawn("Fader").setFadeTime(0.5);
@@ -23,17 +22,17 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     textA = spawn("Thanks for Playing - Text")
             .setPosition(Vector2(34, 48))
             .setMaxWidth(Screen.width - 34 * 2)
-            .setText("$THANKSFORPLAYING_PARAGRAPH1");
+            .setText(1);
 
     textB = spawn("Thanks for Playing - Text")
             .setPosition(Vector2(34, 87))
             .setMaxWidth(Screen.width - 34 * 2)
-            .setText("$THANKSFORPLAYING_PARAGRAPH2");
+            .setText(2);
 
     textC = spawn("Thanks for Playing - Text")
             .setPosition(Vector2(234, 128))
             .setMaxWidth(160)
-            .setText("$THANKSFORPLAYING_PARAGRAPH3");
+            .setText(3);
 
     menu = spawn("Simple Menu Builder")
            .addOption("yes", "$THANKSFORPLAYING_YES",  Vector2.zero)
@@ -74,7 +73,12 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     fun onChooseMenuOption(optionId)
     {
         if(optionId == "yes") {
-            SurgeTheRabbit.download();
+
+            if(!SurgeEngine.mobile)
+                SurgeTheRabbit.download();
+            else
+                SurgeTheRabbit.donate();
+
             state = "waiting";
         }
         else
@@ -84,11 +88,6 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     fun constructor()
     {
         fader.fadeIn();
-
-        if(Platform.isAndroid) {
-            if(SurgeTheRabbit.isBuild("googleplay"))
-                Level.loadNext();
-        }
     }
 }
 
@@ -118,9 +117,13 @@ object "Thanks for Playing - Text" is "private", "detached", "entity"
         label.align = "left";
     }
 
-    fun setText(text)
+    fun setText(p)
     {
-        label.text = text;
+        if(SurgeEngine.mobile)
+            label.text = "$THANKSFORPLAYING_TEXT" + p + "M";
+        else
+            label.text = "$THANKSFORPLAYING_TEXT" + p;
+
         return this;
     }
 

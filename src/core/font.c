@@ -782,7 +782,7 @@ int expand_vars(char* dest, const char* src, size_t dest_size, const char* (*cal
         number_of_substitutions++; \
     } while(0);
 
-    for(i = j = 0; '\0' != src[i] && j < m; i++) {
+    for(a = i = j = 0; '\0' != src[i] && j < m; i++) {
         char curr_char = src[i], next_char = src[i+1];
 
         switch(state) {
@@ -1248,6 +1248,7 @@ void preprocess_split(fonttext_t* out, const fontdrv_t* drv, fontalign_t align)
     darray_clear(out->text_segment);
     darray_clear(out->color);
     darray_clear(out->offset);
+    darray_clear(out->size);
     out->total_size = v2d_new(0, 0);
 
     color = out->color_sequence[0];
@@ -1355,6 +1356,7 @@ void preprocess_text(fonttext_t* out, const fontdrv_t* drv, const char* text, in
     darray_clear(out->text_segment);
     darray_clear(out->color);
     darray_clear(out->offset);
+    darray_clear(out->size);
     darray_clear(out->line_width);
     darray_clear(out->color_sequence);
     darray_clear(out->buffer);

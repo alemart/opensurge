@@ -525,8 +525,10 @@ object "Item Box" is "entity", "private"
                 }
             }
 
-            if(player.collider.collidesWith(biggerCollider))
-                restoreBrick = false;
+            if(player.collider.collidesWith(biggerCollider)) {
+                if(canCrush(player))
+                    restoreBrick = false;
+            }
         }
 
         if(restoreBrick)

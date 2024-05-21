@@ -185,15 +185,18 @@ RATEGAME_YES                "Sure!"
 RATEGAME_NO                 "Not now"
 
 // Play classic levels
-PLAYCLASSICLEVELS_TEXT      "Play the classic levels?"
+PLAYCLASSICLEVELS_TEXT      "Play on the classic levels?"
 PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
 PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Thanks for playing!"
-THANKSFORPLAYING_PARAGRAPH1 "Support this independent work! Get the official edition of the engine for mobile devices!"
-THANKSFORPLAYING_PARAGRAPH2 "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
-THANKSFORPLAYING_PARAGRAPH3 "Become a supporter of this open source game engine today!"
+THANKSFORPLAYING_TEXT1      "Support this independent work! Get the official edition of the engine for mobile devices!"
+THANKSFORPLAYING_TEXT2      "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
+THANKSFORPLAYING_TEXT3      "Become a supporter of this open source game engine today!"
+THANKSFORPLAYING_TEXT1M     "\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
+THANKSFORPLAYING_TEXT2M     ""
+THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
 THANKSFORPLAYING_YES        "Sure!"
 THANKSFORPLAYING_NO         "Not now"
 

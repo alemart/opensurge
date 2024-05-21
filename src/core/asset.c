@@ -155,6 +155,9 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
         CRASH("Can't initialize physfs. %s", PHYSFSx_getLastErrorMessage());
 #endif
 
+    /* permit symbolic links. this is used by some Linux distros to de-duplicate .ttf fonts */
+    PHYSFS_permitSymbolicLinks(TRUE);
+
     /* set the default name of the user-modifiable asset sub-directory */
     str_cpy(user_datadirname, DEFAULT_USER_DATADIRNAME, sizeof(user_datadirname));
 
@@ -1325,6 +1328,8 @@ bool clear_cached_files(const char* folder_name, time_t time_to_live)
 {
 #if HAVE_CACHE_DIR
 
+    ALLEGRO_FS_ENTRY* entry = NULL;
+    ALLEGRO_PATH* path = NULL;
     ALLEGRO_STATE state;
     bool error = true;
     int n = 0;
@@ -1333,13 +1338,13 @@ bool clear_cached_files(const char* folder_name, time_t time_to_live)
     al_store_state(&state, ALLEGRO_STATE_NEW_FILE_INTERFACE);
     al_set_standard_file_interface();
 
-    ALLEGRO_PATH* path = create_path_at_cache(NULL, folder_name);
+    path = create_path_at_cache(NULL, folder_name);
     if(path == NULL) {
         WARN("No cache directory was found");
         goto finally;
     }
 
-    ALLEGRO_FS_ENTRY* entry = al_create_fs_entry(al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP));
+    entry = al_create_fs_entry(al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP));
     if(entry == NULL) {
         WARN("No cache filesystem entry was found");
         goto finally;
@@ -1614,6 +1619,14 @@ void setup_compatibility_pack(const char* shared_dirpath, const char* engine_ver
         file_size = reallocx(file_size, file_count * sizeof(*file_size));
         file_size[last] = 0;
 
+        char* actual_vpath = file_vpath[last], *p;
+        if((p = strchr(actual_vpath, '<')) != NULL) {
+            /* file_vpath[last] will be added to the pack, but its contents are at actual_vpath */
+            *p = '\0';
+            actual_vpath = p+1;
+            LOG("Will use \"%s\" as a replacement of \"%s\"", actual_vpath, file_vpath[last]);
+        }
+
         if(file_vpath[last][0] == '-') {
             LOG("Will ignore file \"%s\"...", file_vpath[last] + 1);
             free(file_vpath[last]);
@@ -1623,7 +1636,7 @@ void setup_compatibility_pack(const char* shared_dirpath, const char* engine_ver
             file_data[last] = NULL;
             file_size[last] = 0;
         }
-        else if(!read_file(file_vpath[last], (void**)&file_data[last], &file_size[last])) {
+        else if(!read_file(actual_vpath, (void**)&file_data[last], &file_size[last])) {
             WARN("Can't add file \"%s\" to the compatibility pack!", file_vpath[last]);
 
             /* the file probably no longer exists. Make it blank,
