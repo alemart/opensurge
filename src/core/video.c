@@ -83,10 +83,12 @@ ALLEGRO_DEFINE_PROC_TYPE(void, fun_glinvalidateframebuffer_t, (GLenum, GLsizei, 
 ALLEGRO_DEFINE_PROC_TYPE(void, fun_glclear_t, (GLbitfield));
 ALLEGRO_DEFINE_PROC_TYPE(void, fun_glclearcolor_t, (GLfloat, GLfloat, GLfloat, GLfloat));
 ALLEGRO_DEFINE_PROC_TYPE(void, fun_glcleardepth_t, (GLdouble));
+ALLEGRO_DEFINE_PROC_TYPE(const GLubyte*, fun_glgetstring_t, (GLenum));
 static fun_glinvalidateframebuffer_t _glInvalidateFramebuffer = NULL;
 static fun_glclear_t _glClear = NULL;
 static fun_glclearcolor_t _glClearColor = NULL;
 static fun_glcleardepth_t _glClearDepth = NULL;
+static fun_glgetstring_t _glGetString = NULL;
 static void import_opengl_symbols();
 
 
@@ -265,6 +267,19 @@ void video_init()
 
     /* import OpenGL symbols */
     import_opengl_symbols();
+
+    /* now that we have a display (i.e., a valid OpenGL context) and the
+       OpenGL symbols, let's log a few more things */
+    if(_glGetString != NULL) {
+        LOG("GL version: %s", (const char*)_glGetString(GL_VERSION));
+        LOG("GL vendor: %s", (const char*)_glGetString(GL_VENDOR));
+        LOG("GL renderer: %s", (const char*)_glGetString(GL_RENDERER));
+    }
+
+    if(al_get_opengl_variant() == ALLEGRO_OPENGL_ES) /* see remark at video_is_using_gles() */
+        LOG("OpenGL ES version 0x%08x", al_get_opengl_version());
+    else
+        LOG("OpenGL version 0x%08x", al_get_opengl_version());
 
     /* initialize the shader system */
     shader_init();
@@ -763,6 +778,50 @@ bool video_use_default_shader()
     return use_default_shader();
 }
 
+/*
+ * video_is_using_gles()
+ * Are we using OpenGL ES?
+ */
+bool video_is_using_gles()
+{
+#if !defined(__ANDROID__)
+
+    const char* gl_version;
+
+   /* According to the OpenGL ES 3.0.6 spec, section 2.1 page 5,
+      "Issuing GL commands when the program is not connected to a context results in undefined behavior." */
+    assertx(display != NULL, "need a valid OpenGL context");
+
+    if(NULL == _glGetString || NULL == (gl_version = (const char*)_glGetString(GL_VERSION))) {
+        /* fallback. As of Allegro 5.2.9, the return value of
+           al_get_opengl_variant() is determined by a preprocessor constant */
+        return al_get_opengl_variant() == ALLEGRO_OPENGL_ES;
+    }
+
+    /*
+
+    OpenGL 2.0 (sec 6.1.11), 3.0 (sec 6.1.11), 4.0 (sec 6.1.6) specifications:
+
+        The VERSION string is laid out as follows:
+        <version number> <vendor-specific information>
+
+    OpenGL ES 2.0 (sec 6.1), 3.0 (sec 6.1.6) specifications:
+
+        The VERSION string is laid out as follows:
+        OpenGL ES <version number> <vendor-specific information>
+
+    */
+
+    return strncmp(gl_version, "OpenGL ES", 9) == 0;
+
+#else
+
+    return true;
+
+#endif
+}
+
+
 
 
 /* -------------------- private stuff -------------------- */
@@ -781,7 +840,6 @@ bool video_use_default_shader()
 bool create_display(int width, int height)
 {
     ALLEGRO_STATE state;
-    const char* opengl_variant;
 
     LOG("Creating the display...");
 
@@ -842,10 +900,6 @@ bool create_display(int width, int height)
 
     if(display == NULL)
         return false;
-
-    /* the display was created. Log OpenGL version & variant */
-    opengl_variant = (al_get_opengl_variant() == ALLEGRO_OPENGL_ES) ? "OpenGL ES" : "OpenGL";
-    LOG("We're using %s version 0x%08x", opengl_variant, al_get_opengl_version());
 
     /* configure the display */
     al_set_window_title(display, window_title);
@@ -1386,21 +1440,26 @@ void import_opengl_symbols()
 
     /* glInvalidateFramebuffer: OpenGL 4.3+ and OpenGL ES 3.0+ */
     _glInvalidateFramebuffer = (fun_glinvalidateframebuffer_t)al_get_opengl_proc_address("glInvalidateFramebuffer");
+
+    /* glGetString */
+    _glGetString = (fun_glgetstring_t)al_get_opengl_proc_address("glGetString");
 #else
     _glClear = NULL;
     _glClearColor = NULL;
     _glClearDepth = NULL;
     _glInvalidateFramebuffer = NULL;
+    _glGetString = NULL;
 #endif
 
     /* log */
-    #define LOG_GL(symbol) LOG("Found gl" #symbol ": %s", (_gl ## symbol != NULL) ? "yes" : "no")
+    #define LOG_GL(symbol) LOG("Found " #symbol ": %s", (_ ## symbol != NULL) ? "yes" : "no")
 
     LOG("Importing OpenGL symbols");
-    LOG_GL(Clear);
-    LOG_GL(ClearColor);
-    LOG_GL(ClearDepth);
-    LOG_GL(InvalidateFramebuffer);
+    LOG_GL(glClear);
+    LOG_GL(glClearColor);
+    LOG_GL(glClearDepth);
+    LOG_GL(glInvalidateFramebuffer);
+    LOG_GL(glGetString);
 
     #undef LOG_GL
 }
