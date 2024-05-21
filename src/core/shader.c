@@ -27,6 +27,7 @@
 #include "../util/numeric.h"
 #include "../core/logfile.h"
 #include "../core/image.h"
+#include "../core/video.h"
 
 /* shader struct */
 struct shader_t
@@ -142,6 +143,11 @@ static const char default_fs_glsl[] = ""
     "   color = v_color * p;\n"
     "}\n"
 "";
+
+/* static assertions */
+static const char glsl_version_prefix[] = SHADER_GLSL_PREFIX;
+static const char glsl_es_version_prefix[] = SHADER_GLSL_ES_PREFIX;
+STATIC_ASSERTX(sizeof glsl_version_prefix == sizeof glsl_es_version_prefix, glsl_version_prefix_of_same_size);
 
 /* Helpers */
 #define LOG(...)            logfile_message("Shader - " __VA_ARGS__)
@@ -491,25 +497,42 @@ void shader_set_sampler(shader_t* shader, const char* var_name, const image_t* i
 ALLEGRO_SHADER* create_glsl_shader(const char* fs_glsl, const char* vs_glsl, char* error_string, size_t error_string_size)
 {
     ALLEGRO_SHADER* sh = al_create_shader(ALLEGRO_SHADER_GLSL);
+    char *fs = str_dup(fs_glsl), *vs = str_dup(vs_glsl);
+    char *xs[] = { vs, fs, NULL };
 
+    /* validate the #version line - replace it if necessary */
+    bool want_glsl_es = video_is_using_gles(); /* will crash if using OpenGL ES 2 with GLSL ES 3 shaders */
+    for(char** glsl = xs; *glsl != NULL; glsl++) {
+        if(!want_glsl_es)
+            assertx(0 == strncmp(*glsl, glsl_version_prefix, strlen(glsl_version_prefix)));
+        else if(0 != strncmp(*glsl, glsl_version_prefix, strlen(glsl_version_prefix)))
+            assertx(0 == strncmp(*glsl, glsl_es_version_prefix, strlen(glsl_es_version_prefix)));
+        else
+            memcpy(*glsl, glsl_es_version_prefix, strlen(glsl_es_version_prefix));
+    }
+
+    /* create the shader */
     if(sh == NULL) {
         snprintf(error_string, error_string_size, "Can't create GLSL shader");
     }
-    else if(!al_attach_shader_source(sh, ALLEGRO_VERTEX_SHADER, vs_glsl)) {
-        snprintf(error_string, error_string_size, "Can't compile the vertex shader. %s", al_get_shader_log(sh));
+    else if(!al_attach_shader_source(sh, ALLEGRO_VERTEX_SHADER, vs)) {
+        snprintf(error_string, error_string_size, "Can't compile the vertex shader. %s\n\n%s", al_get_shader_log(sh), vs);
         al_destroy_shader(sh);
         sh = NULL;
     }
-    else if(!al_attach_shader_source(sh, ALLEGRO_PIXEL_SHADER, fs_glsl)) {
-        snprintf(error_string, error_string_size, "Can't compile the fragment shader. %s", al_get_shader_log(sh));
+    else if(!al_attach_shader_source(sh, ALLEGRO_PIXEL_SHADER, fs)) {
+        snprintf(error_string, error_string_size, "Can't compile the fragment shader. %s\n\n%s", al_get_shader_log(sh), fs);
         al_destroy_shader(sh);
         sh = NULL;
     }
     else if(!al_build_shader(sh)) {
-        snprintf(error_string, error_string_size, "Can't build the shader. %s", al_get_shader_log(sh));
+        snprintf(error_string, error_string_size, "Can't build the shader. %s\n\n%s", al_get_shader_log(sh), fs);
         al_destroy_shader(sh);
         sh = NULL;
     }
+
+    free(vs);
+    free(fs);
 
     return sh;
 }

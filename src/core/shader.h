@@ -46,11 +46,11 @@ void shader_set_bool(shader_t* shader, const char* var_name, bool value);
 void shader_set_float_vector(shader_t* shader, const char* var_name, int num_components, const float* value);
 void shader_set_sampler(shader_t* shader, const char* var_name, const struct image_t* image);
 
-#if !defined(__ANDROID__)
-#define SHADER_GLSL_PREFIX "#version 330 core\n"
-#else
-#define SHADER_GLSL_PREFIX "#version 300 es\n"
-#endif
+#define SHADER_GLSL_PREFIX \
+    "#version 330 core\n\n"
+
+#define SHADER_GLSL_ES_PREFIX \
+    "#version 300 es\n  \n"
 
 #define FRAGMENT_SHADER_GLSL_PREFIX(default_precision) "" \
     SHADER_GLSL_PREFIX \
