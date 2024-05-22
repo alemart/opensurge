@@ -43,7 +43,7 @@ Official website: http://opensurge2d.org
 
 ## Play MODs
 
-You can play MODs provided by other users.
+You can play MODs created by other users.
 
 1. Download the MOD.
     - Linux users: preferably download it to your home folder.

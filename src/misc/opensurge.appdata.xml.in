@@ -7,8 +7,8 @@
   </developer>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <!-- summary: max len 78 chars -->
-  <summary>A retro game engine with a fun platformer for making your dreams come true!</summary>
+  <!-- summary max length: 78 (snap store), 35 (flathub; ideally 10-25) -->
+  <summary>Retro game engine & fun platformer</summary>
   <description>
     <p>Make your dreams come true! Open Surge Engine is an open-source 2D retro game engine for creating games and making your dreams come true!</p>
     <p>It's a ton of fun! Surge the Rabbit is a featured jump 'n' run created with the Open Surge Engine. It's made in the spirit of classic 16-bit Sonic platformers of the 1990s. Play as Surge in fun and exciting levels filled with challenges!</p>
@@ -52,6 +52,28 @@
     <category>ActionGame</category>
     <category>ArcadeGame</category>
   </categories>
+  <keywords>
+    <keyword>game</keyword>
+    <keyword>action</keyword>
+    <keyword>adventure</keyword>
+    <keyword>arcade</keyword>
+    <keyword>platformer</keyword>
+    <keyword>jump'n'run</keyword>
+    <keyword>side-scroller</keyword>
+    <keyword>retro</keyword>
+    <keyword>old-school</keyword>
+    <keyword>allegro</keyword>
+    <keyword>gamedev</keyword>
+    <keyword>engine</keyword>
+    <keyword>surge</keyword>
+    <keyword>sonic</keyword>
+    <keyword>kids</keyword>
+    <keyword>2d</keyword>
+  </keywords>
+  <branding>
+    <color type="primary" scheme_preference="light">#f6f7f8</color>
+    <color type="primary" scheme_preference="dark">#1b1b1d</color>
+  </branding>
   <launchable type="desktop-id">opensurge.desktop</launchable>
   <!--
   <icon type="local">@DESKTOP_ICON_FULLPATH@</icon>
