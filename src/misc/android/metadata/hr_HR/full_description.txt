@@ -6,7 +6,7 @@
 
 <b>Moćan motor za retro igre!</b> Jedan od ključnih elemenata motora je SurgeScript, skriptni jezik za igre. Upotrijebite ga za stvaranje novih mehanika igranja, likova sa posebnim sposobnostima, šefova i još mnogo toga! Nebo je granica!
 
-Open Surge Engine je nevjerovatan alat za učenje razvoja igara, programiranja, digitalne umjetnosti i prirode besplatnog softvera otvorenog koda na razigran način.
+Open Surge Motor je nevjerovatan alat za učenje razvoja igara, programiranja, digitalne umjetnosti i prirode besplatnog softvera otvorenog koda na razigran način.
 
 Napomena: preporučeno je da se koristi osobno računalo za izradu igara. Možete ih igrati na računalima i mobilnim uređajima. Korisnicima Android TV-a je potreban džojstik za igranje i miš za korištenje uređivača razina.
 
