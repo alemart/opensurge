@@ -786,7 +786,7 @@ bool video_is_using_gles()
 {
 #if !defined(__ANDROID__)
 
-    const char* gl_version;
+    const char* gl_version = "";
 
    /* According to the OpenGL ES 3.0.6 spec, section 2.1 page 5,
       "Issuing GL commands when the program is not connected to a context results in undefined behavior." */
