@@ -34,7 +34,11 @@
 static const char watershader_glsl[] = ""
     FRAGMENT_SHADER_GLSL_PREFIX("lowp")
 
-    "uniform lowp sampler2D tex;\n"
+    /* some drivers crash with a message:
+       "precision statement not allowed for type" */
+    /*"uniform lowp sampler2D tex;\n"*/
+
+    "uniform sampler2D tex;\n"
     "uniform lowp vec4 watercolor;\n"
     "uniform highp float scroll_y;\n"
 
@@ -79,14 +83,14 @@ static const char watershader_glsl[] = ""
     "   );\n"
 
         /* slower version; I left it here for clarity */
-    "   int k = wave[wanted_y & 63];\n"
-    "   vec3 wanted_pixel = pixel[k].rgb;\n"
+    "   int w = wave[wanted_y & 63];\n"
+    "   vec3 wanted_pixel = pixel[w].rgb;\n"
 #else
         /* faster version */
-    "   int w = wanted_y & 63;\n"
-    "   int k = int(w >= 20) + int(w >= 32) * int(w <= 51);\n" /* waveform (k = 0, 1, 2) */
-    "   bvec3 indicator = bvec3((k == 0), (k == 1), (k == 2));\n"
-    "   vec3 wanted_pixel = mat3(pixel) * vec3(indicator);\n"
+    "   int k = wanted_y & 63;\n"
+    "   int w = int(k >= 20) + int(k >= 32) * int(k <= 51);\n" /* waveform (w = 0, 1, 2) */
+    "   bvec3 selector = bvec3((w == 0), (w == 1), (w == 2));\n"
+    "   vec3 wanted_pixel = mat3(pixel) * vec3(selector);\n"
 #endif
 
     "   vec3 blended_pixel = mix(wanted_pixel, watercolor.rgb, watercolor.a);\n"
