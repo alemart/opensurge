@@ -39,7 +39,7 @@ static const char watershader_glsl[] = ""
     /*"uniform lowp sampler2D tex;\n"*/
 
     "uniform sampler2D tex;\n"
-    "uniform lowp vec4 watercolor;\n"
+    "uniform vec4 watercolor;\n"
     "uniform highp float scroll_y;\n"
 
     "void main()\n"
