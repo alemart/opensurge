@@ -353,6 +353,9 @@ void render_default_effect(int y, float camera_y, float offset, float timer, flo
         return;
     }
 
+    /* empty the command buffer */
+    video_flush();
+
     /* copy the backbuffer */
     /* possibly expensive on mobile platforms because we trigger a pipeline
        flush when unbinding a partially rendered FBO, but we mitigate the cost
