@@ -26,13 +26,9 @@ sprite "Flag Icon"
         es_ES       3
         fr_FR       4
         de_DE       5
-        nl_NL       6
-        it_IT       7
-        pl_PL       8
-        bs_BA       9
-        ru_RU       10
-        sr_RS       11
-        hr_HR       12
+        it_IT       6
+        pl_PL       7
+        ru_RU       8
         eo          31
     }
 
@@ -84,16 +80,8 @@ sprite "Flag Icon"
         data        60
     }
 
-    // nl_NL
-    animation 6
-    {
-        repeat      TRUE
-        fps         8
-        data        173
-    }
-
     // it_IT
-    animation 7
+    animation 6
     {
         repeat      TRUE
         fps         8
@@ -101,43 +89,19 @@ sprite "Flag Icon"
     }
 
     // pl_PL
-    animation 8
+    animation 7
     {
         repeat      TRUE
         fps         8
         data        188
     }
 
-    // bs_BA
-    animation 9
-    {
-        repeat      TRUE
-        fps         8
-        data        19
-    }
-
     // ru_RU
-    animation 10
+    animation 8
     {
         repeat      TRUE
         fps         8
         data        199
-    }
-
-    // sr_RS
-    animation 11
-    {
-        repeat      TRUE
-        fps         8
-        data        198
-    }
-
-    // hr_HR
-    animation 12
-    {
-        repeat      TRUE
-        fps         8
-        data        101
     }
 
     // eo
