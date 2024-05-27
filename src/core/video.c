@@ -83,11 +83,13 @@ ALLEGRO_DEFINE_PROC_TYPE(void, fun_glinvalidateframebuffer_t, (GLenum, GLsizei, 
 ALLEGRO_DEFINE_PROC_TYPE(void, fun_glclear_t, (GLbitfield));
 ALLEGRO_DEFINE_PROC_TYPE(void, fun_glclearcolor_t, (GLfloat, GLfloat, GLfloat, GLfloat));
 ALLEGRO_DEFINE_PROC_TYPE(void, fun_glcleardepth_t, (GLdouble));
+ALLEGRO_DEFINE_PROC_TYPE(void, fun_glflush_t, (void));
 ALLEGRO_DEFINE_PROC_TYPE(const GLubyte*, fun_glgetstring_t, (GLenum));
 static fun_glinvalidateframebuffer_t _glInvalidateFramebuffer = NULL;
 static fun_glclear_t _glClear = NULL;
 static fun_glclearcolor_t _glClearColor = NULL;
 static fun_glcleardepth_t _glClearDepth = NULL;
+static fun_glflush_t _glFlush = NULL;
 static fun_glgetstring_t _glGetString = NULL;
 static void import_opengl_symbols();
 
@@ -828,6 +830,15 @@ bool video_is_using_gles()
 #endif
 }
 
+/*
+ * video_flush()
+ * Empty the command buffer
+ */
+void video_flush()
+{
+    if(_glFlush != NULL)
+        _glFlush();
+}
 
 
 
@@ -1448,6 +1459,9 @@ void import_opengl_symbols()
     /* glInvalidateFramebuffer: OpenGL 4.3+ and OpenGL ES 3.0+ */
     _glInvalidateFramebuffer = (fun_glinvalidateframebuffer_t)al_get_opengl_proc_address("glInvalidateFramebuffer");
 
+    /* glFlush */
+    _glFlush = (fun_glflush_t)al_get_opengl_proc_address("glFlush");
+
     /* glGetString */
     _glGetString = (fun_glgetstring_t)al_get_opengl_proc_address("glGetString");
 #else
@@ -1455,6 +1469,7 @@ void import_opengl_symbols()
     _glClearColor = NULL;
     _glClearDepth = NULL;
     _glInvalidateFramebuffer = NULL;
+    _glFlush = NULL;
     _glGetString = NULL;
 #endif
 
@@ -1466,6 +1481,7 @@ void import_opengl_symbols()
     LOG_GL(glClearColor);
     LOG_GL(glClearDepth);
     LOG_GL(glInvalidateFramebuffer);
+    LOG_GL(glFlush);
     LOG_GL(glGetString);
 
     #undef LOG_GL
