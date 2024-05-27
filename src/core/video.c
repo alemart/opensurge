@@ -276,10 +276,17 @@ void video_init()
         LOG("GL renderer: %s", (const char*)_glGetString(GL_RENDERER));
     }
 
-    if(al_get_opengl_variant() == ALLEGRO_OPENGL_ES) /* see remark at video_is_using_gles() */
+    /* log & validate OpenGL version */
+    if(video_is_using_gles()) {
         LOG("OpenGL ES version 0x%08x", al_get_opengl_version());
-    else
+        if(al_get_opengl_version() < 0x03000000u)
+            FATAL("OpenGL ES 3.0 or later is required to run the game");
+    }
+    else {
         LOG("OpenGL version 0x%08x", al_get_opengl_version());
+        if(al_get_opengl_version() < 0x03030000u)
+            FATAL("OpenGL 3.3 or later is required to run the game");
+    }
 
     /* initialize the shader system */
     shader_init();
