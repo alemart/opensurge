@@ -175,6 +175,11 @@ static const char* BLACKLIST[] = {
     EXACT("images/ui/title_card_zone_numbers.png"), /* 0.6.0 => 0.6.1 */
     EXACT("images/players/surge_goal.png"), /* 0.6.0 => 0.6.1 */
     EXACT("images/players/surge_life_icon.png"), /* 0.6.0 => 0.6.1 */
+    EXACT("languages/korean.lng"), /* 0.5.1 => 0.6.0 */
+    EXACT("languages/bosnian.lng"), /* 0.5.1.2 => 0.6.1.1 */
+    EXACT("languages/dutch.lng"), /* 0.5.1.2 => 0.6.1.1 */
+    EXACT("languages/serbian.lng"), /* 0.5.1.2 => 0.6.1.1 */
+    EXACT("languages/croatian.lng"), /* 0.6.1 => 0.6.1.1 */
 
     /* NULL-terminated list */
     NULL
