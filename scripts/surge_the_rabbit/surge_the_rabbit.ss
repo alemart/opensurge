@@ -104,7 +104,7 @@ object "SurgeTheRabbit"
 
     fun isDevelopmentBuild()
     {
-        return SurgeEngine.version.indexOf("-dev") >= 0;
+        return isBuild("-dev");
     }
 
     fun isBuild(buildName)
