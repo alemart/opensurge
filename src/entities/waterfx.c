@@ -32,7 +32,7 @@
 
 /* shader */
 static const char watershader_glsl[] = ""
-    FRAGMENT_SHADER_GLSL_PREFIX("lowp")
+    FRAGMENT_SHADER_GLSL_PREFIX
 
     /* some drivers crash with a message:
        "precision statement not allowed for type" */

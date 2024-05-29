@@ -46,13 +46,28 @@ void shader_set_bool(shader_t* shader, const char* var_name, bool value);
 void shader_set_float_vector(shader_t* shader, const char* var_name, int num_components, const float* value);
 void shader_set_sampler(shader_t* shader, const char* var_name, const struct image_t* image);
 
-#define SHADER_GLSL_PREFIX \
-    "#version 330 core\n\n"
 
-#define SHADER_GLSL_ES_PREFIX \
+
+/*
+ * Shader templates
+ */
+
+#define GLSL_ES_VERSION_DIRECTIVE \
     "#version 300 es\n  \n"
 
-#define FRAGMENT_SHADER_GLSL_PREFIX(default_precision) "" \
+#define GLSL_VERSION_DIRECTIVE \
+    "#version 330 core\n\n"
+
+#if defined(__ANDROID__)
+#define SHADER_GLSL_PREFIX GLSL_ES_VERSION_DIRECTIVE
+#else
+#define SHADER_GLSL_PREFIX GLSL_VERSION_DIRECTIVE
+#endif
+
+#define FRAGMENT_SHADER_GLSL_PREFIX "" \
+    FRAGMENT_SHADER_GLSL_PREFIX_EX("lowp")
+
+#define FRAGMENT_SHADER_GLSL_PREFIX_EX(default_precision) "" \
     SHADER_GLSL_PREFIX \
     \
     "#define use_tex " ALLEGRO_SHADER_VAR_USE_TEX "\n" \
@@ -64,6 +79,26 @@ void shader_set_sampler(shader_t* shader, const char* var_name, const struct ima
     "in highp vec2 v_texcoord;\n" \
     "in lowp vec4 v_color;\n" /* tint color */ \
     "out lowp vec4 color;\n" /* fragment color */ \
+    ""
+
+#define VERTEX_SHADER_GLSL_PREFIX "" \
+    SHADER_GLSL_PREFIX \
+    \
+    "#define a_position " ALLEGRO_SHADER_VAR_POS "\n" \
+    "#define a_color " ALLEGRO_SHADER_VAR_COLOR "\n" \
+    "#define a_texcoord " ALLEGRO_SHADER_VAR_TEXCOORD "\n" \
+    "#define projview " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX "\n" \
+    "#define use_texmatrix " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX "\n" \
+    "#define texmatrix " ALLEGRO_SHADER_VAR_TEX_MATRIX "\n" \
+    \
+    "precision highp float;\n" \
+    \
+    "in vec4 a_position;\n" \
+    "in vec4 a_color;\n" \
+    "in vec2 a_texcoord;\n" \
+    \
+    "out vec4 v_color;\n" \
+    "out vec2 v_texcoord;\n" \
     ""
 
 #endif

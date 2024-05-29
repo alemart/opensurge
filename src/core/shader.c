@@ -92,23 +92,7 @@ static void uniform_dtor(void *uniform, void* ctx) { destroy_uniform((shader_uni
 
 /* default vertex shader */
 static const char default_vs_glsl[] = ""
-    SHADER_GLSL_PREFIX
-
-    "#define a_position " ALLEGRO_SHADER_VAR_POS "\n"
-    "#define a_color " ALLEGRO_SHADER_VAR_COLOR "\n"
-    "#define a_texcoord " ALLEGRO_SHADER_VAR_TEXCOORD "\n"
-    "#define projview " ALLEGRO_SHADER_VAR_PROJVIEW_MATRIX "\n"
-    "#define use_texmatrix " ALLEGRO_SHADER_VAR_USE_TEX_MATRIX "\n"
-    "#define texmatrix " ALLEGRO_SHADER_VAR_TEX_MATRIX "\n"
-
-    "precision highp float;\n"
-
-    "in vec4 a_position;\n"
-    "in vec4 a_color;\n"
-    "in vec2 a_texcoord;\n"
-
-    "out vec4 v_color;\n"
-    "out vec2 v_texcoord;\n"
+    VERTEX_SHADER_GLSL_PREFIX
 
     "uniform mat4 projview;\n"
     "uniform mat4 texmatrix;\n"
@@ -128,7 +112,7 @@ static const char default_vs_glsl[] = ""
 
 /* default fragment shader */
 static const char default_fs_glsl[] = ""
-    FRAGMENT_SHADER_GLSL_PREFIX("lowp")
+    FRAGMENT_SHADER_GLSL_PREFIX
 
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"
@@ -145,9 +129,9 @@ static const char default_fs_glsl[] = ""
 "";
 
 /* static assertions */
-static const char glsl_version_prefix[] = SHADER_GLSL_PREFIX;
-static const char glsl_es_version_prefix[] = SHADER_GLSL_ES_PREFIX;
-STATIC_ASSERTX(sizeof glsl_version_prefix == sizeof glsl_es_version_prefix, glsl_version_prefix_of_same_size);
+static const char glsl_version_directive[] = GLSL_VERSION_DIRECTIVE;
+static const char glsl_es_version_directive[] = GLSL_ES_VERSION_DIRECTIVE;
+STATIC_ASSERTX(sizeof glsl_version_directive == sizeof glsl_es_version_directive, glsl_version_prefix_of_same_size);
 
 /* Helpers */
 #define LOG(...)            logfile_message("Shader - " __VA_ARGS__)
@@ -503,12 +487,18 @@ ALLEGRO_SHADER* create_glsl_shader(const char* fs_glsl, const char* vs_glsl, cha
     /* validate the #version line - replace it if necessary */
     bool want_glsl_es = video_is_using_gles(); /* will crash if using OpenGL ES 2 with GLSL ES 3 shaders */
     for(char** glsl = xs; *glsl != NULL; glsl++) {
-        if(!want_glsl_es)
-            assertx(0 == strncmp(*glsl, glsl_version_prefix, strlen(glsl_version_prefix)));
-        else if(0 != strncmp(*glsl, glsl_version_prefix, strlen(glsl_version_prefix)))
-            assertx(0 == strncmp(*glsl, glsl_es_version_prefix, strlen(glsl_es_version_prefix)));
-        else
-            memcpy(*glsl, glsl_es_version_prefix, strlen(glsl_es_version_prefix));
+        if(want_glsl_es) {
+            if(0 == strncmp(*glsl, glsl_version_directive, sizeof(glsl_version_directive)))
+                memcpy(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive));
+            else
+                assertx(0 == strncmp(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive)));
+        }
+        else {
+            if(0 == strncmp(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive)))
+                memcpy(*glsl, glsl_version_directive, strlen(glsl_version_directive));
+            else
+                assertx(0 == strncmp(*glsl, glsl_version_directive, strlen(glsl_version_directive)));
+        }
     }
 
     /* create the shader */
