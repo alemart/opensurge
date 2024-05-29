@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>org.opensurge2d.OpenSurge</id>
+  <!-- name max length: 25 (flathub; ideally 15) -->
   <name>Surge Engine</name>
   <developer id="org.opensurge2d">
     <name>alemart</name>
@@ -8,7 +9,7 @@
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <!-- summary max length: 78 (snap store), 35 (flathub; ideally 10-25) -->
-  <summary>Retro game engine &amp; fun platformer</summary>
+  <summary>Fun retro platformer &amp; game creator</summary>
   <description>
     <p>Make your dreams come true! Open Surge Engine is an open-source 2D retro game engine for creating games and making your dreams come true!</p>
     <p>It's a ton of fun! Surge the Rabbit is a featured jump 'n' run created with the Open Surge Engine. It's made in the spirit of classic 16-bit Sonic platformers of the 1990s. Play as Surge in fun and exciting levels filled with challenges!</p>
@@ -71,8 +72,8 @@
     <keyword>2d</keyword>
   </keywords>
   <branding>
-    <color type="primary" scheme_preference="light">#f6f7f8</color>
-    <color type="primary" scheme_preference="dark">#1b1b1d</color>
+    <color type="primary" scheme_preference="light">#fece90</color>
+    <color type="primary" scheme_preference="dark">#4d2525</color>
   </branding>
   <launchable type="desktop-id">opensurge.desktop</launchable>
   <!--
