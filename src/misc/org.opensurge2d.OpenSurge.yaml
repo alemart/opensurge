@@ -44,6 +44,7 @@ modules:
         sha256: 0ee3fc22ae74601ad36c70afd793ff062f0f7187eeb6e78f8a24e5bf69170d30
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DWANT_GLES3=ON
       - -DWANT_DEMO=OFF
       - -DWANT_DOCS=OFF
       - -DWANT_EXAMPLES=OFF
