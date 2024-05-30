@@ -486,11 +486,12 @@ ALLEGRO_SHADER* create_glsl_shader(const char* fs_glsl, const char* vs_glsl, cha
 
     /* validate the #version line. Adapt it if necessary*
 
-       (*) the Flatpak edition of the game uses OpenGL ES 3.0 instead of OpenGL
-           (Desktop) with Allegro 5.2.9.1 and with the org.freedesktop.Platform
-           23.08 runtime. The runtime doesn't include libGLU, which is required
-           by the Desktop OpenGL backend of Allegro. We can compile libGLU or
-           just stick to OpenGL ES. The runtime includes OpenGL ES (Mesa 3D).
+       (*) the Flatpak edition of the game crashed when using OpenGL ES 3.0
+           instead of Desktop OpenGL (with Allegro 5.2.9.1 and with the
+           org.freedesktop.Platform 23.08 runtime). The runtime doesn't include
+           libGLU, which is required by the Desktop OpenGL backend of Allegro.
+           We can compile libGLU or just stick to OpenGL ES, which is included
+           in the runtime (Mesa 3D).
 
        This section adapts the #version line of the shaders as necessary.
        Allegro may be compiled with the OpenGL ES backend even on Desktop
