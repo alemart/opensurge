@@ -484,20 +484,34 @@ ALLEGRO_SHADER* create_glsl_shader(const char* fs_glsl, const char* vs_glsl, cha
     char *fs = str_dup(fs_glsl), *vs = str_dup(vs_glsl);
     char *xs[] = { vs, fs, NULL };
 
-    /* validate the #version line - replace it if necessary */
-    bool want_glsl_es = video_is_using_gles(); /* will crash if using OpenGL ES 2 with GLSL ES 3 shaders */
+    /* validate the #version line. Adapt it if necessary*
+
+       (*) the Flatpak edition of the game uses OpenGL ES 3.0 instead of OpenGL
+           (Desktop) with Allegro 5.2.9.1 and with the org.freedesktop.Platform
+           23.08 runtime. The runtime doesn't include libGLU, which is required
+           by the Desktop OpenGL backend of Allegro. We can compile libGLU or
+           just stick to OpenGL ES. The runtime includes OpenGL ES (Mesa 3D).
+
+       This section adapts the #version line of the shaders as necessary.
+       Allegro may be compiled with the OpenGL ES backend even on Desktop
+       platforms.
+
+       Note: GLSL 3.30 and GLSL ES 3.0 are similar. The GL_ES preprocessor flag
+             may be used in GLSL code to distinguish between the two. */
+
+    bool want_glsl_es = video_is_using_gles(); /* GLES3+ is required in video.c */
     for(char** glsl = xs; *glsl != NULL; glsl++) {
         if(want_glsl_es) {
             if(0 == strncmp(*glsl, glsl_version_directive, sizeof(glsl_version_directive)))
                 memcpy(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive));
-            else
-                assertx(0 == strncmp(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive)));
+            else if(0 != strncmp(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive)))
+                FATAL("Expected %s in\n\n%s", glsl_es_version_directive, *glsl);
         }
         else {
             if(0 == strncmp(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive)))
-                memcpy(*glsl, glsl_version_directive, strlen(glsl_version_directive));
-            else
-                assertx(0 == strncmp(*glsl, glsl_version_directive, strlen(glsl_version_directive)));
+                memcpy(*glsl, glsl_version_directive, strlen(glsl_version_directive)); /* this should never happen? */
+            else if(0 != strncmp(*glsl, glsl_version_directive, strlen(glsl_version_directive)))
+                FATAL("Expected %s in\n\n%s", glsl_version_directive, *glsl);
         }
     }
 
