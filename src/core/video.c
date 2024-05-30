@@ -866,6 +866,7 @@ bool create_display(int width, int height)
         FATAL("Duplicate display");
 
     /* create a new display */
+    memset(&state, 0, sizeof(state));
     al_store_state(&state, ALLEGRO_STATE_NEW_DISPLAY_PARAMETERS);
     al_set_new_display_flags(
         ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE |
