@@ -892,6 +892,8 @@ void entitymanager_remove_entity_info(surgescript_object_t* entity_manager, surg
 
         fasthash_delete(db->id_to_handle, entity_id);
         fasthash_delete(db->info, entity_handle);
+
+        db->cached_query = &NULL_ENTRY; /* db->cached_query depends on db->info */
     }
 }
 
