@@ -18,6 +18,11 @@ object "SurgeTheRabbit"
     public readonly website = "https://opensurge2d.org";
     engineVersion = "";
 
+    fun visitHomepage()
+    {
+        openWebsite("/", {});
+    }
+
     fun donate()
     {
         if(!canAcceptDonations())
