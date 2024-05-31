@@ -301,6 +301,7 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
         // spawn menu items
         items.push(spawn("Title Screen - Menu Item - Start Game"));
         items.push(spawn("Title Screen - Menu Item - Options"));
+        items.push(spawn("Title Screen - Menu Item - Create"));
 
         if(!SurgeEngine.mobile)
             items.push(spawn("Title Screen - Menu Item - Mobile"));
@@ -379,6 +380,49 @@ object "Title Screen - Menu Item - Options" is "private", "detached", "entity"
     {
         Player.active.lives = Player.initialLives;
         Level.load("quests/options.qst");
+    }
+
+    fun onSelect()
+    {
+        parent.onSelect(this);
+    }
+
+    fun onHighlight()
+    {
+    }
+
+    fun setHighlighted(highlighted)
+    {
+        delegate.setHighlighted(highlighted);
+        return this;
+    }
+
+    fun setOffset(offset)
+    {
+        delegate.setOffset(offset);
+        return this;
+    }
+
+    fun get_width()
+    {
+        return delegate.width;
+    }
+}
+
+object "Title Screen - Menu Item - Create" is "private", "detached", "entity"
+{
+    delegate = spawn("Title Screen - Menu Item")
+               .setText("$TITLESCREEN_CREATE");
+
+    fun onEnter()
+    {
+        // reset player data
+        player = Player.active;
+        player.lives = Player.initialLives;
+        player.score = 0;
+
+        // load the demo quest
+        Level.load("quests/demo.qst");
     }
 
     fun onSelect()

@@ -15,7 +15,7 @@
 LANG_ID                  "fr_FR"                          // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                "Français"                       // language name
 LANG_AUTHOR              "Stilic"                         // translation author
-LANG_LASTUPDATE          "2024-03-12"                     // date format: yyyy-mm-dd
+LANG_LASTUPDATE          "2024-05-30"                     // date format: yyyy-mm-dd
 LANG_COMPATIBILITY       "0.6.1"                          // required engine version
 
 
@@ -153,6 +153,7 @@ CREDITS_RES_SCRIPTS_TEXT "Les auteurs sont identifiés dans les scripts eux-mêm
 // Title Screen
 TITLESCREEN_PLAY            "LANCER LE JEU"
 TITLESCREEN_OPTIONS         "OPTIONS"
+TITLESCREEN_CREATE          "CRÉER"
 TITLESCREEN_MOBILE          "JOUER SUR MOBILE"
 TITLESCREEN_SHARE           "PARTAGER"
 TITLESCREEN_DONATE          "FAIRE UN DON"
@@ -282,6 +283,7 @@ LEV_DEMO_3                  "<color=$COLOR_TITLE>Libérez votre créativité !</
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool !</color>\nÊtes-vous déjà excité ? Le ciel est la limite ! Visitez <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> pour créer vos propres jeux géniaux dès aujourd'hui !"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Essayez vous-même !</color>\nMaintenant, c'est ton tour ! <color=$COLOR_HIGHLIGHT>Appuyer sur F12 pour ouvrir l'éditeur de stage</color>. Ensuite, ouvrez la palette d'objets et commencez à construire votre stage ! (utilisez F1 pour l'aide)"
 LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Essayez-le vous-même !</color>\nMettez le jeu en pause, faites glisser la poignée en bas de l'écran et entrez dans le <color=$COLOR_HIGHLIGHT>MODE DEBUG</color> pour <color=$COLOR_HIGHLIGHT>modifier le niveau</color> !"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>Cool !</color>\nVisitez <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> pour créer vos propres jeux géniaux dès aujourd'hui !"
 
 
 //

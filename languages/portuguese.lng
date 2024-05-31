@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-03-30"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -154,6 +154,7 @@ CREDITS_RES_SCRIPTS_TEXT    "Os autores são identificados nos próprios scripts
 // Title Screen
 TITLESCREEN_PLAY            "JOGAR"
 TITLESCREEN_OPTIONS         "CONFIGURAR"
+TITLESCREEN_CREATE          "CRIAR"
 TITLESCREEN_MOBILE          "JOGAR NO MOBILE"
 TITLESCREEN_SHARE           "COMPARTILHAR"
 TITLESCREEN_DONATE          "DOAR"
@@ -283,6 +284,7 @@ LEV_DEMO_3                  "<color=$COLOR_TITLE>Liberte sua criatividade!</colo
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Que massa!</color>\nE aí, curtiu? Sua imaginação é o limite! Visite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> e comece a criar seus games incríveis hoje mesmo!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Agora é a sua vez!</color>\n<color=$COLOR_HIGHLIGHT>Aperte F12 para abrir o editor de fases</color>. Em seguida, abra a palheta de itens e comece a criar sua fase! (aperte F1 para obter ajuda)"
 LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Agora é a sua vez!</color>\nPause o jogo, arraste a alça na parte inferior da tela e entre no <color=$COLOR_HIGHLIGHT>Modo Debug</color> para <color=$COLOR_HIGHLIGHT>editar a fase</color>!"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>Que massa!</color>\nVisite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> e comece a criar seus games incríveis hoje mesmo!"
 
 
 

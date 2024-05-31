@@ -15,7 +15,7 @@
 LANG_ID                     "es_ES"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Español"                 // language name
 LANG_AUTHOR                 "Álvaro Bazán"            // translation author
-LANG_LASTUPDATE             "2024-03-12"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -153,6 +153,7 @@ CREDITS_RES_SCRIPTS_TEXT    "Los autores están identificados dentro de los prop
 // Title Screen
 TITLESCREEN_PLAY            "EMPEZAR PARTIDA"
 TITLESCREEN_OPTIONS         "OPCIONES"
+TITLESCREEN_CREATE          "CREAR"
 TITLESCREEN_MOBILE          "JUGAR EN MÓVIL"
 TITLESCREEN_SHARE           "COMPARTIR"
 TITLESCREEN_DONATE          "DONAR"
@@ -282,6 +283,7 @@ LEV_DEMO_3                  "<color=$COLOR_TITLE>¡Desata tu creatividad!</color
 LEV_DEMO_4                  "<color=$COLOR_TITLE>¡Guay!</color>\n¿Emocionado todavía? ¡El cielo es el limite! Visita <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> para crear tus propios juegos alucinantes hoy!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>¡Pruebalo tú mismo!</color> ¡Ahora te toca a tí! <color=$COLOR_HIGHLIGHT>Pulsa F12 para abrir el editor</color>. Después, abre la paleta de objetos y empieza a construir tu nivel! (usa F1 para ayuda)"
 LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>¡Pruebalo tú mismo!</color>\n¡Ahora te toca a tí! Pausa el juego, arrastra el tirador de la parte inferior de la pantalla y entra en el <color=$COLOR_HIGHLIGHT>MODO DEBUG</color> para <color=$COLOR_HIGHLIGHT>editar el nivel</color>!"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>¡Guay!</color>\nVisita <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> para crear tus propios juegos alucinantes hoy!"
 
 
 

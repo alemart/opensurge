@@ -15,7 +15,7 @@
 LANG_ID                     "pl_PL"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Polski"                  // language name
 LANG_AUTHOR                 "suve"                    // translation author
-LANG_LASTUPDATE             "2024-03-29"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -154,6 +154,7 @@ CREDITS_RES_SCRIPTS_TEXT    "Autorzy wymienieni zostali wewnątrz skryptów."
 // Title Screen
 TITLESCREEN_PLAY            "NOWA GRA"
 TITLESCREEN_OPTIONS         "USTAWIENIA"
+TITLESCREEN_CREATE          "TWÓRZ"
 TITLESCREEN_MOBILE          "GRAJ NA TELEFONIE"
 TITLESCREEN_SHARE           "PODAJ DALEJ"
 TITLESCREEN_DONATE          "ZRÓB DONATE"
@@ -283,6 +284,7 @@ LEV_DEMO_3                  "<color=$COLOR_TITLE>Uwolnij swoją kreatywność!</
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Czad!</color>\nEkscytujące? Sięgaj ku gwiazd! Odwiedź <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color>, aby już dzisiaj zacząć tworzyć niesamowite gry!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Spróbuj!</color>\nTeraz twoja kolej! <color=$COLOR_HIGHLIGHT>Naciśnij F12, by otworzyć edytor.</color> Następnie otwórz paletę przedmiotów i zacznij budować swój poziom! (Naciśnij F1, jeżeli potrzebujesz pomocy.)"
 LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Spróbuj samemu!</color>\nTeraz twoja kolej! Zapauzuj grę, przeciągnij uchwyt na dole ekranu i przejdź do <color=$COLOR_HIGHLIGHT>TRYBU DEBUGOWANIA</color> aby <color=$COLOR_HIGHLIGHT>edytować ten poziom</color>!"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>Czad!</color>\nOdwiedź <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color>, aby już dzisiaj zacząć tworzyć niesamowite gry!"
 
 
 

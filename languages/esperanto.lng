@@ -15,7 +15,7 @@
 LANG_ID                     "eo"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Esperanto"                 // language name
 LANG_AUTHOR                 "Jorge Maldonado Ventura"       // translation author
-LANG_LASTUPDATE             "2024-03-25"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -154,6 +154,7 @@ CREDITS_RES_SCRIPTS_TEXT    "La aŭtoroj estas identigitaj en la propraj skripto
 // Title Screen
 TITLESCREEN_PLAY            "KOMENCI LUDON"
 TITLESCREEN_OPTIONS         "OPCIOJ"
+TITLESCREEN_CREATE          "KREI"
 TITLESCREEN_MOBILE          "LUDI EN POŜTELEFONO"
 TITLESCREEN_SHARE           "DISKONIGI"
 TITLESCREEN_DONATE          "DONACI"
@@ -289,6 +290,7 @@ LEV_DEMO_3                  "<color=$COLOR_TITLE>Uzu vian kreemon!</color>\nUnu 
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Malaĉe!</color>\nĈu vi sentas jam ekscitita? La ĉielo estas la limo! Vizitu <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Provu ĝin vi!</color>\nNun estas via vico! <color=$COLOR_HIGHLIGHT>Premu F12-n por malfermi la redaktilon.</color> Poste malfermu la paletron de eroj kaj komencu konstrui vian nivelon! (uzu F1-n por helpo)"
 LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Vi provu mem!</color>\nNun estas via vico! Paŭzigi la ludon, trenu tenilon en la malsupro de la ekrano kaj eniri en la <color=$COLOR_HIGHLIGHT>PROGRAMISTAN REĜIMON</color> por <color=$COLOR_HIGHLIGHT>redakti la nivelon</color>!"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>Malaĉe!</color>\nVizitu <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> por krei viajn proprajn malaĉajn ludojn hodiaŭ!"
 
 
 

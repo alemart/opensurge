@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2023-03-11"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -161,6 +161,7 @@ CREDITS_RES_SCRIPTS_TEXT    "The authors are identified within the scripts thems
 // Title Screen
 TITLESCREEN_PLAY            "START GAME"
 TITLESCREEN_OPTIONS         "OPTIONS"
+TITLESCREEN_CREATE          "CREATE"
 TITLESCREEN_MOBILE          "PLAY ON MOBILE"
 TITLESCREEN_SHARE           "SHARE"
 TITLESCREEN_DONATE          "DONATE"
@@ -290,6 +291,7 @@ LEV_DEMO_3                  "<color=$COLOR_TITLE>Unleash your creativity!</color
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Cool!</color>\nFeeling excited yet? The sky is the limit! Visit <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> to create your own awesome games today!"
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! <color=$COLOR_HIGHLIGHT>Press F12 to open the editor.</color> Next, open the item palette and start building your level! (use F1 for help)"
 LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Try it yourself!</color>\nNow it's your turn! Pause the game, drag the handle at the bottom of the screen and enter the <color=$COLOR_HIGHLIGHT>Debug Mode</color> to <color=$COLOR_HIGHLIGHT>edit the level</color>!"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>Cool!</color>\nVisit <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> to create your own awesome games today!"
 
 
 

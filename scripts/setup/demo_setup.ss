@@ -16,6 +16,7 @@ using SurgeEngine.Events.EventChain;
 using SurgeEngine.Events.EntityEvent;
 using SurgeEngine.Events.DelayedEvent;
 using SurgeEngine.Events.FunctionEvent;
+using SurgeTheRabbit;
 
 object "Demo Setup"
 {
@@ -65,6 +66,20 @@ object "Demo Setup"
                 "onTrigger": FunctionEvent("Show Message").withArgument(
                     !SurgeEngine.mobile ? Lang["LEV_DEMO_5"] : Lang["LEV_DEMO_5_MOBILE"]
                 )
+            },
+            "Event Trigger 2": {
+                "onTrigger": EventList([
+                    DelayedEvent(
+                        FunctionEvent("Show Message")
+                        .withArgument(Lang["LEV_DEMO_6"])
+                    ).willWait(7.5),
+                    DelayedEvent(
+                        FunctionEvent("Invoke")
+                        .withArgument(SurgeTheRabbit)
+                        .withArgument("visitHomepage")
+                        .withArgument([])
+                    ).willWait(15.0)
+                ])
             },
             "Bridge": {
                 "anim": 1
