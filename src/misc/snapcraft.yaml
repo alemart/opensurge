@@ -117,7 +117,7 @@ parts:
     source-checksum: sha256/1991500eaeb8d5325e3a8361847ff3bf8e03ec89252b7915e1f25b3f8ab5d560
     plugin: cmake
     cmake-parameters:
-      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DCMAKE_BUILD_TYPE=Release
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DPHYSFS_BUILD_TEST=OFF
       - -DPHYSFS_BUILD_DOCS=OFF
@@ -131,7 +131,7 @@ parts:
     source-checksum: sha256/0ee3fc22ae74601ad36c70afd793ff062f0f7187eeb6e78f8a24e5bf69170d30
     plugin: cmake
     cmake-parameters:
-      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DCMAKE_BUILD_TYPE=Release
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DWANT_DEMO=OFF
       - -DWANT_DOCS=OFF
