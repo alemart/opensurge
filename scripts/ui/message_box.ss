@@ -153,8 +153,17 @@ object "Message Box Controller"
 
     state "main"
     {
-        if(Level.cleared)
+        if(Level.cleared) {
             hide(msgbox);
+            state = "cleared";
+        }
+    }
+
+    state "cleared"
+    {
+        // a message box may be displayed after the level is cleared
+        if(!Level.cleared)
+            state = "main";
     }
 
     fun show(mb)
