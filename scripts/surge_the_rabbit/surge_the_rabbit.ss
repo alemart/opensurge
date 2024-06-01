@@ -33,13 +33,10 @@ object "SurgeTheRabbit"
 
     fun share()
     {
-        if(Platform.isAndroid) {
-            text = "Surge the Rabbit " + website;
-            Platform.Android.shareText(text);
-        }
-        else {
+        if(Platform.isAndroid)
+            Platform.Android.shareText(website);
+        else
             openWebsite("/share", {});
-        }
     }
 
     fun download()
