@@ -421,8 +421,8 @@ object "Title Screen - Menu Item - Create" is "private", "detached", "entity"
         player.lives = Player.initialLives;
         player.score = 0;
 
-        // load the demo quest
-        Level.load("quests/demo.qst");
+        // load the create quest
+        Level.load("quests/create.qst");
     }
 
     fun onSelect()
