@@ -12,37 +12,29 @@ using SurgeEngine.Video.Screen;
 using SurgeEngine.Platform;
 using SurgeEngine;
 using SurgeTheRabbit;
+using SurgeEngine.Camera;
 
 object "Thanks for Playing" is "setup", "private", "detached", "entity"
 {
     fader = spawn("Fader").setFadeTime(0.5);
 
-    title = spawn("Thanks for Playing - Title");
+    title = spawn("Thanks for Playing - Title")
+            .setPosition(Vector2(Screen.width / 2, 1));
 
-    textA = spawn("Thanks for Playing - Text")
-            .setPosition(Vector2(34, 48))
-            .setMaxWidth(Screen.width - 34 * 2)
-            .setText(1);
-
-    textB = spawn("Thanks for Playing - Text")
-            .setPosition(Vector2(34, 87))
-            .setMaxWidth(Screen.width - 34 * 2)
-            .setText(2);
-
-    textC = spawn("Thanks for Playing - Text")
-            .setPosition(Vector2(234, 128))
-            .setMaxWidth(160)
-            .setText(3);
+    text = spawn("Thanks for Playing - Text")
+            .setPosition(Vector2(Screen.width / 2, 64));
 
     menu = spawn("Simple Menu Builder")
            .addOption("yes", "$THANKSFORPLAYING_YES",  Vector2.zero)
-           .addOption("no",  "$THANKSFORPLAYING_NO", Vector2.down.scaledBy(16 * 1))
+           .addOption("no",  "$THANKSFORPLAYING_NO", Vector2.down.scaledBy(20 * 1))
            .setBackOption("no")
-           .setPosition(Vector2(250, 184))
+           .setPosition(Vector2(Screen.width / 2, 192))
            .setIcon("Thanks for Playing - Pointer")
            .setHighlightColor("ffee11")
            .setFontName("Thanks for Playing - Text")
-           .setAlignment("left")
+           .setAlignment("center")
+           .setHighlightSound("samples/pause_highlight.wav")
+           .setChooseSound("samples/pause_confirm.wav")
            .build();
 
     state "main"
@@ -73,12 +65,7 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
     fun onChooseMenuOption(optionId)
     {
         if(optionId == "yes") {
-
-            if(!SurgeEngine.mobile)
-                SurgeTheRabbit.download();
-            else
-                SurgeTheRabbit.donate();
-
+            SurgeTheRabbit.share();
             state = "waiting";
         }
         else
@@ -100,9 +87,12 @@ object "Thanks for Playing - Title" is "private", "detached", "entity"
     {
         label.text = "$THANKSFORPLAYING_TITLE";
         label.align = "center";
-        label.maxWidth = Screen.width - 16;
+    }
 
-        transform.position = Vector2(Screen.width / 2, -1);
+    fun setPosition(position)
+    {
+        transform.position = position;
+        return this;
     }
 }
 
@@ -113,24 +103,9 @@ object "Thanks for Playing - Text" is "private", "detached", "entity"
 
     fun constructor()
     {
-        label.text = "";
-        label.align = "left";
-    }
-
-    fun setText(p)
-    {
-        if(SurgeEngine.mobile)
-            label.text = "$THANKSFORPLAYING_TEXT" + p + "M";
-        else
-            label.text = "$THANKSFORPLAYING_TEXT" + p;
-
-        return this;
-    }
-
-    fun setMaxWidth(maxWidth)
-    {
-        label.maxWidth = maxWidth;
-        return this;
+        label.text = "$THANKSFORPLAYING_TEXT";
+        label.align = "center";
+        label.maxWidth = Screen.width - 48;
     }
 
     fun setPosition(position)

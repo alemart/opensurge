@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-06-01"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -185,12 +185,7 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Obrigado por jogar!"
-THANKSFORPLAYING_TEXT1      "Apóie este trabalho independente! Baixe a edição oficial da engine para mobile!"
-THANKSFORPLAYING_TEXT2      "Jogue Surge the Rabbit - e também seus próprios games - no celular e no tablet!"
-THANKSFORPLAYING_TEXT3      "Torne-se hoje mesmo um apoiador desta engine livre e de código aberto!"
-THANKSFORPLAYING_TEXT1M     "\nEste jogo foi criado com o <color=$COLOR_HIGHLIGHT>Open Surge</color>, uma game engine 2D muito flexível e open-source que está agora mesmo nas suas mãos!"
-THANKSFORPLAYING_TEXT2M     ""
-THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
+THANKSFORPLAYING_TEXT       "Este jogo foi criado com o Open Surge, um motor de jogos 2D muito flexível e de código aberto que está em suas mãos!\n\nAgora espalhe a alegria! Compartilhe com sua família, seus amigos, seus bichinhos e divulgue!"
 THANKSFORPLAYING_YES        "Beleza!"
 THANKSFORPLAYING_NO         "Agora não"
 

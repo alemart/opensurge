@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-06-01"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -192,12 +192,7 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Thanks for playing!"
-THANKSFORPLAYING_TEXT1      "Support this independent work! Get the official edition of the engine for mobile devices!"
-THANKSFORPLAYING_TEXT2      "Play Surge the Rabbit - and also your own games - on your phone and tablet!"
-THANKSFORPLAYING_TEXT3      "Become a supporter of this open source game engine today!"
-THANKSFORPLAYING_TEXT1M     "\nThis game is created with <color=$COLOR_HIGHLIGHT>Open Surge</color>, a very flexible and open-source 2D game engine that is now in your hands!"
-THANKSFORPLAYING_TEXT2M     ""
-THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
+THANKSFORPLAYING_TEXT       "This game is created with Open Surge, a very flexible and open-source 2D game engine that is now in your hands!\n\nNow share the joy! Tell your family, friends and pets about it and spread the word!"
 THANKSFORPLAYING_YES        "Sure!"
 THANKSFORPLAYING_NO         "Not now"
 

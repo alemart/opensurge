@@ -15,7 +15,7 @@
 LANG_ID                     "eo"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Esperanto"                 // language name
 LANG_AUTHOR                 "Jorge Maldonado Ventura"       // translation author
-LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-06-01"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -185,12 +185,7 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Dankon pro ludi"
-THANKSFORPLAYING_TEXT1      "Subtenu ĉi tiun sendependan laboron! Akiru la oficialan eldonon de la motoro por porteblaj iloj!"
-THANKSFORPLAYING_TEXT2      "Ludi Surge the Rabbit - kaj ankaŭ viajn proprajn ludojn - en viaj poŝtelefono kaj tabulkomputiloj!"
-THANKSFORPLAYING_TEXT3      "Iĝi subtenanto de ĉi tiu malfermitkoda ludo hodiaŭ!"
-THANKSFORPLAYING_TEXT1M     "\nĈi tiu ludo estis kreita per <color=$COLOR_HIGHLIGHT>Open Surge</color>, tre fleksebla kaj malfermitkoda 2D-a videluda motoro, kiu estas nun en viaj manoj!"
-THANKSFORPLAYING_TEXT2M     ""
-THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
+THANKSFORPLAYING_TEXT       "Ĉi tiu ludo estis kreita per Open Surge, tre fleksebla kaj malfermitkoda 2D-a videluda motoro, kiu estas nun en viaj manoj!\n\nNun diskonigu la ĝojon! Diru al via familio, amikoj kaj dombestoj kaj disvastigu la informon!" // FIXME
 THANKSFORPLAYING_YES        "Jes ja!"
 THANKSFORPLAYING_NO         "Ne nun"
 

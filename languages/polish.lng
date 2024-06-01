@@ -15,7 +15,7 @@
 LANG_ID                     "pl_PL"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Polski"                  // language name
 LANG_AUTHOR                 "suve"                    // translation author
-LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-06-01"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -185,12 +185,7 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Dzięki za grę!"
-THANKSFORPLAYING_TEXT1      "Wesprzyj naszą pracę! Pobierz oficjalną wersję na urządzenia mobilne!"
-THANKSFORPLAYING_TEXT2      "Graj w Surge the Rabbit - oraz inne gry na tym silniku - na telefonie lub tablecie!"
-THANKSFORPLAYING_TEXT3      "Już dziś możesz wesprzeć ten otwarty silnik do gier!"
-THANKSFORPLAYING_TEXT1M     "\nTa gra została stworzona przy użyciu <color=$COLOR_HIGHLIGHT>Open Surge</color>, otwartoźródłowego silnika 2D, który teraz jest w twoich rękach!"
-THANKSFORPLAYING_TEXT2M     ""
-THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
+THANKSFORPLAYING_TEXT       "Ta gra została stworzona przy użyciu Open Surge, otwartoźródłowego silnika 2D, który teraz jest w twoich rękach!\n\nPodziel się radością - opowiedz swoim znajomym i rodzinie!" // FIXME
 THANKSFORPLAYING_YES        "Jasne!"
 THANKSFORPLAYING_NO         "Nie tym razem"
 

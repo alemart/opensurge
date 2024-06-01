@@ -15,7 +15,7 @@
 LANG_ID                  "fr_FR"                          // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                "Français"                       // language name
 LANG_AUTHOR              "Stilic"                         // translation author
-LANG_LASTUPDATE          "2024-05-30"                     // date format: yyyy-mm-dd
+LANG_LASTUPDATE          "2024-06-01"                     // date format: yyyy-mm-dd
 LANG_COMPATIBILITY       "0.6.1"                          // required engine version
 
 
@@ -184,12 +184,7 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Merci d'avoir joué !"
-THANKSFORPLAYING_TEXT1      "Soutenez ce travail indépendant ! Obtenez l'édition officielle du moteur pour les appareils mobiles !"
-THANKSFORPLAYING_TEXT2      "Jouez à Surge the Rabbit - et aussi à vos propres jeux - sur votre téléphone et votre tablette !"
-THANKSFORPLAYING_TEXT3      "Devenez un supporter de ce moteur de jeu open source dès aujourd'hui !"
-THANKSFORPLAYING_TEXT1M     "\nCe jeu est créé avec <color=$COLOR_HIGHLIGHT>Open Surge</color>, un moteur de jeu 2D très flexible et open-source qui est maintenant entre vos mains !"
-THANKSFORPLAYING_TEXT2M     ""
-THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
+THANKSFORPLAYING_TEXT       "Ce jeu est créé avec Open Surge, un moteur de jeu 2D très flexible et open-source qui est maintenant entre vos mains !\n\nMaintenant, partagez la joie ! Parlez-en à votre famille, vos amis et vos animaux et faites passer le mot !" // FIXME
 THANKSFORPLAYING_YES        "Bien sûr !"
 THANKSFORPLAYING_NO         "Pas maintenant"
 

@@ -5,68 +5,92 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 
-// background images
+// white background
 background
 {
     initial_position    0 0
     scroll_speed        0 0
-    behavior            DEFAULT
-    repeat_x            FALSE
-    repeat_y            FALSE
+    behavior            LINEAR -16 16
+    repeat_x            TRUE
+    repeat_y            TRUE
 
     sprite
     {
         source_file     "images/scenes/thanks_for_playing.png"
-        source_rect     0 240 852 480
-        frame_size      426 240
+        source_rect     0 48 120 120
+        frame_size      120 120
 
         animation
         {
             repeat      TRUE
-            fps         1
-            data        0 0 0 1 1 1 2 2 2 3 3 3
+            fps         8
+            data        0
         }
     }
 }
 
-// screenshots
+// moving layer
 background
 {
-    initial_position    40 132
+    initial_position    0 0
     scroll_speed        0 0
-    behavior            DEFAULT
-    repeat_x            FALSE
-    repeat_y            FALSE
+    behavior            LINEAR 32 -32
+    repeat_x            TRUE
+    repeat_y            TRUE
 
     sprite
     {
         source_file     "images/scenes/thanks_for_playing.png"
-        source_rect     432 0 340 192
-        frame_size      170 96
+        source_rect     416 0 416 240
+        frame_size      416 240
 
         animation
         {
             repeat      TRUE
-            fps         1
-            data        0 0 0 1 1 1 2 2 2 3 3 3
+            fps         8
+            data        0
         }
     }
 }
 
-// mobile phone
+// moving layer
 background
 {
-    initial_position    32 128
+    initial_position    0 0
     scroll_speed        0 0
-    behavior            DEFAULT
-    repeat_x            FALSE
-    repeat_y            FALSE
+    behavior            LINEAR -32 0
+    repeat_x            TRUE
+    repeat_y            TRUE
 
     sprite
     {
         source_file     "images/scenes/thanks_for_playing.png"
-        source_rect     32 128 184 104
-        frame_size      184 104
+        source_rect     416 240 416 240
+        frame_size      416 240
+
+        animation
+        {
+            repeat      TRUE
+            fps         8
+            data        0
+        }
+    }
+}
+
+// moving layer
+background
+{
+    initial_position    0 0
+    scroll_speed        0 0
+    behavior            LINEAR 32 0
+    repeat_x            TRUE
+    repeat_y            TRUE
+
+    sprite
+    {
+        source_file     "images/scenes/thanks_for_playing.png"
+        source_rect     0 240 416 240
+        frame_size      416 240
 
         animation
         {
@@ -82,15 +106,15 @@ background
 {
     initial_position    0 0
     scroll_speed        0 0
-    behavior            LINEAR -30 0
+    behavior            LINEAR -32 0
     repeat_x            TRUE
     repeat_y            FALSE
 
     sprite
     {
         source_file     "images/scenes/thanks_for_playing.png"
-        source_rect     0 0 416 44
-        frame_size      416 44
+        source_rect     0 0 416 48
+        frame_size      416 48
 
         animation
         {

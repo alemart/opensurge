@@ -14,7 +14,7 @@
 LANG_ID                     "ru_RU"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Русский"                 // language name
 LANG_AUTHOR                 "Halatnikov"              // translation author
-LANG_LASTUPDATE             "2024-05-30"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-06-01"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -185,12 +185,7 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Спасибо за игру!"
-THANKSFORPLAYING_TEXT1      "Поддержите эту независимую разработку! Скачайте официальную версию на мобильные устройства!"
-THANKSFORPLAYING_TEXT2      "Сыграйте в Surge the Rabbit - а также в ваши игры - на телефоне или планшете!"
-THANKSFORPLAYING_TEXT3      "Поддержите этот движок с открытым исходным кодом сегодня!" // slightly redundant, since there's no word for "supporter"
-THANKSFORPLAYING_TEXT1M     "\nЭта игра создана с использованием <color=$COLOR_HIGHLIGHT>Open Surge</color>, очень гибкого 2D движка с открытым исходным кодом, который теперь в ваших руках!"
-THANKSFORPLAYING_TEXT2M     ""
-THANKSFORPLAYING_TEXT3M     "$THANKSFORPLAYING_TEXT3"
+THANKSFORPLAYING_TEXT       "Эта игра создана с использованием Open Surge, очень гибкого 2D движка с открытым исходным кодом, который теперь в ваших руках!\n\nТеперь поделитесь с остальными! Расскажите вашим друзьям, семье и питомцам о ней!"
 THANKSFORPLAYING_YES        "Конечно!"
 THANKSFORPLAYING_NO         "Не сейчас"
 
