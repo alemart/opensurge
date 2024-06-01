@@ -677,8 +677,24 @@ font "gameover"
             source_rect         306 166 16 38
             offset              0 -6
         }
+        char "é" {
+            source_rect         360 166 16 38
+            offset              0 -6
+        }
+        char "¡" {
+            source_rect         432 166 16 38
+            offset              0 -6
+        }
+        char "ü" {
+            source_rect         906 166 16 38
+            offset              0 -6
+        }
         char "Š" {
             source_rect         1234 166 16 38
+            offset              0 -6
+        }
+        char "ę" {
+            source_rect         1578 166 16 38
             offset              0 -6
         }
         char "Ń" {
