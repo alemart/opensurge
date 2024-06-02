@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Share Open Surge</title>
+        <title>Share Surge the Rabbit</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900">
@@ -12,7 +12,7 @@
         <style>
         body {
             color: #fff;
-            background: #353e73;
+            background: #fece90;
             font-family: 'Catamaran', 'Helvetica', 'Arial', 'sans-serif';
         }
         a, a:visited, a:hover, a:focus, a:active, a:link {
@@ -88,17 +88,17 @@
         <div class="content">
             <div class="container text-center">
                 <div class="panel">
-                    <img class="icon" src="icon.png" alt="Open Surge">
-                    <h3 class="lang en_US">Have you enjoyed the game?<br>Share it with your friends!</h3>
-                    <h3 class="lang pt_BR">Curtiu o jogo?<br>Compartilhe com seus amigos!</h3>
+                    <img class="icon" src="icon.png" alt="Surge the Rabbit">
+                    <h3 class="lang en_US">Share the joy!<br>opensurge2d.org</h3>
                     <div>
-                        <a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fopensurge2d.org" onclick="return share(this,'facebook')" class="btn"><img src="facebook.png" alt="Facebook"></a>
-                        <a href="http://twitter.com/share?text=Surge%20Engine%3A%20make%20your%20dreams%20come%20true!&url=http%3A%2F%2Fopensurge2d.org" onclick="return share(this,'twitter')" class="btn"><img src="twitter.png" alt="Twitter"></a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fopensurge2d.org&quote=%23opensurge" onclick="return share(this,'facebook')" class="btn"><img src="facebook.png" alt="Share on Facebook"></a>
+                        <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fopensurge2d.org&hashtags=opensurge" onclick="return share(this,'twitter')" class="btn"><img src="twitter.png" alt="Share on X"></a>
+                        <a href="https://wa.me/?text=https%3A%2F%2Fopensurge2d.org" onclick="return share(this,'whatsapp')" class="btn"><img src="whatsapp.png" alt="Share via WhatsApp"></a>
+                        <a href="https://t.me/share/url?url=https%3A%2F%2Fopensurge2d.org" onclick="return share(this,'telegram')" class="btn"><img src="telegram.png" alt="Share via Telegram"></a>
                     </div>
                     <h4 class="text-center lang en_US hidden">You will be redirected shortly...</h4>
-                    <h4 class="text-center lang pt_BR hidden">Você será redirecionado...</h4>
                     <h4></h4>
-                    <progress id="progressbar" value="0" max="1000"></progress>
+                    <progress id="progressbar" value="0" max="1000" hidden></progress>
                 </div>
             </div>
         </div>
@@ -158,7 +158,7 @@
                     try {
                         if(!win || win.closed) {
                             window.clearInterval(tmr);
-                            redirect();
+                            //redirect();
                         }
                     }
                     catch(e) { ; }
