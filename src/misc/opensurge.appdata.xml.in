@@ -87,6 +87,19 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
+    <release version="0.6.1.1" date="2024-06-01">
+      <description>
+        <ul>
+          <li>Fixed an OpenGL-related issue in the Flatpak edition</li>
+          <li>Fixed a memory-related bug in the Entity Manager</li>
+          <li>Updated metadata and translations</li>
+          <li>Tweaked the water effect for extra performance</li>
+          <li>Reintroduced the Create option at the Main Menu</li>
+          <li>Updated the Thanks for Playing screen</li>
+          <li>Other minor changes</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.6.1" date="2024-05-17">
       <description>
         <ul>

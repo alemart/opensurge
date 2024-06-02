@@ -1,5 +1,15 @@
 # Release Notes
 
+## 0.6.1.1 - June 1st, 2024
+
+* Fixed an OpenGL-related issue in the Flatpak edition
+* Fixed a memory-related bug in the Entity Manager
+* Updated metadata and translations
+* Tweaked the water effect for extra performance
+* Reintroduced the Create option at the Main Menu
+* Updated the Thanks for Playing screen
+* Other minor changes
+
 ## 0.6.1 - May 17th, 2024
 
 * Ported the game engine to Android
@@ -19,7 +29,7 @@
 * Updated several SurgeScript objects. Introduced new items and new components
 * Reimplemented nanoparser, the asset system, the animation system, the entity system, the brick system, the particle system, the level height sampler, and more
 
-This large update includes changes not detailed in the above list.
+This massive update includes changes not detailed in the list!
 
 ## 0.6.0.3 - September 23rd, 2022
 

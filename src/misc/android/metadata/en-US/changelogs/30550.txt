@@ -1,0 +1,7 @@
+* Fixed an OpenGL-related issue in the Flatpak edition
+* Fixed a memory-related bug in the Entity Manager
+* Updated metadata and translations
+* Tweaked the water effect for extra performance
+* Reintroduced the Create option at the Main Menu
+* Updated the Thanks for Playing screen
+* Other minor changes
