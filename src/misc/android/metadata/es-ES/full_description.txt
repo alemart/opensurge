@@ -1,13 +1,13 @@
-<b>¡Haz realidad tus sueños!</b> ¡Open Surge Engine es un motor de juegos retro 2D de código abierto para crear juegos y hacer realidad tus sueños!
+<b>Â¡Haz realidad tus sueÃ±os!</b> Â¡Open Surge Engine es un motor de juegos retro 2D de cÃ³digo abierto para crear juegos y hacer realidad tus sueÃ±os!
 
-<b>¡Es divertidísimo!</b> Surge the Rabbit es un juego de plataformas creado con el motor Open Surge Engine. Está hecho con el espíritu de los clásicos juegos de plataformas de Sonic de 16 bits de la década de 1990. ¡Juega como Surge en divertidos y emocionantes niveles llenos de desafíos!
+<b>Â¡Es divertidÃ­simo!</b> Surge the Rabbit es un juego de plataformas creado con el motor Open Surge Engine. EstÃ¡ hecho con el espÃ­ritu de los clÃ¡sicos juegos de plataformas de Sonic de 16 bits de la dÃ©cada de 1990. Â¡Juega como Surge en divertidos y emocionantes niveles llenos de desafÃ­os!
 
-<b>¡Desata tu creatividad!</b> Crea tus propios juegos increíbles y juega con ellos en tu PC y en tu dispositivo móvil. ¡Comparte tus juegos con tus amigos! ¡Diversión sin límites!
+<b>Â¡Desata tu creatividad!</b> Crea tus propios juegos increÃ­bles y juega con ellos en tu PC y en tu dispositivo mÃ³vil. Â¡Comparte tus juegos con tus amigos! Â¡DiversiÃ³n sin lÃ­mites!
 
-<b>¡Un potente motor para juegos retro!</b> Uno de los elementos centrales del motor es SurgeScript, un lenguaje de scripting para juegos. ¡Utilízalo para crear nuevas mecánicas de juego, personajes con habilidades especiales, jefes y mucho más! ¡El cielo es el límite!
+<b>Â¡Un potente motor para juegos retro!</b> Uno de los elementos centrales del motor es SurgeScript, un lenguaje de scripting para juegos. Â¡UtilÃ­zalo para crear nuevas mecÃ¡nicas de juego, personajes con habilidades especiales, jefes y mucho mÃ¡s! Â¡El cielo es el lÃ­mite!
 
-Open Surge Engine es una herramienta increíble para aprender desarrollo de juegos, programación, arte digital y la naturaleza del software libre y de código abierto de una forma lúdica.
+Open Surge Engine es una herramienta increÃ­ble para aprender desarrollo de juegos, programaciÃ³n, arte digital y la naturaleza del software libre y de cÃ³digo abierto de una forma lÃºdica.
 
-Nota: se recomienda utilizar un PC para crear tus juegos. Puedes jugarlos en PC y en dispositivos móviles. Los usuarios de Android TV necesitan un gamepad para jugar y un ratón para usar el editor de niveles.
+Nota: se recomienda utilizar un PC para crear tus juegos. Puedes jugarlos en PC y en dispositivos mÃ³viles. Los usuarios de Android TV necesitan un gamepad para jugar y un ratÃ³n para usar el editor de niveles.
 
 Sitio web oficial: http://opensurge2d.org
