@@ -8,7 +8,7 @@ using SurgeEngine.Player;
 
 /*
 
-Team Play is a mode of gameplay in which all playable characters of a level
+Team Play is a mode of gameplay in which all playable characters in a level
 have AI and in which character switching is enabled. The player may pick any
 character at any time, and the others will follow.
 
