@@ -336,8 +336,12 @@ void player_update(player_t *player, const obstaclemap_t* obstaclemap)
         }
 
         /* am I hurt? Gotta have the focus */
-        if(player_is_getting_hit(player) || player_is_dying(player))
+        if(
+            (player_is_getting_hit(player) && (!player_is_invulnerable(player) || !player_is_secondary(player))) ||
+            (player_is_dying(player) && (!player_is_immortal(player) || !player_is_secondary(player)))
+        ) {
             player_focus(player);
+        }
 
     }
 
