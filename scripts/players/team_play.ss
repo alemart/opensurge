@@ -19,15 +19,20 @@ How to use: add "Team Play" to the setup list of your .lev file.
 
 object "Team Play" is "setup"
 {
+    public enableWarnings = true;
     aiList = [];
 
     state "main"
     {
-        if(Player.count < 2)
-            Console.print("Team Play requires at least two players in the level");
+        if(enableWarnings) {
 
-        if(Level.child("Surge Gameplay") === null)
-            Console.print("Team Play may not work properly without Surge Gameplay");
+            if(Player.count < 2)
+                Console.print("Team Play requires at least two players in the level");
+
+            if(Level.child("Surge Gameplay") === null)
+                Console.print("Team Play may not work properly without Surge Gameplay");
+
+        }
 
         state = "watch";
     }
