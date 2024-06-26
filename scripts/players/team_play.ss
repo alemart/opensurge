@@ -5,6 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
+using SurgeEngine.Level;
 
 /*
 
@@ -25,8 +26,8 @@ object "Team Play" is "setup"
         if(Player.count < 2)
             Application.crash("Team Play requires at least two players in the level");
 
-        /*if(Level.findObject("Switch Controller") === null)
-            Console.print("Team Play may not work property without the Switch Controller");*/
+        if(Level.child("Surge Gameplay") === null)
+            Console.print("Team Play may not work properly without Surge Gameplay");
 
         state = "watch";
     }
