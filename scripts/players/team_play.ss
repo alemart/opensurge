@@ -24,7 +24,7 @@ object "Team Play" is "setup"
     state "main"
     {
         if(Player.count < 2)
-            Application.crash("Team Play requires at least two players in the level");
+            Console.print("Team Play requires at least two players in the level");
 
         if(Level.child("Surge Gameplay") === null)
             Console.print("Team Play may not work properly without Surge Gameplay");
