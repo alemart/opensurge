@@ -6,6 +6,7 @@
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
 using SurgeEngine.Level;
+using SurgeEngine.Video.Screen;
 
 /*
 
@@ -20,6 +21,8 @@ How to use: add "Team Play" to the setup list of your .lev file.
 object "Team Play" is "setup"
 {
     public enableWarnings = true;
+    bgx = Level.child("Background Exchange Manager") ||
+          Level.spawn("Background Exchange Manager");
     aiList = [];
 
     state "main"
@@ -48,9 +51,26 @@ object "Team Play" is "setup"
             ai = player.child("Follow the Leader AI") ||
                  player.spawn("Follow the Leader AI");
 
-            if(aiList.indexOf(ai) < 0) {
-                ai.focusable = true;
+            if(aiList.indexOf(ai) < 0)
                 aiList.push(ai);
+
+            if(player.hasFocus() || !ai.enabled) {
+
+                // the player is controlled by a human
+                ai.focusable = true;
+
+            }
+            else {
+
+                // the player is controlled by AI
+                distance = player.transform.position.distanceTo(Player.active.transform.position);
+                maxDistance = Screen.width / 2;
+
+                ai.focusable = (
+                    !ai.repositioning && !player.frozen && distance < maxDistance &&
+                    bgx.backgroundOfPlayer(player) === bgx.backgroundOfPlayer(Player.active)
+                );
+
             }
         }
     }
