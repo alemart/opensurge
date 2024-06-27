@@ -105,4 +105,9 @@ object "Background Exchange Manager"
     {
         currentBackgroundOf[player.id] = originalBackgroundOf[player.id];
     }
+
+    fun backgroundOfPlayer(player)
+    {
+        return currentBackgroundOf[player.id];
+    }
 }
