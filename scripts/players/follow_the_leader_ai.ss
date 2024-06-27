@@ -278,7 +278,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         player.immortal = true;
         player.invulnerable = true;
         player.secondary = true;
-        player.focusable = focusable;
+        player.focusable = focusable && !this.repositioning;
     }
 
     fun setPlayer1Flags(player)
@@ -558,12 +558,12 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         if(!enabled)
             return;
 
-        // do nothing while repositioning
-        if(state == "repositioning")
-            return;
-
         // do nothing if I'm the leader at this time
         if(follower == leader)
+            return;
+
+        // do nothing while repositioning
+        if(state == "repositioning")
             return;
 
         // reposition the follower
