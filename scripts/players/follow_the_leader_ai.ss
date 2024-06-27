@@ -5,6 +5,7 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
+using SurgeEngine.Level;
 using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 using SurgeEngine.Camera;
@@ -68,6 +69,9 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
     bufferedState = spawn("Follow the Leader AI - State Buffer");
     jumper = spawn("Follow the Leader AI - Jumper").setPlayer(follower);
     platformSensor = spawn("Follow the Leader AI - Platform Sensor");
+
+    bgx = Level.child("Background Exchange Manager") ||
+          Level.spawn("Background Exchange Manager");
 
     state "main"
     {
@@ -552,6 +556,16 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         return right < -extraMargin || left > Screen.width + extraMargin || bottom < -extraMargin || top > Screen.height + extraMargin;
     }
 
+    fun updateBackground()
+    {
+        distance = follower.transform.position.distanceTo(leader.transform.position);
+
+        if(state == "repositioning" || distance < 64) {
+            backgroundOfLeader = bgx.backgroundOfPlayer(leader);
+            bgx.changeBackgroundOfPlayer(follower, backgroundOfLeader);
+        }
+    }
+
     fun lateUpdate()
     {
         // do nothing if the AI is disabled
@@ -562,7 +576,10 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         if(follower == leader)
             return;
 
-        // do nothing while repositioning
+        // background awareness
+        updateBackground();
+
+        // do nothing else while repositioning
         if(state == "repositioning")
             return;
 
