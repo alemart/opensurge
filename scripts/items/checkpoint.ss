@@ -9,9 +9,12 @@ using SurgeEngine.Audio.Sound;
 using SurgeEngine.Transform;
 using SurgeEngine.Level;
 using SurgeEngine.Collisions.CollisionBox;
+using SurgeEngine.Events.Event;
 
 object "Checkpoint" is "entity", "basic"
 {
+    public onActivate = Event();
+
     sfx = Sound("samples/checkpoint.wav");
     actor = Actor("Checkpoint");
     collider = CollisionBox(18, 65).setAnchor(0.5, 1.0);
@@ -49,6 +52,7 @@ object "Checkpoint" is "entity", "basic"
         if(!player.dying && !player.secondary) {
             sfx.play();
             Level.spawnpoint = transform.position.translatedBy(0, -collider.height/2);
+            onActivate.call();
             state = "activating";
         }
     }

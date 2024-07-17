@@ -11,9 +11,12 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Transform;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
+using SurgeEngine.Events.FunctionEvent;
 
 object "Goal Capsule" is "entity", "basic", "awake"
 {
+    public onActivate = FunctionEvent("Clear Level");
+
     actor = Actor("Goal Capsule");
     brick = [ Brick("Goal Capsule Mask 1"), Brick("Goal Capsule Mask 2") ];
     collider = CollisionBox(32, 16).setAnchor(0.5, 5);
@@ -58,7 +61,7 @@ object "Goal Capsule" is "entity", "basic", "awake"
     {
         // the capsule is open!
         if(timeout(2.0)) {
-            Level.clear();
+            onActivate.call();
             state = "done";
         }
     }

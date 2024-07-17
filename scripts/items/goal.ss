@@ -9,9 +9,12 @@ using SurgeEngine.Audio.Sound;
 using SurgeEngine.Transform;
 using SurgeEngine.Level;
 using SurgeEngine.Collisions.CollisionBox;
+using SurgeEngine.Events.FunctionEvent;
 
 object "Goal" is "entity", "basic"
 {
+    public onActivate = FunctionEvent("Clear Level");
+
     sfx = Sound("samples/endsign.wav");
     actor = Actor("Goal");
     collider = CollisionBox(actor.width, actor.height).setAnchor(0.5, 1.0);
@@ -64,7 +67,7 @@ object "Goal" is "entity", "basic"
     fun goal(player)
     {
         sfx.play();
-        Level.clear();
+        onActivate.call();
         clearedPlayer = player.name;
         state = "rotating";
     }
