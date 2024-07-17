@@ -43,8 +43,10 @@ object "Checkpoint" is "entity", "basic"
 
     fun onCollision(otherCollider)
     {
-        if(state == "main" && otherCollider.entity.hasTag("player"))
-            checkpoint(otherCollider.entity);
+        if(state == "main" && otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            checkpoint(player);
+        }
     }
 
     fun checkpoint(player)
