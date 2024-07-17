@@ -121,8 +121,8 @@ surgescript_var_t* fun_set(surgescript_object_t* object, const surgescript_var_t
 
         /* convert object to string: using toString() */
         surgescript_objecthandle_t handle = surgescript_var_get_objecthandle(param[1]);
-        surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
-        if(obj != NULL) {
+        if(surgescript_objectmanager_exists(manager, handle)) {
+            surgescript_object_t* obj = surgescript_objectmanager_get(manager, handle);
             surgescript_var_t* tmp = surgescript_var_create();
             char* str = NULL;
             surgescript_object_call_function(obj, "toString", NULL, 0, tmp);
