@@ -124,7 +124,7 @@ Tip: you can also use the command-line option `--verbose`. The directories will 
 Dependencies:
 
 * [Allegro](http://liballeg.org) version 5.2.7 or later (modified 5.2.9 on Android)
-* [SurgeScript](http://github.com/alemart/surgescript) version 0.6.0
+* [SurgeScript](http://github.com/alemart/surgescript) version 0.6.1
 * [PhysicsFS](https://github.com/icculus/physfs) version 3.2.0 (recommended) or 3.0.2
 
 Compile as usual:
