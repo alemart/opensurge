@@ -101,7 +101,7 @@ parts:
 
   surgescript:
     source: https://github.com/alemart/surgescript.git
-    source-tag: v0.6.0
+    source-tag: v0.6.1
     #source-commit: 
     plugin: cmake
     cmake-parameters:
