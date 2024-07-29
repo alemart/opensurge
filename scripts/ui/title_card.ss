@@ -196,7 +196,7 @@ object "Default Title Card - Layer" is "entity", "awake", "detached", "private"
 
     fun setZIndex(zindex)
     {
-        assert(actor !== null)
+        assert(actor !== null);
 
         actor.zindex = zindex;
 
