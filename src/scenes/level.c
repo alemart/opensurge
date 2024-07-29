@@ -1450,12 +1450,8 @@ void level_update()
     }
 
     /* enable the debug mode */
-    if(debug_mode_want_to_activate()) {
-
-        /* no readonly check */
+    if(debug_mode_want_to_activate())
         level_enter_debug_mode();
-
-    }
 
     /* -------------------------------------- */
     /* updating the entities */
@@ -2382,6 +2378,13 @@ int level_is_displaying_gizmos()
 void level_enter_debug_mode()
 {
     if(!level_is_in_debug_mode()) {
+
+        if(readonly) {
+            video_showmessage("No way!");
+            sound_play(SFX_DENY);
+            return;
+        }
+
         surgescript_object_t* level = level_ssobject();
         surgescript_var_t* tmp = surgescript_var_create();
         const surgescript_var_t* param[] = { tmp };
