@@ -139,7 +139,7 @@ static char version[128];
 static char license[128];
 static int act_number;
 static int requires[3]; /* this level requires engine version x.y.z */
-static int readonly; /* we can't activate the level editor */
+static bool readonly; /* we can't activate the level editor */
 static v2d_t spawn_point;
 
 /* player data */
@@ -491,7 +491,7 @@ void level_load(const char *filepath)
     requires[0] = GAME_VERSION_SUP;
     requires[1] = GAME_VERSION_SUB;
     requires[2] = GAME_VERSION_WIP;
-    readonly = FALSE;
+    readonly = false;
     dialogregion_size = 0;
 
     /* clear pointers */
@@ -849,7 +849,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
 
     case LEVCOMMAND_READONLY: {
         if(param_count == 0)
-            readonly = TRUE;
+            readonly = true;
         else
             logfile_message("Level loader - command '%s' expects no parameters", command_name);
 
@@ -2348,6 +2348,17 @@ void level_save_state()
 int level_editmode()
 {
     return editor_is_enabled();
+}
+
+
+
+/*
+ * level_is_readonly()
+ * Is the readonly flag enabled?
+ */
+bool level_is_readonly()
+{
+    return readonly;
 }
 
 

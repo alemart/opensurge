@@ -125,5 +125,6 @@ int level_editmode(); /* active editor? */
 int level_is_displaying_gizmos(); /* are we displaying gizmos for visual debugging? */
 void level_enter_debug_mode();
 bool level_is_in_debug_mode();
+bool level_is_readonly();
 
 #endif
