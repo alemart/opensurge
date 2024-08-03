@@ -49,11 +49,9 @@ static const char watershader_fs_glsl[] = ""
 
     "void main()\n"
     "{\n"
-    "   mat4 pixel;\n"
-
-    "   pixel[0] = texture2D(tex, v_leftcoord);\n"
-    "   pixel[1] = texture2D(tex, v_centercoord);\n"
-    "   pixel[2] = texture2D(tex, v_rightcoord);\n"
+    "   vec3 left = texture2D(tex, v_leftcoord).rgb;\n"
+    "   vec3 center = texture2D(tex, v_centercoord).rgb;\n"
+    "   vec3 right = texture2D(tex, v_rightcoord).rgb;\n"
 
 #if defined(__ANDROID__)
     /*
@@ -68,7 +66,7 @@ static const char watershader_fs_glsl[] = ""
      * texture has been previously cleared to RGBA (0,0,0,0) and that we have set
      * its GL_TEXTURE_WRAP_[UV] parameter to GL_MIRRORED_REPEAT.
      */
-    "   pixel[2] += float(all(equal(pixel[2], vec4(0.0)))) * pixel[0];\n" /* pixel[2] becomes pixel[0] if it's zero */
+    "   right += float(all(equal(right, vec3(0.0)))) * left;\n" /* right becomes left if it's zero */
 #endif
 
     "   float screen_height = float(screen_size.y);\n"
@@ -97,11 +95,12 @@ static const char watershader_fs_glsl[] = ""
     "   int d = wanted_y / 64;\n"
     "   int k = wanted_y - 64 * d;\n" /* wanted_y % 64 */
 
-    "   ivec3 m = ivec3(bvec3((k >= 20), (k >= 32), (k <= 51)));\n"
+    "   ivec3 m = ivec3((k >= 20), (k >= 32), (k <= 51));\n"
     "   int w = m.x + m.y * m.z;\n" /* waveform (w = 0, 1, 2) */
 
-    "   bvec3 selector = bvec3((w == 0), (w == 1), (w == 2));\n"
-    "   vec3 wanted_pixel = mat3(pixel) * vec3(selector);\n"
+    "   mat3 pixel = mat3(left, center, right);\n"
+    "   vec3 selector = vec3((w == 0), (w == 1), (w == 2));\n"
+    "   vec3 wanted_pixel = pixel * selector;\n"
 #endif
 
     "   vec3 blended_pixel = mix(wanted_pixel, watercolor.rgb, watercolor.a);\n"
