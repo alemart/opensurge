@@ -30,9 +30,9 @@
 #include "../scenes/level.h"
 #include "../util/util.h"
 
-/* shader */
-static const char watershader_glsl[] = ""
-    FRAGMENT_SHADER_GLSL_PREFIX
+/* fragment shader */
+static const char watershader_fs_glsl[] = ""
+    FRAGMENT_SHADER_GLSL_PREFIX("mediump")
 
     /* some drivers crash with a message:
        "precision statement not allowed for type" */
@@ -40,15 +40,20 @@ static const char watershader_glsl[] = ""
 
     "uniform sampler2D tex;\n"
     "uniform vec4 watercolor;\n"
-    "uniform highp float scroll_y;\n"
+    "uniform float scroll_y;\n"
+    "uniform ivec2 screen_size;\n"
+
+    "varying vec2 v_leftcoord;\n"
+    "varying vec2 v_rightcoord;\n"
+    "#define v_centercoord texcoord\n"
 
     "void main()\n"
     "{\n"
     "   mat4 pixel;\n"
 
-    "   pixel[0] = textureOffset(tex, texcoord, ivec2(-1,0));\n"
-    "   pixel[1] = textureOffset(tex, texcoord, ivec2(0,0));\n"
-    "   pixel[2] = textureOffset(tex, texcoord, ivec2(1,0));\n"
+    "   pixel[0] = texture2D(tex, v_leftcoord);\n"
+    "   pixel[1] = texture2D(tex, v_centercoord);\n"
+    "   pixel[2] = texture2D(tex, v_rightcoord);\n"
 
 #if defined(__ANDROID__)
     /*
@@ -66,10 +71,10 @@ static const char watershader_glsl[] = ""
     "   pixel[2] += float(all(equal(pixel[2], vec4(0.0)))) * pixel[0];\n" /* pixel[2] becomes pixel[0] if it's zero */
 #endif
 
-    "   highp float screen_height = float(textureSize(tex, 0).y);\n"
-    "   highp float screen_y = screen_height - texcoord.y * screen_height;\n"
-    "   highp float world_y = screen_y + scroll_y;\n" /* from screen space to world space */
-    "   highp int wanted_y = int(abs(world_y));\n"
+    "   float screen_height = float(screen_size.y);\n"
+    "   float screen_y = screen_height - texcoord.y * screen_height;\n"
+    "   float world_y = screen_y + scroll_y;\n" /* from screen space to world space */
+    "   int wanted_y = int(abs(world_y));\n"
 
 #if 0
         /* golden ratio */
@@ -82,19 +87,45 @@ static const char watershader_glsl[] = ""
     "      1,1,1,1,1,1,1,1,1,1,1,1\n"
     "   );\n"
 
-        /* slower version; I left it here for clarity */
+        /* slower version (GLSL ES 3.0);
+           I left it here for clarity */
     "   int w = wave[wanted_y & 63];\n"
     "   vec3 wanted_pixel = pixel[w].rgb;\n"
 #else
         /* faster version */
-    "   int k = wanted_y & 63;\n"
-    "   int w = int(k >= 20) + int(k >= 32) * int(k <= 51);\n" /* waveform (w = 0, 1, 2) */
+    /*"   int k = wanted_y & 63;\n"*/ /* GLSL ES 3.0+ */
+    "   int d = wanted_y / 64;\n"
+    "   int k = wanted_y - 64 * d;\n" /* wanted_y % 64 */
+
+    "   ivec3 m = ivec3(bvec3((k >= 20), (k >= 32), (k <= 51)));\n"
+    "   int w = m.x + m.y * m.z;\n" /* waveform (w = 0, 1, 2) */
+
     "   bvec3 selector = bvec3((w == 0), (w == 1), (w == 2));\n"
     "   vec3 wanted_pixel = mat3(pixel) * vec3(selector);\n"
 #endif
 
     "   vec3 blended_pixel = mix(wanted_pixel, watercolor.rgb, watercolor.a);\n"
-    "   color = vec4(blended_pixel, 1.0);\n"
+    "   gl_FragColor = vec4(blended_pixel, 1.0);\n"
+    "}\n"
+;
+
+/* vertex shader */
+static const char watershader_vs_glsl[] = ""
+    VERTEX_SHADER_GLSL_PREFIX()
+    ""
+    "uniform ivec2 screen_size;\n"
+    "varying vec2 v_leftcoord;\n"
+    "varying vec2 v_rightcoord;\n"
+    ""
+    VERTEX_SHADER_GLSL_INFIX("vsmain")
+    ""
+    "void main()\n"
+    "{\n"
+    "   float dx = 1.0 / float(screen_size.x);\n"
+    "   v_leftcoord = a_texcoord - vec2(dx, 0.0);\n"
+    "   v_rightcoord = a_texcoord + vec2(dx, 0.0);\n"
+    ""
+    "   vsmain();\n"
     "}\n"
 ;
 
@@ -135,7 +166,7 @@ void waterfx_init()
     watercolor = DEFAULT_WATERCOLOR();
 
     /* create the shader */
-    watershader = shader_create("waterfx", watershader_glsl);
+    watershader = shader_create_ex("waterfx", watershader_fs_glsl, watershader_vs_glsl);
 
     /* create the backbuffers used for post-processing */
     backbuffer_index = 0;
@@ -368,9 +399,16 @@ void render_default_effect(int y, float camera_y, float offset, float timer, flo
     }
     image_set_drawing_target(target);
 
+    /* screen size */
+    int screen_size[2];
+    screen_size[0] = image_width(target);
+    screen_size[1] = image_height(target);
+    shader_set_int_vector(watershader, "screen_size", 2, screen_size);
+
     /* scrolling */
     float world_scroll_y = speed * timer + offset;
     float scroll_y = world_scroll_y + camera_y;
+    scroll_y = fmodf(scroll_y, 64 * (screen_size[1] >> 6) + 64); /* mediump precision trick */
     shader_set_float(watershader, "scroll_y", scroll_y);
 
     /* watercolor */

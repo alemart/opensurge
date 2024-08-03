@@ -47,12 +47,16 @@ typedef enum shader_uniformtype_t shader_uniformtype_t;
 enum shader_uniformtype_t
 {
     TYPE_FLOAT,
-    TYPE_INT,
-    TYPE_BOOL,
-
     TYPE_FLOAT2, /* TYPE_FLOAT_(k+1) = TYPE_FLOAT_k + 1 */
     TYPE_FLOAT3,
     TYPE_FLOAT4,
+
+    TYPE_INT,
+    TYPE_INT2, /* TYPE_INT_(k+1) = TYPE_INT_k + 1 */
+    TYPE_INT3,
+    TYPE_INT4,
+
+    TYPE_BOOL,
 
     TYPE_SAMPLER_0, /* TYPE_SAMPLER_k := TYPE_SAMPLER_0 + k */
     TYPE_SAMPLER_1,
@@ -81,6 +85,7 @@ struct shader_uniform_t
         int i;
         bool b;
         float fvec[4];
+        int ivec[4];
         const image_t* tex;
     } value;
 };
@@ -92,27 +97,13 @@ static void uniform_dtor(void *uniform, void* ctx) { destroy_uniform((shader_uni
 
 /* default vertex shader */
 static const char default_vs_glsl[] = ""
-    VERTEX_SHADER_GLSL_PREFIX
-
-    "uniform mat4 projview;\n"
-    "uniform mat4 texmatrix;\n"
-    "uniform bool use_texmatrix;\n"
-
-    "void main()\n"
-    "{\n"
-    "   mat4 m = use_texmatrix ? texmatrix : mat4(1.0);\n"
-    "   vec4 uv = m * vec4(a_texcoord, 0.0, 1.0);\n"
-
-    "   v_texcoord = uv.xy;\n"
-    "   v_color = a_color;\n"
-
-    "   gl_Position = projview * a_position;\n"
-    "}\n"
+    VERTEX_SHADER_GLSL_PREFIX()
+    VERTEX_SHADER_GLSL_INFIX("main")
 "";
 
 /* default fragment shader */
 static const char default_fs_glsl[] = ""
-    FRAGMENT_SHADER_GLSL_PREFIX
+    FRAGMENT_SHADER_GLSL_PREFIX("lowp")
 
     "uniform sampler2D tex;\n"
     "uniform bool use_tex;\n"
@@ -121,10 +112,10 @@ static const char default_fs_glsl[] = ""
 
     "void main()\n"
     "{\n"
-    "   vec4 p = use_tex ? texture(tex, v_texcoord) : vec4(1.0);\n"
+    "   vec4 p = use_tex ? texture2D(tex, v_texcoord) : vec4(1.0);\n"
     "   p *= float(p.rgb != MASK_COLOR);\n" /* set all components to zero; we use a premultiplied alpha workflow */
 
-    "   color = v_color * p;\n"
+    "   gl_FragColor = v_color * p;\n"
     "}\n"
 "";
 
@@ -275,7 +266,7 @@ shader_t* shader_create(const char* name, const char* fs_glsl)
 shader_t* shader_create_ex(const char* name, const char* fs_glsl, const char* vs_glsl)
 {
     shader_t* shader = mallocx(sizeof *shader);
-    char error[256] = "";
+    char error[1024] = "";
 
     /* log */
     LOG("Creating shader \"%s\"...", name);
@@ -423,7 +414,7 @@ void shader_set_bool(shader_t* shader, const char* var_name, bool value)
 
 /*
  * shader_set_float_vector()
- * Set the value of a floating-point vector of the given number of components
+ * Set the value of a floating-point vector with the given number of components
  */
 void shader_set_float_vector(shader_t* shader, const char* var_name, int num_components, const float* value)
 {
@@ -440,6 +431,28 @@ void shader_set_float_vector(shader_t* shader, const char* var_name, int num_com
         /* update uniform */
         assertx(stored_uniform->type == TYPE_FLOAT2 + (num_components-2), "Can't change uniform type");
         memcpy(stored_uniform->value.fvec, value, num_components * sizeof(*value));
+    }
+}
+
+/*
+ * shader_set_int_vector()
+ * Set the value of an integer vector with the given number of components
+ */
+void shader_set_int_vector(shader_t* shader, const char* var_name, int num_components, const int* value)
+{
+    assertx(num_components >= 2 && num_components <= 4);
+    shader_uniform_t* stored_uniform = dictionary_get(shader->uniforms, var_name);
+
+    if(stored_uniform == NULL) {
+        /* add new uniform */
+        stored_uniform = create_uniform(TYPE_INT2 + (num_components-2), var_name);
+        memcpy(stored_uniform->value.ivec, value, num_components * sizeof(*value));
+        dictionary_put(shader->uniforms, var_name, stored_uniform);
+    }
+    else {
+        /* update uniform */
+        assertx(stored_uniform->type == TYPE_INT2 + (num_components-2), "Can't change uniform type");
+        memcpy(stored_uniform->value.ivec, value, num_components * sizeof(*value));
     }
 }
 
@@ -497,8 +510,9 @@ ALLEGRO_SHADER* create_glsl_shader(const char* fs_glsl, const char* vs_glsl, cha
        Allegro may be compiled with the OpenGL ES backend even on Desktop
        platforms.
 
-       Note: GLSL 3.30 and GLSL ES 3.0 are similar. The GL_ES preprocessor flag
-             may be used in GLSL code to distinguish between the two. */
+       Note: GLSL 3.30 (1.20) and GLSL ES 3.0 (1.0) are similar. The GL_ES
+             preprocessor flag may be used in GLSL code to distinguish between
+             the two. */
 
     bool want_glsl_es = video_is_using_gles(); /* GLES3+ is required in video.c */
     for(char** glsl = xs; *glsl != NULL; glsl++) {
@@ -521,12 +535,12 @@ ALLEGRO_SHADER* create_glsl_shader(const char* fs_glsl, const char* vs_glsl, cha
         snprintf(error_string, error_string_size, "Can't create GLSL shader");
     }
     else if(!al_attach_shader_source(sh, ALLEGRO_VERTEX_SHADER, vs)) {
-        snprintf(error_string, error_string_size, "Can't compile the vertex shader. %s\n\n%s", al_get_shader_log(sh), vs);
+        snprintf(error_string, error_string_size, "Can't compile the vertex shader.\n%s\n\n%s", al_get_shader_log(sh), vs);
         al_destroy_shader(sh);
         sh = NULL;
     }
     else if(!al_attach_shader_source(sh, ALLEGRO_PIXEL_SHADER, fs)) {
-        snprintf(error_string, error_string_size, "Can't compile the fragment shader. %s\n\n%s", al_get_shader_log(sh), fs);
+        snprintf(error_string, error_string_size, "Can't compile the fragment shader.\n%s\n\n%s", al_get_shader_log(sh), fs);
         al_destroy_shader(sh);
         sh = NULL;
     }
@@ -628,12 +642,6 @@ bool set_uniform(const shader_uniform_t* uniform)
         case TYPE_FLOAT:
             return al_set_shader_float(uniform->name, uniform->value.f);
 
-        case TYPE_INT:
-            return al_set_shader_int(uniform->name, uniform->value.i);
-
-        case TYPE_BOOL:
-            return al_set_shader_bool(uniform->name, uniform->value.b);
-
         case TYPE_FLOAT2:
             return al_set_shader_float_vector(uniform->name, 2, uniform->value.fvec, 1);
 
@@ -642,6 +650,27 @@ bool set_uniform(const shader_uniform_t* uniform)
 
         case TYPE_FLOAT4:
             return al_set_shader_float_vector(uniform->name, 4, uniform->value.fvec, 1);
+
+
+
+        case TYPE_INT:
+            return al_set_shader_int(uniform->name, uniform->value.i);
+
+        case TYPE_INT2:
+            return al_set_shader_int_vector(uniform->name, 2, uniform->value.ivec, 1);
+
+        case TYPE_INT3:
+            return al_set_shader_int_vector(uniform->name, 3, uniform->value.ivec, 1);
+
+        case TYPE_INT4:
+            return al_set_shader_int_vector(uniform->name, 4, uniform->value.ivec, 1);
+
+
+
+        case TYPE_BOOL:
+            return al_set_shader_bool(uniform->name, uniform->value.b);
+
+
 
         case TYPE_SAMPLER_0:
         case TYPE_SAMPLER_1:

@@ -281,13 +281,13 @@ void video_init()
     /* log & validate OpenGL version */
     if(video_is_using_gles()) {
         LOG("OpenGL ES version 0x%08x", al_get_opengl_version());
-        if(al_get_opengl_version() < 0x03000000u)
-            FATAL("OpenGL ES 3.0 or later is required to run the game");
+        if(al_get_opengl_version() < 0x02000000u)
+            FATAL("OpenGL ES 2.0 or later is required to run the game");
     }
     else {
         LOG("OpenGL version 0x%08x", al_get_opengl_version());
-        if(al_get_opengl_version() < 0x03030000u)
-            FATAL("OpenGL 3.3 or later is required to run the game");
+        if(al_get_opengl_version() < 0x02010000u)
+            FATAL("OpenGL 2.1 or later is required to run the game");
     }
 
     /* initialize the shader system */
@@ -874,20 +874,18 @@ bool create_display(int width, int height)
     );
 
 #if defined(__ANDROID__)
-    /* require OpenGL ES 3.0+ on mobile */
+    /* request OpenGL ES 2.0+ on mobile */
     al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_ES_PROFILE);
-    al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 3, ALLEGRO_REQUIRE);
+    al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 2, ALLEGRO_REQUIRE);
     al_set_new_display_option(ALLEGRO_OPENGL_MINOR_VERSION, 0, ALLEGRO_REQUIRE);
 #elif 0
-    /* request OpenGL 3.3+ on Desktop */
+    /* request OpenGL 2.1+ on Desktop */
     /* does not work properly, why? */
-    al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_3_0);
-    al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_CORE_PROFILE);
-    al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 3, ALLEGRO_SUGGEST);
-    al_set_new_display_option(ALLEGRO_OPENGL_MINOR_VERSION, 3, ALLEGRO_SUGGEST);
+    //al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_CORE_PROFILE); // OpenGL 3.2+
+    al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 2, ALLEGRO_SUGGEST);
+    al_set_new_display_option(ALLEGRO_OPENGL_MINOR_VERSION, 1, ALLEGRO_SUGGEST);
 #else
-    /* create an OpenGL context with "default" settings. Will likely work.
-       (we should require 3.3+ instead, or ES 3.0+) */
+    /* create an OpenGL context with "default" settings. Will likely work. */
     ;
 #endif
 
