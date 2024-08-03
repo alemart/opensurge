@@ -27,7 +27,7 @@
 #define GAME_VERSION_SUP        0
 #define GAME_VERSION_SUB        6
 #define GAME_VERSION_WIP        1
-#define GAME_VERSION_FIX        1
+#define GAME_VERSION_FIX        2
 #define GAME_WEBSITE            "opensurge2d.org"
 #define GAME_URL                "http://" GAME_WEBSITE
 #define GAME_YEAR               "2008-2024"
