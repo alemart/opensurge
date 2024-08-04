@@ -52,7 +52,9 @@ struct sound_t {
 };
 
 /* private stuff */
-static const int PREFERRED_NUMBER_OF_SAMPLES = 16; /* how many samples can be played at the same time */
+#define PREFERRED_NUMBER_OF_SAMPLES     16 /* how many samples can be played at the same time */
+#define DEFAULT_VOLUME                  1.0f
+#define DEFAULT_MIXING_PERCENTAGE       0.5f
 
 static ALLEGRO_VOICE* voice = NULL;
 static ALLEGRO_MIXER* master_mixer = NULL;
@@ -60,7 +62,8 @@ static ALLEGRO_MIXER* music_mixer = NULL;
 static ALLEGRO_MIXER* sound_mixer = NULL;
 
 static music_t *current_music = NULL; /* music being played at the moment (NULL if none) */
-static float master_volume = 1.0f; /* a value in [0,1] affecting all musics and sounds */
+static float master_volume = DEFAULT_VOLUME; /* a value in [0,1] affecting all musics and sounds */
+static float mixing_percentage = DEFAULT_MIXING_PERCENTAGE; /* a value in [0,1] that controls relative music-sfx volume */
 static bool globally_muted = false; /* global mute / unmute */
 
 static int preload_sample(const char* vpath, void* data);
@@ -492,7 +495,8 @@ void audio_init()
     logfile_message("Initializing the audio system...");
 
     current_music = NULL;
-    master_volume = 1.0f;
+    master_volume = DEFAULT_VOLUME;
+    mixing_percentage = DEFAULT_MIXING_PERCENTAGE;
     globally_muted = false;
 
     if(!al_is_audio_installed()) {
@@ -642,6 +646,29 @@ void audio_set_sound_volume(float volume)
 
     if(!al_set_mixer_gain(sound_mixer, gain))
         video_showmessage("Can't set the sound gain to %f", gain);
+}
+
+/*
+ * audio_get_mixing_percentage()
+ * Get the music-sfx mixing percentage
+ */
+float audio_get_mixing_percentage()
+{
+    return mixing_percentage;
+}
+
+/*
+ * audio_set_mixing_percentage()
+ * Set the music-sfx mixing percentage
+ */
+void audio_set_mixing_percentage(float percentage)
+{
+    float p = clip(percentage, 0.0f, 1.0f);
+    float alpha = 2.0f * (p - 0.5f); /* -1 <= alpha <= 1 */
+
+    /* 0% (only sfx, no music) ... 50% (equal music-sfx) ... 100% (only music, no sfx) */
+    audio_set_music_volume(1.0f + min(0.0f, alpha));
+    audio_set_sound_volume(1.0f - max(0.0f, alpha));
 }
 
 /*

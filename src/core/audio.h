@@ -41,6 +41,8 @@ float audio_get_music_volume();
 void audio_set_music_volume(float volume);
 float audio_get_sound_volume();
 void audio_set_sound_volume(float volume);
+float audio_get_mixing_percentage();
+void audio_set_mixing_percentage(float percentage);
 
 /* music management */
 music_t *music_load(const char *path); /* will be unloaded automatically */
