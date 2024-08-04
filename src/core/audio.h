@@ -33,10 +33,14 @@ void audio_update();
 void audio_release();
 void audio_preload();
 
-float audio_get_master_volume();
-void audio_set_master_volume(float volume); /* 0.0 <= volume <= 1.0 (default) */
 bool audio_is_muted();
 void audio_set_muted(bool muted); /* global mute / unmute */
+float audio_get_master_volume();
+void audio_set_master_volume(float volume); /* 0.0 <= volume <= 1.0 (default) */
+float audio_get_music_volume();
+void audio_set_music_volume(float volume);
+float audio_get_sound_volume();
+void audio_set_sound_volume(float volume);
 
 /* music management */
 music_t *music_load(const char *path); /* will be unloaded automatically */

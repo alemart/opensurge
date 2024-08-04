@@ -54,12 +54,17 @@ struct sound_t {
 /* private stuff */
 static const int PREFERRED_NUMBER_OF_SAMPLES = 16; /* how many samples can be played at the same time */
 
+static ALLEGRO_VOICE* voice = NULL;
+static ALLEGRO_MIXER* master_mixer = NULL;
+static ALLEGRO_MIXER* music_mixer = NULL;
+static ALLEGRO_MIXER* sound_mixer = NULL;
+
 static music_t *current_music = NULL; /* music being played at the moment (NULL if none) */
 static float master_volume = 1.0f; /* a value in [0,1] affecting all musics and sounds */
 static bool globally_muted = false; /* global mute / unmute */
 
 static int preload_sample(const char* vpath, void* data);
-static void set_global_gain(float gain);
+static void set_master_gain(float gain);
 
 /*
  * music_load()
@@ -84,7 +89,7 @@ music_t *music_load(const char *path)
             fatal_error("Can't load music \"%s\"", path);
         
         /* configure the audio stream */
-        al_attach_audio_stream_to_mixer(m->stream, al_get_default_mixer());
+        al_attach_audio_stream_to_mixer(m->stream, music_mixer);
         al_set_audio_stream_playmode(m->stream, ALLEGRO_PLAYMODE_LOOP);
         al_set_audio_stream_playing(m->stream, false);
 
@@ -367,7 +372,7 @@ void sound_play(sound_t *sample)
 
 /*
  * sound_play_ex()
- * Plays the given sample with extra options! :)
+ * Plays the given sample with extra options
  *
  * 0.0 <= volume (defaults to 1.0)
  * (left speaker) -1.0 <= pan <= 1.0 (right speaker)
@@ -376,7 +381,7 @@ void sound_play(sound_t *sample)
 void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
 {
     if(sample != NULL) {
-        /* ajusting the parameters */
+        /* adjusting the parameters */
         vol = max(vol, 0.0f);
         pan = clip(pan, -1.0f, 1.0f);
         freq = max(freq, 0.0f);
@@ -412,7 +417,7 @@ void sound_stop(sound_t *sample)
 
 /*
  * sound_is_playing()
- * Checks if a given sound is playing or not
+ * Checks if a sound is playing
  */
 bool sound_is_playing(sound_t *sample)
 {
@@ -485,6 +490,7 @@ void sound_set_volume(sound_t *sample, float volume)
 void audio_init()
 {
     logfile_message("Initializing the audio system...");
+
     current_music = NULL;
     master_volume = 1.0f;
     globally_muted = false;
@@ -498,6 +504,26 @@ void audio_init()
         if(!al_init_acodec_addon())
             fatal_error("Can't initialize Allegro's acodec addon");
     }
+
+    if(NULL == (voice = al_create_voice(44100, ALLEGRO_AUDIO_DEPTH_INT16, ALLEGRO_CHANNEL_CONF_2)))
+        fatal_error("Can't create an Allegro voice");
+
+    ALLEGRO_MIXER** mixers[] = { &master_mixer, &music_mixer, &sound_mixer, NULL };
+    for(ALLEGRO_MIXER*** mixer = mixers; *mixer != NULL; ++mixer) {
+        if(NULL == (**mixer = al_create_mixer(44100, ALLEGRO_AUDIO_DEPTH_FLOAT32, ALLEGRO_CHANNEL_CONF_2)))
+            fatal_error("Can't create an Allegro mixer");
+    }
+
+    if(!al_attach_mixer_to_mixer(sound_mixer, master_mixer))
+        fatal_error("Can't attach the sample mixer to the master mixer");
+    if(!al_attach_mixer_to_mixer(music_mixer, master_mixer))
+        fatal_error("Can't attach the music mixer to the master mixer");
+    if(!al_attach_mixer_to_voice(master_mixer, voice))
+        fatal_error("Can't attach the master mixer to the voice");
+
+    al_set_default_voice(voice);
+    if(!al_set_default_mixer(sound_mixer))
+        fatal_error("Can't set the default mixer");
 
     for(int samples = PREFERRED_NUMBER_OF_SAMPLES; samples > 0; samples /= 2) {
         if(al_reserve_samples(samples)) {
@@ -516,6 +542,14 @@ void audio_init()
 void audio_release()
 {
     logfile_message("audio_release()");
+
+    al_destroy_mixer(music_mixer);
+    al_destroy_mixer(sound_mixer);
+    al_destroy_mixer(master_mixer);
+
+    /*al_destroy_voice(voice);*/ /* crash */
+    al_set_default_voice(NULL); /* use this instead */
+
     logfile_message("audio_release() ok");
 }
 
@@ -565,7 +599,49 @@ float audio_get_master_volume()
 void audio_set_master_volume(float volume)
 {
     master_volume = clip(volume, 0.0f, 1.0f);
-    set_global_gain(!globally_muted ? master_volume : 0.0f);
+    set_master_gain(!globally_muted ? master_volume : 0.0f);
+}
+
+/*
+ * audio_get_music_volume()
+ * Get the volume of the music mixer
+ */
+float audio_get_music_volume()
+{
+    return al_get_mixer_gain(music_mixer);
+}
+
+/*
+ * audio_set_music_volume()
+ * Set the volume of the music mixer
+ */
+void audio_set_music_volume(float volume)
+{
+    float gain = clip(volume, 0.0f, 1.0f);
+
+    if(!al_set_mixer_gain(music_mixer, gain))
+        video_showmessage("Can't set the music gain to %f", gain);
+}
+
+/*
+ * audio_get_sound_volume()
+ * Get the volume of the sound mixer
+ */
+float audio_get_sound_volume()
+{
+    return al_get_mixer_gain(sound_mixer);
+}
+
+/*
+ * audio_set_sound_volume()
+ * Set the volume of the sound mixer
+ */
+void audio_set_sound_volume(float volume)
+{
+    float gain = clip(volume, 0.0f, 1.0f);
+
+    if(!al_set_mixer_gain(sound_mixer, gain))
+        video_showmessage("Can't set the sound gain to %f", gain);
 }
 
 /*
@@ -584,7 +660,7 @@ bool audio_is_muted()
 void audio_set_muted(bool muted)
 {
     globally_muted = muted;
-    set_global_gain(!globally_muted ? master_volume : 0.0f);
+    set_master_gain(!globally_muted ? master_volume : 0.0f);
 }
 
 
@@ -597,15 +673,8 @@ int preload_sample(const char* vpath, void* data)
     return 0;
 }
 
-void set_global_gain(float gain)
+void set_master_gain(float gain)
 {
-    ALLEGRO_MIXER* mixer = al_get_default_mixer();
-
-    if(mixer == NULL) {
-        video_showmessage("Can't set the global gain to %f: no mixer", gain);
-        return;
-    }
-
-    if(!al_set_mixer_gain(mixer, gain))
-        video_showmessage("Can't set the global gain to %f", gain);
+    if(!al_set_mixer_gain(master_mixer, gain))
+        video_showmessage("Can't set the master gain to %f", gain);
 }
