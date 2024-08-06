@@ -72,6 +72,7 @@ struct settings_entryvt_t
     void (*on_change)(settings_entry_t*); /* change setting */
     void (*on_enter)(settings_entry_t*); /* enter (e.g., submenus) */
     void (*on_highlight)(settings_entry_t*); /* highlight option */
+    void (*on_dehighlight)(settings_entry_t*);
 
     void (*on_init)(settings_entry_t*);
     void (*on_release)(settings_entry_t*);
@@ -180,120 +181,120 @@ static scene_t* next_scene = NULL;
 static void* next_scene_arg = NULL;
 
 /* vtables */
-#define vt_title (settings_entryvt_t) { nop, nop, nop, nop, nop, nop, visible }
+#define vt_title (settings_entryvt_t) { nop, nop, nop, nop, nop, nop, nop, visible }
 static void nop(settings_entry_t* e) { (void)e; } /* no operation */
 static bool visible(settings_entry_t* e) { (void)e; return true; } /* make visible */
 static bool invisible(settings_entry_t* e) { (void)e; return false; } /* make invisible */
 
-#define vt_back (settings_entryvt_t){ nop, go_back, nop, nop, nop, nop, visible }
+#define vt_back (settings_entryvt_t){ nop, go_back, nop, nop, nop, nop, nop, visible }
 static void go_back(settings_entry_t* e);
 
 /* Graphics */
-#define vt_graphics (settings_entryvt_t) { nop, nop, nop, nop, nop, nop, visible }
+#define vt_graphics (settings_entryvt_t) { nop, nop, nop, nop, nop, nop, nop, visible }
 
-#define vt_quality (settings_entryvt_t){ change_quality, nop, nop, init_quality, nop, nop, visible }
+#define vt_quality (settings_entryvt_t){ change_quality, nop, nop, nop, init_quality, nop, nop, visible }
 static void init_quality(settings_entry_t* e);
 static void change_quality(settings_entry_t* e);
 
-#define vt_resolution (settings_entryvt_t){ change_resolution, nop, nop, init_resolution, nop, nop, !IS_MOBILE_PLATFORM ? visible : invisible }
+#define vt_resolution (settings_entryvt_t){ change_resolution, nop, nop, nop, init_resolution, nop, nop, !IS_MOBILE_PLATFORM ? visible : invisible }
 static void init_resolution(settings_entry_t* e);
 static void change_resolution(settings_entry_t* e);
 
-#define vt_fullscreen (settings_entryvt_t){ change_fullscreen, nop, nop, init_fullscreen, nop, update_fullscreen, !IS_MOBILE_PLATFORM ? visible : invisible }
+#define vt_fullscreen (settings_entryvt_t){ change_fullscreen, nop, nop, nop, init_fullscreen, nop, update_fullscreen, !IS_MOBILE_PLATFORM ? visible : invisible }
 static void init_fullscreen(settings_entry_t* e);
 static void change_fullscreen(settings_entry_t* e);
 static void update_fullscreen(settings_entry_t* e);
 
-#define vt_showfps (settings_entryvt_t){ change_showfps, nop, nop, init_showfps, nop, update_showfps, visible }
+#define vt_showfps (settings_entryvt_t){ change_showfps, nop, nop, nop, init_showfps, nop, update_showfps, visible }
 static void init_showfps(settings_entry_t* e);
 static void change_showfps(settings_entry_t* e);
 static void update_showfps(settings_entry_t* e);
 
 /* Audio */
-#define vt_audio (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
+#define vt_audio (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, visible }
 
-#define vt_mute (settings_entryvt_t){ change_mute, nop, nop, init_mute, nop, update_mute, visible }
+#define vt_mute (settings_entryvt_t){ change_mute, nop, nop, nop, init_mute, nop, update_mute, visible }
 static void init_mute(settings_entry_t* e);
 static void change_mute(settings_entry_t* e);
 static void update_mute(settings_entry_t* e);
 
-#define vt_volume (settings_entryvt_t){ change_volume, nop, nop, init_volume, nop, nop, visible }
+#define vt_volume (settings_entryvt_t){ change_volume, nop, nop, nop, init_volume, nop, nop, visible }
 static void init_volume(settings_entry_t* e);
 static void change_volume(settings_entry_t* e);
 
-#define vt_mixer (settings_entryvt_t){ change_mixer, nop, nop, init_mixer, nop, nop, visible }
+#define vt_mixer (settings_entryvt_t){ change_mixer, nop, nop, nop, init_mixer, nop, nop, visible }
 static void init_mixer(settings_entry_t* e);
 static void change_mixer(settings_entry_t* e);
 
 /* Controls */
-#define vt_controls (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, display_gamepadopacity }
+#define vt_controls (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, display_gamepadopacity }
 
-#define vt_gamepadopacity (settings_entryvt_t){ change_gamepadopacity, nop, nop, init_gamepadopacity, nop, nop, display_gamepadopacity }
+#define vt_gamepadopacity (settings_entryvt_t){ change_gamepadopacity, nop, nop, nop, init_gamepadopacity, nop, nop, display_gamepadopacity }
 static void init_gamepadopacity(settings_entry_t* e);
 static void change_gamepadopacity(settings_entry_t* e);
 static bool display_gamepadopacity(settings_entry_t* e);
 
 /* Game */
-#define vt_game (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
+#define vt_game (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, visible }
 
-#define vt_language (settings_entryvt_t){ change_language, nop, nop, init_language, nop, nop, visible }
+#define vt_language (settings_entryvt_t){ change_language, nop, nop, nop, init_language, nop, nop, visible }
 static void init_language(settings_entry_t* e);
 static void change_language(settings_entry_t* e);
 
-#define vt_developermode (settings_entryvt_t){ nop, enter_developermode, nop, nop, nop, nop, display_developermode }
+#define vt_developermode (settings_entryvt_t){ nop, enter_developermode, nop, nop, nop, nop, nop, display_developermode }
 static bool enable_developermode = false;
 static void enter_developermode(settings_entry_t* e);
 static bool display_developermode(settings_entry_t* e);
 
-#define vt_stageselect (settings_entryvt_t){ nop, enter_stageselect, highlight_stageselect, init_stageselect, release_stageselect, update_stageselect, visible }
+#define vt_stageselect (settings_entryvt_t){ nop, enter_stageselect, highlight_stageselect, nop, init_stageselect, release_stageselect, update_stageselect, visible }
 static void enter_stageselect(settings_entry_t* e);
 static void highlight_stageselect(settings_entry_t* e);
 static void update_stageselect(settings_entry_t* e);
 static void init_stageselect(settings_entry_t* e);
 static void release_stageselect(settings_entry_t* e);
 
-#define vt_credits (settings_entryvt_t){ nop, enter_credits, nop, nop, nop, nop, visible }
+#define vt_credits (settings_entryvt_t){ nop, enter_credits, nop, nop, nop, nop, nop, visible }
 static void enter_credits(settings_entry_t* e);
 
 /* MODs */
-#define vt_mods (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, display_mods }
+#define vt_mods (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, display_mods }
 static bool want_compatibility_mode = true;
 static bool want_zipped_mods = false;
 static bool display_mods(settings_entry_t* e);
 static bool display_mods_from_base_game(settings_entry_t* e);
 static bool display_mods_from_mod(settings_entry_t* e);
 
-#define vt_playgame (settings_entryvt_t){ nop, enter_playgame, nop, init_playgame, release_playgame, nop, display_mods_from_base_game }
+#define vt_playgame (settings_entryvt_t){ nop, enter_playgame, nop, nop, init_playgame, release_playgame, nop, display_mods_from_base_game }
 static void enter_playgame(settings_entry_t* e);
 static void init_playgame(settings_entry_t* e);
 static void release_playgame(settings_entry_t* e);
 
-#define vt_modstorage (settings_entryvt_t){ change_modstorage, nop, nop, nop, nop, nop, display_mods_from_base_game }
+#define vt_modstorage (settings_entryvt_t){ change_modstorage, nop, nop, nop, nop, nop, nop, display_mods_from_base_game }
 static void change_modstorage(settings_entry_t* e);
 
-#define vt_compatibilitymode (settings_entryvt_t) { change_compatibilitymode, nop, nop, nop, nop, nop, display_mods_from_base_game }
+#define vt_compatibilitymode (settings_entryvt_t) { change_compatibilitymode, nop, nop, nop, nop, nop, nop, display_mods_from_base_game }
 static void change_compatibilitymode(settings_entry_t* e);
 
-#define vt_backtobasegame (settings_entryvt_t){ nop, enter_backtobasegame, nop, nop, nop, nop, display_mods_from_mod }
+#define vt_backtobasegame (settings_entryvt_t){ nop, enter_backtobasegame, nop, nop, nop, nop, nop, display_mods_from_mod }
 static void enter_backtobasegame(settings_entry_t* e);
 
 /* Engine */
-#define vt_engine (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, visible }
+#define vt_engine (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, visible }
 
-#define vt_about (settings_entryvt_t){ nop, show_info, nop, nop, nop, nop, visible }
+#define vt_about (settings_entryvt_t){ nop, show_info, nop, nop, nop, nop, nop, visible }
 static void show_info(settings_entry_t* e);
 
-#define vt_share (settings_entryvt_t){ nop, share, nop, nop, nop, nop, visible }
+#define vt_share (settings_entryvt_t){ nop, share, nop, nop, nop, nop, nop, visible }
 static void share(settings_entry_t* e);
 
-#define vt_download (settings_entryvt_t){ nop, download, nop, nop, nop, nop, visible }
+#define vt_download (settings_entryvt_t){ nop, download, nop, nop, nop, nop, nop, visible }
 static void download(settings_entry_t* e);
 
-#define vt_submitfeedback (settings_entryvt_t){ nop, submitfeedback, nop, nop, nop, nop, display_submitfeedback }
+#define vt_submitfeedback (settings_entryvt_t){ nop, submitfeedback, nop, nop, nop, nop, nop, display_submitfeedback }
 static void submitfeedback(settings_entry_t* e);
 static bool display_submitfeedback(settings_entry_t* e);
 
-#define vt_reportissue (settings_entryvt_t){ nop, reportissue, nop, nop, nop, nop, display_reportissue }
+#define vt_reportissue (settings_entryvt_t){ nop, reportissue, nop, nop, nop, nop, nop, display_reportissue }
 static void reportissue(settings_entry_t* e);
 static bool display_reportissue(settings_entry_t* e);
 
@@ -323,8 +324,8 @@ static const struct
 
     /* Audio */
     { TYPE_SUBTITLE, "$OPTIONS_AUDIO", (const char*[]){ NULL }, 0, vt_audio, 8 },
-    { TYPE_SETTING, "$OPTIONS_MUTE", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_mute, 0 },
-    { TYPE_SETTING, "$OPTIONS_VOLUME", (const char*[]){ "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%", NULL }, 10, vt_volume, 8 },
+    { TYPE_SETTING, "$OPTIONS_MUTE", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_mute, 8 },
+    { TYPE_SETTING, "$OPTIONS_VOLUME", (const char*[]){ "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%", NULL }, 10, vt_volume, 0 },
     { TYPE_SETTING, "$OPTIONS_MIXER", (const char*[]){ "0%", "5%", "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "50%", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "100%", NULL }, 10, vt_mixer, 0 },
 
     /* Controls */
@@ -629,16 +630,20 @@ void handle_controls()
     /* change the highlighted setting by pressing up or down */
     if(index_of_highlighted_setting > 0) {
         if(input_button_pressed(input, IB_UP)) {
+            int j = index_of_highlighted_setting;
             int i = --index_of_highlighted_setting;
             sound_play(SFX_CHOOSE);
+            setting[j]->vt->on_dehighlight(setting[j]);
             setting[i]->vt->on_highlight(setting[i]);
         }
     }
 
     if(index_of_highlighted_setting < number_of_settings - 1) {
         if(input_button_pressed(input, IB_DOWN)) {
+            int j = index_of_highlighted_setting;
             int i = ++index_of_highlighted_setting;
             sound_play(SFX_CHOOSE);
+            setting[j]->vt->on_dehighlight(setting[j]);
             setting[i]->vt->on_highlight(setting[i]);
         }
     }
