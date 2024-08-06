@@ -87,6 +87,7 @@ OPTIONS_PIXELSCALER         "Algorytm skalowania"
 OPTIONS_COMINGSOON          "Dostępne wkrótce!"
 OPTIONS_VOLUME              "Głośność"
 OPTIONS_MUTE                "Wycisz wszystko"
+FIXME OPTIONS_MIXER               "Music mixer"
 OPTIONS_GAMEPADOPACITY      "Nieprzezroczystość" // Lit. "non-transparency", but that's how it's typically translated as
 OPTIONS_GAMEPAD             "Używaj gamepada"
 OPTIONS_LANGUAGE            "Język"

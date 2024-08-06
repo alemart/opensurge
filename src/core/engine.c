@@ -521,25 +521,31 @@ void load_managers_preferences(const commandline_t* cmd)
     videoquality_t quality = (videoquality_t)commandline_getint(cmd->video_quality,
         prefs_has_item(prefs, ".videoquality") ?
         prefs_get_int(prefs, ".videoquality") :
-        VIDEOQUALITY_DEFAULT
+        video_get_quality()
     );
 
     bool fullscreen = (bool)commandline_getint(cmd->fullscreen,
         prefs_has_item(prefs, ".fullscreen") ?
         prefs_get_bool(prefs, ".fullscreen") :
-        false
+        video_is_fullscreen()
     );
 
     bool show_fps = (bool)(!commandline_getint(cmd->hide_fps, FALSE) && commandline_getint(cmd->show_fps,
         prefs_has_item(prefs, ".showfps") ?
         prefs_get_bool(prefs, ".showfps") :
-        false
+        video_is_fps_visible()
     ));
 
     int master_volume = (
         prefs_has_item(prefs, ".master_volume") ?
         prefs_get_int(prefs, ".master_volume") :
-        100
+        (int)(audio_get_master_volume() * 100.0f)
+    );
+
+    int music_mixer = (
+        prefs_has_item(prefs, ".music_mixer") ?
+        prefs_get_int(prefs, ".music_mixer") :
+        (int)(audio_get_mixing_percentage() * 100.0f)
     );
 
     const char* lang_path = commandline_getstring(cmd->language_filepath,
@@ -571,6 +577,7 @@ void load_managers_preferences(const commandline_t* cmd)
     }
 
     master_volume = clip(master_volume, 0, 100);
+    music_mixer = clip(music_mixer, 0, 100);
 
     /* apply preferences */
     video_set_resolution(resolution);
@@ -579,6 +586,7 @@ void load_managers_preferences(const commandline_t* cmd)
     video_set_fps_visible(show_fps);
 
     audio_set_master_volume(0.01f * (float)master_volume);
+    audio_set_mixing_percentage(0.01f * (float)music_mixer);
 
     if(*lang_path != '\0')
         lang_loadfile(lang_path);

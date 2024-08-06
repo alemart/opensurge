@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2024-06-01"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-08-06"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -94,6 +94,7 @@ OPTIONS_PIXELSCALER         "Pixel scaler"
 OPTIONS_COMINGSOON          "Coming soon!"
 OPTIONS_VOLUME              "Volume"
 OPTIONS_MUTE                "Muted"
+OPTIONS_MIXER               "Music mixer"
 OPTIONS_GAMEPADOPACITY      "Opacity"
 OPTIONS_GAMEPAD             "Use gamepad"
 OPTIONS_LANGUAGE            "Language"

@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2024-06-01"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-08-06"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -87,6 +87,7 @@ OPTIONS_PIXELSCALER         "Suavizador de píxeis"
 OPTIONS_COMINGSOON          "Em breve!"
 OPTIONS_VOLUME              "Volume"
 OPTIONS_MUTE                "Mudo"
+OPTIONS_MIXER               "Mixer de música"
 OPTIONS_GAMEPADOPACITY      "Opacidade"
 OPTIONS_GAMEPAD             "Usar joystick"
 OPTIONS_LANGUAGE            "Idioma"
