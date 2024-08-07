@@ -545,7 +545,7 @@ void load_managers_preferences(const commandline_t* cmd)
     int music_mixer = (
         prefs_has_item(prefs, ".music_mixer") ?
         prefs_get_int(prefs, ".music_mixer") :
-        (int)(audio_get_mixing_percentage() * 100.0f)
+        (int)(audio_get_mixer_percentage() * 100.0f)
     );
 
     mufflerprofile_t muffler_profile = (
@@ -606,7 +606,7 @@ void load_managers_preferences(const commandline_t* cmd)
     video_set_fps_visible(show_fps);
 
     audio_set_master_volume(0.01f * (float)master_volume);
-    audio_set_mixing_percentage(0.01f * (float)music_mixer);
+    audio_set_mixer_percentage(0.01f * (float)music_mixer);
     audio_muffler_set_profile(muffler_profile);
 
     if(*lang_path != '\0')

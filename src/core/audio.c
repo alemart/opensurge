@@ -55,7 +55,7 @@ struct sound_t {
 /* private stuff */
 #define PREFERRED_NUMBER_OF_SAMPLES     16 /* how many samples can be played at the same time */
 #define DEFAULT_VOLUME                  1.0f
-#define DEFAULT_MIXING_PERCENTAGE       0.5f
+#define DEFAULT_MIXER_PERCENTAGE        0.5f
 #define DEFAULT_MUFFLER_PROFILE         MUFFLER_MEDIUM
 
 static const char* MUFFLER_PROFILE_NAME[] = {
@@ -72,7 +72,7 @@ static ALLEGRO_MIXER* sound_mixer = NULL;
 
 static music_t *current_music = NULL; /* music being played at the moment (NULL if none) */
 static float master_volume = DEFAULT_VOLUME; /* a value in [0,1] affecting all musics and sounds */
-static float mixing_percentage = DEFAULT_MIXING_PERCENTAGE; /* a value in [0,1] that controls relative music-sfx volume */
+static float mixer_percentage = DEFAULT_MIXER_PERCENTAGE; /* a value in [0,1] that controls music & sfx volume */
 static bool is_globally_muted = false; /* global mute / unmute */
 static mufflerprofile_t current_muffler_profile = DEFAULT_MUFFLER_PROFILE;
 static bool is_muffler_activated = false;
@@ -528,7 +528,7 @@ void audio_init()
 
     current_music = NULL;
     master_volume = DEFAULT_VOLUME;
-    mixing_percentage = DEFAULT_MIXING_PERCENTAGE;
+    mixer_percentage = DEFAULT_MIXER_PERCENTAGE;
     is_globally_muted = false;
 
     if(!al_is_audio_installed()) {
@@ -653,68 +653,32 @@ void audio_set_master_volume(float volume)
 }
 
 /*
- * audio_get_music_volume()
- * Get the volume of the music mixer
+ * audio_get_mixer_percentage()
+ * Get the music-sfx mixer percentage
  */
-float audio_get_music_volume()
+float audio_get_mixer_percentage()
 {
-    return al_get_mixer_gain(music_mixer);
+    return mixer_percentage;
 }
 
 /*
- * audio_set_music_volume()
- * Set the volume of the music mixer
+ * audio_set_mixer_percentage()
+ * Set the music-sfx mixer percentage
  */
-void audio_set_music_volume(float volume)
-{
-    float gain = clip(volume, 0.0f, 1.0f);
-
-    if(!al_set_mixer_gain(music_mixer, gain))
-        video_showmessage("Can't set the music gain to %f", gain);
-}
-
-/*
- * audio_get_sound_volume()
- * Get the volume of the sound mixer
- */
-float audio_get_sound_volume()
-{
-    return al_get_mixer_gain(sound_mixer);
-}
-
-/*
- * audio_set_sound_volume()
- * Set the volume of the sound mixer
- */
-void audio_set_sound_volume(float volume)
-{
-    float gain = clip(volume, 0.0f, 1.0f);
-
-    if(!al_set_mixer_gain(sound_mixer, gain))
-        video_showmessage("Can't set the sound gain to %f", gain);
-}
-
-/*
- * audio_get_mixing_percentage()
- * Get the music-sfx mixing percentage
- */
-float audio_get_mixing_percentage()
-{
-    return mixing_percentage;
-}
-
-/*
- * audio_set_mixing_percentage()
- * Set the music-sfx mixing percentage
- */
-void audio_set_mixing_percentage(float percentage)
+void audio_set_mixer_percentage(float percentage)
 {
     float p = clip(percentage, 0.0f, 1.0f);
     float alpha = 2.0f * (p - 0.5f); /* -1 <= alpha <= 1 */
 
     /* 0% (only sfx, no music) ... 50% (equal music-sfx) ... 100% (only music, no sfx) */
-    audio_set_music_volume(1.0f + min(0.0f, alpha));
-    audio_set_sound_volume(1.0f - max(0.0f, alpha));
+    float music_volume = 1.0f + min(0.0f, alpha);
+    float sound_volume = 1.0f - max(0.0f, alpha);
+
+    if(!al_set_mixer_gain(music_mixer, music_volume))
+        video_showmessage("Can't set the music volume to %f", music_volume);
+
+    if(!al_set_mixer_gain(sound_mixer, sound_volume))
+        video_showmessage("Can't set the sound volume to %f", sound_volume);
 }
 
 /*

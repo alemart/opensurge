@@ -763,7 +763,7 @@ void save_preferences()
     prefs_set_bool(prefs, ".showfps", video_is_fps_visible());
 
     prefs_set_int(prefs, ".master_volume", (int)(audio_get_master_volume() * 100.0f));
-    prefs_set_int(prefs, ".music_mixer", (int)(audio_get_mixing_percentage() * 100.0f));
+    prefs_set_int(prefs, ".music_mixer", (int)(audio_get_mixer_percentage() * 100.0f));
     prefs_set_int(prefs, ".muffler_profile", audio_muffler_profile());
 
     prefs_set_string(prefs, ".langpath", filepath_of_lang(lang_getid()));
@@ -1085,7 +1085,7 @@ void change_volume(settings_entry_t* e)
 
 void init_mixer(settings_entry_t* e)
 {
-    int percentage = (int)(audio_get_mixing_percentage() * 100.0f);
+    int percentage = (int)(audio_get_mixer_percentage() * 100.0f);
     int index = percentage / 5;
     e->index_of_current_value = index;
 }
@@ -1093,7 +1093,7 @@ void init_mixer(settings_entry_t* e)
 void change_mixer(settings_entry_t* e)
 {
     float percentage = e->index_of_current_value * 0.05f;
-    audio_set_mixing_percentage(percentage);
+    audio_set_mixer_percentage(percentage);
 }
 
 
