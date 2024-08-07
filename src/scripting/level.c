@@ -423,8 +423,12 @@ surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var
         surgescript_var_destroy(v2_var);
         surgescript_var_destroy(ret);
 
-        /* show warning: since it's delegated, the parent object won't be Level */
-        video_showmessage("Use %s.spawnEntity() to spawn \"%s\"", surgescript_object_name(object), child_name);
+        /* show warning */
+        if(!surgescript_tagsystem_has_tag(tag_system, child_name, "detached")) {
+            /* sometimes we don't want a warning, as with Level.spawn("Fader");
+               entity "Fader" is detached */
+            video_showmessage("Use %s.spawnEntity() to spawn \"%s\"", surgescript_object_name(object), child_name);
+        }
 
         /* done */
         surgescript_object_kill(v2);
