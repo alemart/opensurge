@@ -49,6 +49,7 @@ object "Fader" is "entity", "detached", "awake", "private"
     {
         // setup
         transform.position = Vector2.zero;
+        transform.localScale = Vector2(Screen.width / actor.width, Screen.height / actor.height);
         state = "idle";
     }
 
