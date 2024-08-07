@@ -33,6 +33,7 @@ void audio_update();
 void audio_release();
 void audio_preload();
 
+/* audio settings */
 bool audio_is_muted();
 void audio_set_muted(bool muted); /* global mute / unmute */
 float audio_get_master_volume();
@@ -70,5 +71,20 @@ bool sound_is_playing(sound_t *sample);
 int sound_unref(sound_t *sample); /* returns the number of active references */
 float sound_get_volume(sound_t *sample);
 void sound_set_volume(sound_t *sample, float volume); /* volume is in the [0,1] range */
+
+/* underwater muffler */
+typedef enum mufflerprofile_t mufflerprofile_t;
+enum mufflerprofile_t
+{
+    MUFFLER_OFF = 0,    /* disabled */
+    MUFFLER_LOW,        /* light */
+    MUFFLER_MEDIUM,     /* moderate */
+    MUFFLER_HIGH        /* intense */
+};
+
+void audio_muffler_set_profile(mufflerprofile_t profile);
+mufflerprofile_t audio_muffler_profile();
+void audio_muffler_activate(bool on_off);
+bool audio_muffler_is_activated();
 
 #endif

@@ -548,6 +548,12 @@ void load_managers_preferences(const commandline_t* cmd)
         (int)(audio_get_mixing_percentage() * 100.0f)
     );
 
+    mufflerprofile_t muffler_profile = (
+        prefs_has_item(prefs, ".muffler_profile") ?
+        (mufflerprofile_t)prefs_get_int(prefs, ".muffler_profile") :
+        audio_muffler_profile()
+    );
+
     const char* lang_path = commandline_getstring(cmd->language_filepath,
         prefs_has_item(prefs, ".langpath") ?
         prefs_get_string(prefs, ".langpath") :
@@ -564,6 +570,7 @@ void load_managers_preferences(const commandline_t* cmd)
 
         default:
             resolution = VIDEORESOLUTION_1X;
+            break;
     }
 
     switch(quality) {
@@ -574,6 +581,19 @@ void load_managers_preferences(const commandline_t* cmd)
 
         default:
             quality = VIDEOQUALITY_DEFAULT;
+            break;
+    }
+
+    switch(muffler_profile) {
+        case MUFFLER_OFF:
+        case MUFFLER_LOW:
+        case MUFFLER_MEDIUM:
+        case MUFFLER_HIGH:
+            break;
+
+        default:
+            muffler_profile = MUFFLER_OFF;
+            break;
     }
 
     master_volume = clip(master_volume, 0, 100);
@@ -587,6 +607,7 @@ void load_managers_preferences(const commandline_t* cmd)
 
     audio_set_master_volume(0.01f * (float)master_volume);
     audio_set_mixing_percentage(0.01f * (float)music_mixer);
+    audio_muffler_set_profile(muffler_profile);
 
     if(*lang_path != '\0')
         lang_loadfile(lang_path);

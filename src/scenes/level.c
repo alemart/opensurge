@@ -1219,6 +1219,7 @@ void level_init(void *path_to_lev_file)
     clear_level_state(&saved_state);
     mobilegamepad_fadein();
 
+    audio_muffler_activate(false);
     camera_init();
     entitymanager_init();
     create_obstaclemap();
@@ -1287,6 +1288,7 @@ void level_release()
     destroy_obstaclemap();
     entitymanager_release();
     camera_release();
+    audio_muffler_activate(false);
 
     clear_level_state(&saved_state);
 
@@ -1408,6 +1410,7 @@ void level_update()
 
         wants_to_leave = FALSE;
         music_pause();
+        audio_muffler_activate(false);
         scenestack_push(storyboard_get_scene(SCENE_CONFIRMBOX), &cbd);
         return;
     }
@@ -1433,6 +1436,7 @@ void level_update()
     bool block_pause = got_dying_player || (level_timer < 1.0f);
     if(wants_to_pause && !block_pause) {
         wants_to_pause = FALSE;
+        audio_muffler_activate(false);
         scenestack_push(storyboard_get_scene(SCENE_PAUSE), NULL);
         return;
     }

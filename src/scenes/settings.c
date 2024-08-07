@@ -213,11 +213,6 @@ static void update_showfps(settings_entry_t* e);
 /* Audio */
 #define vt_audio (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, visible }
 
-#define vt_mute (settings_entryvt_t){ change_mute, nop, nop, nop, init_mute, nop, update_mute, visible }
-static void init_mute(settings_entry_t* e);
-static void change_mute(settings_entry_t* e);
-static void update_mute(settings_entry_t* e);
-
 #define vt_volume (settings_entryvt_t){ change_volume, nop, nop, nop, init_volume, nop, nop, visible }
 static void init_volume(settings_entry_t* e);
 static void change_volume(settings_entry_t* e);
@@ -225,6 +220,17 @@ static void change_volume(settings_entry_t* e);
 #define vt_mixer (settings_entryvt_t){ change_mixer, nop, nop, nop, init_mixer, nop, nop, visible }
 static void init_mixer(settings_entry_t* e);
 static void change_mixer(settings_entry_t* e);
+
+#define vt_muffler (settings_entryvt_t){ change_muffler, nop, highlight_muffler, dehighlight_muffler, init_muffler, nop, nop, visible }
+static void init_muffler(settings_entry_t* e);
+static void change_muffler(settings_entry_t* e);
+static void highlight_muffler(settings_entry_t* e);
+static void dehighlight_muffler(settings_entry_t* e);
+
+#define vt_mute (settings_entryvt_t){ change_mute, nop, nop, nop, init_mute, nop, update_mute, visible }
+static void init_mute(settings_entry_t* e);
+static void change_mute(settings_entry_t* e);
+static void update_mute(settings_entry_t* e);
 
 /* Controls */
 #define vt_controls (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, display_gamepadopacity }
@@ -324,9 +330,10 @@ static const struct
 
     /* Audio */
     { TYPE_SUBTITLE, "$OPTIONS_AUDIO", (const char*[]){ NULL }, 0, vt_audio, 8 },
-    { TYPE_SETTING, "$OPTIONS_MUTE", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_mute, 8 },
-    { TYPE_SETTING, "$OPTIONS_VOLUME", (const char*[]){ "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%", NULL }, 10, vt_volume, 0 },
-    { TYPE_SETTING, "$OPTIONS_MIXER", (const char*[]){ "0%", "5%", "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "50%", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "100%", NULL }, 10, vt_mixer, 0 },
+    { TYPE_SETTING, "$OPTIONS_VOLUME", (const char*[]){ "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%", NULL }, 10, vt_volume, 8 },
+    { TYPE_SETTING, "$OPTIONS_MIXER", (const char*[]){ "$OPTIONS_MIXER_MIN", "5%", "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "$OPTIONS_MIXER_MID", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "$OPTIONS_MIXER_MAX", NULL }, 10, vt_mixer, 0 },
+    { TYPE_SETTING, "$OPTIONS_MUFFLER", (const char*[]){ "$OPTIONS_MUFFLER_OFF", "$OPTIONS_MUFFLER_LOW", "$OPTIONS_MUFFLER_MEDIUM", "$OPTIONS_MUFFLER_HIGH", NULL }, 2, vt_muffler, 0 },
+    { TYPE_SETTING, "$OPTIONS_MUTE", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_mute, 0 },
 
     /* Controls */
     { TYPE_SUBTITLE, "$OPTIONS_CONTROLS", (const char*[]){ NULL }, 0, vt_controls, 8 },
@@ -757,6 +764,7 @@ void save_preferences()
 
     prefs_set_int(prefs, ".master_volume", (int)(audio_get_master_volume() * 100.0f));
     prefs_set_int(prefs, ".music_mixer", (int)(audio_get_mixing_percentage() * 100.0f));
+    prefs_set_int(prefs, ".muffler_profile", audio_muffler_profile());
 
     prefs_set_string(prefs, ".langpath", filepath_of_lang(lang_getid()));
 
@@ -935,7 +943,7 @@ void go_back(settings_entry_t* e)
 
 void change_resolution(settings_entry_t* e)
 {
-    videoresolution_t new_resolution[] = {
+    const videoresolution_t new_resolution[] = {
         [0] = VIDEORESOLUTION_1X,
         [1] = VIDEORESOLUTION_2X,
         [2] = VIDEORESOLUTION_3X,
@@ -948,7 +956,7 @@ void change_resolution(settings_entry_t* e)
 
 void init_resolution(settings_entry_t* e)
 {
-    int index[] = {
+    const int index[] = {
         [VIDEORESOLUTION_1X] = 0,
         [VIDEORESOLUTION_2X] = 1,
         [VIDEORESOLUTION_3X] = 2,
@@ -967,7 +975,7 @@ void init_resolution(settings_entry_t* e)
 
 void change_quality(settings_entry_t* e)
 {
-    videoquality_t new_quality[] = {
+    const videoquality_t new_quality[] = {
         [0] = VIDEOQUALITY_LOW,
         [1] = VIDEOQUALITY_MEDIUM,
         [2] = VIDEOQUALITY_HIGH
@@ -985,7 +993,7 @@ void change_quality(settings_entry_t* e)
 
 void init_quality(settings_entry_t* e)
 {
-    int index[] = {
+    const int index[] = {
         [VIDEOQUALITY_LOW] = 0,
         [VIDEOQUALITY_MEDIUM] = 1,
         [VIDEOQUALITY_HIGH] = 2
@@ -1087,6 +1095,49 @@ void change_mixer(settings_entry_t* e)
     float percentage = e->index_of_current_value * 0.05f;
     audio_set_mixing_percentage(percentage);
 }
+
+
+
+/*
+ * Underwater effect
+ */
+
+void init_muffler(settings_entry_t* e)
+{
+    const int index[] = {
+        [MUFFLER_OFF] = 0,
+        [MUFFLER_LOW] = 1,
+        [MUFFLER_MEDIUM] = 2,
+        [MUFFLER_HIGH] = 3
+    };
+
+    mufflerprofile_t profile = audio_muffler_profile();
+    e->index_of_current_value = index[profile];
+}
+
+void change_muffler(settings_entry_t* e)
+{
+    const mufflerprofile_t new_profile[] = {
+        [0] = MUFFLER_OFF,
+        [1] = MUFFLER_LOW,
+        [2] = MUFFLER_MEDIUM,
+        [3] = MUFFLER_HIGH
+    };
+
+    int i = e->index_of_current_value;
+    audio_muffler_set_profile(new_profile[i]);
+}
+
+void highlight_muffler(settings_entry_t* e)
+{
+    audio_muffler_activate(true);
+}
+
+void dehighlight_muffler(settings_entry_t* e)
+{
+    audio_muffler_activate(false);
+}
+
 
 
 

@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include "waterfx.h"
+#include "../core/audio.h"
 #include "../core/image.h"
 #include "../core/video.h"
 #include "../core/shader.h"
@@ -199,6 +200,11 @@ void waterfx_update()
 {
     float dt = timer_get_delta();
     internal_timer += dt;
+
+    /* enable the muffler if the active player is underwater */
+    const player_t* player = level_player();
+    bool is_underwater = player_is_underwater(player);
+    audio_muffler_activate(is_underwater);
 }
 
 /*

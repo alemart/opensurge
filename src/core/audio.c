@@ -27,6 +27,7 @@
 #include "video.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../util/numeric.h"
 
 #define ALLEGRO_UNSTABLE
 #include <allegro5/allegro.h>
@@ -55,6 +56,14 @@ struct sound_t {
 #define PREFERRED_NUMBER_OF_SAMPLES     16 /* how many samples can be played at the same time */
 #define DEFAULT_VOLUME                  1.0f
 #define DEFAULT_MIXING_PERCENTAGE       0.5f
+#define DEFAULT_MUFFLER_PROFILE         MUFFLER_MEDIUM
+
+static const char* MUFFLER_PROFILE_NAME[] = {
+    [MUFFLER_OFF] = "off",
+    [MUFFLER_LOW] = "low",
+    [MUFFLER_MEDIUM] = "medium",
+    [MUFFLER_HIGH] = "high"
+};
 
 static ALLEGRO_VOICE* voice = NULL;
 static ALLEGRO_MIXER* master_mixer = NULL;
@@ -64,10 +73,25 @@ static ALLEGRO_MIXER* sound_mixer = NULL;
 static music_t *current_music = NULL; /* music being played at the moment (NULL if none) */
 static float master_volume = DEFAULT_VOLUME; /* a value in [0,1] affecting all musics and sounds */
 static float mixing_percentage = DEFAULT_MIXING_PERCENTAGE; /* a value in [0,1] that controls relative music-sfx volume */
-static bool globally_muted = false; /* global mute / unmute */
+static bool is_globally_muted = false; /* global mute / unmute */
+static mufflerprofile_t current_muffler_profile = DEFAULT_MUFFLER_PROFILE;
+static bool is_muffler_activated = false;
 
 static int preload_sample(const char* vpath, void* data);
 static void set_master_gain(float gain);
+static void set_muffler(mufflerprofile_t profile);
+static const float* muffler_sigma(mufflerprofile_t profile);
+static void muffler_postprocess(void* buf, unsigned int num_samples, void* data);
+
+
+
+
+/*
+ *
+ * music management
+ *
+ */
+
 
 /*
  * music_load()
@@ -287,7 +311,11 @@ bool music_is_paused()
 
 
 
-/* sound management */
+/*
+ *
+ * sound management
+ *
+ */
 
 
 /*
@@ -484,7 +512,11 @@ void sound_set_volume(sound_t *sample, float volume)
 
 
 
-/* audio manager */
+/*
+ *
+ * audio manager
+ *
+ */
 
 /*
  * audio_init()
@@ -497,7 +529,7 @@ void audio_init()
     current_music = NULL;
     master_volume = DEFAULT_VOLUME;
     mixing_percentage = DEFAULT_MIXING_PERCENTAGE;
-    globally_muted = false;
+    is_globally_muted = false;
 
     if(!al_is_audio_installed()) {
         if(!al_install_audio())
@@ -537,6 +569,10 @@ void audio_init()
         else
             logfile_message("Can't reserve %d samples", samples);
     }
+
+    current_muffler_profile = DEFAULT_MUFFLER_PROFILE;
+    is_muffler_activated = false;
+    set_muffler(MUFFLER_OFF);
 }
 
 /*
@@ -586,6 +622,16 @@ void audio_preload()
     /*asset_foreach_file("samples/", ".ogg", preload_sample, NULL, true);*/
 }
 
+
+
+
+
+/*
+ *
+ * audio settings
+ *
+ */
+
 /*
  * audio_get_master_volume()
  * Get the master volume affecting all musics and samples
@@ -603,7 +649,7 @@ float audio_get_master_volume()
 void audio_set_master_volume(float volume)
 {
     master_volume = clip(volume, 0.0f, 1.0f);
-    set_master_gain(!globally_muted ? master_volume : 0.0f);
+    set_master_gain(!is_globally_muted ? master_volume : 0.0f);
 }
 
 /*
@@ -677,7 +723,7 @@ void audio_set_mixing_percentage(float percentage)
  */
 bool audio_is_muted()
 {
-    return globally_muted;
+    return is_globally_muted;
 }
 
 /*
@@ -686,13 +732,83 @@ bool audio_is_muted()
  */
 void audio_set_muted(bool muted)
 {
-    globally_muted = muted;
-    set_master_gain(!globally_muted ? master_volume : 0.0f);
+    is_globally_muted = muted;
+    set_master_gain(!is_globally_muted ? master_volume : 0.0f);
 }
 
 
 
-/* private */
+
+
+/*
+ *
+ * underwater muffler
+ *
+ */
+
+/*
+ * audio_muffler_set_profile()
+ * Set the profile of the muffler
+ */
+void audio_muffler_set_profile(mufflerprofile_t profile)
+{
+    /* nothing to do */
+    if(current_muffler_profile == profile)
+        return;
+
+    /* log */
+    logfile_message("Changing the muffler profile to %s", MUFFLER_PROFILE_NAME[profile]);
+
+    /* update muffler */
+    current_muffler_profile = profile;
+    if(is_muffler_activated)
+        set_muffler(current_muffler_profile);
+}
+
+/*
+ * audio_muffler_profile()
+ * Get the current profile of the muffler
+ */
+mufflerprofile_t audio_muffler_profile()
+{
+    return current_muffler_profile;
+}
+
+/*
+ * audio_muffler_activate()
+ * Activate or deactivate the muffler at this time
+ */
+void audio_muffler_activate(bool on_off)
+{
+    /* nothing to do */
+    if(is_muffler_activated == on_off)
+        return;
+
+    /* update muffler */
+    is_muffler_activated = on_off;
+    if(is_muffler_activated)
+        set_muffler(current_muffler_profile);
+    else
+        set_muffler(MUFFLER_OFF);
+}
+
+/*
+ * audio_muffler_is_activated()
+ * Check whether or not the muffler is activated at this time
+ */
+bool audio_muffler_is_activated()
+{
+    return is_muffler_activated;
+}
+
+
+
+
+/*
+ *
+ * private
+ *
+ */
 
 int preload_sample(const char* vpath, void* data)
 {
@@ -704,4 +820,125 @@ void set_master_gain(float gain)
 {
     if(!al_set_mixer_gain(master_mixer, gain))
         video_showmessage("Can't set the master gain to %f", gain);
+}
+
+void set_muffler(mufflerprofile_t profile)
+{
+    size_t num_channels = al_get_channel_count(al_get_mixer_channels(master_mixer));
+    size_t depth_size = al_get_audio_depth_size(al_get_mixer_depth(master_mixer));
+
+    if(num_channels != 2 || depth_size != sizeof(float))
+        logfile_message("Can't set the mixer postprocess callback: num_channels = %u, depth_size = %u, sizeof(float) = %u", num_channels, depth_size, sizeof(float));
+    else if(!al_set_mixer_postprocess_callback(master_mixer, muffler_postprocess, (void*)muffler_sigma(profile)))
+        logfile_message("Can't set the mixer postprocess callback.");
+}
+
+const float* muffler_sigma(mufflerprofile_t profile)
+{
+    /* these values were picked for a frequency of 44100 Hz */
+    static const float sigma[] = {
+        [MUFFLER_OFF] = 0.0f,
+        [MUFFLER_LOW] = 12.5f,
+        [MUFFLER_MEDIUM] = 17.25f,
+        [MUFFLER_HIGH] = 25.0f /* 25: sounds good. 30: too much. */
+    };
+
+    switch(profile) {
+        case MUFFLER_OFF:
+        case MUFFLER_LOW:
+        case MUFFLER_MEDIUM:
+        case MUFFLER_HIGH:
+            return &sigma[profile];
+
+        default:
+            return &sigma[DEFAULT_MUFFLER_PROFILE];
+    }
+}
+
+/* this function runs in a dedicated audio thread */
+void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
+{
+    /* the input buffer is expected to be float32 stereo, where
+       each sample is formatted as LR, i.e., buffer = LRLRLRLR... */
+    enum {
+        MAX_SAMPLES = 4096,
+        MAX_SIGMA = 32,
+        NUM_CHANNELS = 2,
+        DEPTH_SIZE = sizeof(float)
+    };
+
+    /* read input */
+    float sigma = *((const float*)data); /* no need of mutexes */
+    size_t buf_size = num_samples * NUM_CHANNELS * DEPTH_SIZE;
+
+    /* nothing to do */
+    if(sigma <= 0.0f)
+        return;
+
+    /* validate */
+    if(sigma > MAX_SIGMA)
+        sigma = MAX_SIGMA;
+
+    if(num_samples > MAX_SAMPLES)
+        return;
+
+    /* calculate a Gaussian */
+    static float g0[1 + 2 * (3 * MAX_SIGMA)];
+    const size_t n = sizeof(g0) / sizeof(float);
+    const int c = (n-1) / 2;
+    static int w = -1;
+    static float prev_sigma = 0.0f;
+
+    if(fabsf(sigma - prev_sigma) > 1e-5) {
+        w = normalized_gaussian(g0, sigma, n);
+        prev_sigma = sigma;
+    }
+
+    if(w < 0) /* this shouldn't happen */
+        return;
+
+    /* store two frames of samples */
+    static float samples[2 * MAX_SAMPLES * NUM_CHANNELS];
+    static unsigned int prev_num_samples = 0;
+
+    if(num_samples != prev_num_samples) {
+        memset(samples, 0, sizeof(samples));
+        prev_num_samples = num_samples;
+    }
+
+    memcpy(samples, samples + num_samples * NUM_CHANNELS, buf_size);
+    memcpy(samples + num_samples * NUM_CHANNELS, buf, buf_size);
+
+    /* find the initial index of the output. We introduce a small delay.
+       start is an even number (NUM_CHANNELS is 2) and points to a L sample */
+    int window_size = 2*w + 1;
+    int start = (num_samples - w) * NUM_CHANNELS; /* inclusive */
+
+    if(window_size >= num_samples) /* this shouldn't happen */
+        return;
+
+    /* now we have window_size < num_samples */
+
+    /*
+
+    Let f(x) be the input signal and g(x) a Gaussian with variance sigma^2 and
+    centered at zero. Compute the convolution h = f * g for each channel.
+
+    This is a low-pass filter.
+
+    */
+    int m = num_samples * NUM_CHANNELS;
+    const float* f0 = samples + start;
+    const float* g = g0 + c;
+    float* h = (float*)buf;
+
+    memset(buf, 0, buf_size);
+
+    for(int i = 0; i < m; i += NUM_CHANNELS) {
+        const float* f = f0 + i;
+        for(int x = -w; x <= w; x++) {
+            h[i] += f[x] * g[x]; /* g[x] == g[-x] */
+            h[i+1] += f[x+1] * g[x];
+        }
+    }
 }
