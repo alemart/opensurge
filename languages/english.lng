@@ -15,7 +15,7 @@
 LANG_ID                     "en_US"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "English"                 // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2024-08-06"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-08-07"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -102,7 +102,7 @@ OPTIONS_MIXER_MAX           "No sounds"
 OPTIONS_MUFFLER             "Underwater effect"
 OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
 OPTIONS_MUFFLER_LOW         "Light" // also: lightweight
-OPTIONS_MUFFLER_MEDIUM      "$OPTIONS_DEFAULT"
+OPTIONS_MUFFLER_MEDIUM      "Moderate"
 OPTIONS_MUFFLER_HIGH        "Intense"
 OPTIONS_MUFFLER_HIGHER      "More intense"
 OPTIONS_GAMEPADOPACITY      "Opacity"

@@ -15,7 +15,7 @@
 LANG_ID                     "pt_BR"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Português do Brasil"     // language name
 LANG_AUTHOR                 "Alexandre Martins"       // translation author
-LANG_LASTUPDATE             "2024-08-06"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-08-07"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -92,10 +92,10 @@ OPTIONS_MIXER               "Mixer"
 OPTIONS_MIXER_MIN           "Sem música"
 OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
 OPTIONS_MIXER_MAX           "Sem sons"
-OPTIONS_MUFFLER             "Efeito de água"
+OPTIONS_MUFFLER             "Efeito ao submergir"
 OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
 OPTIONS_MUFFLER_LOW         "Leve"
-OPTIONS_MUFFLER_MEDIUM      "$OPTIONS_DEFAULT"
+OPTIONS_MUFFLER_MEDIUM      "Moderado"
 OPTIONS_MUFFLER_HIGH        "Intenso"
 OPTIONS_MUFFLER_HIGHER      "Mais intenso"
 OPTIONS_GAMEPADOPACITY      "Opacidade"
