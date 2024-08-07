@@ -40,5 +40,6 @@
 
 float lerp(float a, float b, float t); /* linear interpolation */
 float lerp_angle(float alpha, float beta, float t); /* alpha, beta in radians */
+int normalized_gaussian(float* g, float sigma, size_t n); /* normalized gaussian kernel */
 
 #endif

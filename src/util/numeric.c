@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
 #include "numeric.h"
 #include "v2d.h"
 
@@ -51,9 +52,51 @@ float lerp_angle(float alpha, float beta, float t)
     float dot = v2d_dot(a, b);
     if(nearly_equal(dot, -1.0f)) {
         /* alpha == beta + k * pi, k odd */
-        return alpha + PI * t; /* why not alpha - PI * t? */
+        return alpha + PI * clip01(t); /* why not alpha - PI * t? */
     }
 
     v2d_t c = v2d_lerp(a, b, t);
     return atan2f(c.y, c.x);
+}
+
+/*
+ * normalized_gaussian()
+ * Generate a Gaussian g[0..n-1] with standard deviation sigma around (n-1)/2
+ * with the sum of all g[i] = 1. n should be at least 1 + 2 * ceil(sigma * 3).
+ * Returns half the window size on success or a negative value on error
+ */
+int normalized_gaussian(float* g, float sigma, size_t n)
+{
+    double int_g = 0.0;
+
+    if(n == 0 || sigma <= 0.0f)
+        return -1; /* invalid input */
+
+    int c = (n-1) / 2; /* 0 <= 2*c < n doesn't go out of bounds; also, unsigned n > 0 */
+    int window_size = 1 + 2 * (int)ceilf(sigma * 3); /* [-3 sigma, +3 sigma] */
+    int w = min(window_size / 2, c); /* 0 <= 2*w + 1 <= 2*c + 1 = n */
+
+    memset(g, 0, sizeof(*g) * n);
+    g += c;
+
+    /*
+
+    note: (w >= 0)
+
+    i)  w <= c => 0 <= c-w
+    ii) w <= c and 2*c < n => c+w <= c+c = 2*c < n
+
+    therefore, 0 <= c+x < n for all x in [-w,+w]
+
+    */
+
+    for(int x = -w; x <= w; x++) {
+        g[x] = expf(-0.5f * (x / sigma) * (x / sigma));
+        int_g += g[x];
+    }
+
+    for(int x = -w; x <= w; x++)
+        g[x] /= int_g; /* normalize */
+
+    return w;
 }
