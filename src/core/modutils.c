@@ -117,6 +117,8 @@ static const char* const COMPATIBILITY_LIST[] = {
     "scripts/functions/player/give_extra_lives.ss",     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/misc/lucky_bonus.ss",                      ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
     "scripts/ui/menubuttonlist.ss",                     ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/functions/effects/fade_in.ss",             ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
+    "scripts/functions/effects/fade_out.ss",            ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings */
 
     "scripts/items/event_trigger.ss",                   ":0.6.1",                   /* changes to the entity system in 0.6.1; omit warnings; added Event Triggers 9-16 in 0.6.1 */
     "sprites/items/event_trigger.spr",                  ":0.6.1",                   /* added Event Triggers 9-16 in 0.6.1 */

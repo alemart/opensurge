@@ -21,7 +21,7 @@ using SurgeEngine.Video.Screen;
 //
 // Example - how to use:
 //
-// object "FadeTest" {
+// object "FadeTest" is "entity" {
 //     fader = spawn("Fader");
 //
 //     state "main" {

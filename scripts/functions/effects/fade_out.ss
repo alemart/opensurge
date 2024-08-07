@@ -4,6 +4,7 @@
 // Author: Alexandre Martins <http://opensurge2d.org>
 // License: MIT
 // -----------------------------------------------------------------------------
+using SurgeEngine.Level;
 
 //
 // Fade Out is a function object that performs a
@@ -20,7 +21,7 @@ object "Fade Out"
     fun call(duration)
     {
         if(duration > 0) {
-            fader = fader || spawn("Fader");
+            fader = fader || Level.spawn("Fader");
             fader.fadeTime = duration;
             fader.fadeOut();
         }
