@@ -802,7 +802,7 @@ const float* muffler_sigma(mufflerprofile_t profile)
     /* these values were picked for a frequency of 44100 Hz */
     static const float sigma[] = {
         [MUFFLER_OFF] = 0.0f,
-        [MUFFLER_LOW] = 12.5f,
+        [MUFFLER_LOW] = 11.0f,
         [MUFFLER_MEDIUM] = 17.25f,
         [MUFFLER_HIGH] = 25.0f /* 25: sounds good. 30: too much. */
     };
@@ -826,18 +826,20 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
        each sample is formatted as LR, i.e., buffer = LRLRLRLR... */
     enum {
         MAX_SAMPLES = 4096,
-        MAX_SIGMA = 32,
+        MAX_SIGMA = 30,
         NUM_CHANNELS = 2,
         DEPTH_SIZE = sizeof(float)
     };
 
     /* read input */
+    static float prev_sigma = 0.0f;
     float sigma = *((const float*)data); /* no need of mutexes */
-    size_t buf_size = num_samples * NUM_CHANNELS * DEPTH_SIZE;
 
     /* nothing to do */
-    if(sigma <= 0.0f)
+    if(sigma == 0.0f) {
+        prev_sigma = 0.0f;
         return;
+    }
 
     /* validate */
     if(sigma > MAX_SIGMA)
@@ -851,7 +853,6 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     const size_t n = sizeof(g0) / sizeof(float);
     const int c = (n-1) / 2;
     static int w = -1;
-    static float prev_sigma = 0.0f;
 
     if(fabsf(sigma - prev_sigma) > 1e-5) {
         w = normalized_gaussian(g0, sigma, n);
@@ -863,12 +864,11 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
 
     /* store two frames of samples */
     static float samples[2 * MAX_SAMPLES * NUM_CHANNELS];
-    static unsigned int prev_num_samples = 0;
+    size_t buf_size = num_samples * NUM_CHANNELS * DEPTH_SIZE;
+    bool was_disabled = (prev_sigma == 0.0f);
 
-    if(num_samples != prev_num_samples) {
-        memset(samples, 0, sizeof(samples));
-        prev_num_samples = num_samples;
-    }
+    if(was_disabled)
+        memset(samples, 0, 2 * buf_size);
 
     memcpy(samples, samples + num_samples * NUM_CHANNELS, buf_size);
     memcpy(samples + num_samples * NUM_CHANNELS, buf, buf_size);
