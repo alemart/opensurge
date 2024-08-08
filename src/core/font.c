@@ -39,6 +39,8 @@
 #include "input.h"
 #include "../util/stringutil.h"
 #include "../util/hashtable.h"
+#include "../util/dictionary.h"
+#include "../util/iterator.h"
 #include "../util/darray.h"
 #include "../util/point2d.h"
 #include "../util/rect.h"
@@ -216,6 +218,18 @@ static void preprocess(font_t* f);
 
 /* ------------------------------- */
 
+/* aliases: alias name -> font name */
+static dictionary_t* aliases = NULL;
+static void alias_init();
+static void alias_release();
+static bool alias_add(const char* alias, const char* font_name);
+static bool alias_exists(const char* alias);
+static void alias_validate();
+static const char* alias_resolve(const char* alias_or_font_name);
+static void alias_element_dtor(void* value, void* ctx);
+
+/* ------------------------------- */
+
 /* font struct: this struct is used by the external world */
 struct font_t {
     fontdrv_t* drv; /* font driver */
@@ -247,6 +261,8 @@ static inline bool has_loaded_ttf(const fontdrv_ttf_t* f);
 static void load_ttf(fontdrv_ttf_t* f);
 static void unload_ttf(fontdrv_ttf_t* f);
 
+
+
 /*
  * font_init()
  * Initializes the font module
@@ -261,6 +277,7 @@ void font_init()
 
     /* basic initialization */
     fontdrv_list_init();
+    alias_init();
 
     /* reading the font scripts */
     logfile_message("Loading fonts...");
@@ -269,6 +286,9 @@ void font_init()
 
     /* initializing the font callback table */
     callbacktable_init();
+
+    /* validate the aliases */
+    alias_validate();
 
     /* register predefined vars */
     register_predefined_vars();
@@ -285,6 +305,7 @@ void font_release()
     callbacktable_release();
 
     logfile_message("Unloading font scripts...");
+    alias_release();
     fontdrv_list_release();
 }
 
@@ -312,7 +333,7 @@ void font_register_variable(const char* variable_name, const char* (*callback)()
  */
 bool font_exists(const char* font_name)
 {
-    return fontdrv_list_find(font_name) != NULL;
+    return fontdrv_list_find(alias_resolve(font_name)) != NULL;
 }
 
 
@@ -335,9 +356,13 @@ font_t* font_create(const char* font_name)
     f->name = str_dup(font_name);
     f->lang_id = str_dup(lang_getid());
 
-    f->drv = fontdrv_list_find_ex(f->name, f->lang_id);
-    if(f->drv == NULL)
-        fatal_error("Can't find font \"%s\"", f->name);
+    f->drv = fontdrv_list_find_ex(alias_resolve(f->name), f->lang_id);
+    if(f->drv == NULL) {
+        if(alias_exists(f->name))
+            fatal_error("Can't find font \"%s\" (alias of \"%s\")", alias_resolve(f->name), f->name);
+        else
+            fatal_error("Can't find font \"%s\"", f->name);
+    }
 
     for(i=0; i<FONTARGS_MAX; i++)
         f->argument[i] = NULL;
@@ -1032,9 +1057,13 @@ void refresh_driver(font_t* fnt)
     fnt->lang_id = str_dup(lang_getid());
 
     /* update the driver */
-    fnt->drv = fontdrv_list_find_ex(fnt->name, fnt->lang_id);
-    if(fnt->drv == NULL)
-        fatal_error("Can't find font \"%s\"", fnt->name);
+    fnt->drv = fontdrv_list_find_ex(alias_resolve(fnt->name), fnt->lang_id);
+    if(fnt->drv == NULL) {
+        if(alias_exists(fnt->name))
+            fatal_error("Can't find font \"%s\" (alias of \"%s\")", alias_resolve(fnt->name), fnt->name);
+        else
+            fatal_error("Can't find font \"%s\"", fnt->name);
+    }
 
     /* preprocess the text */
     fnt->preprocessed_text.is_dirty = true;
@@ -1050,6 +1079,85 @@ char* join_names(const char* name, const char* lang_id)
     return str;
 }
 
+
+
+
+/* ------------------------------------------------- */
+/* alias system */
+/* ------------------------------------------------- */
+
+/* initialize the alias system */
+void alias_init()
+{
+    aliases = dictionary_create(false, alias_element_dtor, NULL);
+}
+
+/* release the alias system */
+void alias_release()
+{
+    aliases = dictionary_destroy(aliases);
+}
+
+/* add an alias */
+bool alias_add(const char* alias, const char* font_name)
+{
+    if(0 == str_icmp(alias, font_name)) {
+        logfile_message("Can't add invalid font alias \"%s\"", alias);
+        return false;
+    }
+    else if(dictionary_get(aliases, font_name) != NULL) {
+        logfile_message("Can't add font alias of another font alias \"%s\" -> \"%s\"", alias, font_name);
+        return false;
+    }
+    else if(dictionary_get(aliases, alias) != NULL) {
+        logfile_message("Can't add duplicate font alias \"%s\" -> \"%s\"", alias, font_name);
+        return false;
+    }
+    else {
+        dictionary_put(aliases, alias, str_dup(font_name));
+        return true;
+    }
+}
+
+/* checks if an alias exists */
+bool alias_exists(const char* alias)
+{
+    return dictionary_get(aliases, alias) != NULL;
+}
+
+/* no alias can have the name of a font */
+void alias_validate()
+{
+    iterator_t* it = dictionary_keys(aliases);
+
+    while(iterator_has_next(it)) {
+        const char* alias = iterator_next(it);
+
+        if(fontdrv_list_find(alias) != NULL) {
+            fatal_error("Font \"%s\" cannot be an alias", alias);
+            break;
+        }
+    }
+
+    iterator_destroy(it);
+}
+
+/* resolve an alias */
+const char* alias_resolve(const char* alias_or_font_name)
+{
+    const char* font_name = dictionary_get(aliases, alias_or_font_name);
+
+    if(font_name != NULL)
+        return font_name;
+    else
+        return alias_or_font_name;
+}
+
+/* element destructor */
+void alias_element_dtor(void* value, void* ctx)
+{
+    free(value);
+}
 
 
 
@@ -1425,33 +1533,48 @@ int traverse(const parsetree_statement_t* stmt)
         name = str_dup(nanoparser_get_string(p1));
         logfile_message("Loading font script \"%s\" defined in \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
 
-        /* is this a language-specific font? */
+        /* is this a language-specific font or an alias? */
         if(nanoparser_get_number_of_parameters(param_list) > 2) {
             const parsetree_parameter_t* opt_p2 = nanoparser_get_nth_parameter(param_list, 2);
             const parsetree_parameter_t* opt_p3 = nanoparser_get_nth_parameter(param_list, 3);
-            const char* lang_id = NULL;
-            char* lang_specific_name = NULL;
 
-            /* read the language ID */
-            nanoparser_expect_string(opt_p2, "Font script error: expected \"for\"");
-            if(str_icmp(nanoparser_get_string(opt_p2), "for") != 0)
+            nanoparser_expect_string(opt_p2, "Font script error: expected \"for\" or \"is\"");
+            if(str_icmp(nanoparser_get_string(opt_p2), "for") == 0) {
+                /* read the language ID */
+                nanoparser_expect_string(opt_p3, "Font script error: language ID is expected");
+                const char* lang_id = nanoparser_get_string(opt_p3);
+
+                /* update variables */
+                char* lang_specific_name = join_names(name, lang_id);
+                free(name);
+                name = lang_specific_name;
+                p2 = nanoparser_get_nth_parameter(param_list, 4); /* block */
+            }
+            else if(str_icmp(nanoparser_get_string(opt_p2), "is") == 0) {
+                /* check syntax */
+                nanoparser_expect_string(opt_p3, "Font script error: font name is expected when declaring an alias");
+                if(nanoparser_get_number_of_parameters(param_list) != 3)
+                    fatal_error("Font script error: syntax error at \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+                /* add alias */
+                const char* real_font_name = nanoparser_get_string(opt_p3);
+                if(alias_exists(name))
+                    logfile_message("WARNING: can't redefine alias \"%s\" in \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+                else if(!alias_add(name, real_font_name))
+                    fatal_error("Font script error: can't add font alias \"%s\" = \"%s\" at \"%s\" near line %d", name, real_font_name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
+
+                /* done! */
+                goto done;
+            }
+            else
                 fatal_error("Font script error: invalid format at \"%s\" near line %d", nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-
-            nanoparser_expect_string(opt_p3, "Font script error: language ID is expected");
-            lang_id = nanoparser_get_string(opt_p3);
-
-            /* update variables */
-            lang_specific_name = join_names(name, lang_id);
-            free(name);
-            name = lang_specific_name;
-            p2 = nanoparser_get_nth_parameter(param_list, 4); /* block */
         }
 
         /* duplicate font? */
         if(NULL != fontdrv_list_find(name)) {
             /* fail silently */
             logfile_message("WARNING: can't redefine font \"%s\" in \"%s\" near line %d", name, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
-            return 0;
+            goto done;
         }
 
         /* read the block */
@@ -1488,6 +1611,7 @@ int traverse(const parsetree_statement_t* stmt)
             fontdrv_list_add(name, drv);
 
         /* done */
+        done:
         free(name);
     }
     else
