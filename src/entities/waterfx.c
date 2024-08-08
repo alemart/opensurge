@@ -225,8 +225,8 @@ void waterfx_render_fg(v2d_t camera_position)
     /* adjust y */
     y = max(0, y);
 
-    /* if the active player is too fast,
-       maybe a simple effect will look better? */
+    /* if the active player is too fast, camera_y makes the effect look bad */
+    float camera_multiplier = 1.0f;
     const player_t* player = level_player();
     if(player != NULL && !player_is_dying(player) && !player_is_frozen(player)) {
         static bool disabled_effect = false;
@@ -234,14 +234,15 @@ void waterfx_render_fg(v2d_t camera_position)
 
         if(disabled_effect || abs_ysp >= 270.0f) {
             disabled_effect = (abs_ysp > 180.0f);
-            render_simple_effect(y, watercolor);
-            return;
+            camera_multiplier = 0.0f;
+            /*render_simple_effect(y, watercolor);
+            return;*/
         }
     }
 
     /* render */
     if(video_get_quality() > VIDEOQUALITY_LOW)
-        render_default_effect(y, topleft.y, 0.0f, internal_timer, 32.0f, watercolor);
+        render_default_effect(y, camera_multiplier * topleft.y, 0.0f, internal_timer, 32.0f, watercolor);
     else
         render_simple_effect(y, watercolor);
 }
