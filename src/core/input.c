@@ -117,10 +117,13 @@ static const float ANALOG_AXIS_THRESHOLD[REQUIRED_AXES] = {
 /* the joystick pool is used to keep consistent joystick IDs across reconfigurations */
 #define POOL_CAPACITY    MAX_JOYS /* how many different joysticks we can connect */
 static ALLEGRO_JOYSTICK* joystick_pool[POOL_CAPACITY];
-static ALLEGRO_JOYSTICK* query_joystick_pool(int id);
-static void refresh_joystick_pool();
-static void clear_joystick_pool();
-static int joystick_pool_size();
+static ALLEGRO_JOYSTICK* joystick_pool_query(int id);
+static int joystick_pool_indexof(ALLEGRO_JOYSTICK* joystick);
+static int joystick_pool_next();
+static void joystick_pool_clear();
+static void joystick_pool_refresh();
+static void joystick_pool_recycle();
+static int joystick_pool_count();
 
 /* private data */
 static const char DEFAULT_INPUTMAP_NAME[] = "default";
@@ -185,6 +188,13 @@ void input_init()
     engine_add_event_listener(ALLEGRO_EVENT_MOUSE_AXES, NULL, a5_handle_mouse_event);
 
     /* initialize the joystick */
+#if defined(_WIN32)
+    /* Joysticks: use the XInput driver on Windows */
+    const char* windrv = al_get_config_value(al_get_system_config(), "joystick", "driver");
+    if(windrv == NULL || *windrv == '\0')
+        al_set_config_value(al_get_system_config(), "joystick", "driver", "XINPUT");
+#endif
+
     if(!al_is_joystick_installed()) {
         if(!al_install_joystick())
             fatal_error("Can't initialize the joystick subsystem");
@@ -233,8 +243,8 @@ void input_init()
     for(int j = 0; j < MAX_JOYS; j++)
         wanted_joy[j] = NULL;
 
-    clear_joystick_pool();
-    refresh_joystick_pool();
+    joystick_pool_clear();
+    joystick_pool_refresh();
     log_joysticks();
     ignore_joystick = !input_is_joystick_available();
 
@@ -363,7 +373,7 @@ void input_update()
     for(int j = 0; j < MAX_JOYS; j++) {
         wanted_joy[j] = NULL;
 
-        const ALLEGRO_JOYSTICK* target = query_joystick_pool(j);
+        const ALLEGRO_JOYSTICK* target = joystick_pool_query(j);
         if(target != NULL) {
             for(int k = 0; k < num_joys; k++) {
                 if(al_get_joystick(k) == target) {
@@ -700,15 +710,7 @@ bool input_is_joystick_ignored()
  */
 int input_number_of_joysticks()
 {
-    int n = 0;
-
-    for(int p = 0; p < POOL_CAPACITY && joystick_pool[p] != NULL; p++) {
-        ALLEGRO_JOYSTICK* joystick = joystick_pool[p];
-        if(al_get_joystick_active(joystick))
-            n++;
-    }
-
-    return n;
+    return joystick_pool_count();
 }
 
 
@@ -721,7 +723,7 @@ void input_reconfigure_joysticks()
     logfile_message("Reconfiguring joysticks...");
 
     al_reconfigure_joysticks();
-    refresh_joystick_pool();
+    joystick_pool_refresh();
     log_joysticks();
 }
 
@@ -739,10 +741,13 @@ void input_print_joysticks()
     else
         video_showmessage("No joysticks have been detected");
 
-    for(int j = 0; j < n; j++) {
-        ALLEGRO_JOYSTICK* joystick = query_joystick_pool(j);
-        if(joystick != NULL)
-            video_showmessage("%s", al_get_joystick_name(joystick));
+    for(int j = 0; j < POOL_CAPACITY; j++) {
+        ALLEGRO_JOYSTICK* joystick = joystick_pool_query(j);
+
+        if(joystick != NULL) {
+            int joystick_num = j+1;
+            video_showmessage("#%d %s", joystick_num, al_get_joystick_name(joystick));
+        }
     }
 }
 
@@ -877,7 +882,7 @@ void inputuserdefined_update(input_t* in)
     /* read joystick input */
     if(im->joystick.enabled && input_is_joystick_enabled()) {
         int joy_id = im->joystick.number - 1;
-        if(joy_id < MAX_JOYS && wanted_joy[joy_id] != NULL) {
+        if(joy_id >= 0 && joy_id < MAX_JOYS && wanted_joy[joy_id] != NULL) {
             v2d_t axis = v2d_new(wanted_joy[joy_id]->axis[AXIS_X], wanted_joy[joy_id]->axis[AXIS_Y]);
             v2d_t abs_axis = v2d_new(fabsf(axis.x), fabsf(axis.y));
             float norm_inf = max(abs_axis.x, abs_axis.y);
@@ -1044,55 +1049,83 @@ void remap_joystick_buttons(joystick_input_t* joy)
 }
 
 /* clear the joystick pool */
-void clear_joystick_pool()
+void joystick_pool_clear()
 {
-    for(int p = 0; p < POOL_CAPACITY; p++)
-        joystick_pool[p] = NULL;
+    for(int i = 0; i < POOL_CAPACITY; i++)
+        joystick_pool[i] = NULL;
 }
 
-/* the current size of the joystick pool */
-int joystick_pool_size()
+/* clear all inactive joysticks from the pool */
+void joystick_pool_recycle()
 {
-    int pool_size = 0;
+    for(int i = 0; i < POOL_CAPACITY; i++) {
+        if(joystick_pool[i] != NULL) {
+            if(!al_get_joystick_active(joystick_pool[i]))
+                joystick_pool[i] = NULL;
+        }
+    }
+}
 
-    while(pool_size < POOL_CAPACITY && joystick_pool[pool_size] != NULL)
-        pool_size++;
+/* index of the next joystick in the pool */
+int joystick_pool_next()
+{
+    int index = 0;
 
-    return pool_size;
+    while(index < POOL_CAPACITY && joystick_pool[index] != NULL)
+        index++;
+
+    return index;
+}
+
+/* find the index of a joystick in the pool, or -1 if not found */
+int joystick_pool_indexof(ALLEGRO_JOYSTICK* joystick)
+{
+    for(int i = 0; i < POOL_CAPACITY; i++) {
+        if(joystick_pool[i] == joystick)
+            return i;
+    }
+
+    return -1;
 }
 
 /* refresh the joystick pool. Call after al_reconfigure_joysticks() */
-void refresh_joystick_pool()
+void joystick_pool_refresh()
 {
-    /* compute the current size of the pool */
-    int pool_size = joystick_pool_size();
+    /* clear up inactive joysticks from the pool */
+    joystick_pool_recycle();
 
-    /* the pool is full (really?!). We're not accepting new joysticks */
-    if(pool_size >= POOL_CAPACITY)
-        return;
+    /* after recycling, get the next id */
+    int next = joystick_pool_next();
+
+    /* get the current number of joysticks */
+    int num_joys = al_get_num_joysticks();
+    if(num_joys > MAX_JOYS)
+        num_joys = MAX_JOYS;
 
     /* we'll try to insert new joysticks into the pool */
-    int num_joys = min(al_get_num_joysticks(), MAX_JOYS);
     for(int j = 0; j < num_joys; j++) {
         ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
         int num_buttons = al_get_joystick_num_buttons(joystick);
         int num_sticks = al_get_joystick_num_sticks(joystick);
         int num_axes = num_sticks > 0 ? al_get_joystick_num_axes(joystick, 0) : 0;
-        bool in_the_pool = false;
 
         /* filter out devices that are not gamepads
            (an accelerometer is reported as the first joystick on Android) */
         if(num_buttons < MIN_BUTTONS || num_axes < REQUIRED_AXES)
             continue;
 
-        /* check if the joystick is in the pool */
-        for(int p = 0; p < pool_size && !in_the_pool; p++)
-            in_the_pool = (joystick == joystick_pool[p]);
+        /* is this needed? */
+        if(!al_get_joystick_active(joystick))
+            continue;
 
-        /* add the joystick to the pool. Give it a new, fixed ID */
-        if(!in_the_pool && pool_size < POOL_CAPACITY) {
-            int new_id = pool_size++;
-            joystick_pool[new_id] = joystick;
+        /* the pool is full (really?!) */
+        if(next >= POOL_CAPACITY)
+            break;
+
+        /* if the joystick is not in the pool, add it */
+        if(joystick_pool_indexof(joystick) < 0) {
+            joystick_pool[next] = joystick;
+            next = joystick_pool_next();
         }
     }
 
@@ -1116,7 +1149,7 @@ void refresh_joystick_pool()
 }
 
 /* get a joystick from the joystick pool. This ensures consistent IDs after reconfigurations */
-ALLEGRO_JOYSTICK* query_joystick_pool(int id)
+ALLEGRO_JOYSTICK* joystick_pool_query(int id)
 {
     /* validate ID */
     if(id < 0 || id >= POOL_CAPACITY)
@@ -1135,6 +1168,21 @@ ALLEGRO_JOYSTICK* query_joystick_pool(int id)
 
     /* success! return the candidate */
     return candidate;
+}
+
+/* count the number of active joysticks in the pool */
+int joystick_pool_count()
+{
+    int count = 0;
+
+    for(int i = 0; i < POOL_CAPACITY; i++) {
+        if(joystick_pool[i] != NULL) {
+            if(al_get_joystick_active(joystick_pool[i]))
+                count++;
+        }
+    }
+
+    return count;
 }
 
 /* handle a keyboard event */

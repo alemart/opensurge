@@ -434,9 +434,6 @@ void init_basic_stuff(const commandline_t* cmd)
     if(commandline_getint(cmd->verbose, FALSE))
         al_set_config_value(al_get_system_config(), "trace", "level", "debug");
 
-    /* Joysticks: use the XInput driver on Windows */
-    al_set_config_value(al_get_system_config(), "joystick", "driver", "XINPUT");
-
     /* initialize Allegro */
     if(!al_is_system_installed()) { /* true when the engine is restarted */
         if(!al_init())
