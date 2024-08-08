@@ -73,8 +73,8 @@ OPTIONS_AUDIO               "Audio"
 OPTIONS_BACK                "Indietro"
 OPTIONS_YES                 "Si"
 OPTIONS_NO                  "No"
-OPTIONS_ON                  "On" // alternatively: Enabled
-OPTIONS_OFF                 "Off" // alternatively: Disabled
+FIXME OPTIONS_ON                  "On" // alternatively: Enabled
+FIXME OPTIONS_OFF                 "Off" // alternatively: Disabled
 FIXME OPTIONS_DEFAULT             "Default"
 OPTIONS_FULLSCREEN          "Schermo Intero"
 OPTIONS_RESOLUTION          "Misure schermo"
