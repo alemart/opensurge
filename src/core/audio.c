@@ -830,14 +830,14 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
         NUM_CHANNELS = 2,
         DEPTH_SIZE = sizeof(float)
     };
+    static bool is_initialized = false;
 
     /* read input */
-    static float prev_sigma = 0.0f;
     float sigma = *((const float*)data); /* no need of mutexes */
 
     /* nothing to do */
     if(sigma == 0.0f) {
-        prev_sigma = 0.0f;
+        is_initialized = false;
         return;
     }
 
@@ -853,6 +853,7 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     const size_t n = sizeof(g0) / sizeof(float);
     const int c = (n-1) / 2;
     static int w = -1;
+    static float prev_sigma = 0.0f;
 
     if(fabsf(sigma - prev_sigma) > 1e-5) {
         w = normalized_gaussian(g0, sigma, n);
@@ -865,10 +866,11 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     /* store two frames of samples */
     static float samples[2 * MAX_SAMPLES * NUM_CHANNELS];
     size_t buf_size = num_samples * NUM_CHANNELS * DEPTH_SIZE;
-    bool was_disabled = (prev_sigma == 0.0f);
 
-    if(was_disabled)
+    if(!is_initialized) {
         memset(samples, 0, 2 * buf_size);
+        is_initialized = true;
+    }
 
     memcpy(samples, samples + num_samples * NUM_CHANNELS, buf_size);
     memcpy(samples + num_samples * NUM_CHANNELS, buf, buf_size);
