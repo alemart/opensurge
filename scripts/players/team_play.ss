@@ -21,9 +21,10 @@ How to use: add "Team Play" to the setup list of your .lev file.
 object "Team Play" is "setup"
 {
     public enableWarnings = true;
+    aiList = [];
     bgx = Level.child("Background Exchange Manager") ||
           Level.spawn("Background Exchange Manager");
-    aiList = [];
+    maxDistance = Screen.width / 2;
 
     state "main"
     {
@@ -64,8 +65,6 @@ object "Team Play" is "setup"
 
                 // the player is controlled by AI
                 distance = player.transform.position.distanceTo(Player.active.transform.position);
-                maxDistance = Screen.width / 2;
-
                 ai.focusable = (
                     !ai.repositioning && !player.frozen && distance < maxDistance &&
                     bgx.backgroundOfPlayer(player) === bgx.backgroundOfPlayer(Player.active)
