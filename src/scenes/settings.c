@@ -322,39 +322,39 @@ static const struct
     { TYPE_TITLE, "$OPTIONS_COLORED_TITLE", (const char*[]){ NULL }, 0, vt_title, 8 },
 
     /* Graphics */
-    { TYPE_SUBTITLE, "$OPTIONS_GRAPHICS", (const char*[]){ NULL }, 0, vt_graphics, 8 },
+    { TYPE_SUBTITLE, "$OPTIONS_COLORED_GRAPHICS", (const char*[]){ NULL }, 0, vt_graphics, 8 },
     { TYPE_SETTING, "$OPTIONS_QUALITY", (const char*[]){ "$OPTIONS_QUALITY_LOW", "$OPTIONS_QUALITY_MEDIUM", "$OPTIONS_QUALITY_HIGH", NULL }, 1, vt_quality, 8 },
     { TYPE_SETTING, "$OPTIONS_RESOLUTION", (const char*[]){ TIMES(1), TIMES(2), TIMES(3), TIMES(4), NULL }, 1, vt_resolution, 0 },
     { TYPE_SETTING, "$OPTIONS_FULLSCREEN", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_fullscreen, 0 },
     { TYPE_SETTING, "$OPTIONS_FPS", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_showfps, 0 },
 
     /* Audio */
-    { TYPE_SUBTITLE, "$OPTIONS_AUDIO", (const char*[]){ NULL }, 0, vt_audio, 8 },
+    { TYPE_SUBTITLE, "$OPTIONS_COLORED_AUDIO", (const char*[]){ NULL }, 0, vt_audio, 8 },
     { TYPE_SETTING, "$OPTIONS_VOLUME", (const char*[]){ "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%", NULL }, 10, vt_volume, 8 },
     { TYPE_SETTING, "$OPTIONS_MIXER", (const char*[]){ "$OPTIONS_MIXER_MIN", "5%", "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "$OPTIONS_MIXER_MID", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "$OPTIONS_MIXER_MAX", NULL }, 10, vt_mixer, 0 },
     { TYPE_SETTING, "$OPTIONS_MUFFLER", (const char*[]){ "$OPTIONS_MUFFLER_OFF", "$OPTIONS_MUFFLER_LOW", "$OPTIONS_MUFFLER_MEDIUM", "$OPTIONS_MUFFLER_HIGH", NULL }, 2, vt_muffler, 0 },
     { TYPE_SETTING, "$OPTIONS_MUTE", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_mute, 0 },
 
     /* Controls */
-    { TYPE_SUBTITLE, "$OPTIONS_CONTROLS", (const char*[]){ NULL }, 0, vt_controls, 8 },
+    { TYPE_SUBTITLE, "$OPTIONS_COLORED_CONTROLS", (const char*[]){ NULL }, 0, vt_controls, 8 },
     { TYPE_SETTING, "$OPTIONS_GAMEPADOPACITY", (const char*[]){ "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%", NULL }, 10, vt_gamepadopacity, 8 },
 
     /* Game */
-    { TYPE_SUBTITLE, "$OPTIONS_GAME", (const char*[]){ NULL }, 0, vt_game, 8 },
+    { TYPE_SUBTITLE, "$OPTIONS_COLORED_GAME", (const char*[]){ NULL }, 0, vt_game, 8 },
     { TYPE_SETTING, "$OPTIONS_LANGUAGE", (const char**)languages.name_list, 0, vt_language, 8 },
     { TYPE_SETTING, "$OPTIONS_DEVELOPERMODE", (const char*[]){ NULL }, 0, vt_developermode, 0 },
     { TYPE_SETTING, "$OPTIONS_STAGESELECT", (const char*[]){ NULL }, 0, vt_stageselect, 0 },
     { TYPE_SETTING, "$OPTIONS_CREDITS", (const char*[]){ NULL }, 0, vt_credits, 0 },
 
     /* MODs */
-    { TYPE_SUBTITLE, "$OPTIONS_MODS", (const char*[]) { NULL }, 0, vt_mods, 8 },
+    { TYPE_SUBTITLE, "$OPTIONS_COLORED_MODS", (const char*[]) { NULL }, 0, vt_mods, 8 },
     { TYPE_SETTING, "$OPTIONS_PLAYMOD", (const char*[]) { NULL }, 0, vt_playgame, 8 },
     { TYPE_SETTING, "$OPTIONS_MODSTORAGE", (const char*[]) { "$OPTIONS_MODSTORAGE_ARCHIVE", "$OPTIONS_MODSTORAGE_FOLDER", NULL }, 0, vt_modstorage, 0 },
     { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", NULL }, 1, vt_compatibilitymode, 0 },
     { TYPE_SETTING, "$OPTIONS_BACKTOBASEGAME", (const char*[]) { NULL }, 0, vt_backtobasegame, 8 },
 
     /* Engine */
-    { TYPE_SUBTITLE, "$OPTIONS_ENGINE", (const char*[]){ NULL }, 0, vt_engine, 8 },
+    { TYPE_SUBTITLE, "$OPTIONS_COLORED_ENGINE", (const char*[]){ NULL }, 0, vt_engine, 8 },
     { TYPE_SETTING, "$OPTIONS_ABOUT", (const char*[]){ NULL }, 0, vt_about, 8 },
     { TYPE_SETTING, "$OPTIONS_SHARE", (const char*[]){ NULL }, 0, vt_share, 0 },
     { TYPE_SETTING, "$OPTIONS_REPORTISSUE", (const char*[]){ NULL }, 0, vt_reportissue, 0 },
