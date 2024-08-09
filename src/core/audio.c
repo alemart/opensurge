@@ -864,16 +864,16 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
         return;
 
     /* store two frames of samples */
-    static float samples[2 * MAX_SAMPLES * NUM_CHANNELS];
+    static float samples[2 * MAX_SAMPLES * NUM_CHANNELS] = { 0.0f };
     size_t buf_size = num_samples * NUM_CHANNELS * DEPTH_SIZE;
-
-    if(!is_initialized) {
-        memset(samples, 0, 2 * buf_size);
-        is_initialized = true;
-    }
 
     memcpy(samples, samples + num_samples * NUM_CHANNELS, buf_size);
     memcpy(samples + num_samples * NUM_CHANNELS, buf, buf_size);
+
+    if(!is_initialized) { /* wait one more frame */
+        is_initialized = true;
+        return;
+    }
 
     /* find the initial index of the output. We introduce a small delay.
        start is an even number (NUM_CHANNELS is 2) and points to a L sample */
