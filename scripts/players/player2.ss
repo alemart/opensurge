@@ -5,9 +5,10 @@
 // License: MIT
 // -----------------------------------------------------------------------------
 using SurgeEngine.Player;
-using SurgeEngine.Vector2;
+using SurgeEngine.Level;
 using SurgeEngine.Input;
 using SurgeEngine.Camera;
+using SurgeEngine.Vector2;
 using SurgeEngine.Video.Screen;
 
 /*
@@ -62,6 +63,9 @@ object "Player 2" is "companion"
     lockedPosition = null;
     canLock = true;
 
+    bgx = Level.child("Background Exchange Manager") ||
+          Level.spawn("Background Exchange Manager");
+
     state "main"
     {
         // initialization
@@ -76,7 +80,7 @@ object "Player 2" is "companion"
             return;
 
         // do nothing if the player is effectively Player 1 at this time
-        if(player == Player.active) {
+        if(player.hasFocus()) {
             setPlayer1Flags(player);
             return;
         }
@@ -321,6 +325,33 @@ object "Player 2" is "companion"
             if(!isOffscreen(player, roiMargin))
                 lockedPosition = null;
         }
+    }
+
+    fun updateBackground()
+    {
+        leader = Player.active;
+        assert(leader !== player);
+
+        distance = player.transform.position.distanceTo(leader.transform.position);
+
+        if(state == "repositioning" || distance < 64) {
+            backgroundOfLeader = bgx.backgroundOfPlayer(leader);
+            bgx.changeBackgroundOfPlayer(player, backgroundOfLeader);
+        }
+    }
+
+    fun lateUpdate()
+    {
+        // do nothing if disabled
+        if(!enabled)
+            return;
+
+        // do nothing if the player is effectively Player 1 at this time
+        if(player.hasFocus())
+            return;
+
+        // background awareness
+        updateBackground();
     }
 
     fun constructor()
