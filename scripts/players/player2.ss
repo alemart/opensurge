@@ -214,7 +214,7 @@ object "Player 2" is "companion"
         player.immortal = true;
         player.invulnerable = true;
         player.secondary = false; // unlike an AI-controlled Player 2
-        player.focusable = focusable;
+        player.focusable = focusable && !this.repositioning;
     }
 
     fun setPlayer1Flags(player)

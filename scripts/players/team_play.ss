@@ -71,6 +71,11 @@ object "Team Play" is "setup"
                 );
 
             }
+
+            // check if the Player 2 companion is also present
+            p2 = player.child("Player 2");
+            if(p2 !== null)
+                p2.focusable = ai.focusable;
         }
     }
 }
