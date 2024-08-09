@@ -17,36 +17,29 @@ using SurgeEngine.Collisions.CollisionBox;
 object "Background Exchanger" is "entity", "special"
 {
     public background = "themes/template.bg";
-    collider = CollisionBox(32, 32);
-    player = null;
-    manager = Level.child("Background Exchange Manager") || Level.spawn("Background Exchange Manager");
+    base = spawn("Background Exchanger Base");
 
-    state "main"
+    fun onBackgroundExchangerCallback(player, manager)
     {
-    }
-
-    state "watch collision"
-    {
-        if(!collider.collidesWith(player.collider)) {
-            manager.changeBackgroundOfPlayer(player, background);
-            state = "main";
-        }
-    }
-
-    fun onCollision(otherCollider)
-    {
-        if(otherCollider.entity.hasTag("player")) {
-            player = otherCollider.entity;
-            state = "watch collision";
-        }
+        manager.changeBackgroundOfPlayer(player, background);
     }
 }
 
 object "Background Restorer" is "entity", "special"
 {
+    base = spawn("Background Exchanger Base");
+
+    fun onBackgroundExchangerCallback(player, manager)
+    {
+        manager.restoreBackgroundOfPlayer(player);
+    }
+}
+
+object "Background Exchanger Base" is "private", "entity"
+{
+    manager = Level.child("Background Exchange Manager") || Level.spawn("Background Exchange Manager");
     collider = CollisionBox(32, 32);
     player = null;
-    manager = Level.child("Background Exchange Manager") || Level.spawn("Background Exchange Manager");
 
     state "main"
     {
@@ -55,7 +48,8 @@ object "Background Restorer" is "entity", "special"
     state "watch collision"
     {
         if(!collider.collidesWith(player.collider)) {
-            manager.restoreBackgroundOfPlayer(player);
+            parent.onBackgroundExchangerCallback(player, manager);
+            player = null;
             state = "main";
         }
     }
@@ -63,6 +57,9 @@ object "Background Restorer" is "entity", "special"
     fun onCollision(otherCollider)
     {
         if(otherCollider.entity.hasTag("player")) {
+            if(player !== null) // if already watching (i.e., multiplayer)
+                parent.onBackgroundExchangerCallback(player, manager);
+
             player = otherCollider.entity;
             state = "watch collision";
         }
