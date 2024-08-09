@@ -1129,6 +1129,10 @@ font "GoodNeighbors"
             source_rect         879 37 8 19
             offset              0 -3
         }
+        char "×" {
+            source_rect         888 37 8 19
+            offset              0 -3
+        }
     }
 }
 
@@ -1800,16 +1804,44 @@ font "GoodNeighborsLarge"
         }
 
 
+        char "À" {
+            source_rect         38 166 16 38
+            offset              0 -6
+        }
+        char "Ã" {
+            source_rect         146 166 16 38
+            offset              0 -6
+        }
         char "Ê" {
             source_rect         306 166 16 38
+            offset              0 -6
+        }
+        char "É" {
+            source_rect         342 166 16 38
             offset              0 -6
         }
         char "é" {
             source_rect         360 166 16 38
             offset              0 -6
         }
+        char "Ç" {
+            source_rect         378 166 16 38
+            offset              0 -6
+        }
         char "¡" {
             source_rect         432 166 16 38
+            offset              0 -6
+        }
+        char "Í" {
+            source_rect         478 166 12 38
+            offset              0 -6
+        }
+        char "Ó" {
+            source_rect         680 166 16 38
+            offset              0 -6
+        }
+        char "Õ" {
+            source_rect         716 166 16 38
             offset              0 -6
         }
         char "ü" {
@@ -1820,12 +1852,20 @@ font "GoodNeighborsLarge"
             source_rect         1234 166 16 38
             offset              0 -6
         }
+        char "Ĝ" {
+            source_rect         1378 166 16 38
+            offset              0 -6
+        }
         char "ę" {
             source_rect         1578 166 16 38
             offset              0 -6
         }
         char "Ń" {
             source_rect         1630 166 18 38
+            offset              0 -6
+        }
+        char "×" {
+            source_rect         1766 166 16 38
             offset              0 -6
         }
     }
