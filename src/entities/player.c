@@ -905,9 +905,14 @@ bool player_focus(player_t* player)
         return false;
 #endif
 
+#if 1
     /* error if the current player is inside a locked area - is this desirable? */
-    if(camera_is_locked() && camera_clip_test(player_position(level_player())))
-        return false;
+    if(camera_is_locked() && camera_clip_test(player_position(level_player()))) {
+        /* let's also check if the target player is outside the locked area */
+        if(!camera_clip_test(player_position(player)))
+            return false;
+    }
+#endif
 
     /* is any player dying? */
     for(int i = 0; (p = level_get_player_by_id(i)) != NULL; i++) {

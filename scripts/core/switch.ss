@@ -12,8 +12,6 @@ object "Switch Controller"
 {
     public enabled = true; // enable character switching?
     deny = Sound("samples/deny.wav");
-    leftShoulder = "fire5";
-    rightShoulder = "fire6";
     secondaryActionButton = "fire2";
 
     state "main"
@@ -21,21 +19,7 @@ object "Switch Controller"
         player = Player.active;
         input = player.input;
 
-        // switch character by pressing L1 or R1
-        if(input.buttonPressed(rightShoulder))
-            switchCharacter(-1);
-        else if(input.buttonPressed(leftShoulder))
-            switchCharacter(+1);
-
-        // We'll keep the following logic temporarily, for backwards
-        // compatibility. Button "fire2" is the secondary action button,
-        // and character switching now happens via shoulder buttons.
-        // The secondary action button is currently unused elsewhere in
-        // the game. We used it to do the character switching. This will
-        // no longer be the case.
-
-        // TODO: remove this fire2 trigger.
-        else if(input.buttonPressed(secondaryActionButton))
+        if(input.buttonPressed(secondaryActionButton))
             switchCharacter(+1);
     }
 
@@ -46,31 +30,25 @@ object "Switch Controller"
             return;
 
         // switch character
-        n = Player.count;
-        for(i = 0; i < n; i++) {
-            player = Player[i];
-            if(player.hasFocus()) {
-
-                if(!(player.midair || player.underwater || player.frozen)) {
-                    nextPlayer = findNextFocusablePlayer(i, direction);
-                    if(nextPlayer !== null) {
-                        if(nextPlayer.focus())
-                            adjustShoulderButtons(nextPlayer.input);
-                    }
-                }
-                else
-                    deny.play();
-
-                break;
-
+        player = Player.active;
+        if(!player.frozen) {
+            nextPlayer = findNextFocusablePlayer(player, direction);
+            if(nextPlayer !== null) {
+                if(nextPlayer.focus())
+                    adjustSwitchButton(nextPlayer.input);
             }
         }
+        else
+            deny.play();
     }
 
-    fun findNextFocusablePlayer(playerIndex, direction)
+    fun findNextFocusablePlayer(player, direction)
     {
+        i = findPlayerIndex(player);
         n = Player.count;
-        i = playerIndex;
+
+        if(i < 0)
+            return null;
 
         for(k = 1; k < n; k++) {
             next = (i + (n + direction * k)) % n;
@@ -83,12 +61,20 @@ object "Switch Controller"
         return null;
     }
 
-    fun adjustShoulderButtons(input)
+    fun findPlayerIndex(player)
     {
-        input.simulateButton(leftShoulder, true);
-        input.simulateButton(rightShoulder, true);
+        n = Player.count;
 
-        // TODO: remove this fire2 trigger.
+        for(i = 0; i < n; i++) {
+            if(Player[i] == player)
+                return i;
+        }
+
+        return -1;
+    }
+
+    fun adjustSwitchButton(input)
+    {
         input.simulateButton(secondaryActionButton, true);
     }
 }
