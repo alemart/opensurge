@@ -13,9 +13,9 @@ requires "0.6.1"
 act 1
 theme "themes/waterworks.brk"
 bgtheme "themes/sunshine.bg"
-spawn_point 112 9904
-setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Cleared Animation" "Example Setup"
-players "Tux"
+spawn_point 160 9904
+setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Cleared Animation" "Example Setup" "Team Play"
+players "Surge" "Neon" "Tux"
 
 // bricks
 brick 1 896 9216
@@ -91,7 +91,7 @@ entity "Collectible" 656 9920 "e64198904b26e018"
 entity "Bumper" 288 9776 "6bde6de8813b267d"
 entity "Spring Standard" 240 9952 "8e08a4ea18030220"
 entity "Spring Booster Right" 528 9952 "b7518b941231c90d"
-entity "Powerup Transformation" 32 9952 "918927fc"
-entity "Powerup Event Trigger" 192 9568 "457a4ab3"
+entity "Powerup Event Trigger" 32 9952 "918927fc"
+entity "Powerup Transformation" 192 9568 "457a4ab3"
 
 // EOF
