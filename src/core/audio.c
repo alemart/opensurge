@@ -802,8 +802,8 @@ const float* muffler_sigma(mufflerprofile_t profile)
     /* these values were picked for a frequency of 44100 Hz */
     static const float sigma[] = {
         [MUFFLER_OFF] = 0.0f,
-        [MUFFLER_LOW] = 11.0f,
-        [MUFFLER_MEDIUM] = 17.25f,
+        [MUFFLER_LOW] = 12.5f,
+        [MUFFLER_MEDIUM] = 20.0f,
         [MUFFLER_HIGH] = 25.0f /* 25: sounds good. 30: too much. */
     };
 
