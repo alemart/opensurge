@@ -50,9 +50,9 @@ static const char watershader_fs_glsl[] = ""
 
     "void main()\n"
     "{\n"
-    "   vec3 left = texture2D(tex, v_leftcoord).rgb;\n"
-    "   vec3 center = texture2D(tex, v_centercoord).rgb;\n"
-    "   vec3 right = texture2D(tex, v_rightcoord).rgb;\n"
+    "   vec4 left = texture2D(tex, v_leftcoord);\n" /* must read RGBA (Android hack below) */
+    "   vec4 center = texture2D(tex, v_centercoord);\n"
+    "   vec4 right = texture2D(tex, v_rightcoord);\n"
 
 #if defined(__ANDROID__)
     /*
@@ -67,7 +67,7 @@ static const char watershader_fs_glsl[] = ""
      * texture has been previously cleared to RGBA (0,0,0,0) and that we have set
      * its GL_TEXTURE_WRAP_[UV] parameter to GL_MIRRORED_REPEAT.
      */
-    "   right += float(all(equal(right, vec3(0.0)))) * left;\n" /* right becomes left if it's zero */
+    "   right += float(all(equal(right, vec4(0.0)))) * left;\n" /* right becomes left if it's zero */
 #endif
 
     "   float screen_height = float(screen_size.y);\n"
@@ -99,7 +99,7 @@ static const char watershader_fs_glsl[] = ""
     "   ivec3 m = ivec3((k >= 20), (k >= 32), (k <= 51));\n"
     "   int w = m.x + m.y * m.z;\n" /* waveform (w = 0, 1, 2) */
 
-    "   mat3 pixel = mat3(left, center, right);\n"
+    "   mat3 pixel = mat3(left.rgb, center.rgb, right.rgb);\n"
     "   vec3 selector = vec3((w == 0), (w == 1), (w == 2));\n"
     "   vec3 wanted_pixel = pixel * selector;\n"
 #endif
@@ -144,8 +144,8 @@ static int waterlevel = DEFAULT_WATERLEVEL;
 static color_t watercolor;
 static float internal_timer;
 static shader_t* watershader;
-static void render_simple_effect(int y, color_t color);
-static void render_default_effect(int y, float camera_y, float offset, float timer, float speed, color_t color);
+static void render_simple_effect(int screen_y, color_t color);
+static void render_default_effect(int screen_y, float camera_y, float offset, float timer, float speed, color_t color);
 static float* color_to_vec4(color_t color, float* vec4);
 static color_t premultiply_alpha(color_t color);
 
@@ -216,35 +216,21 @@ void waterfx_render_fg(v2d_t camera_position)
     /* convert the waterlevel from world space to screen space */
     v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
     v2d_t topleft = v2d_subtract(camera_position, half_screen);
-    int y = waterlevel - topleft.y;
+    int screen_y = waterlevel - topleft.y;
 
     /* clip out */
-    if(y >= VIDEO_SCREEN_H)
+    if(screen_y >= VIDEO_SCREEN_H)
         return;
 
     /* adjust y */
-    y = max(0, y);
-
-    /* if the active player is too fast, camera_y makes the effect look bad */
-    float camera_multiplier = 1.0f;
-    const player_t* player = level_player();
-    if(player != NULL && !player_is_dying(player) && !player_is_frozen(player)) {
-        static bool disabled_effect = false;
-        float abs_ysp = fabsf(player_ysp(player));
-
-        if(disabled_effect || abs_ysp >= 270.0f) {
-            disabled_effect = (abs_ysp > 180.0f);
-            camera_multiplier = 0.0f;
-            /*render_simple_effect(y, watercolor);
-            return;*/
-        }
-    }
+    if(screen_y < 0)
+        screen_y = 0;
 
     /* render */
     if(video_get_quality() > VIDEOQUALITY_LOW)
-        render_default_effect(y, camera_multiplier * topleft.y, 0.0f, internal_timer, 32.0f, watercolor);
+        render_default_effect(screen_y, topleft.y, 0.0f, internal_timer, 32.0f, watercolor);
     else
-        render_simple_effect(y, watercolor);
+        render_simple_effect(screen_y, watercolor);
 }
 
 /*
@@ -374,15 +360,15 @@ void handle_video_event(const ALLEGRO_EVENT* event, void* context)
 }
 
 /* render a simple water effect
-   y >= 0 is given in screen space */
-void render_simple_effect(int y, color_t color)
+   screen_y >= 0 is given in screen space */
+void render_simple_effect(int screen_y, color_t color)
 {
     v2d_t screen_size = video_get_screen_size();
-    image_rectfill(0, y, screen_size.x, screen_size.y, premultiply_alpha(watercolor));
+    image_rectfill(0, screen_y, screen_size.x, screen_size.y, premultiply_alpha(watercolor));
 }
 
 /* render the default water effect */
-void render_default_effect(int y, float camera_y, float offset, float timer, float speed, color_t color)
+void render_default_effect(int screen_y, float camera_y, float offset, float timer, float speed, color_t color)
 {
     /* this should never happen; backbuffers may be recreated */
     if(backbuffer[backbuffer_index] == NULL) {
@@ -426,7 +412,7 @@ void render_default_effect(int y, float camera_y, float offset, float timer, flo
     shader_set_active(watershader);
     {
         v2d_t screen_size = video_get_screen_size();
-        image_blit(backbuffer[backbuffer_index], 0, y, 0, y, screen_size.x, screen_size.y);
+        image_blit(backbuffer[backbuffer_index], 0, screen_y, 0, screen_y, screen_size.x, screen_size.y);
     }
     shader_set_active(prev);
 
