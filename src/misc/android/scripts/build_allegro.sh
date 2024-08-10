@@ -30,8 +30,7 @@ cmake ../../src \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCMAKE_VERBOSE_MAKEFILE=on \
     -DWANT_MONOLITH=off -DSHARED=on -DPREFER_STATIC_DEPS=on \
-    "-DGL_BUILD_TYPE=gles2+" -DWANT_GLES3=off \
-    -DWANT_MP3=off -DWANT_MODAUDIO=off \
+    -DWANT_GLES3=off -DWANT_MP3=off -DWANT_MODAUDIO=off \
     -DWANT_EXAMPLES=off -DWANT_DEMO=off -DWANT_TESTS=off \
     -DWANT_DOCS=off -DWANT_ANDROID_LEGACY=off
 

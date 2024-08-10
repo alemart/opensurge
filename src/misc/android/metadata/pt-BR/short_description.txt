@@ -1,1 +1,1 @@
-Uma game engine incrível com um platformer retrô para você realizar seus sonhos!
+Uma game engine retrô com um divertido jogo de plataforma inspirado no Sonic de 16 bits.

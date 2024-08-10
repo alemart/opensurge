@@ -1,1 +1,1 @@
-A retro game engine with a fun platformer for making your dreams come true!
+A retro game engine with a fun platformer inspired by 16-bit Sonic games.
