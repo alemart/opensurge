@@ -198,6 +198,7 @@ void waterfx_release()
  */
 void waterfx_update()
 {
+    /* update the internal timer */
     float dt = timer_get_delta();
     internal_timer += dt;
 
@@ -242,20 +243,21 @@ void waterfx_render_bg(v2d_t camera_position)
     /* convert the waterlevel from world space to screen space */
     v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
     v2d_t topleft = v2d_subtract(camera_position, half_screen);
-    int y = waterlevel - topleft.y;
+    int screen_y = waterlevel - topleft.y;
 
     /* clip out */
-    if(y >= VIDEO_SCREEN_H)
+    if(screen_y >= VIDEO_SCREEN_H)
         return;
 
     /* adjust y */
-    y = max(0, y);
+    if(screen_y < 0)
+        screen_y = 0;
 
     /* render */
     if(video_get_quality() > VIDEOQUALITY_LOW) {
         float camera_y = 0.0f; /* no camera */
         color_t transparent = color_rgba(0, 0, 0, 0);
-        render_default_effect(y, camera_y, 16.0f, internal_timer, 64.0f, transparent);
+        render_default_effect(screen_y, camera_y, 16.0f, internal_timer, 64.0f, transparent);
     }
 }
 
@@ -411,8 +413,7 @@ void render_default_effect(int screen_y, float camera_y, float offset, float tim
     const shader_t* prev = shader_get_active();
     shader_set_active(watershader);
     {
-        v2d_t screen_size = video_get_screen_size();
-        image_blit(backbuffer[backbuffer_index], 0, screen_y, 0, screen_y, screen_size.x, screen_size.y);
+        image_blit(backbuffer[backbuffer_index], 0, screen_y, 0, screen_y, screen_size[0], screen_size[1]);
     }
     shader_set_active(prev);
 
