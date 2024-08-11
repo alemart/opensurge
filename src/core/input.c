@@ -87,6 +87,10 @@ static struct {
 #define REQUIRED_AXES    2 /* required number of axes of a stick */
 enum { AXIS_X = 0, AXIS_Y = 1 }; /* axes of a stick */
 
+#if defined(ALLEGRO_UNIX)
+#define JOY_INIT_QUIRK   1
+#endif
+
 typedef struct joystick_input_t joystick_input_t;
 struct joystick_input_t {
     float axis[REQUIRED_AXES]; /* -1.0 <= axis[i] <= 1.0 */
@@ -167,6 +171,22 @@ void input_init()
 {
     /* initialize the Allegro input system */
     logfile_message("Initializing the input system...");
+
+#if defined(JOY_INIT_QUIRK)
+    /*
+
+    Handle a quirk of Allegro 5.2.9.
+
+    On Linux, Allegro will scan /dev/input when calling al_install_joystick().
+    In function ljoy_scan() at src/linux/ljoynu.c, we see that Allegro's file
+    system routines are used. If the ALLEGRO_FS_INTERFACE vtable is not the
+    default one based on stdio (like the physfs vtable), then the scan will
+    fail and the initially connected joysticks will not be detected.
+
+    */
+    const ALLEGRO_FS_INTERFACE* fs_interface = al_get_fs_interface();
+    al_set_standard_fs_interface();
+#endif
 
     /* initialize the keyboard */
     if(!al_is_keyboard_installed()) {
@@ -255,6 +275,11 @@ void input_init()
     /* this seems to be needed on Android TV */
     if(is_tv_device())
         input_reconfigure_joysticks();
+#endif
+
+#if defined(JOY_INIT_QUIRK)
+    /* restore the file system interface */
+    al_set_fs_interface(fs_interface);
 #endif
 }
 
