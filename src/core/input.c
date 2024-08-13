@@ -87,7 +87,7 @@ static struct {
 #define REQUIRED_AXES    2 /* required number of axes of a stick */
 enum { AXIS_X = 0, AXIS_Y = 1 }; /* axes of a stick */
 
-#if defined(ALLEGRO_UNIX)
+#if defined(ALLEGRO_UNIX) && ALLEGRO_VERSION_INT < AL_ID(5,2,10,0)
 #define JOY_INIT_QUIRK   1
 #endif
 
@@ -172,22 +172,6 @@ void input_init()
     /* initialize the Allegro input system */
     logfile_message("Initializing the input system...");
 
-#if defined(JOY_INIT_QUIRK)
-    /*
-
-    Handle a quirk of Allegro 5.2.9.
-
-    On Linux, Allegro will scan /dev/input when calling al_install_joystick().
-    In function ljoy_scan() at src/linux/ljoynu.c, we see that Allegro's file
-    system routines are used. If the ALLEGRO_FS_INTERFACE vtable is not the
-    default one based on stdio (like the physfs vtable), then the scan will
-    fail and the initially connected joysticks will not be detected.
-
-    */
-    const ALLEGRO_FS_INTERFACE* fs_interface = al_get_fs_interface();
-    al_set_standard_fs_interface();
-#endif
-
     /* initialize the keyboard */
     if(!al_is_keyboard_installed()) {
         if(!al_install_keyboard())
@@ -215,12 +199,33 @@ void input_init()
         al_set_config_value(al_get_system_config(), "joystick", "driver", "XINPUT");
 #endif
 
+#if defined(JOY_INIT_QUIRK)
+    /*
+
+    Handle a quirk of Allegro 5.2.9 and below.
+
+    On Linux, Allegro will scan /dev/input when calling al_install_joystick().
+    In function ljoy_scan() at src/linux/ljoynu.c, we see that Allegro's file
+    system routines are used. If the ALLEGRO_FS_INTERFACE vtable is not the
+    default one based on stdio (like the physfs vtable), then the scan will
+    fail and the initially connected joysticks will not be detected.
+
+    */
+    const ALLEGRO_FS_INTERFACE* fs_interface = al_get_fs_interface();
+    al_set_standard_fs_interface();
+#endif
+
     if(!al_is_joystick_installed()) {
         if(!al_install_joystick())
             fatal_error("Can't initialize the joystick subsystem");
     }
     engine_add_event_source(al_get_joystick_event_source());
     engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_CONFIGURATION, NULL, a5_handle_joystick_event);
+
+#if defined(JOY_INIT_QUIRK)
+    /* restore the file system interface */
+    al_set_fs_interface(fs_interface);
+#endif
 
     /* initialize touch input */
     if(!al_is_touch_input_installed()) {
@@ -275,11 +280,6 @@ void input_init()
     /* this seems to be needed on Android TV */
     if(is_tv_device())
         input_reconfigure_joysticks();
-#endif
-
-#if defined(JOY_INIT_QUIRK)
-    /* restore the file system interface */
-    al_set_fs_interface(fs_interface);
 #endif
 }
 
