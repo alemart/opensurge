@@ -34,7 +34,7 @@
 #include "../util/util.h"
 #include "../util/stringutil.h"
 
-#if defined(ALLEGRO_VERSION_INT) && defined(AL_ID) && ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
+#if ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
 #define WANT_WRAP 1
 #else
 #define WANT_WRAP 0
