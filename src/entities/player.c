@@ -1919,6 +1919,8 @@ bool require_angle_to_be_zero(physicsactorstate_t state, movmode_t movmode)
 
         case PAS_DEAD:
         case PAS_DROWNED:
+        case PAS_ROLLING:
+        case PAS_CHARGING:
             return true;
 
         default:
@@ -1992,13 +1994,9 @@ void hotspot_magic(player_t* player)
                 act->hot_spot.y += 4 - roll_delta - 6 * cosf(act->angle);
                 break;
         }
-
-        /* disable angle */
-        act->angle = 0.0f;
     }
     else {
         act->hot_spot.y += 1;
-        act->angle = 0.0f;
     }
 }
 
