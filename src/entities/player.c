@@ -76,7 +76,7 @@ static void update_animation_speed(player_t *player);
 static void update_underwater_status(player_t* player);
 static void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap);
 static float smooth_angle(const physicsactor_t* pa, float current_angle);
-static bool require_angle_to_be_zero(physicsactorstate_t state, movmode_t movmode);
+static bool require_angle_to_be_zero(const physicsactor_t* pa);
 static inline float delta_angle(float alpha, float beta);
 static void hotspot_magic(player_t* player);
 static void animate_invincibility_stars(player_t* player);
@@ -404,6 +404,7 @@ void player_render(player_t *player, v2d_t camera_position)
 {
     actor_t *act = player->actor;
     v2d_t hot_spot = act->hot_spot;
+    float angle = act->angle;
 
     /* invisible player? */
     if(!player->visible)
@@ -423,6 +424,10 @@ void player_render(player_t *player, v2d_t camera_position)
     /* hotspot "gambiarra" */
     hotspot_magic(player);
 
+    /* reset the angle */
+    if(require_angle_to_be_zero(player->pa))
+        act->angle = 0.0f;
+
     /* render the player */
     actor_render(act, camera_position);
 
@@ -436,8 +441,9 @@ void player_render(player_t *player, v2d_t camera_position)
             actor_render(player->star[i], camera_position);
     }
 
-    /* restore hot spot */
+    /* restore hot spot & angle */
     act->hot_spot = hot_spot;
+    act->angle = angle;
 }
 
 /*
@@ -1883,33 +1889,29 @@ void physics_adapter(player_t *player, const obstaclemap_t* obstaclemap)
 /* angle interpolation */
 float smooth_angle(const physicsactor_t* pa, float current_angle)
 {
+    const float threshold = 101.25f * DEG2RAD;
+    float new_angle = fix_angle(physicsactor_get_angle(pa), 15) * DEG2RAD;
+    float delta = delta_angle(new_angle, current_angle);
+
+    if(delta < threshold) {
+        const float min_t = 0.125f, max_t = 1.0f;
+        float t = min_t + (delta / threshold) * (max_t - min_t);
+
+        if(physicsactor_is_midair(pa))
+            t = 0.0625f; /* make the animation more fluid after running on a wall */
+
+        return lerp_angle(current_angle, new_angle, t);
+    }
+
+    return new_angle;
+}
+
+/* should the angle be zero? */
+bool require_angle_to_be_zero(const physicsactor_t* pa)
+{
     movmode_t movmode = physicsactor_get_movmode(pa);
     physicsactorstate_t state = physicsactor_get_state(pa);
 
-    if(!require_angle_to_be_zero(state, movmode)) {
-        const float threshold = 101.25f * DEG2RAD;
-        float new_angle = fix_angle(physicsactor_get_angle(pa), 15) * DEG2RAD;
-        float delta = delta_angle(new_angle, current_angle);
-
-        if(delta < threshold) {
-            const float min_t = 0.125f, max_t = 1.0f;
-            float t = min_t + (delta / threshold) * (max_t - min_t);
-
-            if(physicsactor_is_midair(pa))
-                t = 0.0625f; /* make the animation more fluid after running on a wall */
-
-            return lerp_angle(current_angle, new_angle, t);
-        }
-
-        return new_angle;
-    }
-
-    return 0.0f;
-}
-
-/* angle interpolation: helper function */
-bool require_angle_to_be_zero(physicsactorstate_t state, movmode_t movmode)
-{
     switch(state) {
         case PAS_WALKING:
         case PAS_RUNNING:
@@ -1920,7 +1922,6 @@ bool require_angle_to_be_zero(physicsactorstate_t state, movmode_t movmode)
         case PAS_DEAD:
         case PAS_DROWNED:
         case PAS_ROLLING:
-        case PAS_CHARGING:
             return true;
 
         default:
