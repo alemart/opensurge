@@ -52,7 +52,7 @@ object "Simple Repositioning Method" is "player-repositioning-method"
         onStart();
 
         // reposition the follower
-        follower.transform.position = leader.transform.position.translatedBy(0, -192);
+        follower.transform.position = leader.transform.position.translatedBy(0, -0.8 * Screen.height);
         follower.gsp = follower.xsp = follower.ysp = 0;
         follower.restore();
 
@@ -187,7 +187,7 @@ object "Flying Repositioning Method" is "player-repositioning-method"
 
     deltaIndex = 0;
     landingDistance = 8;
-    teleportOffset = Vector2(0, -192);
+    teleportOffset = Vector2(0, -0.8 * Screen.height);
     teleportDistance = Math.max(Screen.width, Screen.height) + 32;
     bufferedState = spawn("Follow the Leader AI - State Buffer");
 
@@ -348,7 +348,7 @@ object "Default Repositioning Method" is "player-repositioning-method", "private
 
     xsp = 0;
     ysp = 0;
-    dy = 150;
+    dy = 30 + Screen.height / 2;
 
     state "main"
     {
