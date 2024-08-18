@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // File: languages/russian.lng
-// Description: russian translation (revision 6) (encoding: UTF-8)
+// Description: russian translation (revision 7) (encoding: UTF-8)
 // Author: Halatnikov <https://halatnikov.github.io>
 // License: MIT
 // -----------------------------------------------------------------------------
@@ -14,8 +14,8 @@
 LANG_ID                     "ru_RU"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Русский"                 // language name
 LANG_AUTHOR                 "Halatnikov"              // translation author
-LANG_LASTUPDATE             "2024-06-01"              // date format: yyyy-mm-dd
-LANG_COMPATIBILITY          "0.6.1"                   // required engine version
+LANG_LASTUPDATE             "2024-08-18"              // date format: yyyy-mm-dd
+LANG_COMPATIBILITY          "0.6.1.2"                   // required engine version
 
 
 
@@ -57,7 +57,6 @@ LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
 
-
 //
 // Section: menus
 //
@@ -75,7 +74,7 @@ OPTIONS_YES                 "Да"
 OPTIONS_NO                  "Нет"
 OPTIONS_ON                  "Вкл" // alternatively: Enabled
 OPTIONS_OFF                 "Выкл" // alternatively: Disabled
-FIXME OPTIONS_DEFAULT             "Default"
+OPTIONS_DEFAULT             "По умолчанию"
 OPTIONS_FULLSCREEN          "Во весь экран"
 OPTIONS_RESOLUTION          "Размер окна"
 OPTIONS_QUALITY             "Качество"
@@ -88,16 +87,16 @@ OPTIONS_PIXELSCALER         "Масштабирование пикселей"
 OPTIONS_COMINGSOON          "Скоро будет!"
 OPTIONS_VOLUME              "Громкость"
 OPTIONS_MUTE                "Заглушить"
-FIXME OPTIONS_MIXER               "Mixer"
-FIXME OPTIONS_MIXER_MIN           "No music"
-FIXME OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
-FIXME OPTIONS_MIXER_MAX           "No sounds"
-FIXME OPTIONS_MUFFLER             "Underwater effect"
-FIXME OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
-FIXME OPTIONS_MUFFLER_LOW         "Light" // also: lightweight
-FIXME OPTIONS_MUFFLER_MEDIUM      "Moderate"
-FIXME OPTIONS_MUFFLER_HIGH        "Intense"
-FIXME OPTIONS_MUFFLER_HIGHER      "More intense"
+OPTIONS_MIXER               "Баланс громкости"
+OPTIONS_MIXER_MIN           "Только звуки"
+OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
+OPTIONS_MIXER_MAX           "Только музыка"
+OPTIONS_MUFFLER             "Подводный эффект"
+OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
+OPTIONS_MUFFLER_LOW         "Низкий" // also: lightweight
+OPTIONS_MUFFLER_MEDIUM      "Средний"
+OPTIONS_MUFFLER_HIGH        "Высокий"
+OPTIONS_MUFFLER_HIGHER      "Очень высокий"
 OPTIONS_GAMEPADOPACITY      "Прозрачность джойстика"
 OPTIONS_GAMEPAD             "Геймпад"
 OPTIONS_LANGUAGE            "Язык"
@@ -166,7 +165,7 @@ CREDITS_RES_SCRIPTS_TEXT    "Авторы указаны внутри самих
 TITLESCREEN_PLAY            "НАЧАТЬ ИГРУ"
 TITLESCREEN_OPTIONS         "НАСТРОЙКИ"
 TITLESCREEN_CREATE          "СОЗДАТЬ"
-TITLESCREEN_MOBILE          "ИГРАТЬ НА ТЕЛЕФОНЕ"
+TITLESCREEN_MOBILE          "МОБИЛЬНАЯ ВЕРСИЯ"
 TITLESCREEN_SHARE           "ПОДЕЛИТЬСЯ"
 TITLESCREEN_DONATE          "ПОДДЕРЖАТЬ"
 TITLESCREEN_QUIT            "ВЫХОД"
@@ -291,6 +290,7 @@ LEV_DEMO_4                  "<color=$COLOR_TITLE>Круто!</color>\nУже з�
 LEV_DEMO_5                  "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! <color=$COLOR_HIGHLIGHT>Нажмите F12 чтобы открыть редактор.</color> Затем, откройте список предметов и начните собирать свой уровень! (нажмите F1 для справки)"
 LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Попробуйте сами!</color>\nТеперь ваша очередь! Поставьте игру на паузу, потяните за ручку внизу экрана и нажмите <color=$COLOR_HIGHLIGHT>DEBUG</color> чтобы <color=$COLOR_HIGHLIGHT>изменить уровень</color>!"
 LEV_DEMO_6                  "<color=$COLOR_TITLE>Круто!</color>\nПосетите <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> чтобы начать создавать свои собственные игры уже сегодня!"
+
 
 
 //
