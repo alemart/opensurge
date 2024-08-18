@@ -48,7 +48,7 @@ warnings and no missing features.
 
 The compatibility pack is generated on a file-by-file basis. It is generated
 with a subset of the compatibility list below. Each file is linked to a version
-range of the form [first:last] (inclusive). If the compatibility version falls
+range of the form [first:last) (inc.-excl.). If the compatibility version falls
 within the range, the corresponding file will be included in the compatibility
 pack. The compatibility version is usually the engine version of the MOD. When
 writing the "last" part of the range, consider the development builds as well.
@@ -98,7 +98,7 @@ static const char* const COMPATIBILITY_LIST[] = {
 
 #if 1
     /* active changes */
-    "sprites/ui/pause.spr",                             ":0.6.0.3",                 /* introduce a new pause menu in 0.6.1 */
+    "sprites/ui/pause.spr",                             ":0.6.1",                   /* introduce a new pause menu in 0.6.1 */
     "scripts/core/hud.ss",                              ":0.6.1",                   /* mobile: add pause button to the Default HUD in 0.6.1 */
     "scripts/core/pause.ss",                            ":0.6.1",                   /* better user experience in 0.6.1 */
     "inputs/default.in",                                ":0.6.1",                   /* updated mappings are better */
@@ -352,7 +352,7 @@ bool scan_level_line(const char* vpath, int line, levparser_command_t command, c
 /*
  * falls_within_version_range()
  * Checks if an engine version of the form x.y.z[.w] falls within a range of
- * the form [first:last] (inclusive)
+ * the form [first:last)
  */
 bool falls_within_version_range(const char* version, const char* range)
 {
@@ -387,5 +387,5 @@ bool falls_within_version_range(const char* version, const char* range)
     test_version = parse_version_number(version);
 
     /* test if the engine version falls within the interval */
-    return first <= test_version && test_version <= last;
+    return first <= test_version && test_version < last;
 }
