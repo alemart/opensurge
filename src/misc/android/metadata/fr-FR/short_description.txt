@@ -1,1 +1,1 @@
-Un moteur de jeu rétro avec un platformer fun pour rendre vos rêves réels !
+Un moteur de jeu rétro avec un platformer fun inspiré des jeux Sonic 16 bits.
