@@ -1,1 +1,1 @@
-¡Un motor de juego retro con un divertido plataformas para cumplir tus sueños!
+Un motor de juego retro con un divertido juego de plataformas inspirado en los juegos de Sonic de 16 bits.
