@@ -1,1 +1,1 @@
-Retro-Spielengine mit einem Plattformer, um deine Träume wahr werden zu lassen!
+Eine Retro-Spielengine mit einem spaßigen Plattformspiel, das von 16-Bit-Sonic-Spielen inspiriert wurde.

@@ -15,7 +15,7 @@
 LANG_ID                     "de_DE"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Deutsch"                 // language name
 LANG_AUTHOR                 "Wuzzy"                   // translation author
-LANG_LASTUPDATE             "2024-06-01"              // date format: yyyy-mm-dd
+LANG_LASTUPDATE             "2024-08-18"              // date format: yyyy-mm-dd
 LANG_COMPATIBILITY          "0.6.1"                   // required engine version
 
 
@@ -74,7 +74,7 @@ OPTIONS_YES                 "Ja"
 OPTIONS_NO                  "Nein"
 OPTIONS_ON                  "Ein" // alternatively: Enabled
 OPTIONS_OFF                 "Aus" // alternatively: Disabled
-FIXME OPTIONS_DEFAULT             "Default"
+OPTIONS_DEFAULT             "Standard"
 OPTIONS_FULLSCREEN          "Vollbild"
 OPTIONS_RESOLUTION          "Bildschirmgröße"
 OPTIONS_QUALITY             "Qualität"
@@ -87,16 +87,16 @@ OPTIONS_PIXELSCALER         "Pixelskalierer"
 OPTIONS_COMINGSOON          "Kommt bald!"
 OPTIONS_VOLUME              "Lautstärke"
 OPTIONS_MUTE                "Stumm"
-FIXME OPTIONS_MIXER               "Mixer"
-FIXME OPTIONS_MIXER_MIN           "No music"
-FIXME OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
-FIXME OPTIONS_MIXER_MAX           "No sounds"
-FIXME OPTIONS_MUFFLER             "Underwater effect"
-FIXME OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
-FIXME OPTIONS_MUFFLER_LOW         "Light" // also: lightweight
-FIXME OPTIONS_MUFFLER_MEDIUM      "Moderate"
-FIXME OPTIONS_MUFFLER_HIGH        "Intense"
-FIXME OPTIONS_MUFFLER_HIGHER      "More intense"
+OPTIONS_MIXER               "Mischpult"
+OPTIONS_MIXER_MIN           "Keine Musik"
+OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
+OPTIONS_MIXER_MAX           "Keine Töne"
+OPTIONS_MUFFLER             "Unterwasser-Effekt"
+OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
+OPTIONS_MUFFLER_LOW         "Schwach" // also: lightweight
+OPTIONS_MUFFLER_MEDIUM      "Moderat"
+OPTIONS_MUFFLER_HIGH        "Stark"
+OPTIONS_MUFFLER_HIGHER      "Noch stärker"
 OPTIONS_GAMEPADOPACITY      "Undurchsichtigkeit"
 OPTIONS_GAMEPAD             "Gamepad benutzen"
 OPTIONS_LANGUAGE            "Sprache"
@@ -195,7 +195,7 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Danke fürs Spielen!"
-THANKSFORPLAYING_TEXT       "Dieses Spiel wurde mit Open Surge erstellt, einer sehr flexiblen Open-Source-2-D-Spielengine, die sich jetzt in deinen Händen befindet!\n\nUnd jetzt verbreite den Spaß! Erzähl deiner Famile, Freunden und Haustieren davon!" // FIXME
+THANKSFORPLAYING_TEXT       "Dieses Spiel wurde mit Open Surge erstellt, einer sehr flexiblen Open-Source-2-D-Spielengine, die sich jetzt in deinen Händen befindet!\n\nUnd jetzt verbreite den Spaß! Erzähl deiner Familie, Freunden und Haustieren davon!" // FIXME
 THANKSFORPLAYING_YES        "Sicher!"
 THANKSFORPLAYING_NO         "Jetzt nicht"
 
