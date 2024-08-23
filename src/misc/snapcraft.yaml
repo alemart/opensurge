@@ -32,7 +32,7 @@ parts:
   opensurge:
     after: [libphysfs, liballegro5, surgescript]
     source: https://github.com/alemart/opensurge.git
-    source-tag: v0.6.1.1
+    source-tag: v0.6.1.2
     #source-commit: 
     plugin: cmake
     parse-info: [usr/share/metainfo/opensurge.appdata.xml]

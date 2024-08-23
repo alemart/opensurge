@@ -70,7 +70,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/alemart/opensurge.git
-        tag: v0.6.1.1
+        tag: v0.6.1.2
         #commit: ""
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
