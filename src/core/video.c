@@ -884,8 +884,8 @@ bool create_display(int width, int height)
 #if defined(__ANDROID__)
     /* request OpenGL ES 2.0+ on mobile */
     al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_ES_PROFILE);
-    al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 2, ALLEGRO_REQUIRE);
-    al_set_new_display_option(ALLEGRO_OPENGL_MINOR_VERSION, 0, ALLEGRO_REQUIRE);
+    al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 2, ALLEGRO_SUGGEST);
+    al_set_new_display_option(ALLEGRO_OPENGL_MINOR_VERSION, 0, ALLEGRO_SUGGEST);
 #elif 0
     /* request OpenGL 2.1+ on Desktop */
     /* does not work properly, why? */
