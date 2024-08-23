@@ -85,13 +85,16 @@ ALLEGRO_DEFINE_PROC_TYPE(void, fun_glclearcolor_t, (GLfloat, GLfloat, GLfloat, G
 ALLEGRO_DEFINE_PROC_TYPE(void, fun_glcleardepth_t, (GLdouble));
 ALLEGRO_DEFINE_PROC_TYPE(void, fun_glflush_t, (void));
 ALLEGRO_DEFINE_PROC_TYPE(const GLubyte*, fun_glgetstring_t, (GLenum));
+ALLEGRO_DEFINE_PROC_TYPE(GLenum, fun_glgeterror_t, (void));
 static fun_glinvalidateframebuffer_t _glInvalidateFramebuffer = NULL;
 static fun_glclear_t _glClear = NULL;
 static fun_glclearcolor_t _glClearColor = NULL;
 static fun_glcleardepth_t _glClearDepth = NULL;
 static fun_glflush_t _glFlush = NULL;
 static fun_glgetstring_t _glGetString = NULL;
+static fun_glgeterror_t _glGetError = NULL;
 static void import_opengl_symbols();
+static const char* get_opengl_error();
 
 
 /* FPS counter */
@@ -261,11 +264,11 @@ void video_init()
 
     /* create the display */
     if(!create_display(game_screen_width, game_screen_height))
-        FATAL("Failed to create a %dx%d display", game_screen_width, game_screen_height);
+        FATAL("Failed to create a %dx%d display. %s", game_screen_width, game_screen_height, get_opengl_error());
 
     /* create the backbuffer */
     if(!create_backbuffer())
-        FATAL("Failed to create the backbuffer");
+        FATAL("Failed to create the backbuffer. %s", get_opengl_error());
 
     /* import OpenGL symbols */
     import_opengl_symbols();
@@ -293,7 +296,7 @@ void video_init()
     /* initialize the shader system */
     shader_init();
     if(!use_default_shader())
-        FATAL("Failed to use the default shader");
+        FATAL("Failed to use the default shader. %s", get_opengl_error());
 
     /* initialize the console */
     init_console();
@@ -514,7 +517,7 @@ void video_set_immersive(bool immersive)
         /* restore the default shader */
         if(changed_mode) {
             if(!use_default_shader())
-                LOG("Can't set the default shader");
+                LOG("Can't set the default shader. %s", get_opengl_error());
         }
 
     }
@@ -862,8 +865,10 @@ bool create_display(int width, int height)
     LOG("Creating the display...");
 
     /* check for duplicates */
-    if(display != NULL)
+    if(display != NULL) {
         FATAL("Duplicate display");
+        return false;
+    }
 
     /* create a new display */
     memset(&state, 0, sizeof(state));
@@ -977,7 +982,7 @@ void reconfigure_display()
 
             /* restore the default shader */
             if(!use_default_shader())
-                LOG("Can't set the default shader");
+                LOG("Can't set the default shader. %s", get_opengl_error());
 
         }
         else
@@ -1073,11 +1078,11 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
             al_acknowledge_drawing_resume(event->display.source);
 
             if(!create_backbuffer())
-                FATAL("Can't create backbuffer after al_acknowledge_drawing_resume()");
+                FATAL("Can't create backbuffer after al_acknowledge_drawing_resume(). %s", get_opengl_error());
 
             shader_recreate_all();
             if(!use_default_shader())
-                LOG("Can't set the default shader");
+                LOG("Can't set the default shader. %s", get_opengl_error());
 
             video_set_immersive(was_immersive);
             break;
@@ -1167,11 +1172,11 @@ void reconfigure_backbuffer()
 
     /* create the new */
     if(!create_backbuffer())
-        FATAL("Can't reconfigure the backbuffer");
+        FATAL("Can't reconfigure the backbuffer. %s", get_opengl_error());
 
     /* reset shader */
     if(!use_default_shader())
-        LOG("Can't set the default shader");
+        LOG("Can't set the default shader. %s", get_opengl_error());
 }
 
 /* Compute the size of the screen / backbuffer according to the video mode */
@@ -1323,6 +1328,8 @@ void render_console()
         PRINT_ENTRIES(first, CONSOLE_MAX_ENTRIES - 1);
     }
 
+    #undef PRINT_ENTRIES
+
     al_restore_state(&state);
 }
 
@@ -1463,6 +1470,9 @@ void import_opengl_symbols()
 
     /* glGetString */
     _glGetString = (fun_glgetstring_t)al_get_opengl_proc_address("glGetString");
+
+    /* glGetError */
+    _glGetError = (fun_glgeterror_t)al_get_opengl_proc_address("glGetError");
 #else
     _glClear = NULL;
     _glClearColor = NULL;
@@ -1470,6 +1480,7 @@ void import_opengl_symbols()
     _glInvalidateFramebuffer = NULL;
     _glFlush = NULL;
     _glGetString = NULL;
+    _glGetError = NULL;
 #endif
 
     /* log */
@@ -1482,6 +1493,29 @@ void import_opengl_symbols()
     LOG_GL(glInvalidateFramebuffer);
     LOG_GL(glFlush);
     LOG_GL(glGetString);
+    LOG_GL(glGetError);
 
     #undef LOG_GL
+}
+
+/* a string that tells the OpenGL error flag */
+const char* get_opengl_error()
+{
+    /* glGetError() is unavailable */
+    if(_glGetError == NULL)
+        return "";
+
+    GLenum error = _glGetError();
+    switch(error)
+    {
+        case GL_NO_ERROR:                       return "no error";
+        case GL_INVALID_ENUM:                   return "invalid enum";
+        case GL_INVALID_VALUE:                  return "invalid value";
+        case GL_INVALID_OPERATION:              return "invalid operation";
+        case GL_INVALID_FRAMEBUFFER_OPERATION:  return "invalid framebuffer operation";
+        case GL_OUT_OF_MEMORY:                  return "out of memory";
+        case GL_STACK_UNDERFLOW:                return "stack underflow";
+        case GL_STACK_OVERFLOW:                 return "stack overflow";
+        default:                                return "unknown";
+    }
 }
