@@ -1513,14 +1513,14 @@ const char* get_opengl_error()
     GLenum error = _glGetError();
     switch(error)
     {
-        case GL_NO_ERROR:                       return "no error";
-        case GL_INVALID_ENUM:                   return "invalid enum";
-        case GL_INVALID_VALUE:                  return "invalid value";
-        case GL_INVALID_OPERATION:              return "invalid operation";
-        case GL_INVALID_FRAMEBUFFER_OPERATION:  return "invalid framebuffer operation";
-        case GL_OUT_OF_MEMORY:                  return "out of memory";
-        case GL_STACK_UNDERFLOW:                return "stack underflow";
-        case GL_STACK_OVERFLOW:                 return "stack overflow";
-        default:                                return "unknown";
+        case GL_NO_ERROR:                       return "GL no error";
+        case GL_INVALID_ENUM:                   return "GL invalid enum";
+        case GL_INVALID_VALUE:                  return "GL invalid value";
+        case GL_INVALID_OPERATION:              return "GL invalid operation";
+        case GL_INVALID_FRAMEBUFFER_OPERATION:  return "GL invalid framebuffer operation";
+        case GL_OUT_OF_MEMORY:                  return "GL out of memory";
+        case GL_STACK_UNDERFLOW:                return "GL stack underflow";
+        case GL_STACK_OVERFLOW:                 return "GL stack overflow";
+        default:                                return "GL unknown";
     }
 }
