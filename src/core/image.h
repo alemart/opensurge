@@ -50,7 +50,6 @@ enum {
 /* image management */
 image_t* image_create(int width, int height); /* create an image */
 image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height); /* creates a shared sub-image */
-image_t* image_create_backbuffer(int width, int height, bool want_depth_buffer); /* create an optimized drawing target */
 image_t* image_create_ex(int width, int height, int flags); /* create an image with extra options */
 void image_destroy(image_t* img); /* call this after image_create() */
 

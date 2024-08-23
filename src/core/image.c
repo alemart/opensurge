@@ -59,8 +59,7 @@ static const int MAX_IMAGE_SIZE = 4096; /* maximum image size for broad compatib
 
 /*
  * image_load()
- * Loads a image from a file.
- * Supported types: PNG, JPG, BMP, PCX, TGA
+ * Loads a image from a file
  */
 image_t* image_load(const char* path)
 {
@@ -215,22 +214,6 @@ image_t* image_create_shared(const image_t* parent, int x, int y, int width, int
     }
 
     return img;
-}
-
-/*
- * image_create_backbuffer()
- * Creates an image that is optimized to be a drawing target.
- * Its contents need not be preserved: the resulting image is
- * meant to be copied to the screen.
- */
-image_t* image_create_backbuffer(int width, int height, bool want_depth_buffer)
-{
-    int flags = IC_BACKBUFFER;
-
-    if(want_depth_buffer)
-        flags |= IC_DEPTH;
-
-    return image_create_ex(width, height, flags);
 }
 
 /*

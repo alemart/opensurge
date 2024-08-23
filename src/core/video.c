@@ -1115,13 +1115,14 @@ bool create_backbuffer()
     compute_screen_size(settings.mode, &screen_width, &screen_height);
 
     /* create the images */
-    bool want_depth_buffer = true;
+    int flags = IC_BACKBUFFER;
+    flags |= IC_DEPTH;
 
-    if(NULL == (backbuffer[0] = image_create_backbuffer(screen_width, screen_height, want_depth_buffer))) {
+    if(NULL == (backbuffer[0] = image_create_ex(screen_width, screen_height, flags))) {
         return false;
     }
 #if USE_ROUNDROBIN_BACKBUFFER
-    else if(NULL == (backbuffer[1] = image_create_backbuffer(screen_width, screen_height, want_depth_buffer))) {
+    else if(NULL == (backbuffer[1] = image_create_ex(screen_width, screen_height, flags))) {
         image_destroy(backbuffer[0]);
         backbuffer[0] = NULL;
         return false;
