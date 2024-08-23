@@ -587,6 +587,9 @@ void video_set_quality(videoquality_t quality)
     /* TODO */
     if(quality > VIDEOQUALITY_MEDIUM)
         video_showmessage("%s video quality: coming soon!", VIDEOQUALITY_NAME[quality]);
+
+    /* maybe we will or won't need a depth buffer */
+    reconfigure_backbuffer();
 }
 
 /*
@@ -1099,7 +1102,7 @@ void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data)
  *
  */
 
-/* Create the backbuffer (the image texture to which the game will be rendered to) */
+/* Create the backbuffer (i.e., the texture to which the graphics will be rendered) */
 bool create_backbuffer()
 {
     int screen_width = game_screen_width;
@@ -1116,7 +1119,8 @@ bool create_backbuffer()
 
     /* create the images */
     int flags = IC_BACKBUFFER;
-    flags |= IC_DEPTH;
+    if(settings.quality < VIDEOQUALITY_MEDIUM)
+        flags |= IC_DEPTH;
 
     if(NULL == (backbuffer[0] = image_create_ex(screen_width, screen_height, flags))) {
         return false;
