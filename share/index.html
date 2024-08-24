@@ -1,172 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
     <head>
         <meta charset="utf-8">
         <title>Share Surge the Rabbit</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900">
+        <meta http-equiv="refresh" content="0; url=../contribute">
         <link rel="shortcut icon" href="/favicon.ico">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <link rel="stylesheet" href="style.css">
         <script async src="//gc.zgo.at/count.js" data-goatcounter="https://opensurge.goatcounter.com/count"></script>
-        <style>
-        body {
-            color: #fff;
-            background: #fece90;
-            font-family: 'Catamaran', 'Helvetica', 'Arial', 'sans-serif';
-        }
-        a, a:visited, a:hover, a:focus, a:active, a:link {
-            color: #fff;
-        }
-        .content {
-            display: flex;
-            align-items: center;
-            height: 100vh;
-        }
-        .btn-go {
-            background: #f55044;
-            color: #fff !important;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-go:hover, .btn-go:focus {
-            background: #e14034;
-        }
-        .container {
-            /*width: 100%;*/
-            max-width: 480px;
-        }
-        .panel {
-            background: #fff;
-            color: #606060;
-            padding: 5px;
-            position: relative;
-            border: none;
-        }
-        .icon {
-            width: 256px;
-            position: relative;
-            left: 16px;
-        }
-        .btn img {
-            width: 64px;
-            height: 64px;
-            border-radius: 4px;
-        }
-        h3 {
-            margin-top: 7px;
-            font-size: 22px;
-        }
-        footer {
-            padding: 5px 10px;
-            text-align: center;
-            color: #fff;
-            position: fixed;
-            bottom: 0;
-            width: 100vw;
-            font-size: 12px;
-        }
-        progress {
-            width: 100%;
-            height: 4px;
-            display: inline-block;
-            position: absolute;
-            left: 0; bottom: 0;
-            border: none;
-            -moz-appearance: none;
-            -webkit-appearance: none;
-            appearance: none;
-            background: #777;
-            color: #ff1010;
-        }
-        progress::-moz-progress-bar { background: #ff1010 !important; }
-        progress::-webkit-progress-value { background: #ff1010 !important; }
-        progress::-webkit-progress-bar { background: #777 !important; }
-        </style>
     </head>
     <body>
-        <div class="content">
-            <div class="container text-center">
-                <div class="panel">
-                    <img class="icon" src="icon.png" alt="Surge the Rabbit">
-                    <h3 class="lang en_US">Share the joy!<br>opensurge2d.org</h3>
-                    <div>
-                        <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fopensurge2d.org&quote=%23opensurge" onclick="return share(this,'facebook')" class="btn"><img src="facebook.png" alt="Share on Facebook"></a>
-                        <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fopensurge2d.org&hashtags=opensurge" onclick="return share(this,'twitter')" class="btn"><img src="twitter.png" alt="Share on X"></a>
-                        <a href="https://wa.me/?text=https%3A%2F%2Fopensurge2d.org" onclick="return share(this,'whatsapp')" class="btn"><img src="whatsapp.png" alt="Share via WhatsApp"></a>
-                        <a href="https://t.me/share/url?url=https%3A%2F%2Fopensurge2d.org" onclick="return share(this,'telegram')" class="btn"><img src="telegram.png" alt="Share via Telegram"></a>
-                    </div>
-                    <h4 class="text-center lang en_US hidden">You will be redirected shortly...</h4>
-                    <h4></h4>
-                    <progress id="progressbar" value="0" max="1000" hidden></progress>
-                </div>
+        <section class="center-of-screen">
+            <p>Redirecting...</p>
+            <div class="loading-animation">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
             </div>
-        </div>
-
-        <!-- Progress Bar -->
-        <script>
-        (function($) {
-            $.fn.progress = function(totalTime, onComplete) {
-                var max = this.attr('max');
-                var tmr = window.setInterval(function() {
-                    var inc = max / (1000 * totalTime / 50);
-                    var val = Number(this.attr('value'));
-                    if((val += inc) >= max) {
-                        onComplete.call(this);
-                        this.stop();
-                    }
-                    this.attr('value', Math.min(val, max));
-                }.bind(this), 50);
-                this.stop = function() { window.clearInterval(tmr); };
-                return this;
-            };
-        })(jQuery);
-        </script>
-
-        <!-- Language selector -->
-        <script>
-        window.qs = (function(params) {
-            var param = {};
-            for(var i = 0; i < params.length; i++) {
-                var p = params[i].split('=', 2);
-                if(p.length == 1)
-                    param[p[0]] = '';
-                else
-                    param[p[0]] = decodeURIComponent(p[1].replace(/\+/g, ' '));
-            }
-            return param;
-        })(window.location.search.substr(1).split('&'));
-        window.lang = (window.qs || {})['lang'] || 'en_US';
-        window.ver = (window.qs || {})['v'] || null;
-        $(document).ready(function() {
-            var hasLang = $('.lang.' + window.lang).length > 0;
-            if(hasLang)
-                $('.lang:not(.' + window.lang + ')').hide();
-            else
-                $('.lang:not(.en_US)').hide();
-        });
-        </script>
-
-        <!-- Sharing Code -->
-        <script>
-        $(document).ready(function() {
-            var redirect = function() { window.location = '/?v=' + window.ver + '&lang=' + window.lang; }
-            //var progress = $('#progressbar').progress(10.0, redirect);
-            window.share = function(link, on) {
-                var win = window.open(link.href, 'Social ' + on, 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes'); //width=657,height=487
-                var tmr = window.setInterval(function() {
-                    try {
-                        if(!win || win.closed) {
-                            window.clearInterval(tmr);
-                            //redirect();
-                        }
-                    }
-                    catch(e) { ; }
-                }, 500);
-                //progress.stop();
-                return false;
-            }
-        });
-        </script>
+        </section>
     </body>
 </html>
