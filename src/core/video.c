@@ -1519,8 +1519,14 @@ const char* get_opengl_error()
         case GL_INVALID_OPERATION:              return "GL invalid operation";
         case GL_INVALID_FRAMEBUFFER_OPERATION:  return "GL invalid framebuffer operation";
         case GL_OUT_OF_MEMORY:                  return "GL out of memory";
+
+#if defined(GL_STACK_OVERFLOW) && defined(GL_STACK_UNDERFLOW)
+        /* the following error codes are not defined on OpenGL ES 2.0 / 3.0:
+           https://registry.khronos.org/OpenGL-Refpages/es3.0/html/glGetError.xhtml */
         case GL_STACK_UNDERFLOW:                return "GL stack underflow";
         case GL_STACK_OVERFLOW:                 return "GL stack overflow";
-        default:                                return "GL unknown";
+#endif
+
+        default:                                return "GL unknown error";
     }
 }
