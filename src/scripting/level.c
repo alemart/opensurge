@@ -1022,11 +1022,10 @@ surgescript_var_t* fun_spawnassetupobject(surgescript_object_t* object, const su
     }
 
     /* check if the setup object is already tagged "setup" */
-    if(!surgescript_tagsystem_has_tag(tag_system, setup_object_name, "setup"))
+    if(!surgescript_tagsystem_has_tag(tag_system, setup_object_name, "setup")) {
         logfile_message("Setup object \"%s\" isn't tagged \"setup\"", setup_object_name);
-
-    /* add the "setup" tag */
-    surgescript_tagsystem_add_tag(tag_system, setup_object_name, "setup");
+        surgescript_tagsystem_add_tag(tag_system, setup_object_name, "setup");
+    }
 
     /* make the setup object an awake entity for backwards-compatibility purposes */
     if(!surgescript_tagsystem_has_tag(tag_system, setup_object_name, "entity")) {
