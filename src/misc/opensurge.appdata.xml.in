@@ -87,6 +87,19 @@
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
   <releases>
+    <release version="0.6.1.2" date="2024-08-26">
+      <description>
+        <ul>
+          <li>Relaxed OpenGL requirements for compatibility with older hardware</li>
+          <li>Introduced an underwater audio effect and an audio mixer</li>
+          <li>Added the Team Play mechanic</li>
+          <li>Updated joystick-related code</li>
+          <li>Introduced font aliases</li>
+          <li>Made additions and fixes to SurgeScript</li>
+          <li>Other minor fixes and changes</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.6.1.1" date="2024-06-01">
       <description>
         <ul>

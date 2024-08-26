@@ -1,0 +1,7 @@
+* Relaxed OpenGL requirements for compatibility with older hardware
+* Introduced an underwater audio effect and an audio mixer
+* Added the Team Play mechanic
+* Updated joystick-related code
+* Introduced font aliases
+* Made additions and fixes to SurgeScript
+* Other minor fixes and changes

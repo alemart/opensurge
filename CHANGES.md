@@ -1,5 +1,15 @@
 # Release Notes
 
+## 0.6.1.2 - August 26th, 2024
+
+* Relaxed OpenGL requirements for compatibility with older hardware
+* Introduced an underwater audio effect and an audio mixer
+* Added the Team Play mechanic
+* Updated joystick-related code
+* Introduced font aliases
+* Made additions and fixes to SurgeScript
+* Other minor fixes and changes
+
 ## 0.6.1.1 - June 1st, 2024
 
 * Fixed an OpenGL-related issue in the Flatpak edition
