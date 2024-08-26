@@ -24,6 +24,7 @@
 #include "../../credits.h"
 #include "../../../core/timer.h"
 #include "../../../core/video.h"
+#include "../../../core/shader.h"
 #include "../../../core/image.h"
 #include "../../../core/input.h"
 #include "../../../core/color.h"
@@ -194,6 +195,7 @@ void render(mobile_subscene_t* subscene_ptr, v2d_t subscene_offset)
     /* render the font to the backbuffer of the subscene */
     image_t* target = image_drawing_target();
     image_set_drawing_target(subscene->backbuffer);
+        shader_set_active(shader_get_default());
         image_clear(color_hex(BACKGROUND_COLOR));
         font_render(subscene->font, camera);
     image_set_drawing_target(target);
