@@ -27,8 +27,7 @@ sprite "Flag Icon"
         fr_FR       4
         de_DE       5
         it_IT       6
-        pl_PL       7
-        ru_RU       8
+        ru_RU       7
         eo          31
     }
 
@@ -88,16 +87,8 @@ sprite "Flag Icon"
         data        113
     }
 
-    // pl_PL
-    animation 7
-    {
-        repeat      TRUE
-        fps         8
-        data        188
-    }
-
     // ru_RU
-    animation 8
+    animation 7
     {
         repeat      TRUE
         fps         8
