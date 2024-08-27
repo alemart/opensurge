@@ -42,7 +42,7 @@ static const char watershader_fs_glsl[] = ""
     "uniform sampler2D tex;\n"
     "uniform vec4 watercolor;\n"
     "uniform float scroll_y;\n"
-    "uniform mediump ivec2 screen_size;\n"
+    "uniform mediump ivec2 screen_size;\n" /* default int precision: highp (vs), mediump (fs) */
 
     "varying vec2 v_leftcoord;\n"
     "varying vec2 v_rightcoord;\n"
