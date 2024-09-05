@@ -70,7 +70,7 @@ OPTIONS_ENGINE              "Engine"
 OPTIONS_MODS                "MODs"
 OPTIONS_AUDIO               "Audio"
 OPTIONS_BACK                "Indietro"
-OPTIONS_YES                 "Si"
+OPTIONS_YES                 "Sì"
 OPTIONS_NO                  "No"
 OPTIONS_ON                  "Acceso" // alternatively: Enabled
 OPTIONS_OFF                 "Spento" // alternatively: Disabled
@@ -86,14 +86,14 @@ OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
 OPTIONS_PIXELSCALER         "Pixel scaler"
 OPTIONS_COMINGSOON          "Prossimamente!"
 OPTIONS_VOLUME              "Volume"
-OPTIONS_MUTE                "Mutato"
+OPTIONS_MUTE                "Muto"
 OPTIONS_MIXER               "Mixer"
 OPTIONS_MIXER_MIN           "Senza musica"
 OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
 OPTIONS_MIXER_MAX           "Nessun suono"
 OPTIONS_MUFFLER             "Effetto subacqueo"
 OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
-OPTIONS_MUFFLER_LOW         "Luce" // also: lightweight
+OPTIONS_MUFFLER_LOW         "Leggero" // also: lightweight
 OPTIONS_MUFFLER_MEDIUM      "Moderato"
 OPTIONS_MUFFLER_HIGH        "Intenso"
 OPTIONS_MUFFLER_HIGHER      "Più intenso"
@@ -162,7 +162,7 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Scripts</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Gli autori sono identificati all'interno degli stessi script."
 
 // Title Screen
-TITLESCREEN_PLAY            "AVVIO DEL GIOCO"
+TITLESCREEN_PLAY            "GIOCA"
 TITLESCREEN_OPTIONS         "OPZIONI"
 TITLESCREEN_CREATE          "CREA"
 TITLESCREEN_MOBILE          "GIOCA SU MOBILE"
@@ -195,7 +195,7 @@ PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
 THANKSFORPLAYING_TITLE      "Grazie per aver giocato!"
-THANKSFORPLAYING_TEXT       "Questo gioco è stato creato con Open Surge, un engine di gioco 2D molto flessibile e open-source che ora è nelle vostre mani.!\n\nCondividi la gioia parlandone alla famiglia, agli amici e animali e spargi la voce!"
+THANKSFORPLAYING_TEXT       "Questo gioco è stato creato con Open Surge, un engine di gioco 2D molto flessibile e open-source che ora è nelle vostre mani!\n\nCondividi la gioia parlandone alla famiglia, agli amici e animali e spargi la voce!"
 THANKSFORPLAYING_YES        "Sicuro!"
 THANKSFORPLAYING_NO         "Non ora"
 
@@ -270,7 +270,7 @@ INPUT_JOY_FIRE8             "<disponibile>"
 
 // Quit game? confirm box
 QUIT_QUESTION               "Vuoi davvero uscire?"
-QUIT_OPTION1                "Si"
+QUIT_OPTION1                "Sì"
 QUIT_OPTION2                "No"
 
 // Loading Screen
@@ -283,7 +283,7 @@ LOADING_TEXT                "caricamento..."
 //
 
 // Demo Level
-LEV_DEMO_1                  "<color=$COLOR_TITLE>Crea i tuoi fantastici giochi!</color>\nQuesto gioco è stato creato con <color=$COLOR_HIGHLIGHT>Open Surge</color>, un engine di gioco 2D molto flessibile e open-source che ora è nelle vostre mani.!"
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Crea i tuoi fantastici giochi!</color>\nQuesto gioco è stato creato con <color=$COLOR_HIGHLIGHT>Open Surge</color>, un engine di gioco 2D molto flessibile e open-source che ora è nelle vostre mani!"
 LEV_DEMO_2                  "<color=$COLOR_TITLE>Lo sapevi che...?</color>\nOgni cosa in Open Surge è personalizzabile. Puoi creare livelli, oggetti, boss, personaggi e altro! È un completo <color=$COLOR_HIGHLIGHT>sistema di creazione di giochi</color>."
 LEV_DEMO_3                  "<color=$COLOR_TITLE>Libera la tua creatività!</color>\nUna delle caratteristiche chiave di Open Surge è <color=$COLOR_HIGHLIGHT>SurgeScript</color>. È lo scripting per i giochi! Usalo per costruire qualsiasi cosa tu possa immaginare!"
 LEV_DEMO_4                  "<color=$COLOR_TITLE>Bello!</color>\nTi senti già eccitato? Il cielo è il limite! Visita <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> per creare i tuoi fantastici giochi oggi stesso!"
@@ -375,7 +375,7 @@ EDITOR_INPUT_MOUSEWHEEL     "Rotella del mouse"
 
 // Confirm boxes
 EDITOR_CONFIRM_RELOAD       "Ricaricare il livello?"
-EDITOR_CONFIRM_YES          "Si"
+EDITOR_CONFIRM_YES          "Sì"
 EDITOR_CONFIRM_NO           "No"
 
 // Messages
@@ -416,7 +416,7 @@ HUD_TIME                    "Tempo"
 HUD_POWER                   "Potere"
 
 // Level Cleared animation
-CLEARED_LINE1               "TU HAI"
+CLEARED_LINE1               "HAI"
 CLEARED_LINE2               "SUPERATO LA ZONA $LEVEL_ACT"
 CLEARED_POWER               "Potere Bonus"
 CLEARED_TIME                "Tempo Bonus"
