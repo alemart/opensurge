@@ -416,8 +416,8 @@ HUD_TIME                    "Tempo"
 HUD_POWER                   "Potere"
 
 // Level Cleared animation
-CLEARED_LINE1               "HAI"
-CLEARED_LINE2               "SUPERATO LA ZONA $LEVEL_ACT"
+CLEARED_LINE1               "HAI SUPERATO"
+CLEARED_LINE2               "LA ZONA $LEVEL_ACT"
 CLEARED_POWER               "Potere Bonus"
 CLEARED_TIME                "Tempo Bonus"
 CLEARED_SCORE               "Punteggio"
