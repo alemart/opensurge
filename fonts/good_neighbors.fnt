@@ -1133,6 +1133,14 @@ font "GoodNeighbors"
             source_rect         888 37 8 19
             offset              0 -3
         }
+        char "Ì" {
+            source_rect         897 37 6 19
+            offset              0 -3
+        }
+        char "ì" {
+            source_rect         904 37 6 19
+            offset              0 -3
+        }
     }
 }
 
