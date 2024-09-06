@@ -302,11 +302,11 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
                 /* manually set compatibility version */
                 LOG("Manually set compatibility version: %s", compatibility_version);
                 int version_code = parse_version_number(compatibility_version);
-                int min_version = parse_version_number(required_engine_version);
+                int min_version = parse_version_number("0.5.0");
                 int max_version = parse_version_number(GAME_VERSION_STRING);
 
                 if(version_code < min_version) {
-                    compatibility_version = required_engine_version;
+                    compatibility_version = "0.5.0";
                     LOG("Adjusting the compatibility version to %s", compatibility_version);
                 }
                 else if(version_code > max_version) {
