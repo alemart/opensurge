@@ -264,8 +264,9 @@ static void enter_credits(settings_entry_t* e);
 
 /* MODs */
 #define vt_mods (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, display_mods }
-static bool want_compatibility_mode = true;
 static bool want_zipped_mods = false;
+static bool want_compatibility_mode = true;
+static int wanted_compatibility_version = 0;
 static bool display_mods(settings_entry_t* e);
 static bool display_mods_from_base_game(settings_entry_t* e);
 static bool display_mods_from_mod(settings_entry_t* e);
@@ -278,8 +279,9 @@ static void release_playgame(settings_entry_t* e);
 #define vt_modstorage (settings_entryvt_t){ change_modstorage, nop, nop, nop, nop, nop, nop, display_mods_from_base_game }
 static void change_modstorage(settings_entry_t* e);
 
-#define vt_compatibilitymode (settings_entryvt_t) { change_compatibilitymode, nop, nop, nop, nop, nop, nop, display_mods_from_base_game }
+#define vt_compatibilitymode (settings_entryvt_t) { change_compatibilitymode, nop, nop, dehighlight_compatibilitymode, nop, nop, nop, display_mods_from_base_game }
 static void change_compatibilitymode(settings_entry_t* e);
+static void dehighlight_compatibilitymode(settings_entry_t* e);
 
 #define vt_backtobasegame (settings_entryvt_t){ nop, enter_backtobasegame, nop, nop, nop, nop, nop, display_mods_from_mod }
 static void enter_backtobasegame(settings_entry_t* e);
@@ -350,7 +352,7 @@ static const struct
     { TYPE_SUBTITLE, "$OPTIONS_COLORED_MODS", (const char*[]) { NULL }, 0, vt_mods, 8 },
     { TYPE_SETTING, "$OPTIONS_PLAYMOD", (const char*[]) { NULL }, 0, vt_playgame, 8 },
     { TYPE_SETTING, "$OPTIONS_MODSTORAGE", (const char*[]) { "$OPTIONS_MODSTORAGE_ARCHIVE", "$OPTIONS_MODSTORAGE_FOLDER", NULL }, 0, vt_modstorage, 0 },
-    { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", NULL }, 1, vt_compatibilitymode, 0 },
+    { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", "0.6.1", "0.6.0", "0.5.2", NULL }, 1, vt_compatibilitymode, 0 },
     { TYPE_SETTING, "$OPTIONS_BACKTOBASEGAME", (const char*[]) { NULL }, 0, vt_backtobasegame, 8 },
 
     /* Engine */
@@ -415,8 +417,9 @@ void settings_init(void* data)
 
     /* options */
     enable_developermode = false;
-    want_compatibility_mode = true;
     want_zipped_mods = true;
+    want_compatibility_mode = true;
+    wanted_compatibility_version = 0;
 
     /* initialize objects */
     background = background_load(BGFILE);
@@ -1603,7 +1606,11 @@ void change_modstorage(settings_entry_t* e)
 void change_compatibilitymode(settings_entry_t* e)
 {
     want_compatibility_mode = (e->index_of_current_value != 0);
+    wanted_compatibility_version = (e->index_of_current_value <= 1) ? 0 : parse_version_number(e->possible_values[e->index_of_current_value]);
+}
 
+void dehighlight_compatibilitymode(settings_entry_t* e)
+{
     /* warn the user if the compatibility mode is disabled */
     if(!want_compatibility_mode) {
         sound_play(SFX_QUESTION);
@@ -1611,6 +1618,7 @@ void change_compatibilitymode(settings_entry_t* e)
         /* Suggestion: use an in-game widget instead of a native message box */
         if(!confirm("%s", lang_get("OPTIONS_PLAYMOD_COMPATWARN"))) {
             want_compatibility_mode = true;
+            wanted_compatibility_version = 0;
             e->index_of_current_value = 1;
             sound_play(SFX_BACK);
         }
@@ -1706,6 +1714,8 @@ void filechooser_handle_event(const ALLEGRO_EVENT* event, void* arg)
 
         str_cpy(cmd.gamedir, path_to_game, sizeof(cmd.gamedir));
         cmd.compatibility_mode = want_compatibility_mode ? TRUE : FALSE;
+        if(wanted_compatibility_version != 0)
+            stringify_version_number(wanted_compatibility_version, cmd.compatibility_version, sizeof(cmd.compatibility_version));
         cmd.mobile = (IS_MOBILE_PLATFORM || in_mobile_mode()) ? TRUE : FALSE;
 
         save_preferences();
