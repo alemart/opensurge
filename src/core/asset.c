@@ -133,8 +133,9 @@ bool write_file(const char* vpath, void* file_data, size_t file_size);
  */
 void asset_init(const char* argv0, const char* optional_gamedir, const char* compatibility_version, uint32_t* out_game_id, int* out_compatibility_version_code)
 {
-    uint32_t game_id = 0;
     int compatibility_version_code = DEFAULT_COMPATIBILITY_VERSION_CODE;
+    char version_buffer[16] = "";
+    uint32_t game_id = 0;
 
     /* already initialized? */
     if(asset_is_init())
@@ -170,7 +171,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
     if(gamedir != NULL) {
 
         char game_dirname[256] = "";
-        char required_engine_version[16] = "0.5.0";
+        char detected_engine_version[16] = "0.5.0";
 #if !defined(__ANDROID__)
         uint32_t mode = get_fs_mode(gamedir);
 #else
@@ -221,20 +222,20 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
 
         /* which engine version does this MOD require? */
         al_set_physfs_file_interface();
-        guess_engine_version_of_mod(required_engine_version, sizeof(required_engine_version));
+        guess_engine_version_of_mod(detected_engine_version, sizeof(detected_engine_version));
         al_restore_state(&state);
-        LOG("Required engine version of this MOD: %s", required_engine_version);
+        LOG("Detected engine version of this MOD: %s", detected_engine_version);
         {
             int sup, sub, wip;
-            int mod_version = parse_version_number_ex(required_engine_version, &sup, &sub, &wip, NULL);
+            int mod_version = parse_version_number_ex(detected_engine_version, &sup, &sub, &wip, NULL);
             int engine_version = parse_version_number(GAME_VERSION_STRING);
 
             if(game_version_compare(sup, sub, wip) < 0)
-                CRASH("This MOD requires a newer version of the engine, %s. Please upgrade the engine or downgrade the MOD to version %s of the engine.", required_engine_version, GAME_VERSION_STRING);
+                CRASH("This MOD requires a newer version of the engine, %s. Please upgrade the engine or downgrade the MOD to version %s of the engine.", detected_engine_version, GAME_VERSION_STRING);
             else if(engine_version < mod_version)
-                LOG("This MOD requires a newer version of the engine, %s. We'll try to run it anyway. Engine version is %s.", required_engine_version, GAME_VERSION_STRING);
+                LOG("This MOD requires a newer version of the engine, %s. We'll try to run it anyway. Engine version is %s.", detected_engine_version, GAME_VERSION_STRING);
             else if(mod_version < VERSION_CODE(0,5,0))
-                LOG("Legacy games are unsupported. Detected version: %s", required_engine_version);
+                LOG("Legacy games are unsupported. Detected version: %s", detected_engine_version);
         }
 
         /* read the configuration file */
@@ -247,7 +248,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
             config_game_title(NULL),
             config_game_version(NULL),
             game_dirname,
-            required_engine_version
+            detected_engine_version
         );
         LOG("Game ID: %08x", game_id);
         LOG("Game title: %s", config_game_title("(null)"));
@@ -294,7 +295,6 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
 
         /* compatibility mode */
         if(compatibility_version != NULL) {
-            char buffer[16];
             LOG("Using compatibility mode for MODs");
 
             /* validate compatibility version */
@@ -302,7 +302,7 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
                 /* manually set compatibility version */
                 LOG("Manually set compatibility version: %s", compatibility_version);
                 int version_code = parse_version_number(compatibility_version);
-                int min_version = parse_version_number("0.5.0");
+                int min_version = VERSION_CODE(0,5,0);
                 int max_version = parse_version_number(GAME_VERSION_STRING);
 
                 if(version_code < min_version) {
@@ -311,13 +311,13 @@ void asset_init(const char* argv0, const char* optional_gamedir, const char* com
                 }
                 else if(version_code > max_version) {
                     LOG("Can't set the compatibility version to %s", compatibility_version);
-                    compatibility_version = stringify_version_number(max_version, buffer, sizeof(buffer));
+                    compatibility_version = stringify_version_number(max_version, version_buffer, sizeof(version_buffer));
                     LOG("Adjusting the compatibility version to %s", compatibility_version);
                 }
             }
             else {
                 /* automatically set compatibility version */
-                compatibility_version = required_engine_version;
+                compatibility_version = detected_engine_version;
                 LOG("Automatically set compatibility version: %s", compatibility_version);
             }
 
