@@ -143,6 +143,7 @@ static const char* const COMPATIBILITY_LIST[] = {
     "levels/scenes/contribute.lev",                     ":0.6.1",                   /* introduced in 0.6.0.3; uses contribute.ss */
 
     "sprites/ui/pointer.spr",                           ":0.6.1",                   /* simplified in 0.6.1 */
+    "scripts/ui/title_card.ss",                         ":0.6.1.2",                 /* add missing semicolon in 0.6.1.2 (SurgeScript 0.6.1) */
 
     "scripts/items/profiler.ss",                        ":",                        /* always use own Profiler */
 #endif
