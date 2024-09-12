@@ -522,4 +522,6 @@ void save_selection(int option)
 
     if(option >= 0 && option < stage_count)
         prefs_set_string(prefs, STAGE_PREFSENTRY, stage_data[option]->filepath);
+
+    prefs_save(prefs);
 }

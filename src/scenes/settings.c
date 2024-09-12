@@ -772,6 +772,8 @@ void save_preferences()
     prefs_set_string(prefs, ".langpath", filepath_of_lang(lang_getid()));
 
     prefs_set_int(prefs, ".gamepad_opacity", mobilegamepad_opacity());
+
+    prefs_save(prefs);
 }
 
 /* returns a static char[] */

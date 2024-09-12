@@ -293,6 +293,7 @@ void save_preferences(const char *filepath)
 {
     extern prefs_t* prefs;
     prefs_set_string(prefs, ".langpath", filepath);
+    prefs_save(prefs);
 }
 
 /* reads the language list from the languages/ folder */
