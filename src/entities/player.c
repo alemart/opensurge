@@ -2312,6 +2312,7 @@ void on_physics_event(physicsactor_t* pa, physicsactorevent_t event, void* conte
             player_set_invulnerable(player, FALSE);
             player->shield_type = SH_NONE;
             sound_play(player->character->sample.death);
+            logfile_message("Player \"%s\" was killed.", player_name(player));
             break;
 
         case PAE_DROWN:
@@ -2321,6 +2322,7 @@ void on_physics_event(physicsactor_t* pa, physicsactorevent_t event, void* conte
             player_set_aggressive(player, FALSE);
             player_set_invulnerable(player, FALSE);
             sound_play(SFX_DROWN);
+            logfile_message("Player \"%s\" has drowned.", player_name(player));
             break;
 
         case PAE_SMASH:
@@ -2329,6 +2331,7 @@ void on_physics_event(physicsactor_t* pa, physicsactorevent_t event, void* conte
 
         case PAE_RESURRECT:
             player_set_position(player, level_spawnpoint());
+            logfile_message("Player \"%s\" was resurrected.", player_name(player));
             break;
     }
 }
