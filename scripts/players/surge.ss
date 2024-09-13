@@ -59,7 +59,7 @@ object "Surge's Falling Animation" is "companion"
         // Now the player is midair and will fall
         // down. We'll capture this event and
         // change the animation accordingly
-        if(player.ysp >= 0 && player.midair && (player.springing || player.walking)) {
+        if(player.ysp >= 0 && player.midair && !player.frozen && (player.springing || player.walking)) {
             player.anim = falling;
             state = "falling";
         }
@@ -69,7 +69,7 @@ object "Surge's Falling Animation" is "companion"
 
     state "falling"
     {
-        if(player.ysp >= 0 && player.midair)
+        if(player.ysp >= 0 && player.midair && !player.frozen)
             player.anim = falling;
         else
             state = "main";
