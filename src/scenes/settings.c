@@ -955,6 +955,11 @@ void change_resolution(settings_entry_t* e)
         [3] = VIDEORESOLUTION_4X
     };
 
+    /* disable fullscreen */
+    if(video_is_fullscreen())
+        video_set_fullscreen(false);
+
+    /* change the resolution */
     int i = e->index_of_current_value;
     video_set_resolution(new_resolution[i]);
 }
