@@ -799,8 +799,6 @@ bool video_use_default_shader()
  */
 bool video_is_using_gles()
 {
-#if !defined(__ANDROID__)
-
     const char* gl_version = "";
 
    /* According to the OpenGL ES 3.0.6 spec, section 2.1 page 5,
@@ -828,12 +826,6 @@ bool video_is_using_gles()
     */
 
     return strncmp(gl_version, "OpenGL ES", 9) == 0;
-
-#else
-
-    return true;
-
-#endif
 }
 
 /*

@@ -119,11 +119,6 @@ static const char default_fs_glsl[] = ""
     "}\n"
 "";
 
-/* static assertions */
-static const char glsl_version_directive[] = GLSL_VERSION_DIRECTIVE;
-static const char glsl_es_version_directive[] = GLSL_ES_VERSION_DIRECTIVE;
-STATIC_ASSERTX(sizeof glsl_version_directive == sizeof glsl_es_version_directive, glsl_version_prefix_of_same_size);
-
 /* Helpers */
 #define LOG(...)            logfile_message("Shader - " __VA_ARGS__)
 #define FATAL(...)          fatal_error("Shader - " __VA_ARGS__)
@@ -149,6 +144,15 @@ void shader_init()
     LOG("Initializing...");
     default_shader = NULL;
     active_shader = NULL;
+
+    /* validate */
+#if WANT_GLSL_ES
+    if(!video_is_using_gles())
+        LOG("WARNING: WANT_GLSL_ES is set, but Desktop GL is in use");
+#else
+    if(video_is_using_gles())
+        LOG("WARNING: WANT_GLSL_ES is not set, but OpenGL ES is in use");
+#endif
 
     /* initialize the registry of shaders */
     registry = dictionary_create(false, destroy_shader_callback, NULL);
@@ -494,64 +498,25 @@ void shader_set_sampler(shader_t* shader, const char* var_name, const image_t* i
 ALLEGRO_SHADER* create_glsl_shader(const char* fs_glsl, const char* vs_glsl, char* error_string, size_t error_string_size)
 {
     ALLEGRO_SHADER* sh = al_create_shader(ALLEGRO_SHADER_GLSL);
-    char *fs = str_dup(fs_glsl), *vs = str_dup(vs_glsl);
-    char *xs[] = { vs, fs, NULL };
 
-    /* validate the #version line. Adapt it if necessary*
-
-       (*) the Flatpak edition of the game crashed when using OpenGL ES 3.0
-           instead of Desktop OpenGL (with Allegro 5.2.9.1 and with the
-           org.freedesktop.Platform 23.08 runtime). The runtime doesn't include
-           libGLU, which is required by the Desktop OpenGL backend of Allegro.
-           We can compile libGLU or just stick to OpenGL ES, which is included
-           in the runtime (Mesa 3D).
-
-       This section adapts the #version line of the shaders as necessary.
-       Allegro may be compiled with the OpenGL ES backend even on Desktop
-       platforms.
-
-       Note: GLSL 3.30 (1.20) and GLSL ES 3.0 (1.0) are similar. The GL_ES
-             preprocessor flag may be used in GLSL code to distinguish between
-             the two. */
-
-    bool want_glsl_es = video_is_using_gles(); /* GLES3+ is required in video.c */
-    for(char** glsl = xs; *glsl != NULL; glsl++) {
-        if(want_glsl_es) {
-            if(0 == strncmp(*glsl, glsl_version_directive, sizeof(glsl_version_directive)))
-                memcpy(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive));
-            else if(0 != strncmp(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive)))
-                FATAL("Expected %s in\n\n%s", glsl_es_version_directive, *glsl);
-        }
-        else {
-            if(0 == strncmp(*glsl, glsl_es_version_directive, strlen(glsl_es_version_directive)))
-                memcpy(*glsl, glsl_version_directive, strlen(glsl_version_directive)); /* this should never happen? */
-            else if(0 != strncmp(*glsl, glsl_version_directive, strlen(glsl_version_directive)))
-                FATAL("Expected %s in\n\n%s", glsl_version_directive, *glsl);
-        }
-    }
-
-    /* create the shader */
     if(sh == NULL) {
         snprintf(error_string, error_string_size, "Can't create GLSL shader");
     }
-    else if(!al_attach_shader_source(sh, ALLEGRO_VERTEX_SHADER, vs)) {
-        snprintf(error_string, error_string_size, "Can't compile the vertex shader.\n%s\n\n%s", al_get_shader_log(sh), vs);
+    else if(!al_attach_shader_source(sh, ALLEGRO_VERTEX_SHADER, vs_glsl)) {
+        snprintf(error_string, error_string_size, "Can't compile the vertex shader.\n%s\n\n%s", al_get_shader_log(sh), vs_glsl);
         al_destroy_shader(sh);
         sh = NULL;
     }
-    else if(!al_attach_shader_source(sh, ALLEGRO_PIXEL_SHADER, fs)) {
-        snprintf(error_string, error_string_size, "Can't compile the fragment shader.\n%s\n\n%s", al_get_shader_log(sh), fs);
+    else if(!al_attach_shader_source(sh, ALLEGRO_PIXEL_SHADER, fs_glsl)) {
+        snprintf(error_string, error_string_size, "Can't compile the fragment shader.\n%s\n\n%s", al_get_shader_log(sh), fs_glsl);
         al_destroy_shader(sh);
         sh = NULL;
     }
     else if(!al_build_shader(sh)) {
-        snprintf(error_string, error_string_size, "Can't build the shader. %s\n\n%s", al_get_shader_log(sh), fs);
+        snprintf(error_string, error_string_size, "Can't build the shader. %s\n\n%s\n\n%s", al_get_shader_log(sh), fs_glsl, vs_glsl);
         al_destroy_shader(sh);
         sh = NULL;
     }
-
-    free(vs);
-    free(fs);
 
     return sh;
 }
@@ -598,7 +563,7 @@ void discard_shader(shader_t* shader)
 /* recreate a shader (after discarding it) */
 void recreate_shader(shader_t* shader)
 {
-    char error[256] = "";
+    char error[1024] = "";
     assertx(shader->shader == NULL);
 
     shader->shader = create_glsl_shader(shader->fs, shader->vs, error, sizeof error);

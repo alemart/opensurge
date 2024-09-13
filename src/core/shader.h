@@ -47,22 +47,19 @@ void shader_set_float_vector(shader_t* shader, const char* var_name, int num_com
 void shader_set_int_vector(shader_t* shader, const char* var_name, int num_components, const int* value);
 void shader_set_sampler(shader_t* shader, const char* var_name, const struct image_t* image);
 
-
+/* Use GLSL ES shaders? */
+#ifndef WANT_GLSL_ES
+#define WANT_GLSL_ES 0
+#endif
 
 /*
  * Shader templates
  */
 
-#define GLSL_ES_VERSION_DIRECTIVE \
-    "#version 100\n"
-
-#define GLSL_VERSION_DIRECTIVE \
-    "#version 120\n"
-
-#if defined(__ANDROID__)
+#if WANT_GLSL_ES
 
 #define SHADER_GLSL_PREFIX() \
-    GLSL_ES_VERSION_DIRECTIVE \
+    "#version 100\n" \
     "#ifndef GL_FRAGMENT_PRECISION_HIGH\n" \
     "# define highp mediump\n" \
     "#endif\n"
@@ -70,10 +67,10 @@ void shader_set_sampler(shader_t* shader, const char* var_name, const struct ima
 #else
 
 #define SHADER_GLSL_PREFIX() \
-    GLSL_VERSION_DIRECTIVE \
+    "#version 120\n" \
     "#define lowp\n" \
     "#define mediump\n" \
-    "#define highp\n" \
+    "#define highp\n"
 
 #endif
 

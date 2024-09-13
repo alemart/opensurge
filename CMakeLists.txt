@@ -99,6 +99,16 @@ IF(WANT_PLAYMOD)
   LIST(APPEND DEFS "WANT_PLAYMOD=1")
 ENDIF()
 
+# OpenGL
+IF(ANDROID)
+  OPTION(WANT_GLSL_ES "Use GLSL ES shaders. This should match the configuration of Allegro" ON)
+ELSE()
+  OPTION(WANT_GLSL_ES "Use GLSL ES shaders. This should match the configuration of Allegro" OFF)
+ENDIF()
+IF(WANT_GLSL_ES)
+  LIST(APPEND DEFS "WANT_GLSL_ES=1")
+ENDIF()
+
 # User-specified paths
 SET(ALLEGRO_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for Allegro & its dependencies")
 SET(ALLEGRO_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of Allegro")
