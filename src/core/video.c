@@ -50,7 +50,9 @@
 #include "../util/stringutil.h"
 #include "../entities/mobilegamepad.h"
 
-
+#ifndef WANT_GLES
+#define WANT_GLES 0
+#endif
 
 /* Display (window) */
 #define DEFAULT_WINDOW_TITLE (GAME_TITLE " " GAME_VERSION_STRING)
@@ -873,13 +875,13 @@ bool create_display(int width, int height)
         ALLEGRO_OPENGL | ALLEGRO_PROGRAMMABLE_PIPELINE
     );
 
-#if defined(__ANDROID__)
-    /* request OpenGL ES 2.0+ on mobile */
+#if WANT_GLES
+    /* request OpenGL ES 2.0+ */
     al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_ES_PROFILE);
     al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 2, ALLEGRO_SUGGEST);
     al_set_new_display_option(ALLEGRO_OPENGL_MINOR_VERSION, 0, ALLEGRO_SUGGEST);
 #elif 0
-    /* request OpenGL 2.1+ on Desktop */
+    /* request OpenGL 2.1+ */
     /* does not work properly, why? */
     //al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_CORE_PROFILE); // OpenGL 3.2+
     al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 2, ALLEGRO_SUGGEST);
