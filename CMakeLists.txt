@@ -101,12 +101,12 @@ ENDIF()
 
 # OpenGL
 IF(ANDROID)
-  OPTION(WANT_GLSL_ES "Use GLSL ES shaders. This should match the configuration of Allegro" ON)
+  OPTION(WANT_GLES "Use OpenGL ES. This should match the configuration of Allegro" ON)
 ELSE()
-  OPTION(WANT_GLSL_ES "Use GLSL ES shaders. This should match the configuration of Allegro" OFF)
+  OPTION(WANT_GLES "Use OpenGL ES. This should match the configuration of Allegro" OFF)
 ENDIF()
-IF(WANT_GLSL_ES)
-  LIST(APPEND DEFS "WANT_GLSL_ES=1")
+IF(WANT_GLES)
+  LIST(APPEND DEFS "WANT_GLES=1")
 ENDIF()
 
 # User-specified paths

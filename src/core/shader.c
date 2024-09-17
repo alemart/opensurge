@@ -146,12 +146,12 @@ void shader_init()
     active_shader = NULL;
 
     /* validate */
-#if WANT_GLSL_ES
+#if WANT_GLES
     if(!video_is_using_gles())
-        LOG("WARNING: WANT_GLSL_ES is set, but Desktop GL is in use");
+        LOG("WARNING: WANT_GLES is set, but Desktop GL is in use");
 #else
     if(video_is_using_gles())
-        LOG("WARNING: WANT_GLSL_ES is not set, but OpenGL ES is in use");
+        LOG("WARNING: WANT_GLES is not set, but OpenGL ES is in use");
 #endif
 
     /* initialize the registry of shaders */

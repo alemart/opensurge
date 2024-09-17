@@ -48,15 +48,15 @@ void shader_set_int_vector(shader_t* shader, const char* var_name, int num_compo
 void shader_set_sampler(shader_t* shader, const char* var_name, const struct image_t* image);
 
 /* Use GLSL ES shaders? */
-#ifndef WANT_GLSL_ES
-#define WANT_GLSL_ES 0
+#ifndef WANT_GLES
+#define WANT_GLES 0
 #endif
 
 /*
  * Shader templates
  */
 
-#if WANT_GLSL_ES
+#if WANT_GLES
 
 #define SHADER_GLSL_PREFIX() \
     "#version 100\n" \
