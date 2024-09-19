@@ -99,11 +99,11 @@ IF(WANT_PLAYMOD)
   LIST(APPEND DEFS "WANT_PLAYMOD=1")
 ENDIF()
 
-# OpenGL
+# OpenGL ES
 IF(ANDROID)
-  OPTION(WANT_GLES "Use OpenGL ES. This should match the configuration of Allegro" ON)
+  OPTION(WANT_GLES "Use OpenGL ES" ON)
 ELSE()
-  OPTION(WANT_GLES "Use OpenGL ES. This should match the configuration of Allegro" OFF)
+  OPTION(WANT_GLES "Use OpenGL ES" OFF)
 ENDIF()
 IF(WANT_GLES)
   LIST(APPEND DEFS "WANT_GLES=1")
