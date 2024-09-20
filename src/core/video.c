@@ -809,7 +809,8 @@ bool video_is_using_gles()
 
     if(NULL == _glGetString || NULL == (gl_version = (const char*)_glGetString(GL_VERSION))) {
         /* fallback. As of Allegro 5.2.9, the return value of
-           al_get_opengl_variant() is determined by a preprocessor constant */
+           al_get_opengl_variant() is determined by a preprocessor constant.
+           Note that ALLEGRO_OPENGL_ES_PROFILE may be used when creating the display. */
         return al_get_opengl_variant() == ALLEGRO_OPENGL_ES;
     }
 
