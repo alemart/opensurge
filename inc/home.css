@@ -267,7 +267,6 @@ footer h5 {
 }
 
 .testimonial .review {
-  padding: 0 3.5em 0 3.5em;
   font-style: italic;
 }
 
@@ -278,4 +277,23 @@ footer h5 {
 
 .testimonial .rating {
   margin-top: 0.5em;
+}
+
+/* showcase */
+#games .container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  height: 540px;
+  overflow-y: scroll;
+}
+
+@media screen and (max-height: 450px) {
+  #games .container {
+    max-height: 270px;
+  }
+}
+
+#games .game img {
+  max-height: 270px;
 }

@@ -19,13 +19,30 @@ window.addEventListener('load', function() {
 
 /* carousel */
 document.addEventListener('DOMContentLoaded', function() {
-    const glider = new Glider(document.querySelector('.glider'), {
+    const glider = new Glider(document.querySelector('#testimonials .glider'), {
         slidesToShow: 1,
-        dots: '#dots',
+        //dots: '#testimonials .dots',
         draggable: true,
         arrows: {
-            prev: '.glider-prev',
-            next: '.glider-next'
+            prev: '#testimonials .glider-prev',
+            next: '#testimonials .glider-next'
         }
     });
+});
+
+/* showcase */
+document.addEventListener('DOMContentLoaded', function() {
+    function shuffle(arr) {
+        let j = arr.length;
+        while(j > 0) {
+            let i = Math.floor(Math.random() * j--);
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    const set = document.querySelectorAll('#games .game');
+    const seq = Array.from({ length: set.length }, (_, i) => i);
+    const ord = shuffle(seq);
+    set.forEach((game, i) => game.style.setProperty('order', ord[i]));
 });
