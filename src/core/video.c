@@ -884,7 +884,7 @@ bool create_display(int width, int height)
 #elif 0
     /* request OpenGL 2.1+ */
     /* does not work properly, why? */
-    //al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_CORE_PROFILE); // OpenGL 3.2+
+    //al_set_new_display_flags(al_get_new_display_flags() | ALLEGRO_OPENGL_CORE_PROFILE); // OpenGL 3.2+; only X11/GLX on Allegro 5.2.7
     al_set_new_display_option(ALLEGRO_OPENGL_MAJOR_VERSION, 2, ALLEGRO_SUGGEST);
     al_set_new_display_option(ALLEGRO_OPENGL_MINOR_VERSION, 1, ALLEGRO_SUGGEST);
 #else
