@@ -1899,6 +1899,8 @@ float smooth_angle(const physicsactor_t* pa, float current_angle)
 
         if(physicsactor_is_midair(pa))
             t = 0.0625f; /* make the animation more fluid after running on a wall */
+        else if(physicsactor_get_gsp(pa) > physicsactor_get_topspeed(pa))
+            t = max(t, 0.5f); /* the player is way too fast */
 
         return lerp_angle(current_angle, new_angle, t);
     }
