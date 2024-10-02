@@ -859,6 +859,7 @@ void physicsactor_breathe(physicsactor_t *pa)
     }
 }
 
+
 /* getters and setters */
 #define GENERATE_GETTER_AND_SETTER_OF(x) \
 double physicsactor_get_##x(const physicsactor_t *pa) \
@@ -877,7 +878,6 @@ GENERATE_GETTER_AND_SETTER_OF(gsp)
 GENERATE_GETTER_AND_SETTER_OF(acc)
 GENERATE_GETTER_AND_SETTER_OF(dec)
 GENERATE_GETTER_AND_SETTER_OF(frc)
-GENERATE_GETTER_AND_SETTER_OF(topspeed)
 GENERATE_GETTER_AND_SETTER_OF(capspeed)
 GENERATE_GETTER_AND_SETTER_OF(air)
 GENERATE_GETTER_AND_SETTER_OF(jmp)
@@ -898,7 +898,22 @@ GENERATE_GETTER_AND_SETTER_OF(brakingthreshold)
 GENERATE_GETTER_AND_SETTER_OF(airdragthreshold)
 GENERATE_GETTER_AND_SETTER_OF(waittime)
 
-double physicsactor_get_airdrag(const physicsactor_t *pa) { return pa->airdrag; }
+double physicsactor_get_topspeed(const physicsactor_t *pa)
+{
+    return pa->topspeed;
+}
+
+void physicsactor_set_topspeed(physicsactor_t *pa, double value)
+{
+    /* topspeed can't be greater than capspeed */
+    pa->topspeed = min(value, pa->capspeed);
+}
+
+double physicsactor_get_airdrag(const physicsactor_t *pa)
+{
+    return pa->airdrag;
+}
+
 void physicsactor_set_airdrag(physicsactor_t *pa, double value)
 {
     pa->airdrag = clip(value, 0.0, 1.0);
