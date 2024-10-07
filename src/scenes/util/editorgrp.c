@@ -187,26 +187,33 @@ int traverse_group(const parsetree_statement_t *stmt, void *entity_list)
 
     if(str_icmp(identifier, "brick") == 0) {
         int id, x, y;
-        bricklayer_t layer;
-        brickflip_t flip;
+        brickflip_t flip = BRF_NOFLIP;
+        bricklayer_t layer = BRL_DEFAULT;
+        int n = nanoparser_get_number_of_parameters(param_list);
 
         p1 = nanoparser_get_nth_parameter(param_list, 1);
         p2 = nanoparser_get_nth_parameter(param_list, 2);
         p3 = nanoparser_get_nth_parameter(param_list, 3);
-        p4 = nanoparser_get_nth_parameter(param_list, 4);
-        p5 = nanoparser_get_nth_parameter(param_list, 5);
 
         nanoparser_expect_string(p1, "Brick id must be given");
         nanoparser_expect_string(p2, "Brick xpos must be given");
         nanoparser_expect_string(p3, "Brick ypos must be given");
-        if(p4) nanoparser_expect_string(p4, "Brick layer is expected");
-        if(p5) nanoparser_expect_string(p5, "Brick flip flags is expected");
 
         id = atoi(nanoparser_get_string(p1));
         x = atoi(nanoparser_get_string(p2));
         y = atoi(nanoparser_get_string(p3));
-        layer = p4 ? brick_util_layercode(nanoparser_get_string(p4)) : BRL_DEFAULT;
-        flip = p5 ? brick_util_flipcode(nanoparser_get_string(p5)) : BRF_NOFLIP;
+
+        if(n >= 4) {
+            p4 = nanoparser_get_nth_parameter(param_list, 4);
+            nanoparser_expect_string(p4, "Brick layer is expected");
+            layer = brick_util_layercode(nanoparser_get_string(p4));
+
+            if(n >= 5) {
+                p5 = nanoparser_get_nth_parameter(param_list, 5);
+                nanoparser_expect_string(p5, "Brick flip flags is expected");
+                flip = brick_util_flipcode(nanoparser_get_string(p5));
+            }
+        }
 
         e.type = EDITORGRP_ENTITY_BRICK;
         e.id = id;
