@@ -64,6 +64,7 @@ static void reconfigure_display();
 static void compute_display_transform(ALLEGRO_TRANSFORM* transform);
 static void set_display_icon(ALLEGRO_DISPLAY* display);
 static void a5_handle_video_event(const ALLEGRO_EVENT* event, void* data);
+static int get_display_adapter(ALLEGRO_DISPLAY* display);
 
 
 /* Backbuffer */
@@ -444,8 +445,14 @@ videoresolution_t video_get_resolution()
 videoresolution_t video_best_fit_resolution()
 {
     ALLEGRO_MONITOR_INFO info;
+    int adapter;
 
-    if(al_get_monitor_info(0, &info)) {
+    /* pick the best adapter */
+    if(display == NULL || (adapter = get_display_adapter(display)) < 0)
+        adapter = 0;
+
+    /* pick the best resolution */
+    if(al_get_monitor_info(adapter, &info)) {
         int desktop_width = info.x2 - info.x1;
         int desktop_height = info.y2 - info.y1;
 
@@ -459,7 +466,7 @@ videoresolution_t video_best_fit_resolution()
             return VIDEORESOLUTION_1X;
     }
 
-    /* if the monitor info is not available, we return a safe guess */
+    /* if the monitor info is unavailable, return a safe guess */
     return VIDEORESOLUTION_2X;
 }
 
@@ -471,6 +478,7 @@ void video_set_fullscreen(bool fullscreen)
 {
     LOG("%s fullscreen", fullscreen ? "Enabling" : "Disabling");
     settings.is_fullscreen = fullscreen;
+
     reconfigure_display();
 }
 
@@ -1211,6 +1219,28 @@ void compute_screen_size(videomode_t mode, int* screen_width, int* screen_height
             }
             break;
     }
+}
+
+/* Polyfill for al_get_display_adapter() (since Allegro 5.2.10) */
+int get_display_adapter(ALLEGRO_DISPLAY* display)
+{
+#if ALLEGRO_VERSION_INT < AL_ID(5,2,10,0)
+    int x, y, n = al_get_num_video_adapters();
+    al_get_window_position(display, &x, &y);
+
+    for(int a = 0; a < n; a++) {
+        ALLEGRO_MONITOR_INFO mi;
+
+        if(al_get_monitor_info(a, &mi)) {
+            if(x >= mi.x1 && x < mi.x2 && y >= mi.y1 && y < mi.y2)
+                return a;
+        }
+    }
+
+    return -1;
+#else
+    return al_get_display_adapter(display);
+#endif
 }
 
 
