@@ -1,0 +1,437 @@
+// -----------------------------------------------------------------------------
+// File: languages/ukrainian.lng
+// Description: Ukrainian translation (encoding: UTF-8)
+// Author: volkov <volkovissocool@gmail.com>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+//
+// Section: generic
+//
+
+// Translation metadata
+// (use the English alphabet)
+LANG_ID                     "uk_UA"                      // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Українська"                 // language name
+LANG_AUTHOR                 "volkov"                     // translation author
+LANG_COMPATIBILITY          "0.6.1.2"                    // required engine version
+
+
+
+//
+// Translators:
+//
+// Before starting your work, please check out the
+// Translation Guide at http://wiki.opensurge2d.org
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// Developer mode: when seeing the Open Surge Engine splash
+// screen, press RIGHT 3 times and enter. You'll see a list
+// of all level files.
+//
+
+//
+// Updating translations:
+//
+// New strings get added from time to time. They are marked
+// as FIXME. To find them, use the Find tool in your editor.
+// Found something? Please search for it now.
+//
+// If you find that mark anywhere in the file, it means that
+// the translation needs to be updated. Please submit a patch
+// to keep it up to date.
+//
+// After translating the new strings, make sure to remove
+// that mark.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
+OPTIONS_TITLE               "НАЛАШТУВАННЯ"
+OPTIONS_GRAPHICS            "Графіка"
+OPTIONS_AUDIO               "Аудіо"
+OPTIONS_CONTROLS            "Керування"
+OPTIONS_GAME                "Гра"
+OPTIONS_ENGINE              "Рушій"
+OPTIONS_MODS                "Модифікації"
+OPTIONS_BACK                "Назад"
+OPTIONS_YES                 "Так"
+OPTIONS_NO                  "Ні"
+OPTIONS_ON                  "Увімкнено" // alternatively: Enabled
+OPTIONS_OFF                 "Вимкнено" // alternatively: Disabled
+OPTIONS_DEFAULT             "За замовченням"
+OPTIONS_FULLSCREEN          "Повний екран"
+OPTIONS_RESOLUTION          "Розмір екрану"
+OPTIONS_QUALITY             "Якість"
+OPTIONS_QUALITY_LOW         "Низька"
+OPTIONS_QUALITY_MEDIUM      "Середня"
+OPTIONS_QUALITY_HIGH        "Висока"
+OPTIONS_FPS                 "Показувати кількість кадрів"
+OPTIONS_VSYNC               "Вертикальна синхронізація" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Масштабування пікселів"
+OPTIONS_COMINGSOON          "Скоро буде додано!"
+OPTIONS_VOLUME              "Гучність"
+OPTIONS_MUTE                "Заглушено"
+OPTIONS_MIXER               "Міксер"
+OPTIONS_MIXER_MIN           "Без музики"
+OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
+OPTIONS_MIXER_MAX           "Без звуків"
+OPTIONS_MUFFLER             "Ефект під водою"
+OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
+OPTIONS_MUFFLER_LOW         "Легкий" // also: lightweight
+OPTIONS_MUFFLER_MEDIUM      "Середній"
+OPTIONS_MUFFLER_HIGH        "Інтенсивний"
+OPTIONS_MUFFLER_HIGHER      "Дуже інтенсивний"
+OPTIONS_GAMEPADOPACITY      "Непрозорість"
+OPTIONS_GAMEPAD             "Використовувати геймпад"
+OPTIONS_LANGUAGE            "Мова"
+OPTIONS_STAGESELECT         "Вибір рівня"
+OPTIONS_DEVELOPERMODE       "Режим розробника"
+OPTIONS_CREDITS             "Розробники Open Surge"
+OPTIONS_WEBSITE             "Завітати на веб-сайт Open Surge"
+OPTIONS_DONATE              "Пожертвувати до Open Surge"
+OPTIONS_ABOUT               "Про рушій"
+OPTIONS_SHARE               "Поділитися рушієм"
+OPTIONS_DOWNLOAD_DESKTOP    "Отримати рушій для настільних платформ"
+OPTIONS_DOWNLOAD_MOBILE     "Отримати рушій для мобільних платформ"
+OPTIONS_PLAYMOD             "Зіграти у гру"
+OPTIONS_PLAYMOD_NOTAGAME    "Обраний предмет не є грою Open Surge!"
+OPTIONS_PLAYMOD_LEGACYERROR "Legacy Open Surge games are not supported."
+OPTIONS_PLAYMOD_COMPATWARN  "Режим сумісності це функція для покращення досвіду від ігроладу. Ви впевнені, що бажаєте вимкнути її?"
+OPTIONS_MODSTORAGE          "Сховище"
+OPTIONS_MODSTORAGE_FOLDER   "Тека" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  ".zip архів"
+OPTIONS_COMPATIBILITYMODE   "Режим сумісності"
+OPTIONS_SUBMITFEEDBACK      "Надіслати відгук"
+OPTIONS_WRITEREVIEW         "Написати огляд"
+OPTIONS_RATEAPP             "Оцінити додаток"
+OPTIONS_REPORTISSUE         "Звітувати про ваду"
+OPTIONS_BACKTOBASEGAME      "Повернутися до базової гри"
+
+// Stage Select
+STAGESELECT_TITLE           "ВИБІР РІВНЯ"
+STAGESELECT_DEBUG           "РЕЖИМ РОЗРОБНИКА"
+STAGESELECT_MSG             "Натисніть <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> щоб повернутися"
+STAGESELECT_PAGE            "сторінка $1/$2"
+STAGESELECT_ACT             "Зона"
+
+// Credits
+CREDITS_TITLE               "ПРО РОЗРОБНИКІВ"
+CREDITS_BACK                "Натисніть <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> щоб повернутися"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME версія $ENGINE_VERSION</color>\nпрацює на $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Люди</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Колишні учасники</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Дякуємо</color>"
+CREDITS_ALEXANDRE           "Лідер і засновник проекту\nРозробник проекту\nХудожник"
+CREDITS_JOAO                "Художник спрайтів"
+CREDITS_MATEUS              "Звукові ефекти"
+CREDITS_CODY                "Художник концептів\nДизайнер ворогів"
+CREDITS_JOHAN               "Музикант (спочивай з миром, друже)"
+CREDITS_DI                  "Музикант"
+CREDITS_VICTOR              "Музикант"
+CREDITS_M374LX              "Музикант"
+CREDITS_COLIN               "Спрайти, перша історія"
+CREDITS_BRIAN               "Художник спрайтів"
+CREDITS_TRANSLATOR          "Перекладач"
+CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Перекладачі</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Колишні перекладачі</color>"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Про окремі ресурси</color>"
+CREDITS_RES_TEXT            "Усі файли знизу використовують вільні ліцензії. Представлені відповідні автори:"
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Зображення</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Музика</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Звукові ефекти</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Шрифти</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Рівні</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Переклади</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Скрипти</color>"
+CREDITS_RES_SCRIPTS_TEXT    "Автори самі ідентифікують себе у скриптах."
+
+// Title Screen
+TITLESCREEN_PLAY            "ПОЧАТИ ГРУ"
+TITLESCREEN_OPTIONS         "НАЛАШТУВАННЯ"
+TITLESCREEN_CREATE          "СТВОРИТИ"
+TITLESCREEN_MOBILE          "ЗІГРАТИ З МОБІЛЬНОГО ПРИСТРОЮ"
+TITLESCREEN_SHARE           "ПОДІЛИТИСЯ"
+TITLESCREEN_DONATE          "ПОЖЕРТВУВАТИ"
+TITLESCREEN_QUIT            "ВИЙТИ"
+TITLESCREEN_SUBMITFEEDBACK  "НАДІСЛАТИ ВІДГУК"
+TITLESCREEN_WRITEREVIEW     "НАПИСАТИ ОГЛЯД"
+TITLESCREEN_RATEAPP         "ОЦІНИТИ ДОДАТОК"
+TITLESCREEN_REPORTISSUE     "ЗВІТУВАТИ ПРО ВАДУ"
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
+
+// End of Demo
+ENDOFDEMO_CONTINUE          "ПРОДОВЖИТИ"
+ENDOFDEMO_VERSION           "ДЕМО ВЕРСІЯ $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Дякуємо за гру! Surge the Rabbit все ще знаходиться у розробці.\n\nЗавітайте на <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> щоб дізнатися більше!\n\nА тепер давайте поглянемо як ви впораєтеся зі створенням ваших власних ігор!"
+
+// Rate the Game
+// Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+RATEGAME_TITLE              "Оцінити Surge the Rabbit?"
+RATEGAME_MESSAGE            "Ми би хотіли почути, чи сподобалося вам!\nВаш відгук допоможе цій грі (з відкритим джерельним кодом!) та рушію!" // 2 lines max.
+RATEGAME_YES                "Звісно!"
+RATEGAME_NO                 "Не зараз"
+
+// Play classic levels
+PLAYCLASSICLEVELS_TEXT      "Зіграти на класичних рівнях?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+
+// Thanks for playing
+THANKSFORPLAYING_TITLE      "Дякуємо за гру!"
+THANKSFORPLAYING_TEXT       "Ця гра створена за допомогою Open Surge, дуже гнучкий, 2Д рушій з відкритим джерельним кодом який тепер у вас в руках!\n\nТепер поділіться радістю! Розкажіть близьким, друзям та домашнім тваринкам про нього!"
+THANKSFORPLAYING_YES        "Звісно!"
+THANKSFORPLAYING_NO         "Не зараз"
+
+// (legacy) Main Menu
+MAINMENU_TITLE              "МЕНЮ"
+MAINMENU_PLAY               "ЗІГРАТИ"
+MAINMENU_CREATE             "СТВОРИТИ"
+MAINMENU_SHARE              "ПОДІЛИТИСЯ"
+MAINMENU_OPTIONS            "НАЛАШТУВАННЯ"
+MAINMENU_QUIT               "ВИЙТИ"
+MAINMENU_DEVBUILD           "Версія розробників"
+MAINMENU_VERSION            "вер. $ENGINE_VERSION" // abbreviated
+
+// (legacy) Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "СТВОРИТИ"
+CREATEMENU_PLAY             "ЗІГРАТИ У ДЕМО"
+CREATEMENU_LEARN            "ДІЗНАТИСЯ"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "НАЗАД"
+CREATEMENU_TEXT             "Open Surge дозволяє вам створювати ваші власні чудові ігри! Дайте волю своїй творчості! Дозвольте потенціалу текти крізь вас!\n\nПочніть свій власний проект! Створіть нові рівні, предмети, босів, персонажів та більше! Спробуйте редактор рівнів, вивчайте рушій і пірнайте у SurgeScript, щоб розкрити весь потенціал!"
+
+// (legacy) Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "ДЯКУЄМО ЗА ГРУ"
+CONGRATULATIONS_SHARE       "ПОДІЛИТИСЯ"
+CONGRATULATIONS_DONATE      "ПОЖЕРТВУВАТИ"
+CONGRATULATIONS_BACK        "НАЗАД"
+CONGRATULATIONS_TEXT        "Дякуємо, що зіграли у Open Surge версії $ENGINE_VERSION.\nБажаєте зіграти більше? Відвідайте $ENGINE_WEBSITE!\n\nOpen Surge дозволяє вам грати і створювати ваші власні ігри. Він створений такими же людьми, як і ви. Тепер поділіться радістю! Розкажіть близьким, друзям та домашнім тваринкам про нього!"
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
+INPUT_KEYB_DIRECTIONAL      "КНОПКИ СТРІЛОК"
+INPUT_KEYB_LEFT             "ЛІВА КНОПКА"
+INPUT_KEYB_RIGHT            "ПРАВА КНОПКА"
+INPUT_KEYB_UP               "ВЕРХНЯ КНОПКА"
+INPUT_KEYB_DOWN             "НИЖНЯ КНОПКА"
+INPUT_KEYB_FIRE1            "ПРОБІЛ"
+INPUT_KEYB_FIRE2            "ЛІВИЙ CTRL"
+INPUT_KEYB_FIRE3            "ENTER"
+INPUT_KEYB_FIRE4            "ESC"
+INPUT_KEYB_FIRE5            "ЛІВИЙ SHIFT"
+INPUT_KEYB_FIRE6            "ПРАВИЙ SHIFT"
+INPUT_KEYB_FIRE7            "<доступно>"
+INPUT_KEYB_FIRE8            "<доступно>"
+
+// joystick
+INPUT_JOY_DIRECTIONAL       "КНОПКИ НАПРЯМКУ"
+INPUT_JOY_LEFT              "ЛІВА КНОПКА"
+INPUT_JOY_RIGHT             "ПРАВА КНОПКА"
+INPUT_JOY_UP                "ВЕРХНЯ КНОПКА"
+INPUT_JOY_DOWN              "НИЖНЯ КНОПКА"
+INPUT_JOY_FIRE1             "КНОПКА ДІЇ"
+INPUT_JOY_FIRE2             "ДОДАТКОВА КНОПКА ДІЇ"
+INPUT_JOY_FIRE3             "ПАУЗА"
+INPUT_JOY_FIRE4             "НАЗАД"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
+INPUT_JOY_FIRE7             "<доступно>"
+INPUT_JOY_FIRE8             "<доступно>"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
+QUIT_QUESTION               "Ви дійсно бажаєте вийти?"
+QUIT_OPTION1                "Так"
+QUIT_OPTION2                "Ні"
+
+// Loading Screen
+LOADING_TEXT                "Завантаження..."
+
+
+
+//
+// Section: levels
+//
+
+// Demo Level
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Створюйте ваші власні чудові ігри!</color>\nЦя гра створена за допомогою <color=$COLOR_HIGHLIGHT>Open Surge</color>, дуже гнучкий, 2Д рушій з відкритим джерельним кодом який тепер у ваших руках!"
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Чи ви знали?</color>\nУсе в Open Surge можна налаштувати. Ви можете створювати рівні, предмети, босів, персонажів та більше! Це повна <color=$COLOR_HIGHLIGHT>система для створення гри</color>."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Розкрийте свою креативність!</color>\nГоловна фішка Open Surge це <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Це мова скриптування для ігор! Використвойте її щоб створити все, що тільки забажаєте!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Круто!</color>\nВже у захваті? Межа - лише ваша уява! Завітайте на <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> щоб створити вашу неймовірну гру вже сьогодні!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Спробуйте самі!</color>\nТепер ваша черга! <color=$COLOR_HIGHLIGHT>Натисніть F12 щоб відкрити редактор.</color> А потім, відкрийте список предметів і почніть будувати ваш рівень! (F1 для допомоги)"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Спробуйте самі!</color>\nТепер ваша черга! Поставте гру на паузу, потягніть ручку внизу екрану і увійдіть <color=$COLOR_HIGHLIGHT>Режим налагодження</color> щоб <color=$COLOR_HIGHLIGHT>редагувати рівень</color>!"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>Круто!</color>\nЗавітайте на <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> щоб створити вашу власну неймовірну гру вже сьогодні!"
+
+
+
+//
+// Section: level editor
+//
+
+// Main UI
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: допомога"
+EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
+EDITOR_UI_BRICK             "деталь"
+EDITOR_UI_GROUP             "група"
+EDITOR_UI_ENTITY            "сутність"
+EDITOR_UI_LEGACYITEM        "старий предмет"
+EDITOR_UI_LEGACYOBJECT      "старий об'єкт"
+EDITOR_UI_MISSING           "<відсутній>"
+
+// Bricks - scenery elements
+// Translators: please keep the names below succint. See the comments for their meaning.
+EDITOR_BRICK_TYPE_SOLID     "ТВЕРДИЙ"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "ПЛАТФОРМА"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "ПРОХІДНИЙ"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "НЕВІДОМО"
+
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "БЕЗ ПОВЕДІНКИ"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "КРУГОВА"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "РОЗГОЙДУЄТЬСЯ"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "КРИХКА" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "ЛАМАЄТЬСЯ" // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "ПАДУЧА"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "ПЛАВУЧА"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "МАРКЕР"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "НЕВІДОМО"
+
+EDITOR_BRICK_FLIP_NOFLIP    "не перевернуто"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "перевернуто горизонтально" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "перевернуто вертикально"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "розвернуто на 180°"      // flip horizontally & vertically
+
+// Palette
+EDITOR_PALETTE_BRICK        "деталь"
+EDITOR_PALETTE_MISSING      "відсутня"
+EDITOR_PALETTE_EMPTY        "Не знайдено предметів. Натисніть <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> щоб повернутися."
+
+// Help screen
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Загальні</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Розташування предметів</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Система шарів</color>"
+EDITOR_HELP_BACK            "Натисніть <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> щоб повернутися"
+EDITOR_HELP_TINYWINDOW      "Не достатньо місця, щоб відобразити допомогу. Будь ласка,збільшить розмір вікна у налаштуваннях екрану.\n\nНатисніть <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> щоб повернутися."
+EDITOR_HELP_LAYERSTUTORIAL  "Гравець змінить шар при торканні до Зелених-Жовтих L об'єктів (дивитися у список предметів)\nЗелений L об'єкт увімкнене зелений шар і вимкне жовтий\nЖовтий L об'єкт увімкне жовтий шар і вимкне зелений\nНатисніть кнопку L, щоб змінити шар на якому ви розставляєте деталі\nЗелений шар відображається попереду жовтого"
+
+EDITOR_HELP_CMD_RETURN      "Повернутися до гри"
+EDITOR_HELP_CMD_PALETTE     "Відкрити список предметів"
+EDITOR_HELP_CMD_SAVE        "Зберегти рівень"
+EDITOR_HELP_CMD_RELOAD      "Перезапустити рівень"
+EDITOR_HELP_CMD_MOVE        "Рухати камеру"
+EDITOR_HELP_CMD_MOVEFASTER  "Рухати камеру (швидше)"
+EDITOR_HELP_CMD_UNDO        "Скасувати"
+EDITOR_HELP_CMD_REDO        "Відновити"
+EDITOR_HELP_CMD_HELP        "Показати допомогу"
+EDITOR_HELP_CMD_GRID        "Прив’язка до сітки"
+EDITOR_HELP_CMD_MASKS       "Показати маски колізій"
+EDITOR_HELP_CMD_PUTITEM     "Поставити предмет"
+EDITOR_HELP_CMD_PICKITEM    "Підняти предмет"
+EDITOR_HELP_CMD_DELETEITEM  "Видалити предмет (утримання: гумка)"
+EDITOR_HELP_CMD_CHANGEITEM  "Змінити предмет"
+EDITOR_HELP_CMD_CHANGETYPE  "Змінити тип предмету"
+EDITOR_HELP_CMD_WATERLEVEL  "Змінити рівень води"
+EDITOR_HELP_CMD_SPAWNPOINT  "Змінити точку відродження"
+EDITOR_HELP_CMD_BRICKLAYER  "Змінити шар розміщення деталей"
+EDITOR_HELP_CMD_FLIPBRICK   "Обернути поточну деталь"
+
+// Input keys
+EDITOR_INPUT_ARROWS         "Стрілки"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Ліва кнопка миші"
+EDITOR_INPUT_RIGHTCLICK     "Права кнопка миші"
+EDITOR_INPUT_MIDDLECLICK    "Середня кнопка"
+EDITOR_INPUT_MOUSEWHEEL     "Коліщатко миші"
+
+// Confirm boxes
+EDITOR_CONFIRM_RELOAD       "Перезапустити рівень?"
+EDITOR_CONFIRM_YES          "Так"
+EDITOR_CONFIRM_NO           "Ні"
+
+// Messages
+EDITOR_MESSAGE_WELCOME      "Вітаємо у редакторі рівнів!"
+EDITOR_MESSAGE_SAVED        "Збережено у <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Не вдалося зберегти рівень. Будь-ласка, перевірте журнал подій"
+EDITOR_MESSAGE_RELOADED     "Рівень було перезапущено"
+EDITOR_MESSAGE_UNDOERROR    "Неможливо скасувати ще"
+EDITOR_MESSAGE_REDOERROR    "Неможливо повернути ще"
+EDITOR_MESSAGE_SNAP2GRIDON  "Прив'язка до сітки: використовуючи $1 на $2 сітку"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Прив'язка до сітки: вимкнена"
+EDITOR_MESSAGE_DEFAULTLAYER "Шар змінено на <color=$1>СТАНДАРТНИЙ</color>"
+EDITOR_MESSAGE_GREENLAYER   "Шар змінено на <color=$1>ЗЕЛЕНИЙ</color>"
+EDITOR_MESSAGE_YELLOWLAYER  "Шар змінено на <color=$1>ЖОВТИЙ</color>"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Translators:
+//
+// This section accepts SOME language-specific
+// special characters. Please test as necessary.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+// Heads-Up Display
+HUD_SCORE                   "Рахунок"
+HUD_TIME                    "Час"
+HUD_POWER                   "Енергія"
+
+// Level Cleared animation
+CLEARED_LINE1               "ВИ ПРОЙШЛИ"
+CLEARED_LINE2               "ЗОНУ $LEVEL_ACT"
+CLEARED_POWER               "Бонус за Енергію"
+CLEARED_TIME                "Бонус за Час"
+CLEARED_SCORE               "Загальний рахунок"
+
+// Game Over
+GAMEOVER_PART1              "ГРА"
+GAMEOVER_PART2              "ЗАВЕРШЕНА"
+
+// Time Over
+TIMEOVER_PART1              "ЧАС"
+TIMEOVER_PART2              "СКІНЧИВСЯ"
+
+// Pause Menu
+PAUSE_TITLE                 "ПАУЗА"
+PAUSE_CONTINUE              "ПРОДОВЖИТИ"
+PAUSE_RESTART               "ПЕРЕЗАПУСТИТИ"
+PAUSE_EXIT                  "ВИЙТИ"
+
+// EOF
