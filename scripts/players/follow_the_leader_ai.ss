@@ -662,7 +662,7 @@ object "Follow the Leader AI - Platform Sensor" is "private", "awake", "entity"
 
 object "Follow the Leader AI - Input Buffer"
 {
-    maxSamples = 15; // target fps / 60
+    maxSamples = 15; // target fps / 4
     upBuffer = [];
     rightBuffer = [];
     downBuffer = [];
