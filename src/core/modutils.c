@@ -144,6 +144,7 @@ static const char* const COMPATIBILITY_LIST[] = {
 
     "sprites/ui/pointer.spr",                           ":0.6.1",                   /* simplified in 0.6.1 */
     "scripts/ui/title_card.ss",                         ":0.6.1.2",                 /* add missing semicolon in 0.6.1.2 (SurgeScript 0.6.1) */
+    "sprites/ui/title_card.spr",                        ":0.6.1",                   /* new Title Card in 0.6.1; should accompany title_card.ss */
 
     "scripts/items/profiler.ss",                        ":",                        /* always use own Profiler */
 #endif

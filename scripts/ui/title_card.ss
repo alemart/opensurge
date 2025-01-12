@@ -122,8 +122,15 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         transform.position = Vector2.zero;
         actor.zindex = zindex;
 
+        // note: props may not exist (compatibility mode),
+        //       or they may be incorrectly configured
+
+        // read and validate the number of layers
+        numberOfLayers = Math.floor(Number(actor.animation.prop("number_of_layers")));
+        if(numberOfLayers < 1)
+            numberOfLayers = 1;
+
         // create layers
-        numberOfLayers = Number(actor.animation.prop("number_of_layers"));
         for(n = numberOfLayers; n >= 1; n--) {
             zoffset = 1 - (n-1) / numberOfLayers;
             layer = spawn(this.__name + " - Layer")
@@ -134,16 +141,16 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         }
 
         // attach the level name to a layer
-        titleLayerNumber = Number(actor.animation.prop("level_name_layer"));
+        titleLayerNumber = Math.floor(Number(actor.animation.prop("level_name_layer")));
         titleLayer = getLayer(titleLayerNumber);
         levelName.setLayer(titleLayer);
 
         // set the font of the level name
-        titleLayerFont = String(actor.animation.prop("level_name_font"));
+        titleLayerFont = String(actor.animation.prop("level_name_font") || "GoodNeighbors");
         levelName.setFontName(titleLayerFont);
 
         // attach the zone number to a layer
-        zoneLayerNumber = Number(actor.animation.prop("level_zone_layer"));
+        zoneLayerNumber = Math.floor(Number(actor.animation.prop("level_zone_layer")));
         zoneLayer = getLayer(zoneLayerNumber);
         zoneNumber.setLayer(zoneLayer);
     }
