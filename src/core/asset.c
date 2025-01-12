@@ -1069,6 +1069,13 @@ const char* case_insensitive_fix(const char* virtual_path)
     assertx(strlen(virtual_path) < sizeof(buffer)); /* really?! */
     str_cpy(buffer, virtual_path, sizeof(buffer));
 
+    /* Windows users may specify '\\' as the directory separator.
+       Doing so makes the case-insensitive search fail on other platforms. */
+    for(char* p = buffer; *p != '\0'; p++) {
+        if(*p == '\\')
+            *p = '/';
+    }
+
     if(0 == PHYSFSEXT_locateCorrectCase(buffer))
         return buffer;
     else
