@@ -146,7 +146,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         levelName.setLayer(titleLayer);
 
         // set the font of the level name
-        titleLayerFont = String(actor.animation.prop("level_name_font") || "GoodNeighbors");
+        titleLayerFont = String(actor.animation.prop("level_name_font") || "GoodNeighborsLarge");
         levelName.setFontName(titleLayerFont);
 
         // attach the zone number to a layer
