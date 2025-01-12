@@ -190,9 +190,16 @@ surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     double max_width = surgescript_var_get_number(surgescript_heap_at(heap, MAXWIDTH_ADDR));
     char* font_name = !surgescript_var_is_null(param[0]) ? surgescript_var_get_string(param[0], manager) : str_dup(DEFAULT_FONT);
-    font_t* font = font_create(font_name);
+
+    /* check if the font exists */
+    if(!font_exists(font_name)) {
+        surgescript_objecthandle_t parent_handle = surgescript_object_parent(object);
+        const surgescript_object_t* parent = surgescript_objectmanager_get(manager, parent_handle);
+        scripting_error(parent, "Can't create Text: font \"%s\" doesn't exist!", font_name);
+    }
 
     /* configure font */
+    font_t* font = font_create(font_name);
     font_set_text(font, "%s", surgescript_var_fast_get_string(surgescript_heap_at(heap, TEXT_ADDR)));
     font_set_align(font, str2align(surgescript_var_fast_get_string(surgescript_heap_at(heap, ALIGN_ADDR))));
     font_set_visible(font, surgescript_var_get_bool(surgescript_heap_at(heap, VISIBLE_ADDR)));
