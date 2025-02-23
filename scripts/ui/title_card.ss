@@ -65,6 +65,7 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
     {
         MobileGamepad.fadeOut();
         setAnim(0);
+        timeBlocker.setTime(Level.time);
         onStart();
         state = "warming up";
     }
@@ -294,9 +295,17 @@ object "Default Title Card - Zone Number" is "entity", "awake", "detached", "pri
 // Do not advance time until we are finished with the Title Card animation
 object "Default Title Card - Time Blocker"
 {
+    time = 0.0;
+
     state "main"
     {
-        Level.time = 0.0;
+        Level.time = time;
+    }
+
+    fun setTime(t)
+    {
+        time = t;
+        return this;
     }
 }
 
