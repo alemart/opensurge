@@ -22,6 +22,14 @@ object "Collectibles Listener"
 
     state "main"
     {
+        // initialize the counter
+        // Player.active.collectibles may or may not be zero at this moment
+        counter = Math.floor(Player.active.collectibles / divisor);
+        state = "listening";
+    }
+
+    state "listening"
+    {
         c = Math.floor(Player.active.collectibles / divisor);
         if(c > counter) {
             counter = c;
