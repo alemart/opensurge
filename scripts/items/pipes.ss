@@ -12,6 +12,7 @@ using SurgeEngine.Vector2;
 using SurgeEngine.Brick;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
+using SurgeEngine.Collisions.CollisionBall;
 
 object "Pipe Up" is "entity", "special"
 {
@@ -82,6 +83,7 @@ object "Pipe Out" is "entity", "special"
     pipeManager = Level.child("Pipe Manager") || Level.spawn("Pipe Manager");
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
     brick = Brick("Pipe Out");
+    collider = CollisionBall(80);
     playerCollider = null;
     isBlocked = { };
     public zindex = 1.0;
@@ -107,6 +109,15 @@ object "Pipe Out" is "entity", "special"
         pipeManager.getOut(player);
         playerCollider = player.collider;
         state = "block";
+    }
+
+    fun onCollision(otherCollider)
+    {
+        if(otherCollider.entity.hasTag("player")) {
+            player = otherCollider.entity;
+            if(pipeManager.isInsidePipe(player))
+                isBlocked[player.id] = false;
+        }
     }
 
     fun constructor()
