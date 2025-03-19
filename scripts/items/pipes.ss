@@ -90,7 +90,11 @@ object "Pipe Out" is "entity", "special"
 
     state "main"
     {
-        brick.enabled = (isBlocked[Player.active.id] || false);
+        player = Player.active;
+        if(isBlocked.has(player.id))
+            brick.enabled = isBlocked[player.id];
+        else
+            brick.enabled = true;
     }
 
     state "block"
@@ -123,7 +127,7 @@ object "Pipe Out" is "entity", "special"
     fun constructor()
     {
         brick.type = "solid";
-        brick.enabled = false;
+        brick.enabled = true;
     }
 }
 
