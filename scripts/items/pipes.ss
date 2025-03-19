@@ -416,6 +416,7 @@ object "Pipe Traveler"
     fun getIn()
     {
         if(!isTraveling()) {
+            player.roll(); // will shrink sensors
             player.frozen = true;
             state = "in";
         }
@@ -432,6 +433,7 @@ object "Pipe Traveler"
 
     fun goUp()
     {
+        player.speed = player.ysp = 0;
         state = "up";
     }
 
