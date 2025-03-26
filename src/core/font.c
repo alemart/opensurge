@@ -251,6 +251,7 @@ static const char* read_variable(const char* key, void* data);
 static int expand_vars(char* dest, const char* src, size_t dest_size, const char* (*callback)(const char*,void*), void* data);
 static inline bool has_vars_to_expand(const char* str);
 static char* convert_to_ascii(char* str);
+static uint32_t remap_codepoint(uint32_t chr);
 static char* find_wordwrap(const fontdrv_t* drv, char* text, int max_width);
 static int find_blanks(const char* text, int blank[], size_t size);
 static char* tagged_text_offset(char* text, int charnum);
@@ -937,6 +938,25 @@ char* convert_to_ascii(char* str)
 
     *q = '\0';
     return str;
+}
+
+/* remap code points:
+   make bitmap characters outside of the supported range work */
+uint32_t remap_codepoint(uint32_t chr)
+{
+    switch(chr) {
+        /* left double quotation mark */
+        case 0x201C:
+            return 0x30F;
+
+        /* double low-9 quotation mark */
+        case 0x201E:
+            return 0x348;
+
+        /* no remapping */
+        default:
+            return chr;
+    }
 }
 
 /* find the next point where a wordwrap should be placed */
@@ -1734,7 +1754,7 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
         nanoparser_expect_string(p1, "Font script error: a sequence of characters is expected in keymap");
 
         keymap = nanoparser_get_string(p1);
-        for(prev_i = i = 0; (chr = u8_nextchar(keymap, &i)) != 0; prev_i = i) {
+        for(prev_i = i = 0; (chr = remap_codepoint(u8_nextchar(keymap, &i))) != 0; prev_i = i) {
             if(chr < FONT_MAXBITMAPGLYPHS) {
                 if(!header->data.bmp.chr[chr].valid) {
                     header->data.bmp.chr[chr].index = prev_i;
@@ -1762,7 +1782,7 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
         nanoparser_expect_string(p1, "Font script error: a character is expected in char");
 
         size_t i = 0;
-        uint32_t c = u8_nextchar(nanoparser_get_string(p1), &i);
+        uint32_t c = remap_codepoint(u8_nextchar(nanoparser_get_string(p1), &i));
 
         if(c < FONT_MAXBITMAPGLYPHS)
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), &header->data.bmp.chr[c], traverse_bmp_char);
@@ -1988,7 +2008,7 @@ void fontdrv_bmp_textout(const fontdrv_t* fnt, const char* text, int x, int y, c
     int vsp = f->spacing.y;
     uint32_t c = 0;
 
-    for(size_t i = 0; (c = u8_nextchar(text, &i)) != 0; ) {
+    for(size_t i = 0; (c = remap_codepoint(u8_nextchar(text, &i))) != 0; ) {
         point2d_t glyph_offset;
         const image_t* glyph = find_bmp_glyph(f, c, &glyph_offset);
         if(glyph != NULL) {
@@ -2013,7 +2033,7 @@ int fontdrv_bmp_linewidth(const fontdrv_t* fnt, const char* text)
     int line_width = 0;
     uint32_t c = 0;
 
-    for(size_t i = 0; (c = u8_nextchar(text, &i)) != 0; ) {
+    for(size_t i = 0; (c = remap_codepoint(u8_nextchar(text, &i))) != 0; ) {
         const image_t* glyph = find_bmp_glyph(f, c, NULL);
         if(glyph != NULL) {
             line_width += image_width(glyph) + space;
