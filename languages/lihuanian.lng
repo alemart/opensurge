@@ -1,0 +1,438 @@
+// -----------------------------------------------------------------------------
+// File: languages/lithuanian.lng
+// Description: lithuanian translation (encoding: UTF-8)
+// Author: Linasmi <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+//
+// Section: generic
+//
+
+// Translation metadata
+// (use the English alphabet)
+LANG_ID                     "lt_LT"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Lietuvių"                 // language name
+LANG_AUTHOR                 "Linasmi"              // translation author
+LANG_COMPATIBILITY          "0.6.1.3"                   // required engine version
+
+
+
+
+//
+// Translators:
+//
+// Before starting your work, please check out the
+// Translation Guide at http://wiki.opensurge2d.org
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// Developer mode: when seeing the Open Surge Engine splash
+// screen, press RIGHT 3 times and enter. You'll see a list
+// of all level files.
+//
+
+//
+// Updating translations:
+//
+// New strings get added from time to time. They are marked
+// as FIXME. To find them, use the Find tool in your editor.
+// Found something? Please search for it now.
+//
+// If you find that mark anywhere in the file, it means that
+// the translation needs to be updated. Please submit a patch
+// to keep it up to date.
+//
+// After translating the new strings, make sure to remove
+// that mark.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
+OPTIONS_TITLE               "NUSTATYMAI"
+OPTIONS_GRAPHICS            "Grafika"
+OPTIONS_AUDIO               "Garsas"
+OPTIONS_CONTROLS            "Valdymas"
+OPTIONS_GAME                "Žaidimas"
+OPTIONS_ENGINE              "Variklis"
+OPTIONS_MODS                "MODai"
+OPTIONS_BACK                "Atgal"
+OPTIONS_YES                 "Taip"
+OPTIONS_NO                  "Ne"
+OPTIONS_ON                  "Įj." // alternatively: Enabled
+OPTIONS_OFF                 "Išj." // alternatively: Disabled
+OPTIONS_DEFAULT             "Nutylint"
+OPTIONS_FULLSCREEN          "Per visą ekraną"
+OPTIONS_RESOLUTION          "Lango dydis"
+OPTIONS_QUALITY             "Kokybė"
+OPTIONS_QUALITY_LOW         "Žema"
+OPTIONS_QUALITY_MEDIUM      "Vidutinė"
+OPTIONS_QUALITY_HIGH        "Aukšta"
+OPTIONS_FPS                 "Rodyti FPS"
+OPTIONS_VSYNC               "Vertikali sinchronizacija" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Pikselių mastelio keitimas"
+OPTIONS_COMINGSOON          "Greitai bus!"
+OPTIONS_VOLUME              "Garsumas"
+OPTIONS_MUTE                "Nutildyti"
+OPTIONS_MIXER               "Garsumo balansas"
+OPTIONS_MIXER_MIN           "Tik garsai"
+OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
+OPTIONS_MIXER_MAX           "Tik muzika"
+OPTIONS_MUFFLER             "Povandeninis efektas"
+OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
+OPTIONS_MUFFLER_LOW         "Žemas" // also: lightweight
+OPTIONS_MUFFLER_MEDIUM      "Vidutinis"
+OPTIONS_MUFFLER_HIGH        "Aukštas"
+OPTIONS_MUFFLER_HIGHER      "Labai aukštas"
+OPTIONS_GAMEPADOPACITY      "Gamepado permatomumas"
+OPTIONS_GAMEPAD             "Gamepadas"
+OPTIONS_LANGUAGE            "Kalba"
+OPTIONS_STAGESELECT         "Pasirinkti lygį"
+OPTIONS_DEVELOPERMODE       "Kūrėjo režimas"
+OPTIONS_CREDITS             "Open Surge autoriai"
+OPTIONS_WEBSITE             "Aplankyti Open Surge puslapį"
+OPTIONS_DONATE              "Palaikyti Open Surge"
+OPTIONS_ABOUT               "Informacija apie variklį"
+OPTIONS_SHARE               "Pasidalinti varikliu"
+OPTIONS_DOWNLOAD_DESKTOP    "Atsisiųsti stalinę versiją"
+OPTIONS_DOWNLOAD_MOBILE     "Atsisiųsti mobilią versiją"
+OPTIONS_PLAYMOD             "Žaisti MODą"
+OPTIONS_PLAYMOD_NOTAGAME    "Pasirinktas elementas nėra „Open Surge“ žaidime!"
+OPTIONS_PLAYMOD_LEGACYERROR "Žaidimai su pasenusiomis „Open Surge“ versijomis nepalaikomi."
+OPTIONS_PLAYMOD_COMPATWARN  "Suderinamumo režimas sukurtas siekiant pagerinti jūsų žaidimo patirtį. Ar tikrai norite jį išjungti?"
+OPTIONS_MODSTORAGE          "Išsaugojimo tipas"
+OPTIONS_MODSTORAGE_FOLDER   "Aplankas" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  ".zip archyvas"
+OPTIONS_COMPATIBILITYMODE   "Suderinamumo režimas"
+OPTIONS_SUBMITFEEDBACK      "Palikti atsiliepimą"
+OPTIONS_WRITEREVIEW         "Parašyti apžvalgą"
+OPTIONS_RATEAPP             "Įvertinti programėlę"
+OPTIONS_REPORTISSUE         "Pranešti apie problemą"
+OPTIONS_BACKTOBASEGAME      "Grįžti į bazinę žaidimo versiją"
+
+// Stage Select
+STAGESELECT_TITLE           "PASIRINKTI LYGĮ"
+STAGESELECT_DEBUG           "KŪRĖJO REŽIMAS"
+STAGESELECT_MSG             "Paspauskite <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color>, kad grįžtumėte"
+STAGESELECT_PAGE            "puslapis $1/$2"
+STAGESELECT_ACT             "Zona"
+
+// Credits
+CREDITS_TITLE               "AUTORIAI"
+CREDITS_BACK                "Paspauskite <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color>, kad grįžtumėte"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versija $ENGINE_VERSION</color>\nnaudoja $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Aktyvūs dalyviai</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Ankstesni dalyviai</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Padėka</color>"
+CREDITS_ALEXANDRE           "Projekto vadovas ir įkūrėjas\nProjekto kūrėjas\nDailininkas"
+CREDITS_JOAO                "Dailininkas\nIliustratorius"
+CREDITS_MATEUS              "Garso efektai"
+CREDITS_CODY                "Koncepcijos dailininkas\nPriešų dizaineris"
+CREDITS_JOHAN               "Kompozitorius (ilsėkis ramybėje, bičiuli)"
+CREDITS_DI                  "Kompozitorius"
+CREDITS_VICTOR              "Kompozitorius"
+CREDITS_M374LX              "Kompozitorius"
+CREDITS_COLIN               "Spraitų dailininkas, pirmasis siužeto variantas"
+CREDITS_BRIAN               "Spraitų dailininkas"
+CREDITS_TRANSLATOR          "Vertėjas"
+CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Vertėjai</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Ankstesni vertėjai</color>"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Atskirų resursų autoriai</color>"
+CREDITS_RES_TEXT            "Visiems toliau išvardytiems failams taikomos nemokamos licencijos. Atitinkami jų autoriai yra nurodyti:"
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Vaizdai</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muzika</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Garso efektai</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Šriftai</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Lygiai</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Vertimai</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skriptai</color>"
+CREDITS_RES_SCRIPTS_TEXT    "Autoriai išvardyti pačiuose skriptuose."
+
+// Title Screen
+TITLESCREEN_PLAY            "PRADĖTI ŽAIDIMĄ"
+TITLESCREEN_OPTIONS         "NUSTATYMAI"
+TITLESCREEN_CREATE          "SUKURTI"
+TITLESCREEN_MOBILE          "MOBILI VERSIJA"
+TITLESCREEN_SHARE           "PASIDALINTI"
+TITLESCREEN_DONATE          "PALAIKYTI"
+TITLESCREEN_QUIT            "IŠEITI"
+TITLESCREEN_SUBMITFEEDBACK  "PALIKTI ATSILIEPIMĄ"
+TITLESCREEN_WRITEREVIEW     "PARAŠYTI APŽVALGĄ"
+TITLESCREEN_RATEAPP         "ĮVERTINTI PROGRAMĄ."
+TITLESCREEN_REPORTISSUE     "PRANEŠTI APIE PROBLEMĄ"
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
+
+// End of Demo
+ENDOFDEMO_CONTINUE          "TĘSTI"
+ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Ačiū, kad žaidžiate! „Surge the Rabbit“ yra kuriamas.\n\nSekite naujienas adresu <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> !\n\nDabar pažiūrėkime, kaip ir jūs galite sukurti savo žaidimą!"
+
+// Rate the Game
+// Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+RATEGAME_TITLE              "Patinka Surge the Rabbit?"
+RATEGAME_MESSAGE            "Norėtume išgirsti apie jūsų patirtį! Jūsų atsiliepimai padeda šiam atviro kodo žaidimui augti!" // 2 lines max.
+RATEGAME_YES                "Žinoma!"
+RATEGAME_NO                 "Ne dabar"
+
+// Play classic levels
+PLAYCLASSICLEVELS_TEXT      "Žaisti klasikinius lygius?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+
+// Thanks for playing
+THANKSFORPLAYING_TITLE      "Ačiū, kad žaidžiate!"
+THANKSFORPLAYING_TEXT       "Šis žaidimas sukurtas naudojant „Open Surge“ - labai lankstų atviro kodo 2D variklį, kuris dabar yra jūsų rankose!\n\nDabar pasidalykite ja su mumis! Papasakokite apie tai savo draugams, šeimos nariams ir augintiniams!"
+THANKSFORPLAYING_YES        "Žinoma!"
+THANKSFORPLAYING_NO         "Ne dabar"
+
+// (legacy) Main Menu
+MAINMENU_TITLE              "MENIU"
+MAINMENU_PLAY               "ŽAISTI"
+MAINMENU_CREATE             "SUKURTI"
+MAINMENU_SHARE              "PASIDALINTI"
+MAINMENU_OPTIONS            "NUSTATYMAI"
+MAINMENU_QUIT               "IŠEITI"
+MAINMENU_DEVBUILD           "Kuriama versija"
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
+
+// (legacy) Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "SUKURTI"
+CREATEMENU_PLAY             "DEMO LYGIS"
+CREATEMENU_LEARN            "APSILANKYTI"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "ATGAL"
+CREATEMENU_TEXT             "„Open Surge“ leidžia kurti savo žaidimus! Išlaisvinkite savo kūrybiškumą!\n\nPradėkite savo projektą! Kurkite naujus lygius, daiktus, bosus, veikėjus ir dar daugiau! Išbandykite lygių redaktorių, tyrinėkite variklį ir pasinerkite į „SurgeScript“, kad pasiektumėte didžiausią galingumą!"
+
+// (legacy) Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "AČIŪ, KAD ŽAIDŽIATE"
+CONGRATULATIONS_SHARE       "PASIDALINTI"
+CONGRATULATIONS_DONATE      "PALAIKYTI"
+CONGRATULATIONS_BACK        "GRĮŽTI Į MENIU"
+CONGRATULATIONS_TEXT        "Ačiū, kad žaidžiate „Open Surge“ versiją $ENGINE_VERSION!\nNorite daugiau? Sekite naujinimus $ENGINE_WEBSITE\n\nOpen Surge leidžia žaisti ir kurti savo žaidimus. Jį sukūrė tokie pat žmonės kaip jūs! Dabar papasakokite apie tai kitiems!"
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
+INPUT_KEYB_DIRECTIONAL      "KRYPČIŲ KLAVIŠAI"
+INPUT_KEYB_LEFT             "KAIRĖN"
+INPUT_KEYB_RIGHT            "DEŠINĖN"
+INPUT_KEYB_UP               "AUKŠTYN"
+INPUT_KEYB_DOWN             "ŽEMYN"
+INPUT_KEYB_FIRE1            "TARPAS"
+INPUT_KEYB_FIRE2            "KAIRYS CTRL"
+INPUT_KEYB_FIRE3            "ENTER"
+INPUT_KEYB_FIRE4            "ESC"
+INPUT_KEYB_FIRE5            "KAIRYS SHIFT"
+INPUT_KEYB_FIRE6            "DEŠINYS SHIFT"
+INPUT_KEYB_FIRE7            "<pasiekiama>"
+INPUT_KEYB_FIRE8            "<pasiekiama>"
+
+// joystick
+INPUT_JOY_DIRECTIONAL       "KRYPČIŲ MYGTUKAI"
+INPUT_JOY_LEFT              "KAIRĖN"
+INPUT_JOY_RIGHT             "DEŠINĖN"
+INPUT_JOY_UP                "AUKŠTYN"
+INPUT_JOY_DOWN              "ŽEMYN"
+INPUT_JOY_FIRE1             "ŠUOLIS"
+INPUT_JOY_FIRE2             "PAPILDOMAS VEIKSMAS"
+INPUT_JOY_FIRE3             "PAUZĖ"
+INPUT_JOY_FIRE4             "ATGAL"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
+INPUT_JOY_FIRE7             "<pasiekiama>"
+INPUT_JOY_FIRE8             "<pasiekiama>"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
+QUIT_QUESTION               "Ar tikrai norite išeiti?"
+QUIT_OPTION1                "Taip"
+QUIT_OPTION2                "Ne"
+
+// Loading Screen
+LOADING_TEXT                "Įkėlimas..."
+
+
+
+//
+// Section: levels
+//
+
+// Demo Level
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Sukurkite savo nuostabų žaidimą!</color>\nŠis žaidimas buvo sukurtas naudojant <color=$COLOR_HIGHLIGHT>Open Surge</color>, Itin lanksčiu atvirojo kodo 2D varikliu, kuris dabar yra jūsų rankose!"
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Ar žinojote...?</color>\nViską „Open Surge“ galima keisti pagal poreikius. Galite kurti lygius, daiktus, bosus, veikėjus ir dar daugiau! Tai pilnavertė <color=$COLOR_HIGHLIGHT>žaidimų kūrimo sistema</color>."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Išlaisvinkite savo kūrybiškumą! </color>\nViena iš pagrindinių „Open Surge“ funkcijų yra <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Tai yra žaidimų skriptų kūrimas! Naudokite jį, kad įgyvendintumėte viską, ką tik galite įsivaizduoti!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Puiku!</color>\nJau susidomėjote? Riba – tik dangus! Apsilankykite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> ir pradėkite kurti savo žaidimus jau šiandien!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Pabandykite patys!</color>\nDabar jūsų eilė! <color=$COLOR_HIGHLIGHT>Paspauskite F12, kad atidarytumėte redaktorių.</color> Tada atidarykite daiktų sąrašą ir pradėkite rinkti savo lygį! (paspauskite F1, kad gautumėte pagalbos)"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Pabandykite patys!</color>\nDabar jūsų eilė! Pristabdykite žaidimą, patraukite ekrano apačioje esančią rankenėlę ir paspauskite, <color=$COLOR_HIGHLIGHT>DEBUG</color> kad <color=$COLOR_HIGHLIGHT>pakeistumėte lygį</color>!"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>Puiku!</color>\nAplankykite <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> ir pradėkite kurti savo žaidimus jau šiandien!"
+
+
+
+//
+// Section: level editor
+//
+
+// Main UI
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: pagalba"
+EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
+EDITOR_UI_BRICK             "detalė"
+EDITOR_UI_GROUP             "grupė"
+EDITOR_UI_ENTITY            "esybė"
+EDITOR_UI_LEGACYITEM        "pasenęs elementas"
+EDITOR_UI_LEGACYOBJECT      "pasenęs objektas"
+EDITOR_UI_MISSING           "<nėra>"
+
+// Bricks - scenery elements
+// Translators: please keep the names below succint. See the comments for their meaning.
+EDITOR_BRICK_TYPE_SOLID     "KIETA"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "PLATFORMA"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "PASSABLE"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "NEŽINOMA"
+
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "NEJUDANTIS"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "APVALUS"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "ŠVYTUOKLINIS"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "LŪŽTANTIS" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "SUNAIKINAMAS" // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "KRENTANTIS"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "SKLANDANTIS"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "ŽYMEKLIS"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "NEŽINOMA"
+
+EDITOR_BRICK_FLIP_NOFLIP    "nepasukta"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "atspindėta horizontaliai" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "atspindėta vertikaliai"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "pasukta 180°"      // flip horizontally & vertically
+
+// Palette
+EDITOR_PALETTE_BRICK        "detalė"
+EDITOR_PALETTE_MISSING      "nėra"
+EDITOR_PALETTE_EMPTY        "Daiktų nerasta. Paspauskite, <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> kad grįžtumėte."
+
+// Help screen
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Pagrindai</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Daiktų išdėstymas</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Sluoksnių sistema</color>"
+EDITOR_HELP_BACK            "Paspauskite, <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> kad grįžtumėte"
+EDITOR_HELP_TINYWINDOW      "Pagalbos rodymui nepakanka vietos. Padidinkite lango dydį žaidimo nustatymuose.\nPaspauskite, <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> kad grįžtumėte."
+EDITOR_HELP_LAYERSTUTORIAL  "Žaidėjas pakeis esamą sluoksnį, jei palies\nžalius/geltonus L objektus (žr. esybių paletę).\nŽalias L objektas įjungia žalią sluoksnį ir išjungia geltoną sluoksnį\nGeltonas L objektas įjungia geltoną sluoksnį ir išjungia žalią sluoksnį\nPaspauskite klavišą L, kad pakeistumėte sluoksnį, į kurį dedate detales\nŽalias sluoksnis yra virš geltono sluoksnio"
+
+EDITOR_HELP_CMD_RETURN      "Grįžti į žaidimą"
+EDITOR_HELP_CMD_PALETTE     "Atidaryti paletę detalių | esybių"
+EDITOR_HELP_CMD_SAVE        "Išsaugoti lygį"
+EDITOR_HELP_CMD_RELOAD      "Įkelti lygį iš naujo"
+EDITOR_HELP_CMD_MOVE        "Judinti kamerą"
+EDITOR_HELP_CMD_MOVEFASTER  "Judinti kamerą (greičiau)"
+EDITOR_HELP_CMD_UNDO        "Atšaukti veiksmą"
+EDITOR_HELP_CMD_REDO        "Grąžinti veiksmą"
+EDITOR_HELP_CMD_HELP        "Rodyti pagalbą"
+EDITOR_HELP_CMD_GRID        "Išlyginti pagal tinklelį"
+EDITOR_HELP_CMD_MASKS       "Rodyti kolizijų kaukes"
+EDITOR_HELP_CMD_PUTITEM     "Įdėti daiktą"
+EDITOR_HELP_CMD_PICKITEM    "Pasirinkti daiktą"
+EDITOR_HELP_CMD_DELETEITEM  "Pašalinti daiktą (laikymas nuspaudus: trintukas)"
+EDITOR_HELP_CMD_CHANGEITEM  "Keisti daiktus"
+EDITOR_HELP_CMD_CHANGETYPE  "Keisti daiktų tipus"
+EDITOR_HELP_CMD_WATERLEVEL  "Nustatyti vandens lygį"
+EDITOR_HELP_CMD_SPAWNPOINT  "Nustatyti atgimimo tašką"
+EDITOR_HELP_CMD_BRICKLAYER  "Pakeisti daiktų išdėstymo sluoksnį"
+EDITOR_HELP_CMD_FLIPBRICK   "Pasukti dabartinę dalį"
+
+// Input keys
+EDITOR_INPUT_ARROWS         "Krypčių mygtukai"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Kairysis pelės mygtukas"
+EDITOR_INPUT_RIGHTCLICK     "Dešinysis pelės mygtukas"
+EDITOR_INPUT_MIDDLECLICK    "Vidurinis pelės mygtukas"
+EDITOR_INPUT_MOUSEWHEEL     "Pelės ratukas"
+
+// Confirm boxes
+EDITOR_CONFIRM_RELOAD       "Įkelti lygį iš naujo?"
+EDITOR_CONFIRM_YES          "Taip"
+EDITOR_CONFIRM_NO           "Ne"
+
+// Messages
+EDITOR_MESSAGE_WELCOME      "Sveiki atvykę į lygių redaktorių!"
+EDITOR_MESSAGE_SAVED        "Išsaugota <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Nepavyko išsaugoti lygio. Žiūrėkite logfile.txt"
+EDITOR_MESSAGE_RELOADED     "Lygis įkeltas iš naujo"
+EDITOR_MESSAGE_UNDOERROR    "Atšaukti toliau nebegalima"
+EDITOR_MESSAGE_REDOERROR    "Grąžinti toliau nebegalima"
+EDITOR_MESSAGE_SNAP2GRIDON  "Išlyginti pagal tinklelį: naudojamas tinklelis $1 × $2"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Išlyginti pagal tinklelį: išjungta"
+EDITOR_MESSAGE_DEFAULTLAYER "Sluoksnis pakeistas į <color=$1>standartinį</color>"
+EDITOR_MESSAGE_GREENLAYER   "Sluoksnis pakeistas į <color=$1>žalią</color>"
+EDITOR_MESSAGE_YELLOWLAYER  "Sluoksnis pakeistas į <color=$1>geltoną</color>"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Translators:
+//
+// This section accepts SOME language-specific
+// special characters. Please test as necessary.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+// Heads-Up Display
+HUD_SCORE                   "Taškai"
+HUD_TIME                    "Laikas"
+HUD_POWER                   "Energija"
+
+// Level Cleared animation
+CLEARED_LINE1               "JŪS PERĖJOTE"
+CLEARED_LINE2               "$LEVEL_ACT ZONĄ"
+CLEARED_POWER               "Bonusas už energiją"
+CLEARED_TIME                "Bonusas už laiką"
+CLEARED_SCORE               "Bendrai taškų"
+
+// Game Over
+GAMEOVER_PART1              "ŽAIDIMO"
+GAMEOVER_PART2              "PABAIGA"
+
+// Time Over
+TIMEOVER_PART1              "BAIGĖSI"
+TIMEOVER_PART2              "LAIKAS"
+
+// Pause Menu
+PAUSE_TITLE                 "PAUZĖ"
+PAUSE_CONTINUE              "TĘSTI"
+PAUSE_RESTART               "IŠ NAUJO"
+PAUSE_EXIT                  "IŠEITI"
+
+// EOF
