@@ -31,6 +31,7 @@ font "GoodNeighbors"
     Bosnian
     Esperanto
     Polish
+    Lithuanian
 
     */
 
@@ -983,8 +984,6 @@ font "GoodNeighbors"
             source_rect         550 37 9 19
             offset              0 -3
         }
-
-
         char "Ć" {
             source_rect         560 37 8 19
             offset              0 -3
@@ -1139,6 +1138,46 @@ font "GoodNeighbors"
         }
         char "ì" {
             source_rect         904 37 6 19
+            offset              0 -3
+        }
+        char "Ė" {
+            source_rect         911 37 8 19
+            offset              0 -3
+        }
+        char "ė" {
+            source_rect         920 37 8 19
+            offset              0 -3
+        }
+        char "Į" {
+            source_rect         929 37 6 19
+            offset              0 -3
+        }
+        char "į" {
+            source_rect         936 37 6 19
+            offset              0 -3
+        }
+        char "Ų" {
+            source_rect         943 37 8 19
+            offset              0 -3
+        }
+        char "ų" {
+            source_rect         952 37 8 19
+            offset              0 -3
+        }
+        char "Ū" {
+            source_rect         961 37 8 19
+            offset              0 -3
+        }
+        char "ū" {
+            source_rect         970 37 8 19
+            offset              0 -3
+        }
+        char "„" {
+            source_rect         979 37 8 19
+            offset              0 -3
+        }
+        char "“" {
+            source_rect         987 37 8 19
             offset              0 -3
         }
     }
@@ -1856,12 +1895,44 @@ font "GoodNeighborsLarge"
             source_rect         906 166 16 38
             offset              0 -6
         }
+        char "Č" {
+            source_rect         1156 166 16 38
+            offset              0 -6
+        }
+        char "č" {
+            source_rect         1174 166 16 38
+            offset              0 -6
+        }
         char "Š" {
             source_rect         1234 166 16 38
             offset              0 -6
         }
+        char "š" {
+            source_rect         1252 166 16 38
+            offset              0 -6
+        }
+        char "Ž" {
+            source_rect         1306 166 16 38
+            offset              0 -6
+        }
+        char "ž" {
+            source_rect         1324 166 16 38
+            offset              0 -6
+        }
         char "Ĝ" {
             source_rect         1378 166 16 38
+            offset              0 -6
+        }
+        char "Ą" {
+            source_rect         1524 166 16 38
+            offset              0 -6
+        }
+        char "ą" {
+            source_rect         1542 166 16 38
+            offset              0 -6
+        }
+        char "Ę" {
+            source_rect         1560 166 18 38
             offset              0 -6
         }
         char "ę" {
@@ -1874,6 +1945,38 @@ font "GoodNeighborsLarge"
         }
         char "×" {
             source_rect         1766 166 16 38
+            offset              0 -6
+        }
+        char "Ė" {
+            source_rect         1822 166 16 38
+            offset              0 -6
+        }
+        char "ė" {
+            source_rect         1840 166 16 38
+            offset              0 -6
+        }
+        char "Į" {
+            source_rect         1858 166 12 38
+            offset              0 -6
+        }
+        char "į" {
+            source_rect         1872 166 12 38
+            offset              0 -6
+        }
+        char "Ų" {
+            source_rect         1886 166 16 38
+            offset              0 -6
+        }
+        char "ų" {
+            source_rect         1904 166 16 38
+            offset              0 -6
+        }
+        char "Ū" {
+            source_rect         1922 166 16 38
+            offset              0 -6
+        }
+        char "ū" {
+            source_rect         1940 166 16 38
             offset              0 -6
         }
     }
