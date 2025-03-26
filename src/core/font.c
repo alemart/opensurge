@@ -1741,6 +1741,8 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
                     header->data.bmp.chr[chr].valid = true;
                 }
             }
+            else
+                logfile_message("Font script warning: code point U+%04X is not supported (near line %d)", chr, nanoparser_get_line_number(stmt));
         }
     }
     else if(str_icmp(id, "spacing") == 0) {
@@ -1764,6 +1766,8 @@ int traverse_bmp(const parsetree_statement_t* stmt, void* data)
 
         if(c < FONT_MAXBITMAPGLYPHS)
             nanoparser_traverse_program_ex(nanoparser_get_program(p2), &header->data.bmp.chr[c], traverse_bmp_char);
+        else
+            logfile_message("Font script warning: code point U+%04X is not supported (near line %d)", c, nanoparser_get_line_number(stmt));
     }
     else
         fatal_error("Font script error: unknown keyword '%s' in bitmap font", id);
