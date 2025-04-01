@@ -1,0 +1,13 @@
+<b>Išpildykit savo svajones!</b> „Open Surge Engine“ yra atvirojo kodo 2D retro žaidimų variklis, skirtas kurti žaidimus ir įgyvendinti savo svajones!
+
+<b>Tai galybė linksmybių!</b> „Surge the Rabbit“ - tai „Open Surge“ varikliu sukurtas šokinėjimo ir bėgimo žaidimas. Jis sukurtas pagal klasikinių 1990-ųjų 16 bitų "Sonic" platformerių dvasią. Žaiskite už Surge'ą linksmuose ir nuotaikinguose lygiuose, pilnuose iššūkių!
+
+<b>Išlaisvinkite savo kūrybiškumą!</b> Kurkite savo nuostabius žaidimus ir žaiskite juos kompiuteryje bei mobiliajame įrenginyje! Dalinkitės savo žaidimais su draugais! Tai beribės linksmybės!
+
+<b>Galingas retro žaidimų variklis!</b> Vienas iš pagrindinių variklio elementų yra „SurgeScript“ - žaidimų skriptų kalba. Naudokite ją kurdami naujas žaidimo mechanikas, veikėjus su specialiais gebėjimais, bosus ir dar daugiau! Tik dangus yra riba!
+
+„Open Surge Engine“ yra nuostabi priemonė, skirta žaismingai mokytis žaidimų kūrimo, programavimo, skaitmeninio meno ir nemokamos bei atvirojo kodo programinės įrangos pobūdžio.
+
+Pastaba: žaidimams kurti rekomenduojama naudoti asmeninį kompiuterį. Juos galite žaisti kompiuteriuose ir mobiliuosiuose įrenginiuose. „Android TV“ naudotojams reikia žaidimų valdiklio, kad galėtų žaisti, ir pelės, kad galėtų naudotis lygių redaktoriumi.
+
+Oficiali svetainė: http://opensurge2d.org
