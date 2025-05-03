@@ -4582,7 +4582,7 @@ void editor_grid_release()
 /* updates the grid module */
 void editor_grid_update()
 {
-    static int grid_size[] = { 16, 8, 1 };
+    static int grid_size[] = { 64, 32, 16, 8, 1 };
 
     /* next grid size */
     if(editorcmd_is_triggered(editor_cmd, "snap-to-grid")) {
