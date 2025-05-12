@@ -968,12 +968,10 @@ void a5_handle_haltresume_event(const ALLEGRO_EVENT* event, void* data)
             *can_draw = false;
             al_stop_timer(a5_timer);
             timer_pause();
-            al_set_default_voice(NULL);
             break;
 
         case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
             logfile_message("Received an ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING");
-            al_restore_default_mixer();
             timer_resume();
             al_start_timer(a5_timer);
             *can_draw = true;

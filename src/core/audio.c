@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include "audio.h"
+#include "engine.h"
 #include "asset.h"
 #include "resourcemanager.h"
 #include "logfile.h"
@@ -79,6 +80,7 @@ static bool is_muffler_activated = false;
 
 static int preload_sample(const char* vpath, void* data);
 static void set_master_gain(float gain);
+static void handle_haltresume_event(const ALLEGRO_EVENT* event, void* context);
 static void set_muffler(mufflerprofile_t profile);
 static const float* muffler_sigma(mufflerprofile_t profile);
 static void muffler_postprocess(void* buf, unsigned int num_samples, void* data);
@@ -570,6 +572,9 @@ void audio_init()
             logfile_message("Can't reserve %d samples", samples);
     }
 
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, NULL, handle_haltresume_event);
+    engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, NULL, handle_haltresume_event);
+
     current_muffler_profile = DEFAULT_MUFFLER_PROFILE;
     is_muffler_activated = false;
     set_muffler(MUFFLER_OFF);
@@ -582,6 +587,9 @@ void audio_init()
 void audio_release()
 {
     logfile_message("audio_release()");
+
+    engine_remove_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, NULL, handle_haltresume_event);
+    engine_remove_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, NULL, handle_haltresume_event);
 
     al_destroy_mixer(music_mixer);
     al_destroy_mixer(sound_mixer);
@@ -784,6 +792,29 @@ void set_master_gain(float gain)
 {
     if(!al_set_mixer_gain(master_mixer, gain))
         video_showmessage("Can't set the master gain to %f", gain);
+}
+
+void handle_haltresume_event(const ALLEGRO_EVENT* event, void* context)
+{
+    /* pause & resume audio */
+    switch(event->type) {
+        case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
+            logfile_message("Pausing the audio system...");
+            al_set_mixer_playing(sound_mixer, false);
+            al_set_mixer_playing(music_mixer, false);
+            al_set_mixer_playing(master_mixer, false);
+            al_detach_voice(voice); /* stop streaming */
+            break;
+
+        case ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING:
+            logfile_message("Resuming the audio system...");
+            if(!al_attach_mixer_to_voice(master_mixer, voice))
+                logfile_message("AUDIO WARNING: can't reattach the master mixer to the voice");
+            al_set_mixer_playing(master_mixer, true);
+            al_set_mixer_playing(music_mixer, true);
+            al_set_mixer_playing(sound_mixer, true);
+            break;
+    }
 }
 
 void set_muffler(mufflerprofile_t profile)
