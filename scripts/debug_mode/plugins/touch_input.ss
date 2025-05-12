@@ -118,6 +118,8 @@ object "Debug Mode - Touch Input" is "debug-mode-plugin", "debug-mode-observable
 {
     touchArray = [];
     observable = spawn("Debug Mode - Observable");
+    //movementThreshold = 0.0; // generates tapping issues on some Samsung devices
+    movementThreshold = 0.9;
 
     state "main"
     {
@@ -133,7 +135,7 @@ object "Debug Mode - Touch Input" is "debug-mode-plugin", "debug-mode-observable
     state "touching"
     {
         if(Mouse.buttonDown("left")) {
-            moved = (Mouse.position.distanceTo(touchArray[0].position) > 0.0);
+            moved = (Mouse.position.distanceTo(touchArray[0].position) > movementThreshold);
             phase = moved ? "moved" : "stationary";
             touch = Touch(phase, Mouse.position, touchArray[0].position, touchArray[0].initialPosition);
             touchArray[0] = touch;
