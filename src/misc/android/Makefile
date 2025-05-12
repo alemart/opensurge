@@ -314,3 +314,7 @@ version:
 .rebuild_trigger: settings.mk #Makefile
 	@touch $@
 	@$(MAKE) .clean_build
+
+# Helper for development
+.recompile_opensurge: .clean_stage .clean_pull_opensurge .pull_opensurge apk
+	
