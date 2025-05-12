@@ -1855,12 +1855,24 @@ font "GoodNeighborsLarge"
             source_rect         38 166 16 38
             offset              0 -6
         }
+        char "à" {
+            source_rect         56 166 16 38
+            offset              0 -6
+        }
         char "Ã" {
             source_rect         146 166 16 38
             offset              0 -6
         }
+        char "ã" {
+            source_rect         164 166 16 38
+            offset              0 -6
+        }
         char "Ê" {
             source_rect         306 166 16 38
+            offset              0 -6
+        }
+        char "ê" {
+            source_rect         324 166 16 38
             offset              0 -6
         }
         char "É" {
@@ -1875,11 +1887,15 @@ font "GoodNeighborsLarge"
             source_rect         378 166 16 38
             offset              0 -6
         }
-        char "¡" {
-            source_rect         432 166 16 38
+        char "ç" {
+            source_rect         396 166 16 38
             offset              0 -6
         }
         char "Í" {
+            source_rect         478 166 12 38
+            offset              0 -6
+        }
+        char "í" {
             source_rect         478 166 12 38
             offset              0 -6
         }
@@ -1887,12 +1903,32 @@ font "GoodNeighborsLarge"
             source_rect         680 166 16 38
             offset              0 -6
         }
+        char "ó" {
+            source_rect         698 166 16 38
+            offset              0 -6
+        }
         char "Õ" {
             source_rect         716 166 16 38
             offset              0 -6
         }
+        char "õ" {
+            source_rect         734 166 16 38
+            offset              0 -6
+        }
+        char "Ü" {
+            source_rect         888 166 16 38
+            offset              0 -6
+        }
         char "ü" {
             source_rect         906 166 16 38
+            offset              0 -6
+        }
+        char "¿" {
+            source_rect         1068 166 16 38
+            offset              0 -6
+        }
+        char "¡" {
+            source_rect         1086 166 12 38
             offset              0 -6
         }
         char "Č" {
@@ -1923,6 +1959,10 @@ font "GoodNeighborsLarge"
             source_rect         1378 166 16 38
             offset              0 -6
         }
+        char "ĝ" {
+            source_rect         1396 166 16 38
+            offset              0 -6
+        }
         char "Ą" {
             source_rect         1524 166 16 38
             offset              0 -6
@@ -1941,6 +1981,10 @@ font "GoodNeighborsLarge"
         }
         char "Ń" {
             source_rect         1630 166 18 38
+            offset              0 -6
+        }
+        char "ń" {
+            source_rect         1650 166 18 38
             offset              0 -6
         }
         char "×" {
