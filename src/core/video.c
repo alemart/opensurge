@@ -780,7 +780,7 @@ v2d_t video_convert_window_to_screen(v2d_t window_coordinates)
 /*
  * video_take_snapshot()
  * Take a screenshot (a copy of the backbuffer)
- * Destroy the returned image after usage
+ * You must destroy the returned image after usage
  */
 image_t* video_take_snapshot()
 {
@@ -789,8 +789,24 @@ image_t* video_take_snapshot()
 #else
     int index = backbuffer_index;
 #endif
-    const image_t* snapshot = backbuffer[index];
-    return image_clone(snapshot);
+    const image_t* bb = backbuffer[index];
+
+    /* clone the backbuffer */
+    if(bb != NULL)
+        return image_clone(bb);
+
+    /* when the app receives a ALLEGRO_EVENT_DISPLAY_HALT_DRAWING event,
+       the backbuffers are destroyed. We can't take a snapshot in this case */
+    int screen_width = game_screen_width;
+    int screen_height = game_screen_height;
+    compute_screen_size(settings.mode, &screen_width, &screen_height);
+
+    /* return an empty image */
+    return image_create(screen_width, screen_height);
+
+    /* image_create() seems to work, even after ALLEGRO_EVENT_DISPLAY_HALT_DRAWING.
+       Note that we're allocating and clearing a new video bitmap.
+       Alternative: preallocate an image? Maintain the right size? (need to clone?) */
 }
 
 /*
