@@ -553,7 +553,7 @@ void audio_init()
     }
 
     if(!al_attach_mixer_to_mixer(sound_mixer, master_mixer))
-        fatal_error("Can't attach the sample mixer to the master mixer");
+        fatal_error("Can't attach the sound mixer to the master mixer");
     if(!al_attach_mixer_to_mixer(music_mixer, master_mixer))
         fatal_error("Can't attach the music mixer to the master mixer");
     if(!al_attach_mixer_to_voice(master_mixer, voice))
