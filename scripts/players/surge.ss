@@ -69,7 +69,7 @@ object "Surge's Falling Animation" is "companion"
 
     state "falling"
     {
-        if(player.ysp >= 0 && player.midair && !player.frozen)
+        if(player.ysp >= 0 && player.midair && !player.frozen && !player.hit)
             player.anim = falling;
         else
             state = "main";
