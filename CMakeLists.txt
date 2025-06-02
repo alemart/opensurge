@@ -1,7 +1,7 @@
 #
 # Open Surge Engine
 # CMakeLists.txt - CMake script
-# Copyright (C) 2008-2024  Alexandre Martins <alemartf@gmail.com>
+# Copyright (C) 2008-2025  Alexandre Martins <alemartf@gmail.com>
 # http://opensurge2d.org
 #
 # This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 # ------------------------------------------
 
 # Initializing...
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 PROJECT(opensurge)
 SET(CMAKE_C_STANDARD 99)
 SET(GAME_UNIXNAME "opensurge")
@@ -117,10 +117,7 @@ SET(SURGESCRIPT_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look f
 SET(PHYSFS_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for PhysicsFS")
 SET(PHYSFS_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of PhysicsFS")
 IF(UNIX)
-  IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    SET(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "Install path prefix (prepended onto install directories)" FORCE)
-  ENDIF()
-  SET(GAME_BINDIR "games" CACHE PATH "Directory in which the game executable will installed")
+  SET(GAME_BINDIR "games" CACHE PATH "Directory in which the game executable will installed (to be appended to CMAKE_INSTALL_PREFIX)")
   SET(GAME_DATADIR "share/games/${GAME_UNIXNAME}" CACHE PATH "Directory in which the game data will be installed")
   SET(GAME_USERDIRNAME "${GAME_UNIXNAME}" CACHE PATH "Name of the user-modifiable asset directory")
   IF(NOT ANDROID)
@@ -165,7 +162,8 @@ generate_file("credits.c")
 # Generate desktop & metadata files
 # They require the absolute path of the icon
 IF(DEFINED DESKTOP_ICON_PATH)
-  SET(DESKTOP_ICON_FULLPATH "${DESKTOP_ICON_PATH}/opensurge.png")
+  CMAKE_PATH(APPEND DESKTOP_ICON_FULLPATH "${DESKTOP_ICON_PATH}" "opensurge.png")
+  CMAKE_PATH(APPEND DESKTOP_EXEC_FULLPATH "${CMAKE_INSTALL_PREFIX}" "${GAME_BINDIR}" "${GAME_UNIXNAME}")
   generate_file("opensurge.desktop")
   generate_file("opensurge.appdata.xml")
 ENDIF()
