@@ -8,13 +8,15 @@ using SurgeEngine.Level;
 using SurgeEngine.Player;
 using SurgeEngine.Audio.Sound;
 
-object "Switch Controller"
+object "Switch Controller" is "private", "entity", "awake"
 {
     public enabled = true; // enable character switching?
     deny = Sound("samples/deny.wav");
     secondaryActionButton = "fire2";
 
-    state "main"
+    // we use lateUpdate() because other scripts may call
+    // player.input.simulateButton(secondaryActionButton, true)
+    fun lateUpdate()
     {
         player = Player.active;
         input = player.input;
