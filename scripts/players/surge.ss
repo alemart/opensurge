@@ -173,7 +173,7 @@ object "Surge's Lightning Boom" is "companion"
     state "watching"
     {
         timeMidAir += (player.midair ? Time.delta : -timeMidAir);
-        if(timeMidAir >= 0.1 && !player.underwater) {
+        if(timeMidAir >= 0.1) {
             if(player.input.buttonPressed("fire1") && isReady()) {
                 boom();
                 shieldAbilities.unlock();
@@ -256,7 +256,7 @@ object "Surge's Lightning Boom" is "companion"
 
     fun isReady()
     {
-        return player.midair && !shieldAbilities.active &&
+        return player.midair && !player.underwater && !player.frozen && !shieldAbilities.active &&
                (player.jumping || player.rolling || player.springing);
     }
 
