@@ -70,8 +70,11 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
     jumper = spawn("Follow the Leader AI - Jumper").setPlayer(follower);
     platformSensor = spawn("Follow the Leader AI - Platform Sensor");
 
-    bgx = Level.child("Background Exchange Manager") ||
-          Level.spawn("Background Exchange Manager");
+    backgroundManager = Level.child("Background Exchange Manager") ||
+                        Level.spawn("Background Exchange Manager");
+
+    pipeManager = Level.child("Pipe Manager") ||
+                  Level.spawn("Pipe Manager");
 
     state "main"
     {
@@ -438,7 +441,7 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
 
         // reposition if offscreen for too long
         if(offscreenTime >= maxOffscreenTime) {
-            if(!follower.dying && !follower.frozen) {
+            if(!follower.dying && (!follower.frozen || pipeManager.isInsidePipe(follower))) {
                 offscreenTime = 0.0;
                 return true;
             }
@@ -453,6 +456,10 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         // validate
         if(state == "repositioning")
             return;
+
+        // get out of any pipe (if applicable)
+        if(pipeManager.isInsidePipe(follower))
+            pipeManager.getOut(follower);
 
         // change the state
         state = "repositioning";
@@ -561,8 +568,8 @@ object "Follow the Leader AI" is "companion", "private", "awake", "entity"
         distance = follower.transform.position.distanceTo(leader.transform.position);
 
         if(state == "repositioning" || distance < 64) {
-            backgroundOfLeader = bgx.backgroundOfPlayer(leader);
-            bgx.changeBackgroundOfPlayer(follower, backgroundOfLeader);
+            backgroundOfLeader = backgroundManager.backgroundOfPlayer(leader);
+            backgroundManager.changeBackgroundOfPlayer(follower, backgroundOfLeader);
         }
     }
 
