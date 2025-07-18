@@ -30,6 +30,7 @@
 #include "../entities/player.h"
 #include "../scenes/level.h"
 #include "../util/util.h"
+#include "../util/stringutil.h"
 
 /* fragment shader */
 static const char watershader_fs_glsl[] = ""
@@ -205,7 +206,15 @@ void waterfx_update()
     /* enable the muffler if the active player is underwater */
     const player_t* player = level_player();
     bool is_underwater = player_is_underwater(player);
-    audio_muffler_activate(is_underwater);
+    bool is_almost_drowning = music_current() != NULL &&
+        0 == str_icmp("drowning.ogg", str_basename(music_path(music_current()))); /* hard coded hack :( */
+
+    if(!is_underwater)
+        audio_muffler_activate(MUFFLE_NOTHING);
+    else if(!is_almost_drowning)
+        audio_muffler_activate(MUFFLE_EVERYTHING);
+    else
+        audio_muffler_activate(MUFFLE_SOUNDS); /* don't muffle the drowning music */
 }
 
 /*

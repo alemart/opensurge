@@ -80,7 +80,15 @@ enum mufflerprofile_t
 
 void audio_muffler_set_profile(mufflerprofile_t profile);
 mufflerprofile_t audio_muffler_profile();
-void audio_muffler_activate(bool on_off);
+void audio_muffler_activate(int flags);
 bool audio_muffler_is_activated();
+
+enum /* muffler flags */
+{
+    MUFFLE_NOTHING = 0,
+    MUFFLE_SOUNDS = 1,
+    MUFFLE_MUSICS = 2,
+    MUFFLE_EVERYTHING = MUFFLE_SOUNDS | MUFFLE_MUSICS
+};
 
 #endif

@@ -76,12 +76,13 @@ static float master_volume = DEFAULT_VOLUME; /* a value in [0,1] affecting all m
 static float mixer_percentage = DEFAULT_MIXER_PERCENTAGE; /* a value in [0,1] that controls music & sfx volume */
 static bool is_globally_muted = false; /* global mute / unmute */
 static mufflerprofile_t current_muffler_profile = DEFAULT_MUFFLER_PROFILE;
-static bool is_muffler_activated = false;
+static int current_muffler_flags = MUFFLE_NOTHING;
 
 static int preload_sample(const char* vpath, void* data);
 static void set_master_gain(float gain);
 static void handle_haltresume_event(const ALLEGRO_EVENT* event, void* context);
-static void set_muffler(mufflerprofile_t profile);
+static void update_muffler(mufflerprofile_t profile, int flags);
+static void muffle_mixer(ALLEGRO_MIXER* mixer, mufflerprofile_t profile);
 static const float* muffler_sigma(mufflerprofile_t profile);
 static void muffler_postprocess(void* buf, unsigned int num_samples, void* data);
 
@@ -575,9 +576,7 @@ void audio_init()
     engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, NULL, handle_haltresume_event);
     engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, NULL, handle_haltresume_event);
 
-    current_muffler_profile = DEFAULT_MUFFLER_PROFILE;
-    is_muffler_activated = false;
-    set_muffler(MUFFLER_OFF);
+    update_muffler(DEFAULT_MUFFLER_PROFILE, MUFFLE_NOTHING);
 }
 
 /*
@@ -719,6 +718,15 @@ void audio_set_muted(bool muted)
  */
 
 /*
+ * audio_muffler_profile()
+ * Get the current profile of the muffler
+ */
+mufflerprofile_t audio_muffler_profile()
+{
+    return current_muffler_profile;
+}
+
+/*
  * audio_muffler_set_profile()
  * Set the profile of the muffler
  */
@@ -732,36 +740,7 @@ void audio_muffler_set_profile(mufflerprofile_t profile)
     logfile_message("Changing the muffler profile to %s", MUFFLER_PROFILE_NAME[profile]);
 
     /* update muffler */
-    current_muffler_profile = profile;
-    if(is_muffler_activated)
-        set_muffler(current_muffler_profile);
-}
-
-/*
- * audio_muffler_profile()
- * Get the current profile of the muffler
- */
-mufflerprofile_t audio_muffler_profile()
-{
-    return current_muffler_profile;
-}
-
-/*
- * audio_muffler_activate()
- * Activate or deactivate the muffler at this time
- */
-void audio_muffler_activate(bool on_off)
-{
-    /* nothing to do */
-    if(is_muffler_activated == on_off)
-        return;
-
-    /* update muffler */
-    is_muffler_activated = on_off;
-    if(is_muffler_activated)
-        set_muffler(current_muffler_profile);
-    else
-        set_muffler(MUFFLER_OFF);
+    update_muffler(profile, current_muffler_flags);
 }
 
 /*
@@ -770,8 +749,24 @@ void audio_muffler_activate(bool on_off)
  */
 bool audio_muffler_is_activated()
 {
-    return is_muffler_activated;
+    return current_muffler_flags != MUFFLE_NOTHING;
 }
+
+/*
+ * audio_muffler_activate()
+ * Activate or deactivate the muffler
+ */
+void audio_muffler_activate(int flags)
+{
+    /* nothing to do */
+    if(current_muffler_flags == flags)
+        return;
+
+    /* update muffler */
+    update_muffler(current_muffler_profile, flags);
+}
+
+
 
 
 
@@ -817,14 +812,42 @@ void handle_haltresume_event(const ALLEGRO_EVENT* event, void* context)
     }
 }
 
-void set_muffler(mufflerprofile_t profile)
+void update_muffler(mufflerprofile_t profile, int flags)
 {
-    size_t num_channels = al_get_channel_count(al_get_mixer_channels(master_mixer));
-    size_t depth_size = al_get_audio_depth_size(al_get_mixer_depth(master_mixer));
+    current_muffler_profile = profile;
+    current_muffler_flags = flags;
+
+    /* only one mixer can be muffled at any given time */
+    if((flags & MUFFLE_EVERYTHING) == MUFFLE_EVERYTHING) {
+        muffle_mixer(master_mixer, profile);
+        muffle_mixer(sound_mixer, MUFFLER_OFF);
+        muffle_mixer(music_mixer, MUFFLER_OFF);
+    }
+    else if((flags & MUFFLE_SOUNDS) == MUFFLE_SOUNDS) {
+        muffle_mixer(master_mixer, MUFFLER_OFF);
+        muffle_mixer(sound_mixer, profile);
+        muffle_mixer(music_mixer, MUFFLER_OFF);
+    }
+    else if((flags & MUFFLE_MUSICS) == MUFFLE_MUSICS) {
+        muffle_mixer(master_mixer, MUFFLER_OFF);
+        muffle_mixer(sound_mixer, MUFFLER_OFF);
+        muffle_mixer(music_mixer, profile);
+    }
+    else {
+        muffle_mixer(master_mixer, MUFFLER_OFF);
+        muffle_mixer(sound_mixer, MUFFLER_OFF);
+        muffle_mixer(music_mixer, MUFFLER_OFF);
+    }
+}
+
+void muffle_mixer(ALLEGRO_MIXER* mixer, mufflerprofile_t profile)
+{
+    size_t num_channels = al_get_channel_count(al_get_mixer_channels(mixer));
+    size_t depth_size = al_get_audio_depth_size(al_get_mixer_depth(mixer));
 
     if(num_channels != 2 || depth_size != sizeof(float))
         logfile_message("Can't set the mixer postprocess callback: num_channels = %u, depth_size = %u, sizeof(float) = %u", num_channels, depth_size, sizeof(float));
-    else if(!al_set_mixer_postprocess_callback(master_mixer, muffler_postprocess, (void*)muffler_sigma(profile)))
+    else if(!al_set_mixer_postprocess_callback(mixer, profile != MUFFLER_OFF ? muffler_postprocess : NULL, (void*)muffler_sigma(profile)))
         logfile_message("Can't set the mixer postprocess callback.");
 }
 
@@ -850,7 +873,8 @@ const float* muffler_sigma(mufflerprofile_t profile)
     }
 }
 
-/* this function runs in a dedicated audio thread */
+/* this function runs in a dedicated audio thread
+   Only one mixer can be muffled at any given time - notice the static variables */
 void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
 {
     /* the input buffer is expected to be float32 stereo, where
@@ -861,16 +885,22 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
         NUM_CHANNELS = 2,
         DEPTH_SIZE = sizeof(float)
     };
-    static bool is_initialized = false;
 
     /* read input */
     float sigma = *((const float*)data); /* no need of mutexes */
 
+#if 0
     /* nothing to do */
+    static bool is_initialized = false;
     if(sigma == 0.0f) {
         is_initialized = false;
         return;
     }
+#else
+    /* nothing to do */
+    if(sigma == 0.0f)
+        return;
+#endif
 
     /* validate */
     if(sigma > MAX_SIGMA)
@@ -880,7 +910,7 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
         return;
 
     /* calculate a Gaussian */
-    static float g0[1 + 2 * (3 * MAX_SIGMA)];
+    static float g0[1 + 2 * (3 * MAX_SIGMA)] = { 0.0f };
     const size_t n = sizeof(g0) / sizeof(float);
     const int c = (n-1) / 2;
     static int w = -1;
@@ -901,10 +931,13 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     memcpy(samples, samples + num_samples * NUM_CHANNELS, buf_size);
     memcpy(samples + num_samples * NUM_CHANNELS, buf, buf_size);
 
+#if 0
+    /* do we really need this? no audible difference... */
     if(!is_initialized) { /* wait one more frame */
         is_initialized = true;
         return;
     }
+#endif
 
     /* find the initial index of the output. We introduce a small delay.
        start is an even number (NUM_CHANNELS is 2) and points to a L sample */

@@ -1140,12 +1140,12 @@ void change_muffler(settings_entry_t* e)
 
 void highlight_muffler(settings_entry_t* e)
 {
-    audio_muffler_activate(true);
+    audio_muffler_activate(MUFFLE_EVERYTHING);
 }
 
 void dehighlight_muffler(settings_entry_t* e)
 {
-    audio_muffler_activate(false);
+    audio_muffler_activate(MUFFLE_NOTHING);
 }
 
 
