@@ -7,9 +7,11 @@
 using SurgeEngine.Actor;
 using SurgeEngine.Player;
 using SurgeEngine.Level;
+using SurgeEngine.Camera;
 using SurgeEngine.Transform;
 using SurgeEngine.Vector2;
 using SurgeEngine.Brick;
+using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Collisions.CollisionBox;
 using SurgeEngine.Collisions.CollisionBall;
@@ -84,44 +86,57 @@ object "Pipe Out" is "entity", "special"
     pipeSensor = spawn("Pipe Sensor").setManager(pipeManager);
     brick = Brick("Pipe Out");
     collider = CollisionBall(80);
-    playerCollider = null;
-    isBlocked = { };
     public zindex = 1.0;
 
     state "main"
     {
-        player = Player.active;
-        if(isBlocked.has(player.id))
-            brick.enabled = isBlocked[player.id];
-        else
-            brick.enabled = true;
+        state = "blocked";
     }
 
-    state "block"
+    state "blocked"
     {
-        if(!playerCollider.collidesWith(pipeSensor.collider)) {
-            player = playerCollider.entity;
-            if(!player.midair || player.ysp >= 0) {
-                isBlocked[player.id] = true;
-                state = "main";
-            }
+        brick.enabled = true;
+
+        if(wantUnblocked())
+            state = "unblocked";
+    }
+
+    state "unblocked"
+    {
+        brick.enabled = false;
+
+        if(!wantUnblocked())
+            state = "cooldown";
+    }
+
+    state "cooldown"
+    {
+        if(timeout(0.5)) {
+            if(wantUnblocked())
+                state = "unblocked";
+            else
+                state = "blocked";
         }
     }
 
     fun onPipeActivate(player)
     {
         pipeManager.getOut(player);
-        playerCollider = player.collider;
-        state = "block";
     }
 
-    fun onCollision(otherCollider)
+    fun wantUnblocked()
     {
-        if(otherCollider.entity.hasTag("player")) {
-            player = otherCollider.entity;
-            if(pipeManager.isInsidePipe(player))
-                isBlocked[player.id] = false;
+        // we will unblock the exit if there is a player near Pipe Out & inside the tube
+        for(i = 0; i < Player.count; i++) {
+            player = Player[i];
+
+            if(collider.collidesWith(player.collider)) {
+                if(pipeManager.isInsidePipe(player))
+                    return true;
+            }
         }
+
+        return false;
     }
 
     fun constructor()
@@ -152,24 +167,26 @@ object "Pipe In" is "entity", "special"
 
     fun onPipeActivate(player)
     {
-        if(nearestSensor != null) {
-            // get in the pipe
-            pipeManager.getIn(player);
+        // nothing to do
+        if(nearestSensor == null)
+            return;
 
-            // guess the direction to go
-            offset = nearestSensor.transform.position.minus(pipeSensor.transform.position);
-            if(Math.abs(offset.x) >= Math.abs(offset.y)) {
-                if(offset.x >= 0)
-                    pipeManager.goRight(player);
-                else
-                    pipeManager.goLeft(player);
-            }
-            else {
-                if(offset.y >= 0)
-                    pipeManager.goDown(player);
-                else
-                    pipeManager.goUp(player);
-            }
+        // get in the pipe
+        pipeManager.getIn(player);
+
+        // guess the direction to go
+        offset = nearestSensor.position.minus(pipeSensor.position);
+        if(Math.abs(offset.x) >= Math.abs(offset.y)) {
+            if(offset.x >= 0)
+                pipeManager.goRight(player);
+            else
+                pipeManager.goLeft(player);
+        }
+        else {
+            if(offset.y >= 0)
+                pipeManager.goDown(player);
+            else
+                pipeManager.goUp(player);
         }
     }
 
@@ -177,12 +194,12 @@ object "Pipe In" is "entity", "special"
     {
         bestSensor = null;
         bestDistance = Math.infinity;
-        myPosition = pipeSensor.transform.position;
+        myPosition = pipeSensor.position;
 
         sensors = Level.findObjects("Pipe Sensor");
         foreach(sensor in sensors) {
             if(sensor != pipeSensor && !sensor.isEntrance()) {
-                d = distance(sensor.transform.position, myPosition);
+                d = distance(sensor.position, myPosition);
                 if(d < bestDistance) {
                     bestSensor = sensor;
                     bestDistance = d;
@@ -203,8 +220,8 @@ object "Pipe In" is "entity", "special"
 
 object "Pipe Sensor" is "private", "entity"
 {
-    public readonly transform = Transform();
-    public readonly collider = CollisionBox(28, 28);
+    transform = Transform();
+    collider = CollisionBox(28, 28);
     pipeManager = null;
     entrance = false;
 
@@ -227,6 +244,11 @@ object "Pipe Sensor" is "private", "entity"
     fun isEntrance()
     {
         return entrance;
+    }
+
+    fun get_position()
+    {
+        return transform.position;
     }
 
     fun onCollision(otherCollider)
@@ -290,21 +312,47 @@ object "Pipe Manager"
         return travelers[player.id];
     }
 
+    fun isOffscreen(player)
+    {
+        extraMargin = 64;
+
+        collider = player.collider;
+        xmargin = collider.width / 2;
+        ymargin = collider.height / 2;
+
+        topleft = Vector2(collider.left - xmargin, collider.top - ymargin);
+        topleft = Camera.worldToScreen(topleft);
+
+        bottomright = Vector2(collider.right + xmargin, collider.bottom + ymargin);
+        bottomright = Camera.worldToScreen(bottomright);
+
+        top = topleft.y;
+        left = topleft.x;
+        bottom = bottomright.y;
+        right = bottomright.x;
+
+        return right < -extraMargin || left > Screen.width + extraMargin || bottom < -extraMargin || top > Screen.height + extraMargin;
+    }
+
     //
     // public API
     //
     fun getIn(player)
     {
-        if(!isInsidePipe(player))
-            pipeInSfx.play();
+        if(!isInsidePipe(player)) {
+            if(!isOffscreen(player))
+                pipeInSfx.play();
+        }
 
         travelerOf(player).getIn();
     }
 
     fun getOut(player)
     {
-        if(isInsidePipe(player))
-            pipeOutSfx.play();
+        if(isInsidePipe(player)) {
+            if(!isOffscreen(player))
+                pipeOutSfx.play();
+        }
 
         travelerOf(player).getOut();
     }
@@ -337,7 +385,7 @@ object "Pipe Manager"
 
 object "Pipe Traveler"
 {
-    player = null;
+    player = null; // each Pipe Traveler is linked to a player
     rollAnimation = 18;
     pipeManager = parent;
     throwVelocity = Vector2.zero;
@@ -437,26 +485,34 @@ object "Pipe Traveler"
 
     fun goUp()
     {
-        player.speed = player.ysp = 0;
-        state = "up";
+        if(isTraveling()) {
+            player.speed = player.ysp = 0;
+            state = "up";
+        }
     }
 
     fun goRight()
     {
-        player.speed = player.ysp = 0;
-        state = "right";
+        if(isTraveling()) {
+            player.speed = player.ysp = 0;
+            state = "right";
+        }
     }
 
     fun goDown()
     {
-        player.speed = player.ysp = 0;
-        state = "down";
+        if(isTraveling()) {
+            player.speed = player.ysp = 0;
+            state = "down";
+        }
     }
 
     fun goLeft()
     {
-        player.speed = player.ysp = 0;
-        state = "left";
+        if(isTraveling()) {
+            player.speed = player.ysp = 0;
+            state = "left";
+        }
     }
 
     fun isTraveling()
