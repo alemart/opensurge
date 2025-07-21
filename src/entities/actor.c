@@ -88,7 +88,12 @@ void actor_destroy(actor_t *act)
  */
 void actor_render(actor_t *act, v2d_t camera_position)
 {
-    if(act->visible && act->animation != NULL) {
+    /* nothing to do */
+    if(act->animation == NULL)
+        return;
+
+    /* we'll only render if the actor is visible */
+    if(act->visible) {
         const image_t* img = actor_image(act);
         v2d_t topleft = v2d_subtract(camera_position, v2d_multiply(video_get_screen_size(), 0.5f));
         bool has_keyframes = animation_has_keyframes(act->animation);
@@ -124,10 +129,10 @@ void actor_render(actor_t *act, v2d_t camera_position)
             }
             al_use_transform(&prev_transform);
         }
-
-        /* update animation timer (next frame) */
-        update_animation(act);
     }
+
+    /* update animation timer (next frame) */
+    update_animation(act);
 }
 
 
