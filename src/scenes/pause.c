@@ -357,8 +357,7 @@ void pause_init(void *_)
     input_simulate_button_down(input, START_BUTTON); /* this assumes that the start button triggered the opening of this scene */
     input_simulate_button_down(input, BACK_BUTTON);
 
-    /* pause music & scripting */
-    music_pause();
+    /* pause scripting */
     scripting_pause_vm();
 
     /* enable the mobile gamepad (just in case) */
@@ -413,10 +412,6 @@ void pause_init(void *_)
         font_set_position(font[i], v2d_add(actor[parent]->position, offset));
     }
 
-    /* initialize the sound effects */
-    for(int i = 0; i < SOUND_COUNT; i++)
-        sound[i] = sound_load(SOUND_PATH[i]);
-
     /* initialize the mobile overlay */
     overlay_state = OVERLAY_CLOSING;
     mouse_input = input_create_mouse();
@@ -437,7 +432,13 @@ void pause_init(void *_)
         actor[SPRITE_CONTINUE]->position
     ));
 
-    /* done! */
+    /* initialize the sound effects */
+    for(int i = 0; i < SOUND_COUNT; i++)
+        sound[i] = sound_load(SOUND_PATH[i]);
+
+    /* pause music & sounds */
+    music_pause();
+    sound_swap_mixers();
     sound_play(sound[SOUND_APPEAR]);
 }
 
@@ -490,13 +491,17 @@ void pause_release()
     /* restore the immersive mode */
     video_set_immersive(true); /* use immersive mode during gameplay */
 
-    /* resume music & scripting */
-    scripting_resume_vm();
-    music_resume();
-
     /* destroy the input object and the snapshot */
     input_destroy(input);
     image_destroy(snapshot);
+
+    /* resume scripting */
+    scripting_resume_vm();
+
+    /* resume music & sounds */
+    sound_stop_all();
+    sound_swap_mixers();
+    music_resume();
 }
 
 
