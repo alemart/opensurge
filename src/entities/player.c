@@ -2038,10 +2038,12 @@ void run_dying_logic(player_t* player)
 
     if(!can_resurrect) {
         /* fade out the music */
-        float new_volume = 1.0f - min(player->dead_timer, MUSIC_FADEOUT_TIME) / MUSIC_FADEOUT_TIME;
-        float current_volume = music_get_volume();
-        if(new_volume < current_volume)
-            music_set_volume(new_volume);
+        if(!player_is_drowning(player)) {
+            float new_volume = 1.0f - min(player->dead_timer, MUSIC_FADEOUT_TIME) / MUSIC_FADEOUT_TIME;
+            float current_volume = music_get_volume();
+            if(new_volume < current_volume)
+                music_set_volume(new_volume);
+        }
 
         /* hide the mobile gamepad */
         mobilegamepad_fadeout();

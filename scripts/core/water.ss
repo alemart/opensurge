@@ -273,6 +273,15 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
     {
         player = Player.active;
 
+        // the player is drowning
+        if(player.drowning) {
+
+            // we hide the counter but don't stop the drowning music
+            counter.visible = false;
+            return;
+
+        }
+
         // the player is protected by the water shield
         if(player.shield == "water" || player.dying) {
 
@@ -319,7 +328,7 @@ object "WaterController.UnderwaterTimer" is "entity", "private", "detached", "aw
         }
         else if(music.playing) {
             counter.visible = false;
-            music.stop();
+            music.stop(); // got out of water
         }
     }
 
