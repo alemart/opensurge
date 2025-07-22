@@ -61,12 +61,14 @@ const char *music_path(const music_t *music); /* the filepath of the specified m
 sound_t *sound_load(const char *path); /* will be unloaded automatically */
 void sound_destroy(sound_t *sample);
 void sound_play(sound_t *sample);
-void sound_play_ex(sound_t *sample, float vol, float pan, float freq); /* 0.0<=volume<=1.0; (left) -1.0<=pan<=1.0 (right); 1.0 = default frequency */
+void sound_play_ex(sound_t *sample, float volume, float pan, float speed); /* 0.0 <= volume; (left) -1.0 <= pan <= 1.0 (right); 1.0 = default speed */
 void sound_stop(sound_t *sample);
 bool sound_is_playing(sound_t *sample);
 int sound_unref(sound_t *sample); /* returns the number of active references */
 float sound_get_volume(sound_t *sample);
 void sound_set_volume(sound_t *sample, float volume); /* volume is in the [0,1] range */
+void sound_stop_all();
+void sound_swap_mixers();
 
 /* underwater muffler */
 typedef enum mufflerprofile_t mufflerprofile_t;

@@ -35,6 +35,30 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
+/* a handle to a sample that is played at some point in time - past or present */
+typedef int samplehandle_t;
+
+/* pool sample: a playing sample in the present or in the past that is part of a pool */
+typedef struct poolsample_t poolsample_t;
+struct poolsample_t {
+    samplehandle_t handle; /* unique */
+    ALLEGRO_SAMPLE_INSTANCE* sample_instance;
+    const ALLEGRO_MIXER* parent;
+};
+
+/* sound structure */
+struct sound_t {
+    ALLEGRO_SAMPLE* sample;
+    float volume;
+    float pan;
+    float speed;
+    char* filepath; /* relative path */
+    struct {
+        samplehandle_t handle;
+        int pool_index; /* fast access of handle */
+    } last; /* XXX 1:N */
+};
+
 /* music structure */
 struct music_t {
     ALLEGRO_AUDIO_STREAM* stream;
@@ -42,19 +66,11 @@ struct music_t {
     char* filepath; /* relative path */
 };
 
-/* sound structure */
-struct sound_t {
-    ALLEGRO_SAMPLE* sample;
-    ALLEGRO_SAMPLE_ID id;
-    bool valid_id;
-    float duration;
-    float end_time;
-    float volume; /* 0: silence; 1: default */
-    char* filepath; /* relative path */
-};
-
 /* private stuff */
-#define PREFERRED_NUMBER_OF_SAMPLES     16 /* how many samples can be played at the same time */
+#define MAX_SIMULTANEOUS_SAMPLES        16 /* how many samples can be played at the same time */
+#define SAMPLE_POOL_SIZE                (2 * MAX_SIMULTANEOUS_SAMPLES) /* MAX_SIMULTANEOUS_SAMPLES per mixer * 2 mixers */
+#define INVALID_SAMPLE_HANDLE           ((samplehandle_t)-1)
+#define INITIAL_SAMPLE_HANDLE           ((samplehandle_t)0)
 #define DEFAULT_VOLUME                  1.0f
 #define DEFAULT_MIXER_PERCENTAGE        0.5f
 #define DEFAULT_MUFFLER_PROFILE         MUFFLER_MEDIUM
@@ -70,8 +86,12 @@ static ALLEGRO_VOICE* voice = NULL;
 static ALLEGRO_MIXER* master_mixer = NULL;
 static ALLEGRO_MIXER* music_mixer = NULL;
 static ALLEGRO_MIXER* sound_mixer = NULL;
+static ALLEGRO_MIXER* primary_sound_mixer = NULL;
+static ALLEGRO_MIXER* secondary_sound_mixer = NULL;
+static poolsample_t sample_pool[SAMPLE_POOL_SIZE];
 
 static music_t *current_music = NULL; /* music being played at the moment (NULL if none) */
+static samplehandle_t next_sample_handle = INITIAL_SAMPLE_HANDLE; /* "auto increment" counter for sample handles */
 static float master_volume = DEFAULT_VOLUME; /* a value in [0,1] affecting all musics and sounds */
 static float mixer_percentage = DEFAULT_MIXER_PERCENTAGE; /* a value in [0,1] that controls music & sfx volume */
 static bool is_globally_muted = false; /* global mute / unmute */
@@ -81,6 +101,10 @@ static int current_muffler_flags = MUFFLE_NOTHING;
 static int preload_sample(const char* vpath, void* data);
 static void set_master_gain(float gain);
 static void handle_haltresume_event(const ALLEGRO_EVENT* event, void* context);
+static bool acquire_sample_from_pool(samplehandle_t* out_handle, int* out_pool_index);
+static ALLEGRO_SAMPLE_INSTANCE* find_sample_instance(samplehandle_t handle);
+static ALLEGRO_SAMPLE_INSTANCE* find_sample_instance_ex(samplehandle_t handle, int pool_index);
+static void init_muffler();
 static void update_muffler(mufflerprofile_t profile, int flags);
 static void muffle_mixer(ALLEGRO_MIXER* mixer, mufflerprofile_t profile);
 static const float* muffler_sigma(mufflerprofile_t profile);
@@ -330,25 +354,21 @@ sound_t *sound_load(const char *path)
     sound_t *s;
 
     if(NULL == (s = resourcemanager_find_sample(path))) {
-        ALLEGRO_SAMPLE_INSTANCE* spl;
         const char* fullpath = asset_path(path);
         logfile_message("Loading sound \"%s\"...", fullpath);
 
         /* build the sound object */
         s = mallocx(sizeof *s);
-        s->duration = 0.0f;
-        s->end_time = 0.0f;
-        s->valid_id = false;
         s->volume = 1.0f;
+        s->pan = 0.0f;
+        s->speed = 1.0f;
         s->filepath = str_dup(path);
+        s->last.handle = INVALID_SAMPLE_HANDLE;
+        s->last.pool_index = 0;
+
+        /* load the sample */
         if(NULL == (s->sample = al_load_sample(fullpath)))
             fatal_error("Can't load sound \"%s\"", path);
-
-        /* compute its duration */
-        if(NULL != (spl = al_create_sample_instance(s->sample))) {
-            s->duration = al_get_sample_instance_time(spl);
-            al_destroy_sample_instance(spl);
-        }
 
         /* adding it to the resource manager */
         resourcemanager_add_sample(path, s);
@@ -386,12 +406,13 @@ int sound_unref(sound_t* sample)
  */
 void sound_destroy(sound_t *sample)
 {
-    if(sample != NULL) {
-        sound_stop(sample);
-        al_destroy_sample(sample->sample);
-        free(sample->filepath);
-        free(sample);
-    }
+    if(sample == NULL)
+        return;
+
+    sound_stop(sample);
+    al_destroy_sample(sample->sample);
+    free(sample->filepath);
+    free(sample);
 }
 
 /*
@@ -400,8 +421,10 @@ void sound_destroy(sound_t *sample)
  */
 void sound_play(sound_t *sample)
 {
-    if(sample != NULL)
-        sound_play_ex(sample, sample->volume, 0.0f, 1.0f);
+    if(sample == NULL)
+        return;
+
+    sound_play_ex(sample, sample->volume, sample->pan, sample->speed);
 }
 
 /*
@@ -410,28 +433,46 @@ void sound_play(sound_t *sample)
  *
  * 0.0 <= volume (defaults to 1.0)
  * (left speaker) -1.0 <= pan <= 1.0 (right speaker)
- * 1.0 = default frequency
+ * 1.0 = default speed
+ *
+ * TODO return a sound handle for advanced controls
  */
-void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
+void sound_play_ex(sound_t *sample, float volume, float pan, float speed)
 {
-    if(sample != NULL) {
-        /* adjusting the parameters */
-        vol = max(vol, 0.0f);
-        pan = clip(pan, -1.0f, 1.0f);
-        freq = max(freq, 0.0f);
+    ALLEGRO_SAMPLE_INSTANCE* spl;
 
-        /* play the sample */
-        if(al_play_sample(sample->sample, vol, pan, freq, ALLEGRO_PLAYMODE_ONCE, &sample->id)) {
-            sample->end_time = timer_get_elapsed() + sample->duration; /* when does it end? */
-            sample->valid_id = true;
-            sample->volume = vol;
-        }
-        else {
-            sample->end_time = 0.0f;
-            sample->valid_id = false;
-            sample->volume = vol;
-        }
-    }
+    if(sample == NULL)
+        return;
+
+    /* adjust the parameters */
+    volume = max(volume, 0.0f); /* values > 1 may clip the audio */
+    pan = clip(pan, -1.0f, 1.0f);
+    speed = max(speed, 1.0f / 64.0f); /* 1/64 comes from the internals of Allegro */
+
+    /* prepare a sample instance */
+    if(!acquire_sample_from_pool(&sample->last.handle, &sample->last.pool_index))
+        return;
+
+    if(NULL == (spl = find_sample_instance_ex(sample->last.handle, sample->last.pool_index)))
+        return;
+
+    /* set the parameters */
+    al_set_sample_instance_gain(spl, volume);
+    al_set_sample_instance_pan(spl, pan);
+    al_set_sample_instance_speed(spl, speed);
+    al_set_sample_instance_playing(spl, ALLEGRO_PLAYMODE_ONCE);
+
+    sample->volume = volume;
+    sample->pan = pan;
+    sample->speed = speed;
+
+    /* play the sample */
+    al_set_sample(spl, sample->sample);
+    al_play_sample_instance(spl);
+
+    /* TODO return the handle */
+    (void)find_sample_instance;
+    /*return sample->last.handle;*/
 }
 
 /*
@@ -440,13 +481,15 @@ void sound_play_ex(sound_t *sample, float vol, float pan, float freq)
  */
 void sound_stop(sound_t *sample)
 {
-    if(sample != NULL) {
-        if(sample->valid_id) {
-            al_stop_sample(&sample->id);
-            sample->valid_id = false;
-            sample->end_time = 0.0f;
-        }
-    }
+    ALLEGRO_SAMPLE_INSTANCE* spl;
+
+    if(sample == NULL)
+        return;
+
+    if(NULL == (spl = find_sample_instance_ex(sample->last.handle, sample->last.pool_index)))
+        return;
+
+    al_stop_sample_instance(spl);
 }
 
 /*
@@ -455,61 +498,74 @@ void sound_stop(sound_t *sample)
  */
 bool sound_is_playing(sound_t *sample)
 {
-    if(sample != NULL)
-        return timer_get_elapsed() < sample->end_time;
-    else
+    ALLEGRO_SAMPLE_INSTANCE* spl;
+
+    if(sample == NULL)
         return false;
 
-#if 0
-    /* Unstable API (Allegro 5.2.3) */
-    if(sample != NULL) {
-        if(sample->valid_id) {
-            ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
-            if(instance != NULL) {
-                bool is_playing = al_get_sample_instance_playing(instance);
-                al_unlock_sample_id(&sample->id);
-                return is_playing;
-            }
-            else
-                return false;
-        }
-    }
+    if(NULL == (spl = find_sample_instance_ex(sample->last.handle, sample->last.pool_index)))
+        return false;
 
-    return false;
-#endif
+    return al_get_sample_instance_playing(spl);
 }
 
 /*
  * sound_get_volume()
- * Gets the volume of a sound.
+ * Gets the volume of a sound
  * 0.0f means silence; 1.0f, the default volume
  */
 float sound_get_volume(sound_t *sample)
 {
-    if(sample != NULL)
-        return sample->volume;
-    else
-        return 0.0f;
+    return (sample != NULL) ? sample->volume : 0.0f;
 }
 
 /*
  * sound_set_volume()
- * Sets the volume of a sound.
+ * Sets the volume of a sound
  */
 void sound_set_volume(sound_t *sample, float volume)
 {
-    /* Unstable API (since Allegro 5.2.3) */
-    if(sample != NULL) {
-        sample->volume = max(0.0f, volume);
-        if(sample->valid_id) {
-            ALLEGRO_SAMPLE_INSTANCE* instance = al_lock_sample_id(&sample->id);
-            if(instance != NULL) {
-                if(al_get_sample_instance_playing(instance))
-                    al_set_sample_instance_gain(instance, sample->volume);
-                al_unlock_sample_id(&sample->id);
-            }
-        }
+    ALLEGRO_SAMPLE_INSTANCE* spl;
+
+    if(sample == NULL)
+        return;
+
+    sample->volume = max(volume, 0.0f);
+
+    if(NULL == (spl = find_sample_instance_ex(sample->last.handle, sample->last.pool_index)))
+        return;
+
+    al_set_sample_instance_gain(spl, sample->volume);
+}
+
+/*
+ * sound_stop_all()
+ * Stop all sounds
+ */
+void sound_stop_all()
+{
+    for(int i = 0; i < SAMPLE_POOL_SIZE; i++) {
+        ALLEGRO_SAMPLE_INSTANCE* spl = sample_pool[i].sample_instance;
+
+        if(!al_get_mixer_playing(sample_pool[i].parent))
+            continue;
+
+        if(!al_get_sample_instance_playing(spl))
+            continue;
+
+        al_set_sample_instance_playing(spl, false);
     }
+}
+
+/*
+ * sound_swap_mixers()
+ * Swap between primary and secondary sound mixers,
+ * pausing all currently playing sounds
+ */
+void sound_swap_mixers()
+{
+    al_set_mixer_playing(primary_sound_mixer, !al_get_mixer_playing(primary_sound_mixer));
+    al_set_mixer_playing(secondary_sound_mixer, !al_get_mixer_playing(secondary_sound_mixer));
 }
 
 
@@ -530,6 +586,7 @@ void audio_init()
     logfile_message("Initializing the audio system...");
 
     current_music = NULL;
+    next_sample_handle = INITIAL_SAMPLE_HANDLE;
     master_volume = DEFAULT_VOLUME;
     mixer_percentage = DEFAULT_MIXER_PERCENTAGE;
     is_globally_muted = false;
@@ -547,36 +604,40 @@ void audio_init()
     if(NULL == (voice = al_create_voice(44100, ALLEGRO_AUDIO_DEPTH_INT16, ALLEGRO_CHANNEL_CONF_2)))
         fatal_error("Can't create an Allegro voice");
 
-    ALLEGRO_MIXER** mixers[] = { &master_mixer, &music_mixer, &sound_mixer, NULL };
+    ALLEGRO_MIXER** mixers[] = { &master_mixer, &music_mixer, &sound_mixer, &primary_sound_mixer, &secondary_sound_mixer, NULL };
     for(ALLEGRO_MIXER*** mixer = mixers; *mixer != NULL; ++mixer) {
         if(NULL == (**mixer = al_create_mixer(44100, ALLEGRO_AUDIO_DEPTH_FLOAT32, ALLEGRO_CHANNEL_CONF_2)))
             fatal_error("Can't create an Allegro mixer");
     }
 
-    if(!al_attach_mixer_to_mixer(sound_mixer, master_mixer))
-        fatal_error("Can't attach the sound mixer to the master mixer");
-    if(!al_attach_mixer_to_mixer(music_mixer, master_mixer))
-        fatal_error("Can't attach the music mixer to the master mixer");
     if(!al_attach_mixer_to_voice(master_mixer, voice))
-        fatal_error("Can't attach the master mixer to the voice");
+        fatal_error("Can't attach the master mixer");
+    if(!al_attach_mixer_to_mixer(music_mixer, master_mixer))
+        fatal_error("Can't attach the music mixer");
+    if(!al_attach_mixer_to_mixer(sound_mixer, master_mixer))
+        fatal_error("Can't attach the sound mixer");
+    if(!al_attach_mixer_to_mixer(primary_sound_mixer, sound_mixer))
+        fatal_error("Can't attach the primary sound mixer");
+    if(!al_attach_mixer_to_mixer(secondary_sound_mixer, sound_mixer))
+        fatal_error("Can't attach the secondary sound mixer");
+    al_set_mixer_playing(secondary_sound_mixer, false);
 
-    al_set_default_voice(voice);
-    if(!al_set_default_mixer(sound_mixer))
-        fatal_error("Can't set the default mixer");
+    for(int i = 0; i < SAMPLE_POOL_SIZE; i++) {
+        ALLEGRO_MIXER* parent = i < MAX_SIMULTANEOUS_SAMPLES ? primary_sound_mixer : secondary_sound_mixer;
 
-    for(int samples = PREFERRED_NUMBER_OF_SAMPLES; samples > 0; samples /= 2) {
-        if(al_reserve_samples(samples)) {
-            logfile_message("Reserved %d samples", samples);
-            break;
-        }
-        else
-            logfile_message("Can't reserve %d samples", samples);
+        if(NULL == (sample_pool[i].sample_instance = al_create_sample_instance(NULL)))
+            fatal_error("Can't create sample instance %d", i);
+        if(!al_attach_sample_instance_to_mixer(sample_pool[i].sample_instance, parent))
+            fatal_error("Can't attach sample instance %d", i);
+
+        sample_pool[i].handle = INVALID_SAMPLE_HANDLE;
+        sample_pool[i].parent = parent;
     }
+
+    init_muffler();
 
     engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, NULL, handle_haltresume_event);
     engine_add_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, NULL, handle_haltresume_event);
-
-    update_muffler(DEFAULT_MUFFLER_PROFILE, MUFFLE_NOTHING);
 }
 
 /*
@@ -590,12 +651,16 @@ void audio_release()
     engine_remove_event_listener(ALLEGRO_EVENT_DISPLAY_RESUME_DRAWING, NULL, handle_haltresume_event);
     engine_remove_event_listener(ALLEGRO_EVENT_DISPLAY_HALT_DRAWING, NULL, handle_haltresume_event);
 
-    al_destroy_mixer(music_mixer);
+    for(int i = SAMPLE_POOL_SIZE - 1; i >= 0; i--)
+        al_destroy_sample_instance(sample_pool[i].sample_instance);
+
+    al_destroy_mixer(secondary_sound_mixer);
+    al_destroy_mixer(primary_sound_mixer);
     al_destroy_mixer(sound_mixer);
+    al_destroy_mixer(music_mixer);
     al_destroy_mixer(master_mixer);
 
-    /*al_destroy_voice(voice);*/ /* crash */
-    al_set_default_voice(NULL); /* use this instead */
+    al_destroy_voice(voice);
 
     logfile_message("audio_release() ok");
 }
@@ -795,8 +860,6 @@ void handle_haltresume_event(const ALLEGRO_EVENT* event, void* context)
     switch(event->type) {
         case ALLEGRO_EVENT_DISPLAY_HALT_DRAWING:
             logfile_message("Pausing the audio system...");
-            al_set_mixer_playing(sound_mixer, false);
-            al_set_mixer_playing(music_mixer, false);
             al_set_mixer_playing(master_mixer, false);
             al_detach_voice(voice); /* stop streaming */
             break;
@@ -806,10 +869,52 @@ void handle_haltresume_event(const ALLEGRO_EVENT* event, void* context)
             if(!al_attach_mixer_to_voice(master_mixer, voice))
                 logfile_message("AUDIO WARNING: can't reattach the master mixer to the voice");
             al_set_mixer_playing(master_mixer, true);
-            al_set_mixer_playing(music_mixer, true);
-            al_set_mixer_playing(sound_mixer, true);
             break;
     }
+}
+
+bool acquire_sample_from_pool(samplehandle_t* out_handle, int* out_pool_index)
+{
+    for(int i = 0; i < SAMPLE_POOL_SIZE; i++) {
+        if(!al_get_mixer_playing(sample_pool[i].parent))
+            continue;
+
+        if(al_get_sample_instance_playing(sample_pool[i].sample_instance))
+            continue;
+
+        sample_pool[i].handle = next_sample_handle++;
+        *out_handle = sample_pool[i].handle;
+        *out_pool_index = i;
+
+        return true;
+    }
+
+    return false;
+}
+
+ALLEGRO_SAMPLE_INSTANCE* find_sample_instance(samplehandle_t handle)
+{
+    for(int i = 0; i < SAMPLE_POOL_SIZE; i++) {
+        if(sample_pool[i].handle == handle)
+            return sample_pool[i].sample_instance;
+    }
+
+    return NULL;
+}
+
+ALLEGRO_SAMPLE_INSTANCE* find_sample_instance_ex(samplehandle_t handle, int pool_index)
+{
+    int j = pool_index;
+
+    if(j < 0 || j >= SAMPLE_POOL_SIZE || sample_pool[j].handle != handle)
+        return NULL;
+
+    return sample_pool[j].sample_instance;
+}
+
+void init_muffler()
+{
+    update_muffler(DEFAULT_MUFFLER_PROFILE, MUFFLE_NOTHING);
 }
 
 void update_muffler(mufflerprofile_t profile, int flags)
