@@ -26,7 +26,7 @@
 typedef struct surgescript_sound_t surgescript_sound_t;
 struct surgescript_sound_t {
     const sound_t* sound;
-    samplehandle_t handle; /* the handle of the last call to .play(); multiple SurgeScript objects may be created for fine-grained control of multiple instances of the same sound effect */
+    samplehandle_t handle; /* the handle returned by the last call to sound_play[_ex]; multiple SurgeScript objects may be created for fine-grained control of multiple instances of the same sound effect */
     float volume;
     float pan;
     float speed;

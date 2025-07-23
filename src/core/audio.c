@@ -413,6 +413,8 @@ samplehandle_t sound_play(const sound_t* sound)
  * 0.0 <= volume (defaults to 1.0)
  * (left speaker) -1.0 <= pan <= 1.0 (right speaker)
  * 1.0 = default speed
+ *
+ * Returns a handle for dynamic, fine-grained control of the playing sound effect
  */
 samplehandle_t sound_play_ex(const sound_t* sound, float volume, float pan, float speed)
 {
@@ -451,7 +453,7 @@ samplehandle_t sound_play_ex(const sound_t* sound, float volume, float pan, floa
 
 /*
  * sound_stop()
- * Stop a sample
+ * Stop a sound effect
  */
 void sound_stop(samplehandle_t handle)
 {
@@ -465,7 +467,7 @@ void sound_stop(samplehandle_t handle)
 
 /*
  * sound_is_playing()
- * Check if a sound is playing
+ * Check if a sound effect is playing
  */
 bool sound_is_playing(samplehandle_t handle)
 {
@@ -479,7 +481,7 @@ bool sound_is_playing(samplehandle_t handle)
 
 /*
  * sound_get_volume()
- * Get the volume of a sound
+ * Get the volume of a sound effect
  * 0.0f means silence; 1.0f, the default volume
  */
 float sound_get_volume(samplehandle_t handle)
@@ -494,7 +496,7 @@ float sound_get_volume(samplehandle_t handle)
 
 /*
  * sound_set_volume()
- * Set the volume of a sound
+ * Set the volume of a sound effect
  */
 void sound_set_volume(samplehandle_t handle, float volume)
 {
@@ -509,7 +511,7 @@ void sound_set_volume(samplehandle_t handle, float volume)
 
 /*
  * sound_stop_all()
- * Stop all sounds
+ * Stop all sound effects
  */
 void sound_stop_all()
 {

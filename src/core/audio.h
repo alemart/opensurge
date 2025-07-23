@@ -68,7 +68,7 @@ samplehandle_t sound_play_ex(const sound_t* sound, float volume, float pan, floa
 void sound_stop(samplehandle_t handle);
 bool sound_is_playing(samplehandle_t handle);
 float sound_get_volume(samplehandle_t handle);
-void sound_set_volume(samplehandle_t handle, float volume); /* volume is in the [0,1] range */
+void sound_set_volume(samplehandle_t handle, float volume);
 void sound_stop_all();
 void sound_swap_mixers();
 
