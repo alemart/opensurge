@@ -826,7 +826,8 @@ audiostrategy_t* stopsamplestrategy_new(const char *sample_name)
 void stopsamplestrategy_update(audiostrategy_t *s)
 {
     stopsamplestrategy_t *me = (stopsamplestrategy_t*)s;
-    sound_stop(me->sfx);
+    /*sound_stop(me->sfx);*/ /* XXX legacy API */
+    (void)me;
 }
 
 void stopsamplestrategy_release(audiostrategy_t *s)

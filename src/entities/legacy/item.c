@@ -1247,7 +1247,7 @@ void bouncingcollectible_update(item_t* item, player_t** team, int team_size, br
         ) {
             player_set_collectibles(player_get_collectibles() + 1);
             me->is_disappearing = TRUE;
-            sound_stop(sfx);
+            /*sound_stop(sfx);*/ /* XXX legacy API */
             sound_play(sfx);
             break;
         }
@@ -1671,7 +1671,7 @@ void collectible_update(item_t* item, player_t** team, int team_size, brick_list
             player_set_collectibles(player_get_collectibles() + 1);
             me->is_disappearing = TRUE;
             item->bring_to_back = FALSE;
-            sound_stop(sfx);
+            /*sound_stop(sfx);*/ /* XXX legacy API */
             sound_play(sfx);
             break;
         }
@@ -3287,7 +3287,7 @@ void spikes_update(item_t* item, player_t** team, int team_size, brick_list_t* b
             if(!player_is_dying(player) && !player_is_getting_hit(player) && !player_is_blinking(player) && !player_is_invincible(player)) {
                 if(me->collision(item, player)) {
                     sound_t *s = SFX_SPIKES;
-                    if(!sound_is_playing(s))
+                    /*if(!sound_is_playing(s))*/ /* XXX legacy API */
                         sound_play(s);
                     player_hit_ex(player, item->actor);
                 }

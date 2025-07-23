@@ -22,7 +22,18 @@
 #include "../core/audio.h"
 #include "../util/util.h"
 
+/* sound structure */
+typedef struct surgescript_sound_t surgescript_sound_t;
+struct surgescript_sound_t {
+    const sound_t* sound;
+    samplehandle_t handle; /* the handle of the last call to .play(); multiple SurgeScript objects may be created for fine-grained control of multiple instances of the same sound effect */
+    float volume;
+    float pan;
+    float speed;
+};
+
 /* private */
+#define NULL_HANDLE ((samplehandle_t)0) /* sound_play(NULL) */
 static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
@@ -32,10 +43,14 @@ static surgescript_var_t* fun_stop(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_getplaying(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_setvolume(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_getvolume(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
-static inline sound_t* get_sound(const surgescript_object_t* object);
-static const surgescript_heapptr_t VOLUME_ADDR = 0;
-static const double DEFAULT_VOLUME = 1.0;
-static inline double get_volume(const surgescript_object_t* object);
+static inline surgescript_sound_t* get_sound_data(const surgescript_object_t* object);
+static const surgescript_sound_t NO_SOUND = {
+    .sound = NULL,
+    .handle = NULL_HANDLE,
+    .volume = 1.0f,
+    .pan = 0.0f,
+    .speed = 1.0f
+};
 
 /*
  * scripting_register_sound()
@@ -54,16 +69,6 @@ void scripting_register_sound(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "Sound", "get_playing", fun_getplaying, 0);
 }
 
-/*
- * scripting_sound_ptr()
- * Returns the built-in sound_t* associated to the given SurgeScript Sound object
- * May be NULL
- */
-sound_t* scripting_sound_ptr(const surgescript_object_t* object)
-{
-    return get_sound(object);
-}
-
 /* main state */
 surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
@@ -73,57 +78,52 @@ surgescript_var_t* fun_main(surgescript_object_t* object, const surgescript_var_
 /* constructor */
 surgescript_var_t* fun_constructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    ssassert(VOLUME_ADDR == surgescript_heap_malloc(heap));
-    surgescript_var_set_number(surgescript_heap_at(heap, VOLUME_ADDR), DEFAULT_VOLUME);
-    surgescript_object_set_userdata(object, NULL);
-    return NULL;
-}
-
-/* __init: pass the relative path to a sound file */
-surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
-{
-    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
-    surgescript_heap_t* heap = surgescript_object_heap(object);
-    char* path = surgescript_var_get_string(param[0], manager);
-    sound_t* sound = sound_load(path);
-
-    surgescript_object_set_userdata(object, sound);
-    if(sound != NULL)
-        surgescript_var_set_number(surgescript_heap_at(heap, VOLUME_ADDR), sound_get_volume(sound));
-
-    ssfree(path);
+    surgescript_sound_t* sound_data = ssmalloc(sizeof *sound_data);
+    *sound_data = NO_SOUND;
+    surgescript_object_set_userdata(object, sound_data);
     return NULL;
 }
 
 /* destructor */
 surgescript_var_t* fun_destructor(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    sound_t* sound = get_sound(object);
+    surgescript_sound_t* sound_data = get_sound_data(object);
 
-    if(sound != NULL) {
-        /*
-        // is this desirable? e.g., when you
-        // delete the parent object just after
-        // playing this sound
-        if(sound_is_playing(sound))
-            sound_stop(sound);
-        sound_unref(sound); // this may be a bug
-        */
-        surgescript_object_set_userdata(object, NULL);
+#if 0
+    if(sound_data->sound != NULL) {
+        /* is this desirable? e.g., when you
+           delete the parent object just after
+           playing this sound */
+        sound_stop(sound_data->handle); /* undesirable */
+        sound_unref((sound_t*)sound_data->sound); /* this may be a bug */
     }
+#endif
 
+    ssfree(sound_data);
+    return NULL;
+}
+
+/* __init: pass the relative path to a sound file */
+surgescript_var_t* fun_init(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+    surgescript_sound_t* sound_data = get_sound_data(object);
+    surgescript_objectmanager_t* manager = surgescript_object_manager(object);
+    char* path = surgescript_var_get_string(param[0], manager);
+
+    *sound_data = NO_SOUND;
+    sound_data->sound = sound_load(path);
+
+    ssfree(path);
     return NULL;
 }
 
 /* plays the sound */
 surgescript_var_t* fun_play(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    sound_t* sound = get_sound(object);
-    double volume = get_volume(object);
+    surgescript_sound_t* sound_data = get_sound_data(object);
 
-    if(sound != NULL)
-        sound_play_ex(sound, volume, 0.0f, 1.0f);
+    if(sound_data->sound != NULL)
+        sound_data->handle = sound_play_ex(sound_data->sound, sound_data->volume, sound_data->pan, sound_data->speed);
 
     return NULL;
 }
@@ -131,41 +131,33 @@ surgescript_var_t* fun_play(surgescript_object_t* object, const surgescript_var_
 /* stops the sound */
 surgescript_var_t* fun_stop(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    sound_t* sound = get_sound(object);
-
-    if(sound != NULL)
-        sound_stop(sound);
-    
+    surgescript_sound_t* sound_data = get_sound_data(object);
+    sound_stop(sound_data->handle);
     return NULL;
 }
 
 /* is the sound playing? */
 surgescript_var_t* fun_getplaying(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    sound_t* sound = get_sound(object);
-    return surgescript_var_set_bool(surgescript_var_create(),
-        (sound != NULL && sound_is_playing(sound))
-    );
+    surgescript_sound_t* sound_data = get_sound_data(object);
+    return surgescript_var_set_bool(surgescript_var_create(), sound_is_playing(sound_data->handle));
 }
 
 /* get volume, a value in the [0, 1] range */
 surgescript_var_t* fun_getvolume(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    double volume = get_volume(object);
-    return surgescript_var_set_number(surgescript_var_create(), volume);
+    surgescript_sound_t* sound_data = get_sound_data(object);
+    return surgescript_var_set_number(surgescript_var_create(), sound_data->volume);
 }
 
 /* set volume, a value in the [0, 1] range */
 surgescript_var_t* fun_setvolume(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
 {
-    surgescript_heap_t* heap = surgescript_object_heap(object);
+    surgescript_sound_t* sound_data = get_sound_data(object);
     double volume = surgescript_var_get_number(param[0]);
-    sound_t* sound = get_sound(object);
 
-    volume = clip01(volume);
-    surgescript_var_set_number(surgescript_heap_at(heap, VOLUME_ADDR), volume);
-    if(sound != NULL)
-        sound_set_volume(sound, volume);
+    sound_data->volume = clip01(volume);
+    sound_set_volume(sound_data->handle, sound_data->volume);
 
     return NULL;
 }
@@ -175,16 +167,7 @@ surgescript_var_t* fun_setvolume(surgescript_object_t* object, const surgescript
 /* --- utilities --- */
 
 /* gets the sound_t* pointer: may be NULL */
-sound_t* get_sound(const surgescript_object_t* object)
+surgescript_sound_t* get_sound_data(const surgescript_object_t* object)
 {
-    return (sound_t*)surgescript_object_userdata(object);
-}
-
-/* the volume of the sample, a value in [0, 1] */
-double get_volume(const surgescript_object_t* object)
-{
-    sound_t* sound = get_sound(object);
-    return sound != NULL ? sound_get_volume(sound) : surgescript_var_get_number(
-        surgescript_heap_at(surgescript_object_heap(object), VOLUME_ADDR)
-    );
+    return (surgescript_sound_t*)surgescript_object_userdata(object);
 }

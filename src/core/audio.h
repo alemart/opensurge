@@ -22,10 +22,12 @@
 #define _AUDIO_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 /* forward declarations */
-typedef struct music_t music_t;
-typedef struct sound_t sound_t;
+typedef struct music_t music_t; /* music */
+typedef struct sound_t sound_t; /* sound effect */
+typedef uint64_t samplehandle_t; /* a handle to a sample that is played at some point in time - past or present */
 
 /* audio manager */
 void audio_init();
@@ -41,9 +43,10 @@ void audio_set_master_volume(float volume); /* 0.0 <= volume <= 1.0 (default) */
 float audio_get_mixer_percentage();
 void audio_set_mixer_percentage(float percentage); /* no music 0% ... 50% equal music & sfx ... 100% no sfx */
 
-/* music management */
+/* music API */
 music_t *music_load(const char *path); /* will be unloaded automatically */
 void music_destroy(music_t *music); /* you don't usually need to bother with this. */
+int music_unref(music_t *music); /* returns the number of active references */
 void music_play(music_t *music, bool loop); /* plays a music. Set loop to TRUE to make it loop continuously. */
 void music_stop();
 void music_pause();
@@ -52,21 +55,20 @@ void music_set_volume(float volume); /* 0.0 <= volume <= 1.0 (default) */
 float music_get_volume();
 bool music_is_playing();
 bool music_is_paused();
-int music_unref(music_t *music); /* returns the number of active references */
 float music_duration(); /* duration in seconds */
 music_t *music_current(); /* currently playing music. May be NULL */
 const char *music_path(const music_t *music); /* the filepath of the specified music */
 
-/* sample management */
-sound_t *sound_load(const char *path); /* will be unloaded automatically */
-void sound_destroy(sound_t *sample);
-void sound_play(sound_t *sample);
-void sound_play_ex(sound_t *sample, float volume, float pan, float speed); /* 0.0 <= volume; (left) -1.0 <= pan <= 1.0 (right); 1.0 = default speed */
-void sound_stop(sound_t *sample);
-bool sound_is_playing(sound_t *sample);
-int sound_unref(sound_t *sample); /* returns the number of active references */
-float sound_get_volume(sound_t *sample);
-void sound_set_volume(sound_t *sample, float volume); /* volume is in the [0,1] range */
+/* sound API */
+sound_t* sound_load(const char* path); /* will be unloaded automatically */
+void sound_destroy(sound_t* sound);
+int sound_unref(sound_t* sound); /* returns the number of active references */
+samplehandle_t sound_play(const sound_t* sound);
+samplehandle_t sound_play_ex(const sound_t* sound, float volume, float pan, float speed); /* 0.0 <= volume; (left) -1.0 <= pan <= 1.0 (right); 1.0 = default speed */
+void sound_stop(samplehandle_t handle);
+bool sound_is_playing(samplehandle_t handle);
+float sound_get_volume(samplehandle_t handle);
+void sound_set_volume(samplehandle_t handle, float volume); /* volume is in the [0,1] range */
 void sound_stop_all();
 void sound_swap_mixers();
 

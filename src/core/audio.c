@@ -19,7 +19,6 @@
  */
 
 #include <stdlib.h>
-#include <stdint.h>
 #include "audio.h"
 #include "engine.h"
 #include "asset.h"
@@ -36,10 +35,7 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
-/* a handle to a sample that is played at some point in time - past or present */
-typedef uint64_t samplehandle_t;
-
-/* pool sample: a playing sample in the present or in the past that is part of a pool */
+/* a pool of samples */
 typedef struct poolsample_t poolsample_t;
 struct poolsample_t {
     uint32_t unique_id;
@@ -50,11 +46,7 @@ struct poolsample_t {
 /* sound structure */
 struct sound_t {
     ALLEGRO_SAMPLE* sample;
-    float volume;
-    float pan;
-    float speed;
     char* filepath; /* relative path */
-    samplehandle_t handle; /* XXX 1:N */
 };
 
 /* music structure */
@@ -343,36 +335,32 @@ bool music_is_paused()
 
 /*
  * sound_load()
- * Loads a sample from a file
+ * Load a sound effect from a file
  */
-sound_t *sound_load(const char *path)
+sound_t* sound_load(const char* path)
 {
-    sound_t *s;
+    sound_t* sound;
 
-    if(NULL == (s = resourcemanager_find_sample(path))) {
+    if(NULL == (sound = resourcemanager_find_sample(path))) {
         const char* fullpath = asset_path(path);
         logfile_message("Loading sound \"%s\"...", fullpath);
 
         /* build the sound object */
-        s = mallocx(sizeof *s);
-        s->volume = 1.0f;
-        s->pan = 0.0f;
-        s->speed = 1.0f;
-        s->filepath = str_dup(path);
-        s->handle = NULL_SAMPLE_HANDLE;
+        sound = mallocx(sizeof *sound);
+        sound->filepath = str_dup(path);
 
         /* load the sample */
-        if(NULL == (s->sample = al_load_sample(fullpath)))
+        if(NULL == (sound->sample = al_load_sample(fullpath)))
             fatal_error("Can't load sound \"%s\"", path);
 
         /* adding it to the resource manager */
-        resourcemanager_add_sample(path, s);
+        resourcemanager_add_sample(path, sound);
         resourcemanager_ref_sample(path);
     }
     else
         resourcemanager_ref_sample(path);
 
-    return s;
+    return sound;
 }
 
 /*
@@ -389,67 +377,63 @@ sound_t *sound_load(const char *path)
  * Note that 'sound_ref()' must not exist.
  * Returns the no. of references to the sample
  */
-int sound_unref(sound_t* sample)
+int sound_unref(sound_t* sound)
 {
-    return resourcemanager_unref_sample(sample->filepath);
+    return resourcemanager_unref_sample(sound->filepath);
 }
 
 /*
  * sound_destroy()
- * Releases the given sample. This is called
+ * Release a sound effect. This is called
  * automatically when releasing the main hash
  */
-void sound_destroy(sound_t *sample)
+void sound_destroy(sound_t* sound)
 {
-    if(sample == NULL)
+    if(sound == NULL)
         return;
 
-    sound_stop(sample);
-    al_destroy_sample(sample->sample);
-    free(sample->filepath);
-    free(sample);
+    al_destroy_sample(sound->sample);
+    free(sound->filepath);
+    free(sound);
 }
 
 /*
  * sound_play()
- * Plays the given sample
+ * Play a sound effect
  */
-void sound_play(sound_t *sample)
+samplehandle_t sound_play(const sound_t* sound)
 {
-    if(sample == NULL)
-        return;
-
-    sound_play_ex(sample, sample->volume, sample->pan, sample->speed);
+    return sound_play_ex(sound, 1.0f, 0.0f, 1.0f);
 }
 
 /*
  * sound_play_ex()
- * Plays the given sample with extra options
+ * Play a sound effect with extra options
  *
  * 0.0 <= volume (defaults to 1.0)
  * (left speaker) -1.0 <= pan <= 1.0 (right speaker)
  * 1.0 = default speed
- *
- * TODO return a sound handle for advanced controls
  */
-void sound_play_ex(sound_t *sample, float volume, float pan, float speed)
+samplehandle_t sound_play_ex(const sound_t* sound, float volume, float pan, float speed)
 {
     ALLEGRO_SAMPLE_INSTANCE* spl;
+    samplehandle_t handle;
 
-    if(sample == NULL)
-        return;
+    /* validate */
+    if(sound == NULL)
+        return NULL_SAMPLE_HANDLE;
+
+    /* prepare a sample instance and a sample handle */
+    if(NULL_SAMPLE_HANDLE == (handle = acquire_sample_from_pool()))
+        return NULL_SAMPLE_HANDLE;
+
+    if(NULL == (spl = get_sample_instance(handle)))
+        return NULL_SAMPLE_HANDLE;
 
     /* adjust the parameters */
     volume = max(volume, 0.0f); /* values > 1 may clip the audio */
     pan = clip(pan, -1.0f, 1.0f);
-    speed = max(speed, 1.0f / 64.0f); /* 1/64 comes from the internals of Allegro */
-
-    /* prepare a sample instance */
-    if(NULL_SAMPLE_HANDLE == (sample->handle = acquire_sample_from_pool()))
-        return;
-
-    if(NULL == (spl = get_sample_instance(sample->handle)))
-        return;
+    speed = max(speed, 1.0f / 64.0f); /* a min speed of 1/64 comes from the internals of Allegro */
 
     /* set the parameters */
     al_set_sample_instance_gain(spl, volume);
@@ -457,30 +441,23 @@ void sound_play_ex(sound_t *sample, float volume, float pan, float speed)
     al_set_sample_instance_speed(spl, speed);
     al_set_sample_instance_playing(spl, ALLEGRO_PLAYMODE_ONCE);
 
-    sample->volume = volume;
-    sample->pan = pan;
-    sample->speed = speed;
-
     /* play the sample */
-    al_set_sample(spl, sample->sample);
+    al_set_sample(spl, sound->sample);
     al_play_sample_instance(spl);
 
-    /* TODO return the handle */
-    /*return sample->handle;*/
+    /* return the handle */
+    return handle;
 }
 
 /*
  * sound_stop()
- * Stops a sample
+ * Stop a sample
  */
-void sound_stop(sound_t *sample)
+void sound_stop(samplehandle_t handle)
 {
     ALLEGRO_SAMPLE_INSTANCE* spl;
 
-    if(sample == NULL)
-        return;
-
-    if(NULL == (spl = get_sample_instance(sample->handle)))
+    if(NULL == (spl = get_sample_instance(handle)))
         return;
 
     al_stop_sample_instance(spl);
@@ -488,16 +465,13 @@ void sound_stop(sound_t *sample)
 
 /*
  * sound_is_playing()
- * Checks if a sound is playing
+ * Check if a sound is playing
  */
-bool sound_is_playing(sound_t *sample)
+bool sound_is_playing(samplehandle_t handle)
 {
     ALLEGRO_SAMPLE_INSTANCE* spl;
 
-    if(sample == NULL)
-        return false;
-
-    if(NULL == (spl = get_sample_instance(sample->handle)))
+    if(NULL == (spl = get_sample_instance(handle)))
         return false;
 
     return al_get_sample_instance_playing(spl);
@@ -505,31 +479,32 @@ bool sound_is_playing(sound_t *sample)
 
 /*
  * sound_get_volume()
- * Gets the volume of a sound
+ * Get the volume of a sound
  * 0.0f means silence; 1.0f, the default volume
  */
-float sound_get_volume(sound_t *sample)
+float sound_get_volume(samplehandle_t handle)
 {
-    return (sample != NULL) ? sample->volume : 0.0f;
+    ALLEGRO_SAMPLE_INSTANCE* spl;
+
+    if(NULL == (spl = get_sample_instance(handle)))
+        return 0.0f; /* not playing */
+
+    return al_get_sample_instance_gain(spl);
 }
 
 /*
  * sound_set_volume()
- * Sets the volume of a sound
+ * Set the volume of a sound
  */
-void sound_set_volume(sound_t *sample, float volume)
+void sound_set_volume(samplehandle_t handle, float volume)
 {
     ALLEGRO_SAMPLE_INSTANCE* spl;
 
-    if(sample == NULL)
+    if(NULL == (spl = get_sample_instance(handle)))
         return;
 
-    sample->volume = max(volume, 0.0f);
-
-    if(NULL == (spl = get_sample_instance(sample->handle)))
-        return;
-
-    al_set_sample_instance_gain(spl, sample->volume);
+    volume = max(volume, 0.0f);
+    al_set_sample_instance_gain(spl, volume);
 }
 
 /*
