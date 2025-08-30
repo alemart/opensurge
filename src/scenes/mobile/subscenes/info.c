@@ -197,8 +197,8 @@ void set_info_text(font_t* font)
     bool multiple_datadirs;
     extern const char LICENSE_TEXT[];
 
-    asset_shared_datadir(path[0], sizeof(path[0]));
-    asset_user_datadir(path[1], sizeof(path[1]));
+    asset_user_datadir(path[0], sizeof(path[0])); /* more important? should come first */
+    asset_shared_datadir(path[1], sizeof(path[1]));
     multiple_datadirs = (0 != strcmp(path[0], path[1]));
 
     #define SEPARATOR       "    "
