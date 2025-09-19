@@ -13,7 +13,7 @@ A retro game engine with a fun platformer for making your dreams come true!
 <br><br>
 </div>
 
-## It's cool!
+## It's so cool!
 
 **Make your dreams come true!** Open Surge Engine is an open-source 2D retro game engine for creating games and making your dreams come true!
 
@@ -25,7 +25,7 @@ A retro game engine with a fun platformer for making your dreams come true!
 
 Open Surge Engine is an amazing tool for learning game development, programming, digital art, and the nature of free and open-source software in a playful way.
 
-Official website: http://opensurge2d.org
+Official website: <https://opensurge2d.org>
 
 ## Download
 
@@ -41,22 +41,30 @@ Official website: http://opensurge2d.org
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J41O00K)
 
-## Play MODs
+## Modding
 
-You can play MODs created by other users.
+### Where do I find MODs?
+
+[Here](https://www.youtube.com/playlist?list=PLbPToEpHpU2dkXfNGn6aFc5RzM103DC5l).
+
+### How do I play a MOD?
 
 1. Download the MOD.
-    - Linux users: preferably download it to your home folder.
     - Flatpak users: download it to `~/Downloads`.
     - Snap users: download it to your home folder.
+    - Other users: preferably download it to your home or user folder.
 2. Load the game.
-    - Windows users: extract the MOD and launch the executable.
-    - Other platforms: load the game from the options screen.
+    - Windows users: extract the package (typically a .zip file) and launch the executable.
+    - Other users: load the game from the options screen.
+
+### How can I create a MOD?
+
+Read [Introduction to Modding](https://github.com/alemart/opensurge/wiki/introduction) at the Wiki.
 
 ## Documentation
 
-* [Open Surge Wiki](https://wiki.opensurge2d.org)
-* [Introduction to Modding](https://wiki.opensurge2d.org/Introduction_to_Modding)
+* [Open Surge Wiki](https://github.com/alemart/opensurge/wiki)
+* [Introduction to Modding](https://github.com/alemart/opensurge/wiki/introduction)
 * [SurgeScript documentation](https://docs.opensurge2d.org)
 * [How to contribute](https://github.com/alemart/opensurge/blob/master/CONTRIBUTING.md)
 
