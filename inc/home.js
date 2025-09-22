@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
             next: '#testimonials .glider-next'
         }
     });
+
+    /* overflow fix for glider.js 1.7.8 */
+    setTimeout(() => window.dispatchEvent(new Event('resize')));
 });
 
 /* showcase */
@@ -41,8 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return arr;
     }
 
-    const set = document.querySelectorAll('#games .game');
+    const set = Array.from(document.querySelectorAll('#games .game'));
     const seq = Array.from({ length: set.length }, (_, i) => i);
-    const ord = shuffle(seq);
+    const ord = shuffle(seq).sort((a, b) => Number(set[b].dataset.year || 0) - Number(set[a].dataset.year || 0));
     set.forEach((game, i) => game.style.setProperty('order', ord[i]));
 });

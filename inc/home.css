@@ -294,6 +294,23 @@ footer h5 {
   }
 }
 
+#games .game > a {
+  display: flex;
+  background: white;
+}
+
 #games .game img {
   max-height: 270px;
+  opacity: 0.9;
+  transition: opacity 0.15s ease-in;
+}
+
+#games .game img:hover {
+  opacity: 1.0;
+}
+
+@media screen and (max-width: 768px) {
+  #games .game img {
+    opacity: 1.0;
+  }
 }
