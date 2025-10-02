@@ -35,6 +35,8 @@ Official website: <https://opensurge2d.org>
 [<img src="https://opensurge2d.org/img/badge_flathub.png" height="120" alt="Get it on Flathub">](https://flathub.org/apps/org.opensurge2d.OpenSurge)
 [<img src="https://opensurge2d.org/img/badge_snapcraft.png" height="120" alt="Get it from the Snap Store">](https://snapcraft.io/opensurge)
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/opensurge.svg?columns=3&minversion=0.6.1.0)](https://repology.org/project/opensurge/versions)
+
 ## Support the project
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/alemart?style=social&logo=github&label=Sponsors)](https://github.com/sponsors/alemart)
