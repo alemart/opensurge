@@ -51,13 +51,21 @@ Official website: <https://opensurge2d.org>
 
 ### How do I play a MOD?
 
-1. Download the MOD.
-    - Flatpak users: download it to `~/Downloads`.
-    - Snap users: download it to your home folder.
-    - Other users: preferably download it to your home or user folder.
-2. Load the game.
-    - Windows users: extract the package (typically a .zip file) and launch the executable.
-    - Other users: load the game from the options screen.
+1. Download the MOD
+    - Windows / Android users: just download it
+    - Flatpak users: download it to `~/Downloads` (`$XDG_DOWNLOAD_DIR`)
+    - Snap users: download it to your home folder
+    - Other \*nix users: preferably download it to your home folder
+2. Load the game
+    - Windows users: extract the package and launch the executable
+    - Android users: load the .zip file via options screen
+    - Other users: load the game via options screen (or via [command line](#command-line-options))
+
+> By default, the Flatpak edition (Linux) cannot access your home folder. You may give it permission by running the following command:
+>
+> `flatpak override --user --filesystem=$HOME org.opensurge2d.OpenSurge`
+>
+> You will be able to load MODs from your home folder then.
 
 ### How can I create a MOD?
 
