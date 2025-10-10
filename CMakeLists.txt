@@ -23,7 +23,7 @@
 # ------------------------------------------
 
 # Initializing...
-CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 PROJECT(opensurge)
 SET(CMAKE_C_STANDARD 99)
 SET(GAME_UNIXNAME "opensurge")
