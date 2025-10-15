@@ -221,6 +221,7 @@ IF(ALLEGRO_STATIC)
     LIST(APPEND REQUIRED_A5_LIBS
       mingw32
       #dumb
+      #openmpt
       #FLAC
       vorbisfile
       vorbis
