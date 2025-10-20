@@ -39,6 +39,7 @@ static surgescript_var_t* fun_setenabled(surgescript_object_t* object, const sur
 static surgescript_var_t* fun_remap(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 /* button hashes */
+#define BUTTON_HASH(x)  djb2(x)
 #define BUTTON_UP       DJB2_CONST('u','p')
 #define BUTTON_DOWN     DJB2_CONST('d','o','w','n')
 #define BUTTON_LEFT     DJB2_CONST('l','e','f','t')
@@ -158,7 +159,8 @@ surgescript_var_t* fun_buttondown(surgescript_object_t* object, const surgescrip
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
-    switch(djb2(button)) {
+
+    switch(BUTTON_HASH(button)) {
         case BUTTON_UP:     return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_UP));
         case BUTTON_DOWN:   return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_DOWN));
         case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_down(input, IB_LEFT));
@@ -182,7 +184,8 @@ surgescript_var_t* fun_buttonpressed(surgescript_object_t* object, const surgesc
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
-    switch(djb2(button)) {
+
+    switch(BUTTON_HASH(button)) {
         case BUTTON_UP:     return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_UP));
         case BUTTON_DOWN:   return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_DOWN));
         case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_pressed(input, IB_LEFT));
@@ -206,7 +209,8 @@ surgescript_var_t* fun_buttonreleased(surgescript_object_t* object, const surges
 {
     input_t* input = (input_t*)surgescript_object_userdata(object);
     const char* button = surgescript_var_fast_get_string(param[0]);
-    switch(djb2(button)) {
+
+    switch(BUTTON_HASH(button)) {
         case BUTTON_UP:     return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_UP));
         case BUTTON_DOWN:   return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_DOWN));
         case BUTTON_LEFT:   return surgescript_var_set_bool(surgescript_var_create(), input_button_released(input, IB_LEFT));
@@ -233,7 +237,7 @@ surgescript_var_t* fun_simulatebutton(surgescript_object_t* object, const surges
     bool down = surgescript_var_get_bool(param[1]);
     void (*simulate_button)(input_t*,inputbutton_t) = down ? input_simulate_button_down : input_simulate_button_up;
 
-    switch(djb2(button)) {
+    switch(BUTTON_HASH(button)) {
         case BUTTON_UP:     simulate_button(input, IB_UP); break;
         case BUTTON_DOWN:   simulate_button(input, IB_DOWN); break;
         case BUTTON_LEFT:   simulate_button(input, IB_LEFT); break;
