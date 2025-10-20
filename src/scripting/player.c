@@ -1219,6 +1219,8 @@ surgescript_var_t* fun_setshield(surgescript_object_t* object, const surgescript
             player_grant_shield(player, SH_ACIDSHIELD);
         else if(strcmp(shield, "wind") == 0)
             player_grant_shield(player, SH_WINDSHIELD);
+        else
+            scripting_warning(object, "Invalid shield \"%s\"", shield);
     }
 
     return NULL;
@@ -1390,8 +1392,10 @@ surgescript_var_t* fun_setlayer(surgescript_object_t* object, const surgescript_
             player_set_layer(player, BRL_GREEN);
         else if(strcmp(layer, "yellow") == 0)
             player_set_layer(player, BRL_YELLOW);
-        else
+        else if(strcmp(layer, "default") == 0)
             player_set_layer(player, BRL_DEFAULT);
+        else
+            scripting_warning(object, "Invalid layer \"%s\"", layer);
     }
     return NULL;
 }
