@@ -982,6 +982,7 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     static float prev_sigma = 0.0f;
 
     if(fabsf(sigma - prev_sigma) > 1e-5) {
+        memset(g0, 0, sizeof g0);
         w = normalized_gaussian(g0, sigma, n);
         prev_sigma = sigma;
     }
