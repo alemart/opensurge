@@ -1,4 +1,5 @@
 #include <winver.h>
+#include "resource.h"
 
 /*
  * Game version
@@ -54,7 +55,7 @@
  * Resource-definition statements
  */
 
-GAME_ICON       ICON  "opensurge.ico"
+IDI_GAMEICON    ICON  "opensurge.ico"
 
 1 VERSIONINFO
 FILEVERSION     GAME_VERSION_MAJOR,GAME_VERSION_MINOR,GAME_VERSION_PATCH,GAME_VERSION_BUILD

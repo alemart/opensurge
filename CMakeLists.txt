@@ -582,6 +582,7 @@ SET(GAME_HEADERS
   src/third_party/ignorecase.h
   src/third_party/utf8.h
 
+  src/misc/resource.h
   ${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.rc
 )
 

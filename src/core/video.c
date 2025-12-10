@@ -30,6 +30,7 @@
 # include <allegro5/allegro_x.h>
 #elif defined(ALLEGRO_WINDOWS)
 # include <allegro5/allegro_windows.h>
+# include "../misc/resource.h"
 #endif
 
 #include <stdio.h>
@@ -1058,7 +1059,7 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
     if(display == NULL)
         return;
 
-    LPCSTR name = "GAME_ICON";
+    LPCSTR name = MAKEINTRESOURCE(IDI_GAMEICON);
     HWND hwnd = al_get_win_window_handle(display);
     HINSTANCE hinstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
 
