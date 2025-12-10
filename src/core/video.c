@@ -26,8 +26,10 @@
 #include <allegro5/allegro_memfile.h>
 #include <allegro5/allegro_opengl.h>
 
-#ifdef ALLEGRO_UNIX
-#include <allegro5/allegro_x.h>
+#if defined(ALLEGRO_UNIX)
+# include <allegro5/allegro_x.h>
+#elif defined(ALLEGRO_WINDOWS)
+# include <allegro5/allegro_windows.h>
 #endif
 
 #include <stdio.h>
@@ -1047,6 +1049,51 @@ void compute_display_transform(ALLEGRO_TRANSFORM* transform)
 /* sets the icon of the display to a built-in icon */
 void set_display_icon(ALLEGRO_DISPLAY* display)
 {
+#if defined(ALLEGRO_WINDOWS)
+
+    /*
+     * Read the icon from the .exe file
+     */
+
+    if(display == NULL)
+        return;
+
+    LPCSTR name = "GAME_ICON";
+    HWND hwnd = al_get_win_window_handle(display);
+    HINSTANCE hinstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
+
+    HICON big_icon = (HICON)LoadImage(hinstance, name, IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
+    if(big_icon != NULL) {
+
+        /* Why call CopyIcon()?
+           Because we must not destroy a shared resource. Allegro calls DestroyIcon()
+           when destroying the display. See _al_win_destroy_display_icons() at
+           src/win/wgl_disp.c - verified for Allegro 5.2.11. */
+
+        HICON new_icon = CopyIcon(big_icon);
+        if(new_icon != NULL) {
+            HICON old_icon = (HICON)SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)new_icon);
+            if(old_icon != NULL)
+                DestroyIcon(old_icon);
+        }
+    }
+
+    HICON small_icon = (HICON)LoadImage(hinstance, name, IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+    if(small_icon != NULL) {
+        HICON new_icon = CopyIcon(small_icon);
+        if(new_icon != NULL) {
+            HICON old_icon = (HICON)SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)new_icon);
+            if(old_icon != NULL)
+                DestroyIcon(old_icon);
+        }
+    }
+
+#else
+
+    /*
+     * Use a built-in icon of Surge
+     */
+
     extern const unsigned char ICON_PNG[];
     extern const size_t ICON_SIZE;
     ALLEGRO_FILE* f = al_open_memfile((void*)ICON_PNG, ICON_SIZE, "rb");
@@ -1055,13 +1102,15 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
     if(display != NULL)
         al_set_display_icon(display, icon);
 
-#if defined(ALLEGRO_UNIX) && !defined(ALLEGRO_RASPBERRYPI)
+# if defined(ALLEGRO_UNIX) && !defined(ALLEGRO_RASPBERRYPI)
     if(display == NULL)
         al_x_set_initial_icon(icon);
-#endif
+# endif
 
     al_destroy_bitmap(icon);
     al_fclose(f);
+
+#endif
 }
 
 /* handle a video event from Allegro */
