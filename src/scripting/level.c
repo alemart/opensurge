@@ -773,7 +773,7 @@ surgescript_var_t* fun_entityid(surgescript_object_t* object, const surgescript_
 
     /* delegate to the entity manager */
     surgescript_var_t* ret = surgescript_var_create();
-    surgescript_object_call_function(entity_manager, "entity", param, 1, ret);
+    surgescript_object_call_function(entity_manager, "entityId", param, 1, ret);
 
     /* done! */
     return ret;
