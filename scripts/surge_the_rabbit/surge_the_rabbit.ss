@@ -166,9 +166,9 @@ object "SurgeTheRabbit - Game State"
         player.score = 0;
     }
 
-    fun consumeEntity(entity)
+    fun transientlyConsumeEntity(entity)
     {
-        consumableEntityTracker.consume(entity);
+        consumableEntityTracker.transientlyConsume(entity);
     }
 
     fun persistentlyConsumeEntity(entity)
@@ -188,40 +188,42 @@ object "SurgeTheRabbit - Consumable Entity Tracker"
 
     All level entities are flagged consumed or not consumed. Initially, none
     are consumed. Any entity may be flagged consumed. A consumable entity is an
-    entity that will become consumed under some circumstances. Consumed entities
-    retain the flag until the player moves to a different level. Restarting the
-    level does not affect the flag. A consumed entity will become not consumed
-    when loading another level. As an exception, persistently consumed entities
-    will remain consumed until the Game State is reset explicitly.
+    entity that will become consumed under some circumstances.
 
-    Life Powerups are examples of consumable entities. Bonus Level Warps are
-    examples of consumable entities that are persistently consumed.
+    Entities may be transiently or persistently consumed. Transiently consumed
+    entities typically remain flagged until another level is loaded. Restarting
+    the level doesn't affect the flag. On the other hand, persistently consumed
+    entities remain consumed until the Game State is reset explicitly.
+
+    Life Powerups are examples of consumable entities that are transiently
+    consumed. Bonus Level Warps are examples of consumable entities that are
+    persistently consumed.
 
     */
 
     watchedLevelFile = "";
-    consumedEntities = [];
+    transientlyConsumedEntities = [];
     persistentlyConsumedEntities = [];
 
     state "main"
     {
-        // clear consumed entities on level change
+        // clear transiently consumed entities on level change
         if(watchedLevelFile != Level.file) {
             watchedLevelFile = Level.file;
-            consumedEntities.clear();
+            transientlyConsumedEntities.clear();
         }
     }
 
-    // consume an entity
-    fun consume(entity)
+    // transiently consume an entity
+    fun transientlyConsume(entity)
     {
-        _reallyConsume(entity, consumedEntities);
+        _consume(entity, transientlyConsumedEntities);
     }
 
     // persistently consume an entity
     fun persistentlyConsume(entity)
     {
-        _reallyConsume(entity, persistentlyConsumedEntities);
+        _consume(entity, persistentlyConsumedEntities);
     }
 
     // check if an entity is consumed
@@ -229,19 +231,19 @@ object "SurgeTheRabbit - Consumable Entity Tracker"
     {
         entityId = Level.entityId(entity);
 
-        return consumedEntities.indexOf(entityId) >= 0 ||
+        return transientlyConsumedEntities.indexOf(entityId) >= 0 ||
                persistentlyConsumedEntities.indexOf(entityId) >= 0;
     }
 
     // forcibly reset the state
     fun reset()
     {
-        consumedEntities.clear();
+        transientlyConsumedEntities.clear();
         persistentlyConsumedEntities.clear();
     }
 
     // internal logic for consuming an entity
-    fun _reallyConsume(entity, list)
+    fun _consume(entity, list)
     {
         entityId = Level.entityId(entity);
 

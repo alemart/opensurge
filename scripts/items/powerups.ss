@@ -157,7 +157,7 @@ object "Powerup 1up" is "entity", "basic", "powerup"
         onCrush.call();
 
         // update the game state
-        GameState.consumeEntity(this);
+        GameState.transientlyConsumeEntity(this);
 
         // done
         state = "crushed";
