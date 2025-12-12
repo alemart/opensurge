@@ -14,7 +14,8 @@ using SurgeEngine.Platform;
 @Package
 object "SurgeTheRabbit"
 {
-    public readonly Settings = spawn("SurgeTheRabbitSettings");
+    public readonly GameState = spawn("SurgeTheRabbit - Game State");
+    public readonly Settings = spawn("SurgeTheRabbit - Settings");
     public readonly website = "https://opensurge2d.org";
     engineVersion = "";
 
@@ -134,7 +135,82 @@ object "SurgeTheRabbit"
     }
 }
 
-object "SurgeTheRabbitSettings"
+object "SurgeTheRabbit - Settings"
 {
     public wantNeonAsPlayer2 = false;
+}
+
+object "SurgeTheRabbit - Game State"
+{
+    consumableEntityTracker = spawn("SurgeTheRabbit - Consumable Entity Tracker");
+
+    fun reset()
+    {
+        consumableEntityTracker.reset();
+    }
+
+    fun consumeEntity(entity)
+    {
+        consumableEntityTracker.consume(entity);
+    }
+
+    fun isEntityConsumed(entity)
+    {
+        return consumableEntityTracker.isConsumed(entity);
+    }
+}
+
+object "SurgeTheRabbit - Consumable Entity Tracker"
+{
+    /*
+
+    All level entities are flagged consumed or not consumed. Initially, none
+    are consumed. Any entity may be flagged consumed. A consumable entity is an
+    entity that will become consumed under some circumstances. Consumed entities
+    retain the flag until the player moves to a different level. Level restarts
+    do not affect the flag. Only by changing the level a consumed entity will
+    become not consumed.
+
+    Life Powerups are examples of consumable entities.
+
+    */
+
+    watchedLevelFile = "";
+    consumedEntities = [];
+
+    state "main"
+    {
+        // reset the state on level change
+        if(watchedLevelFile != Level.file) {
+            watchedLevelFile = Level.file;
+            reset();
+        }
+    }
+
+    // consume an entity
+    fun consume(entity)
+    {
+        entityId = Level.entityId(entity);
+
+        if(String.isNullOrEmpty(entityId)) { // sanity check
+            Console.print("Can't consume entity: invalid ID");
+            return;
+        }
+
+        if(consumedEntities.indexOf(entityId) < 0)
+            consumedEntities.push(entityId);
+    }
+
+    // check if an entity is consumed
+    fun isConsumed(entity)
+    {
+        entityId = Level.entityId(entity);
+        return consumedEntities.indexOf(entityId) >= 0;
+    }
+
+    // forcibly reset the state
+    fun reset()
+    {
+        consumedEntities.clear();
+    }
 }
