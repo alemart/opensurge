@@ -186,9 +186,10 @@ object "SurgeTheRabbit - Consumable Entity Tracker"
 {
     /*
 
-    All level entities are flagged consumed or not consumed. Initially, none
-    are consumed. Any entity may be flagged consumed. A consumable entity is an
-    entity that will become consumed under some circumstances.
+    All entities instantiated with Level.spawnEntity() are flagged consumed or
+    not consumed. Initially, none are consumed. Any such entity may be flagged
+    consumed. A consumable entity is an entity that will become consumed under
+    some circumstances.
 
     Entities may be transiently or persistently consumed. Transiently consumed
     entities typically remain flagged until another level is loaded. Restarting
