@@ -107,6 +107,7 @@ void gameover_update()
             scenestack_pop();
             mobilegamepad_fadein();
             player_set_lives(PLAYER_INITIAL_LIVES);
+            player_set_score(0);
             return;
         }
         fadefx_out(color_rgb(0,0,0), GAMEOVER_FADETIME);
