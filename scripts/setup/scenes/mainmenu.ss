@@ -15,6 +15,7 @@ using SurgeEngine.Video.Screen;
 using SurgeEngine.Audio.Sound;
 using SurgeEngine.Camera;
 using SurgeTheRabbit;
+using SurgeTheRabbit.GameState;
 
 object "MainMenu"
 {
@@ -134,7 +135,8 @@ object "MainMenu"
 
     fun constructor()
     {
-        resetPlayerData();
+        GameState.reset();
+        //resetPlayerData();
         fader.fadeIn();
     }
 }

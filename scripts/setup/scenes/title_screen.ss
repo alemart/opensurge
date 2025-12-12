@@ -18,6 +18,7 @@ using SurgeEngine.Camera;
 using SurgeEngine.Behaviors.DirectionalMovement;
 using SurgeEngine.Input.MobileGamepad;
 using SurgeTheRabbit;
+using SurgeTheRabbit.GameState;
 
 // ----------------------------------------------------------------------------
 // TITLE SCREEN: SETUP OBJECT
@@ -335,12 +336,7 @@ object "Title Screen - Menu Item - Start Game" is "private", "detached", "entity
 
     fun onEnter()
     {
-        // reset player data
-        player = Player.active;
-        player.lives = Player.initialLives;
-        player.score = 0;
-
-        // load the default quest
+        GameState.reset();
         Level.load("quests/default.qst");
     }
 
@@ -378,7 +374,7 @@ object "Title Screen - Menu Item - Options" is "private", "detached", "entity"
 
     fun onEnter()
     {
-        Player.active.lives = Player.initialLives;
+        GameState.reset();
         Level.load("quests/options.qst");
     }
 
@@ -416,12 +412,7 @@ object "Title Screen - Menu Item - Create" is "private", "detached", "entity"
 
     fun onEnter()
     {
-        // reset player data
-        player = Player.active;
-        player.lives = Player.initialLives;
-        player.score = 0;
-
-        // load the create quest
+        GameState.reset();
         Level.load("quests/create.qst");
     }
 

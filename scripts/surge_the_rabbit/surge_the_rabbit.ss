@@ -9,6 +9,7 @@ using SurgeEngine.Web;
 using SurgeEngine.Game;
 using SurgeEngine.Lang;
 using SurgeEngine.Level;
+using SurgeEngine.Player;
 using SurgeEngine.Platform;
 
 @Package
@@ -144,9 +145,25 @@ object "SurgeTheRabbit - Game State"
 {
     consumableEntityTracker = spawn("SurgeTheRabbit - Consumable Entity Tracker");
 
+    state "main"
+    {
+        reset();
+        state = "done";
+    }
+
+    state "done"
+    {
+    }
+
     fun reset()
     {
+        // reset components
         consumableEntityTracker.reset();
+
+        // reset player data
+        player = Player.active;
+        player.lives = Player.initialLives;
+        player.score = 0;
     }
 
     fun consumeEntity(entity)

@@ -12,6 +12,7 @@ using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Camera;
 using SurgeEngine.Web;
+using SurgeTheRabbit.GameState;
 
 object "CreateMenu"
 {
@@ -103,7 +104,8 @@ object "CreateMenu"
 
     fun constructor()
     {
-        resetPlayerData();
+        GameState.reset();
+        //resetPlayerData();
         fader.fadeIn();
     }
 }
