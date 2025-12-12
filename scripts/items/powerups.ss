@@ -14,6 +14,7 @@ using SurgeEngine.Audio.Sound;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Collisions.CollisionBox;
 using SurgeEngine.Events.Event;
+using SurgeEngine.Events.FunctionEvent;
 using SurgeTheRabbit.GameState;
 
 //
@@ -114,7 +115,7 @@ object "Powerup 1up" is "entity", "basic", "powerup"
     sprite = { }; // sprites are indexed by player name (not by player id because players may be transformed)
     generic1upAnim = 18;
     itemBox = spawn("Item Box").setAnimation(generic1upAnim);
-    extraLife = spawn("Give Extra Life"); // function object stored in the functions/ folder
+    onCrush = FunctionEvent("Give Extra Life"); // function object stored in the functions/ folder
     activePlayerName = "";
 
     state "main"
@@ -153,7 +154,7 @@ object "Powerup 1up" is "entity", "basic", "powerup"
     fun onItemBoxCrushed(player)
     {
         // this will play the 1up jingle for us
-        extraLife.call();
+        onCrush.call();
 
         // update the game state
         GameState.consumeEntity(this);
