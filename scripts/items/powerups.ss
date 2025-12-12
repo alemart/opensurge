@@ -14,6 +14,7 @@ using SurgeEngine.Audio.Sound;
 using SurgeEngine.Audio.Music;
 using SurgeEngine.Collisions.CollisionBox;
 using SurgeEngine.Events.Event;
+using SurgeTheRabbit.GameState;
 
 //
 // The following powerups use the "Item Box" object
@@ -118,6 +119,17 @@ object "Powerup 1up" is "entity", "basic", "powerup"
 
     state "main"
     {
+        // prevent the respawning of life powerups when restarting the level
+        if(GameState.isEntityConsumed(this)) {
+            itemBox.forceCrushed();
+            state = "crushed";
+        }
+        else
+            state = "watching";
+    }
+
+    state "watching"
+    {
         // check if the active player has changed or transformed
         if(activePlayerName != Player.active.name) {
             activePlayerName = Player.active.name;
@@ -134,10 +146,20 @@ object "Powerup 1up" is "entity", "basic", "powerup"
         }
     }
 
+    state "crushed"
+    {
+    }
+
     fun onItemBoxCrushed(player)
     {
         // this will play the 1up jingle for us
         extraLife.call();
+
+        // update the game state
+        GameState.consumeEntity(this);
+
+        // done
+        state = "crushed";
     }
 
     fun findSprites(playerName)
@@ -509,7 +531,7 @@ object "Item Box" is "entity", "private"
 
     fun lateUpdate()
     {
-        if(state == "crushed")
+        if(isCrushed())
             return;
 
         restoreBrick = true;
@@ -538,7 +560,7 @@ object "Item Box" is "entity", "private"
     // crushes the item box
     fun crush(player)
     {
-        if(state == "crushed")
+        if(isCrushed())
             return;
 
         // where should we spawn the sprites?
@@ -557,12 +579,8 @@ object "Item Box" is "entity", "private"
             Level.spawnEntity("Score Text", actionSpot).setText(score);
         }
 
-        // crush the item box
-        smallerCollider.enabled = false;
-        biggerCollider.enabled = false;
-        brick.enabled = false;
-        setAnimation(crushed);
-        state = "crushed";
+        // really crush the item box
+        forceCrushed();
 
         // notify the parent
         parent.onItemBoxCrushed(player);
@@ -576,6 +594,26 @@ object "Item Box" is "entity", "private"
 
         // player.attacking won't cut it (it's true when invincible)
         return player.jumping || player.rolling || player.charging || player.aggressive;
+    }
+
+    // force the crushed state without exploding and without notifying the parent
+    fun forceCrushed()
+    {
+        if(isCrushed())
+            return;
+
+        smallerCollider.enabled = false;
+        biggerCollider.enabled = false;
+        brick.enabled = false;
+        setAnimation(crushed);
+
+        state = "crushed";
+    }
+
+    // is the item box crushed?
+    fun isCrushed()
+    {
+        return state == "crushed";
     }
 
     // --- MODIFIERS ---
