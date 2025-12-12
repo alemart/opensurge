@@ -171,6 +171,11 @@ object "SurgeTheRabbit - Game State"
         consumableEntityTracker.consume(entity);
     }
 
+    fun persistentlyConsumeEntity(entity)
+    {
+        consumableEntityTracker.persistentlyConsume(entity);
+    }
+
     fun isEntityConsumed(entity)
     {
         return consumableEntityTracker.isConsumed(entity);
@@ -184,50 +189,70 @@ object "SurgeTheRabbit - Consumable Entity Tracker"
     All level entities are flagged consumed or not consumed. Initially, none
     are consumed. Any entity may be flagged consumed. A consumable entity is an
     entity that will become consumed under some circumstances. Consumed entities
-    retain the flag until the player moves to a different level. Level restarts
-    do not affect the flag. Only by changing the level a consumed entity will
-    become not consumed.
+    retain the flag until the player moves to a different level. Restarting the
+    level does not affect the flag. A consumed entity will become not consumed
+    when loading another level. As an exception, persistently consumed entities
+    will remain consumed until the Game State is reset explicitly.
 
-    Life Powerups are examples of consumable entities.
+    Life Powerups are examples of consumable entities. Bonus Level Warps are
+    examples of consumable entities that are persistently consumed.
 
     */
 
     watchedLevelFile = "";
     consumedEntities = [];
+    persistentlyConsumedEntities = [];
 
     state "main"
     {
-        // reset the state on level change
+        // clear consumed entities on level change
         if(watchedLevelFile != Level.file) {
             watchedLevelFile = Level.file;
-            reset();
+            consumedEntities.clear();
         }
     }
 
     // consume an entity
     fun consume(entity)
     {
-        entityId = Level.entityId(entity);
+        _reallyConsume(entity, consumedEntities);
+    }
 
-        if(String.isNullOrEmpty(entityId)) { // sanity check
-            Console.print("Can't consume entity: invalid ID");
-            return;
-        }
-
-        if(consumedEntities.indexOf(entityId) < 0)
-            consumedEntities.push(entityId);
+    // persistently consume an entity
+    fun persistentlyConsume(entity)
+    {
+        _reallyConsume(entity, persistentlyConsumedEntities);
     }
 
     // check if an entity is consumed
     fun isConsumed(entity)
     {
         entityId = Level.entityId(entity);
-        return consumedEntities.indexOf(entityId) >= 0;
+
+        return consumedEntities.indexOf(entityId) >= 0 ||
+               persistentlyConsumedEntities.indexOf(entityId) >= 0;
     }
 
     // forcibly reset the state
     fun reset()
     {
         consumedEntities.clear();
+        persistentlyConsumedEntities.clear();
+    }
+
+    // internal logic for consuming an entity
+    fun _reallyConsume(entity, list)
+    {
+        entityId = Level.entityId(entity);
+
+        // sanity check: is it really an entity?
+        if(String.isNullOrEmpty(entityId)) {
+            Console.print("Can't consume entity: invalid ID");
+            return;
+        }
+
+        // add entity to the list
+        if(list.indexOf(entityId) < 0)
+            list.push(entityId);
     }
 }
