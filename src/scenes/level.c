@@ -306,10 +306,9 @@ enum editor_entity_type {
 /* internal stuff */
 static bool editor_enabled; /* is the level editor enabled? */
 static editorcmd_t* editor_cmd;
-static v2d_t editor_camera, editor_cursor;
+static v2d_t editor_camera;
 static enum editor_entity_type editor_cursor_entity_type;
 static int editor_cursor_entity_id, editor_cursor_itemid;
-static font_t *editor_cursor_font;
 static videomode_t editor_previous_videomode = VIDEOMODE_DEFAULT;
 static const char* editor_entity_class(enum editor_entity_type objtype);
 static const char* editor_entity_info(enum editor_entity_type objtype, int objid);
@@ -382,11 +381,23 @@ static inline v2d_t editor_grid_snap(v2d_t world_pos); /* snap world position to
 static inline v2d_t editor_grid_snap_ex(v2d_t world_pos, int grid_width, int grid_height);
 static inline v2d_t editor_grid_screen_snap(v2d_t screen_pos); /* snap screen position to grid with custom grid size */
 static inline v2d_t editor_grid_screen_snap_ex(v2d_t screen_pos, int grid_width, int grid_height);
-static inline v2d_t editor_grid_snapped_cursor(); /* returns the world position of the editor cursor aligned to the grid */
 static inline bool editor_grid_is_enabled();
 
+/* editor: mouse cursor */
+static struct {
+    v2d_t screen_position;
+    v2d_t world_position;
+    v2d_t screen_grid_position; /* snap to grid */
+    v2d_t world_grid_position;
+} editor_cursor;
+static font_t *editor_cursor_font;
+static void editor_cursor_init();
+static void editor_cursor_release();
+static void editor_cursor_update();
+static void editor_cursor_render();
+
 /* editor: top bar */
-static font_t *editor_topbar_properties_font;
+static font_t *editor_topbar_info_font;
 static font_t *editor_topbar_help_font;
 static void editor_topbar_init();
 static void editor_topbar_release();
@@ -3259,7 +3270,9 @@ void editor_init()
 
     /* creating objects */
     editor_cmd = editorcmd_create();
-    editor_cursor_font = font_create("EditorCursor");
+
+    /* cursor */
+    editor_cursor_init();
 
     /* grid */
     editor_grid_init();
@@ -3318,9 +3331,11 @@ void editor_release()
     /* grid */
     editor_grid_release();
 
+    /* cursor */
+    editor_cursor_release();
+
     /* destroying objects */
     editorcmd_destroy(editor_cmd);
-    font_destroy(editor_cursor_font);
 
     /* releasing... */
     editor_enabled = false;
@@ -3339,10 +3354,6 @@ void editor_update()
     enemy_list_t *major_enemies;
     int pick_object, delete_object = FALSE;
     int selected_item;
-    v2d_t pos;
-
-    /* mouse cursor */
-    editor_cursor = editorcmd_mousepos(editor_cmd);
 
     /* disable the level editor */
     if(editorcmd_is_triggered(editor_cmd, "quit") || editorcmd_is_triggered(editor_cmd, "quit-alt")) {
@@ -3516,7 +3527,7 @@ void editor_update()
 
     /* change spawn point */
     if(editorcmd_is_triggered(editor_cmd, "change-spawnpoint")) {
-        v2d_t new_position = editor_grid_snapped_cursor();
+        v2d_t new_position = editor_cursor.world_grid_position;
         editor_action_t eda = editor_action_spawnpoint_new(TRUE, new_position, spawn_point);
         eda = editor_action_commit(eda);
         editor_action_register(eda);
@@ -3524,7 +3535,7 @@ void editor_update()
 
     /* change waterlevel */
     if(editorcmd_is_triggered(editor_cmd, "change-waterlevel")) {
-        v2d_t new_position = editor_grid_snapped_cursor();
+        v2d_t new_position = editor_cursor.world_grid_position;
         editor_action_t eda = editor_action_waterlevel_new(TRUE, new_position.y, level_waterlevel());
         eda = editor_action_commit(eda);
         editor_action_register(eda);
@@ -3532,7 +3543,8 @@ void editor_update()
 
     /* put item */
     if(editorcmd_is_triggered(editor_cmd, "put-item")) {
-        editor_action_t eda = editor_action_entity_new(TRUE, editor_cursor_entity_type, editor_cursor_entity_id, editor_grid_snapped_cursor());
+        v2d_t position = editor_cursor.world_grid_position;
+        editor_action_t eda = editor_action_entity_new(TRUE, editor_cursor_entity_type, editor_cursor_entity_id, position);
         eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
@@ -3541,7 +3553,6 @@ void editor_update()
     pick_object = editorcmd_is_triggered(editor_cmd, "pick-item");
     delete_object = editorcmd_is_triggered(editor_cmd, "delete-item") || editor_is_eraser_enabled();
     if(pick_object || delete_object) {
-        v2d_t cursor = editor_screen2world(editor_cursor);
         switch(editor_cursor_entity_type) {
             /* brick */
             case EDT_BRICK: {
@@ -3554,7 +3565,7 @@ void editor_update()
                     v2d_t brk_topleft = brick_position(brick);
                     v2d_t brk_bottomright = v2d_add(brk_topleft, brick_size(brick));
                     float a[4] = { brk_topleft.x, brk_topleft.y, brk_bottomright.x, brk_bottomright.y };
-                    float b[4] = { cursor.x, cursor.y, cursor.x, cursor.y };
+                    float b[4] = { editor_cursor.world_position.x, editor_cursor.world_position.y, editor_cursor.world_position.x, editor_cursor.world_position.y };
 
                     if(bounding_box(a,b)) {
                         const obstacle_t* obstacle = brick_obstacle(brick);
@@ -3597,8 +3608,8 @@ void editor_update()
                 item_t* candidate = NULL;
 
                 for(item_list_t* iti = major_items; iti != NULL; iti = iti->next) {
-                    float a[4] = {iti->data->actor->position.x-iti->data->actor->hot_spot.x, iti->data->actor->position.y-iti->data->actor->hot_spot.y, iti->data->actor->position.x-iti->data->actor->hot_spot.x + image_width(actor_image(iti->data->actor)), iti->data->actor->position.y-iti->data->actor->hot_spot.y + image_height(actor_image(iti->data->actor))};
-                    float b[4] = { cursor.x, cursor.y, cursor.x, cursor.y };
+                    float a[4] = { iti->data->actor->position.x-iti->data->actor->hot_spot.x, iti->data->actor->position.y-iti->data->actor->hot_spot.y, iti->data->actor->position.x-iti->data->actor->hot_spot.x + image_width(actor_image(iti->data->actor)), iti->data->actor->position.y-iti->data->actor->hot_spot.y + image_height(actor_image(iti->data->actor)) };
+                    float b[4] = { editor_cursor.world_position.x, editor_cursor.world_position.y, editor_cursor.world_position.x, editor_cursor.world_position.y };
 
                     if(bounding_box(a,b)) {
                         if(candidate == NULL || !iti->data->bring_to_back)
@@ -3630,8 +3641,8 @@ void editor_update()
                 int candidate_key = 0;
 
                 for(enemy_list_t* ite = major_enemies; ite != NULL; ite = ite->next) {
-                    float a[4] = {ite->data->actor->position.x-ite->data->actor->hot_spot.x, ite->data->actor->position.y-ite->data->actor->hot_spot.y, ite->data->actor->position.x-ite->data->actor->hot_spot.x + image_width(actor_image(ite->data->actor)), ite->data->actor->position.y-ite->data->actor->hot_spot.y + image_height(actor_image(ite->data->actor))};
-                    float b[4] = { cursor.x, cursor.y, cursor.x, cursor.y };
+                    float a[4] = { ite->data->actor->position.x-ite->data->actor->hot_spot.x, ite->data->actor->position.y-ite->data->actor->hot_spot.y, ite->data->actor->position.x-ite->data->actor->hot_spot.x + image_width(actor_image(ite->data->actor)), ite->data->actor->position.y-ite->data->actor->hot_spot.y + image_height(actor_image(ite->data->actor)) };
+                    float b[4] = { editor_cursor.world_position.x, editor_cursor.world_position.y, editor_cursor.world_position.x, editor_cursor.world_position.y };
 
                     int mykey = editor_enemy_name2key(ite->data->name);
                     if(mykey >= 0 && bounding_box(a,b)) {
@@ -3721,13 +3732,8 @@ void editor_update()
     /* topbar */
     editor_topbar_update();
 
-    /* cursor coordinates */
-    v2d_t cursor_position = editor_grid_snapped_cursor();
-    font_set_text(editor_cursor_font, "%d,%d", (int)cursor_position.x, (int)cursor_position.y);
-    pos.x = (int)cursor_position.x - (editor_camera.x - VIDEO_SCREEN_W/2);
-    pos.y = (int)cursor_position.y - (editor_camera.y - VIDEO_SCREEN_H/2) - 2 * font_get_textsize(editor_cursor_font).y;
-    pos.y = clip(pos.y, 10, VIDEO_SCREEN_H - 10);
-    font_set_position(editor_cursor_font, pos);
+    /* cursor */
+    editor_cursor_update();
 
     /* release major entities */
     major_bricks = brickmanager_release_list(major_bricks);
@@ -3756,30 +3762,11 @@ void editor_render()
     v2d_t waterpos = editor_world2screen(v2d_new(0, level_waterlevel()));
     editor_waterline_render(waterpos.y, color_rgb(255, 255, 255));
 
-    /* mouse cursor */
-    if(!editor_is_eraser_enabled()) {
-        /* drawing the object */
-        v2d_t cursor_position = editor_grid_snapped_cursor();
-        editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, editor_world2screen(cursor_position));
-
-        /* drawing the cursor arrow */
-        const image_t* cursor = animation_image(sprite_get_animation("Mouse Cursor", 0), 0);
-        if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
-            image_draw(cursor, (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
-        else
-            image_draw_tinted(cursor, (int)editor_cursor.x, (int)editor_cursor.y, brick_util_layercolor(editor_layer), IF_NONE);
-
-        /* cursor coordinates */
-        font_render(editor_cursor_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-    }
-    else {
-        /* drawing an eraser */
-        const image_t* cursor = animation_image(sprite_get_animation("Eraser", 0), 0);
-        image_draw(cursor, (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
-    }
-
     /* tooltip */
     editor_tooltip_render();
+
+    /* mouse cursor */
+    editor_cursor_render();
 
     /* status bar */
     editor_status_render();
@@ -3814,7 +3801,7 @@ void editor_enable()
     editor_enabled = true;
     editor_camera.x = (int)camera_get_position().x;
     editor_camera.y = (int)camera_get_position().y;
-    editor_cursor = v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2);
+    memset(&editor_cursor, 0, sizeof(editor_cursor));
 
     /* display a warm, welcome message */
     editor_status_display("$EDITOR_MESSAGE_WELCOME", 0, NULL);
@@ -4655,17 +4642,6 @@ v2d_t editor_grid_screen_snap(v2d_t screen_pos)
     return editor_grid_screen_snap_ex(screen_pos, editor_grid_size, editor_grid_size);
 }
 
-/* returns the world position of the editor cursor aligned to the grid */
-v2d_t editor_grid_snapped_cursor()
-{
-    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
-    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
-    v2d_t screen_pos = editor_grid_screen_snap(editor_cursor);
-    v2d_t world_pos = v2d_add(screen_pos, topleft);
-
-    return world_pos;
-}
-
 /* snap world position to grid with custom grid size */
 v2d_t editor_grid_snap_ex(v2d_t world_pos, int grid_width, int grid_height)
 {
@@ -4704,12 +4680,82 @@ bool editor_grid_is_enabled()
 
 
 
+/* level editor: mouse cursor */
+
+/* initializes the mouse cursor */
+void editor_cursor_init()
+{
+    editor_cursor_font = font_create("EditorCursor");
+}
+
+/* releases the mouse cursor */
+void editor_cursor_release()
+{
+    font_destroy(editor_cursor_font);
+}
+
+/* updates the mouse cursor */
+void editor_cursor_update()
+{
+    /* read the position of the mouse */
+    v2d_t mousepos = editorcmd_mousepos(editor_cmd);
+
+    /* update editor_cursor */
+    editor_cursor.screen_position = mousepos;
+    editor_cursor.screen_grid_position = editor_grid_screen_snap(editor_cursor.screen_position);
+    editor_cursor.world_position = editor_screen2world(editor_cursor.screen_position);
+    editor_cursor.world_grid_position = editor_screen2world(editor_cursor.screen_grid_position);
+
+    /* update the font that displays the coordinates of the cursor */
+    v2d_t textsize = font_get_textsize(editor_cursor_font);
+    v2d_t offset = v2d_compmult(textsize, v2d_new(0, -2));
+    v2d_t position = v2d_add(editor_cursor.screen_grid_position, offset);
+
+    v2d_t margin = v2d_new(8.0f, max(8.0f, textsize.y * 0.5f));
+    position.x = clip(position.x, margin.x, VIDEO_SCREEN_W - textsize.x - margin.x);
+    position.y = clip(position.y, margin.y, VIDEO_SCREEN_H - margin.y);
+
+    font_set_text(editor_cursor_font, "%.0f,%.0f", floorf(editor_cursor.world_grid_position.x), floorf(editor_cursor.world_grid_position.y));
+    font_set_position(editor_cursor_font, position);
+}
+
+/* renders the mouse cursor */
+void editor_cursor_render()
+{
+    if(!editor_is_eraser_enabled()) {
+
+        /* drawing the object */
+        editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, editor_cursor.screen_grid_position);
+
+        /* drawing the cursor arrow */
+        const image_t* cursor = animation_image(sprite_get_animation("Mouse Cursor", 0), 0);
+        if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
+            image_draw(cursor, editor_cursor.screen_position.x, editor_cursor.screen_position.y, IF_NONE);
+        else
+            image_draw_tinted(cursor, editor_cursor.screen_position.x, editor_cursor.screen_position.y, brick_util_layercolor(editor_layer), IF_NONE);
+
+        /* cursor coordinates */
+        v2d_t no_camera = editor_world2screen(editor_camera); /* half screen */
+        font_render(editor_cursor_font, no_camera);
+
+    }
+    else {
+
+        /* drawing an eraser */
+        const image_t* cursor = animation_image(sprite_get_animation("Eraser", 0), 0);
+        image_draw(cursor, editor_cursor.screen_position.x - image_width(cursor)/2, editor_cursor.screen_position.y - image_height(cursor)/2, IF_NONE);
+
+    }
+}
+
+
+
 /* level editor: top bar */
 
 /* initializes the top bar */
 void editor_topbar_init()
 {
-    editor_topbar_properties_font = font_create("EditorUI");
+    editor_topbar_info_font = font_create("EditorUI");
     editor_topbar_help_font = font_create("EditorUI");
 }
 
@@ -4717,36 +4763,35 @@ void editor_topbar_init()
 void editor_topbar_release()
 {
     font_destroy(editor_topbar_help_font);
-    font_destroy(editor_topbar_properties_font);
+    font_destroy(editor_topbar_info_font);
 }
 
 /* updates the top bar */
 void editor_topbar_update()
 {
-    char text_buf[32];
-
-    /* help label */
-    font_set_text(editor_topbar_help_font, "$EDITOR_UI_HELP");
-    font_set_position(editor_topbar_help_font, v2d_new(VIDEO_SCREEN_W - font_get_textsize(editor_topbar_help_font).x - 8, 8));
-    font_set_visible(editor_topbar_help_font, video_get_window_size().x > 512);
+    const char* info_text = editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id);
+    char buffer[32];
 
     /* object properties */
-    snprintf(text_buf, sizeof(text_buf), "$EDITOR_UI_%s ", editor_entity_class(editor_cursor_entity_type));
-    font_set_position(editor_topbar_properties_font, v2d_new(8, 8));
-    font_set_textarguments(editor_topbar_properties_font, 2,
-        text_buf,
-        editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id)
-    );
-    font_set_text(editor_topbar_properties_font, "$EDITOR_UI_TOOL");
+    snprintf(buffer, sizeof(buffer), "$EDITOR_UI_%s ", editor_entity_class(editor_cursor_entity_type));
+    font_set_position(editor_topbar_info_font, v2d_new(8, 8));
+    font_set_textarguments(editor_topbar_info_font, 2, buffer, info_text);
+    font_set_text(editor_topbar_info_font, "$EDITOR_UI_TOOL");
+
+    /* help label */
+    font_set_visible(editor_topbar_help_font, VIDEO_SCREEN_W > 512);
+    font_set_align(editor_topbar_help_font, FONTALIGN_RIGHT);
+    font_set_position(editor_topbar_help_font, v2d_new(VIDEO_SCREEN_W - 8, 8));
+    font_set_text(editor_topbar_help_font, "$EDITOR_UI_HELP");
 }
 
 /* renders the top bar */
 void editor_topbar_render()
 {
-    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t no_camera = editor_world2screen(editor_camera); /* half screen */
     image_rectfill(0, 0, VIDEO_SCREEN_W, 32, EDITOR_UI_COLOR_TRANS(160));
-    font_render(editor_topbar_properties_font, half_screen);
-    font_render(editor_topbar_help_font, half_screen);
+    font_render(editor_topbar_info_font, no_camera);
+    font_render(editor_topbar_help_font, no_camera);
 }
 
 
@@ -5382,12 +5427,13 @@ void editor_pick_entity(surgescript_object_t* object, surgescript_object_t** bes
         float right = left + image_width(img);
         float bottom = top + image_height(img);
 
-        /* find the world coordinates of the cursor */
-        v2d_t cursor = editor_screen2world(editor_cursor);
+        /* get the world position of the cursor */
+        float cx = editor_cursor.world_position.x;
+        float cy = editor_cursor.world_position.y;
 
-        /* got collision between the cursor and the entity? */
+        /* detected collision between the cursor and the entity? */
         float a[4] = { left, top, right, bottom },
-              b[4] = { cursor.x, cursor.y, cursor.x, cursor.y };
+              b[4] = { cx, cy, cx, cy };
 
         if(bounding_box(a, b)) {
             if(NULL == *best_candidate || scripting_util_object_zindex(object) >= scripting_util_object_zindex(*best_candidate))
