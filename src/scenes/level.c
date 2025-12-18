@@ -376,8 +376,11 @@ static void editor_grid_init();
 static void editor_grid_release();
 static void editor_grid_update();
 static void editor_grid_render();
-static inline v2d_t editor_grid_snap(v2d_t position); /* aligns position to a cell in the grid */
-static inline v2d_t editor_grid_snap_ex(v2d_t position, int grid_width, int grid_height);
+static inline v2d_t editor_grid_snap(v2d_t world_pos); /* snap world position to grid with custom grid size */
+static inline v2d_t editor_grid_snap_ex(v2d_t world_pos, int grid_width, int grid_height);
+static inline v2d_t editor_grid_screen_snap(v2d_t screen_pos); /* snap screen position to grid with custom grid size */
+static inline v2d_t editor_grid_screen_snap_ex(v2d_t screen_pos, int grid_width, int grid_height);
+static inline v2d_t editor_grid_snapped_cursor(); /* returns the world position of the editor cursor aligned to the grid */
 static inline bool editor_grid_is_enabled();
 
 /* editor: tooltip */
@@ -3503,23 +3506,23 @@ void editor_update()
 
     /* change spawn point */
     if(editorcmd_is_triggered(editor_cmd, "change-spawnpoint")) {
-        v2d_t nsp = editor_grid_snap(editor_cursor);
-        editor_action_t eda = editor_action_spawnpoint_new(TRUE, nsp, spawn_point);
+        v2d_t new_position = editor_grid_snapped_cursor();
+        editor_action_t eda = editor_action_spawnpoint_new(TRUE, new_position, spawn_point);
         eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
 
     /* change waterlevel */
     if(editorcmd_is_triggered(editor_cmd, "change-waterlevel")) {
-        v2d_t nsp = editor_grid_snap(editor_cursor);
-        editor_action_t eda = editor_action_waterlevel_new(TRUE, nsp.y, level_waterlevel());
+        v2d_t new_position = editor_grid_snapped_cursor();
+        editor_action_t eda = editor_action_waterlevel_new(TRUE, new_position.y, level_waterlevel());
         eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
 
     /* put item */
     if(editorcmd_is_triggered(editor_cmd, "put-item")) {
-        editor_action_t eda = editor_action_entity_new(TRUE, editor_cursor_entity_type, editor_cursor_entity_id, editor_grid_snap(editor_cursor));
+        editor_action_t eda = editor_action_entity_new(TRUE, editor_cursor_entity_type, editor_cursor_entity_id, editor_grid_snapped_cursor());
         eda = editor_action_commit(eda);
         editor_action_register(eda);
     }
@@ -3704,10 +3707,11 @@ void editor_update()
     editor_tooltip_update();
 
     /* cursor coordinates */
-    font_set_text(editor_cursor_font, "%d,%d", (int)editor_grid_snap(editor_cursor).x, (int)editor_grid_snap(editor_cursor).y);
-    pos.x = (int)editor_grid_snap(editor_cursor).x - (editor_camera.x - VIDEO_SCREEN_W/2);
-    pos.y = (int)editor_grid_snap(editor_cursor).y - (editor_camera.y - VIDEO_SCREEN_H/2) - 2 * font_get_textsize(editor_cursor_font).y;
-    pos.y = clip(pos.y, 10, VIDEO_SCREEN_H-10);
+    v2d_t cursor_position = editor_grid_snapped_cursor();
+    font_set_text(editor_cursor_font, "%d,%d", (int)cursor_position.x, (int)cursor_position.y);
+    pos.x = (int)cursor_position.x - (editor_camera.x - VIDEO_SCREEN_W/2);
+    pos.y = (int)cursor_position.y - (editor_camera.y - VIDEO_SCREEN_H/2) - 2 * font_get_textsize(editor_cursor_font).y;
+    pos.y = clip(pos.y, 10, VIDEO_SCREEN_H - 10);
     font_set_position(editor_cursor_font, pos);
 
     /* help label */
@@ -3738,7 +3742,6 @@ void editor_update()
  */
 void editor_render()
 {
-    const image_t *cursor;
     v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     item_list_t* major_items = entitymanager_retrieve_active_items();
     enemy_list_t* major_enemies = entitymanager_retrieve_active_objects();
@@ -3760,10 +3763,11 @@ void editor_render()
     /* mouse cursor */
     if(!editor_is_eraser_enabled()) {
         /* drawing the object */
-        editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, v2d_subtract(editor_grid_snap(editor_cursor), topleft));
+        v2d_t cursor_position = editor_grid_snapped_cursor();
+        editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, v2d_subtract(cursor_position, topleft));
 
         /* drawing the cursor arrow */
-        cursor = animation_image(sprite_get_animation("Mouse Cursor", 0), 0);
+        const image_t* cursor = animation_image(sprite_get_animation("Mouse Cursor", 0), 0);
         if(editor_layer == BRL_DEFAULT || (editor_cursor_entity_type != EDT_BRICK && editor_cursor_entity_type != EDT_GROUP))
             image_draw(cursor, (int)editor_cursor.x, (int)editor_cursor.y, IF_NONE);
         else
@@ -3774,7 +3778,7 @@ void editor_render()
     }
     else {
         /* drawing an eraser */
-        cursor = animation_image(sprite_get_animation("Eraser", 0), 0);
+        const image_t* cursor = animation_image(sprite_get_animation("Eraser", 0), 0);
         image_draw(cursor, (int)editor_cursor.x - image_width(cursor)/2, (int)editor_cursor.y - image_height(cursor)/2, IF_NONE);
     }
 
@@ -4606,8 +4610,7 @@ void editor_grid_update()
 /* render the grid */
 void editor_grid_render()
 {
-    v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-    const color_t color = color_rgb(255, 255, 255);
+    const color_t grid_color = color_rgb(255, 255, 255);
     const int grid_size = 128;
 
     /* no grid */
@@ -4617,32 +4620,65 @@ void editor_grid_render()
     /* render */
     for(int x = 0; x < VIDEO_SCREEN_W + grid_size; x += grid_size) {
         for(int y = 0; y < VIDEO_SCREEN_H + grid_size; y += grid_size) {
-            v2d_t grid = v2d_subtract(editor_grid_snap_ex(v2d_new(x, y), grid_size, grid_size), topleft);
-            image_rectfill(grid.x, grid.y, grid.x + 1, grid.y + 1, color);
+            v2d_t screen_pos = v2d_new(x, y);
+            v2d_t snapped_pos = editor_grid_screen_snap_ex(screen_pos, grid_size, grid_size);
+
+            image_rectfill(snapped_pos.x, snapped_pos.y, snapped_pos.x + 1, snapped_pos.y + 1, grid_color);
         }
     }
 }
 
-/* aligns position to a cell in the grid */
-v2d_t editor_grid_snap(v2d_t position)
+/* aligns a world position to the grid */
+v2d_t editor_grid_snap(v2d_t world_pos)
 {
-    return editor_grid_snap_ex(position, editor_grid_size, editor_grid_size);
+    return editor_grid_snap_ex(world_pos, editor_grid_size, editor_grid_size);
 }
 
-/* snap to grid with custom grid size */
-v2d_t editor_grid_snap_ex(v2d_t position, int grid_width, int grid_height)
+/* aligns a screen position to the grid */
+v2d_t editor_grid_screen_snap(v2d_t screen_pos)
 {
-    v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
+    return editor_grid_screen_snap_ex(screen_pos, editor_grid_size, editor_grid_size);
+}
 
-    int w = max(1, grid_width);
-    int h = max(1, grid_height);
-    int cx = (int)topleft.x % w;
-    int cy = (int)topleft.y % h;
+/* returns the world position of the editor cursor aligned to the grid */
+v2d_t editor_grid_snapped_cursor()
+{
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
+    v2d_t screen_pos = editor_grid_screen_snap(editor_cursor);
+    v2d_t world_pos = v2d_add(screen_pos, topleft);
 
-    int xpos = -cx + ((int)position.x / w) * w;
-    int ypos = -cy + ((int)position.y / h) * h;
+    return world_pos;
+}
 
-    return v2d_add(topleft, v2d_new(xpos, ypos));
+/* snap world position to grid with custom grid size */
+v2d_t editor_grid_snap_ex(v2d_t world_pos, int grid_width, int grid_height)
+{
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
+    v2d_t screen_pos = v2d_subtract(world_pos, topleft);
+
+    int x = (int)screen_pos.x - (int)screen_pos.x % grid_width - (int)topleft.x % grid_width;
+    int y = (int)screen_pos.y - (int)screen_pos.y % grid_height - (int)topleft.y % grid_height;
+
+    return v2d_add(topleft, v2d_new(x, y));
+}
+
+/* snap screen position to grid with custom grid size */
+v2d_t editor_grid_screen_snap_ex(v2d_t screen_pos, int grid_width, int grid_height)
+{
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
+    v2d_t world_pos = v2d_add(screen_pos, topleft);
+
+    int dx = (int)topleft.x % grid_width;
+    int dy = (int)topleft.y % grid_height;
+
+    v2d_t adjusted_world_pos = v2d_add(world_pos, v2d_new(dx, dy));
+    v2d_t aligned_world_pos = editor_grid_snap_ex(adjusted_world_pos, grid_width, grid_height);
+    v2d_t aligned_screen_pos = v2d_subtract(aligned_world_pos, topleft);
+
+    return aligned_screen_pos;
 }
 
 /* is the grid enabled? */
