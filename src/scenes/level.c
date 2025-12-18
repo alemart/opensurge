@@ -310,8 +310,6 @@ static v2d_t editor_camera, editor_cursor;
 static enum editor_entity_type editor_cursor_entity_type;
 static int editor_cursor_entity_id, editor_cursor_itemid;
 static font_t *editor_cursor_font;
-static font_t *editor_properties_font; /* top bar */
-static font_t *editor_help_font; /* top bar */
 static videomode_t editor_previous_videomode = VIDEOMODE_DEFAULT;
 static const char* editor_entity_class(enum editor_entity_type objtype);
 static const char* editor_entity_info(enum editor_entity_type objtype, int objid);
@@ -383,6 +381,14 @@ static void editor_grid_render();
 static inline v2d_t editor_grid_snap(v2d_t position); /* aligns position to a cell in the grid */
 static inline v2d_t editor_grid_snap_ex(v2d_t position, int grid_width, int grid_height);
 static inline bool editor_grid_is_enabled();
+
+/* editor: top bar */
+static font_t *editor_topbar_properties_font;
+static font_t *editor_topbar_help_font;
+static void editor_topbar_init();
+static void editor_topbar_release();
+static void editor_topbar_update();
+static void editor_topbar_render();
 
 /* editor: tooltip */
 static font_t* editor_tooltip_font;
@@ -3251,8 +3257,6 @@ void editor_init()
     /* creating objects */
     editor_cmd = editorcmd_create();
     editor_cursor_font = font_create("EditorCursor");
-    editor_properties_font = font_create("EditorUI");
-    editor_help_font = font_create("EditorUI");
 
     /* grid */
     editor_grid_init();
@@ -3262,6 +3266,9 @@ void editor_init()
 
     /* status bar */
     editor_status_init();
+
+    /* top bar */
+    editor_topbar_init();
 
     /* bricks */
     editor_brick_init();
@@ -3296,6 +3303,9 @@ void editor_release()
     /* bricks */
     editor_brick_release();
 
+    /* top bar */
+    editor_topbar_release();
+
     /* status bar */
     editor_status_release();
 
@@ -3307,9 +3317,7 @@ void editor_release()
 
     /* destroying objects */
     editorcmd_destroy(editor_cmd);
-    font_destroy(editor_properties_font);
     font_destroy(editor_cursor_font);
-    font_destroy(editor_help_font);
 
     /* releasing... */
     editor_enabled = false;
@@ -3329,7 +3337,6 @@ void editor_update()
     int pick_object, delete_object = FALSE;
     int selected_item;
     v2d_t pos;
-    char text_buf[32];
 
     /* mouse cursor */
     editor_cursor = editorcmd_mousepos(editor_cmd);
@@ -3708,26 +3715,15 @@ void editor_update()
     /* tooltop */
     editor_tooltip_update();
 
+    /* topbar */
+    editor_topbar_update();
+
     /* cursor coordinates */
     font_set_text(editor_cursor_font, "%d,%d", (int)editor_grid_snap(editor_cursor).x, (int)editor_grid_snap(editor_cursor).y);
     pos.x = (int)editor_grid_snap(editor_cursor).x - (editor_camera.x - VIDEO_SCREEN_W/2);
     pos.y = (int)editor_grid_snap(editor_cursor).y - (editor_camera.y - VIDEO_SCREEN_H/2) - 2 * font_get_textsize(editor_cursor_font).y;
     pos.y = clip(pos.y, 10, VIDEO_SCREEN_H-10);
     font_set_position(editor_cursor_font, pos);
-
-    /* help label */
-    font_set_text(editor_help_font, "$EDITOR_UI_HELP");
-    font_set_position(editor_help_font, v2d_new(VIDEO_SCREEN_W - font_get_textsize(editor_help_font).x - 8, 8));
-    font_set_visible(editor_help_font, video_get_window_size().x > 512);
-
-    /* object properties */
-    snprintf(text_buf, sizeof(text_buf), "$EDITOR_UI_%s ", editor_entity_class(editor_cursor_entity_type));
-    font_set_position(editor_properties_font, v2d_new(8, 8));
-    font_set_textarguments(editor_properties_font, 2,
-        text_buf,
-        editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id)
-    );
-    font_set_text(editor_properties_font, "$EDITOR_UI_TOOL");
 
     /* release major entities */
     major_bricks = brickmanager_release_list(major_bricks);
@@ -3757,11 +3753,6 @@ void editor_render()
     v2d_t waterpos = editor_world2screen(v2d_new(0, level_waterlevel()));
     editor_waterline_render(waterpos.y, color_rgb(255, 255, 255));
 
-    /* top bar */
-    image_rectfill(0, 0, VIDEO_SCREEN_W, 32, EDITOR_UI_COLOR_TRANS(160));
-    font_render(editor_properties_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-    font_render(editor_help_font, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-
     /* mouse cursor */
     if(!editor_is_eraser_enabled()) {
         /* drawing the object */
@@ -3788,6 +3779,9 @@ void editor_render()
 
     /* status bar */
     editor_status_render();
+
+    /* top bar */
+    editor_topbar_render();
 
     /* done */
     major_items = entitymanager_release_retrieved_item_list(major_items);
@@ -4670,6 +4664,53 @@ v2d_t editor_grid_snap_ex(v2d_t position, int grid_width, int grid_height)
 bool editor_grid_is_enabled()
 {
     return editor_grid_size > 1;
+}
+
+
+
+/* level editor: top bar */
+
+/* initializes the top bar */
+void editor_topbar_init()
+{
+    editor_topbar_properties_font = font_create("EditorUI");
+    editor_topbar_help_font = font_create("EditorUI");
+}
+
+/* releases the top bar */
+void editor_topbar_release()
+{
+    font_destroy(editor_topbar_help_font);
+    font_destroy(editor_topbar_properties_font);
+}
+
+/* updates the top bar */
+void editor_topbar_update()
+{
+    char text_buf[32];
+
+    /* help label */
+    font_set_text(editor_topbar_help_font, "$EDITOR_UI_HELP");
+    font_set_position(editor_topbar_help_font, v2d_new(VIDEO_SCREEN_W - font_get_textsize(editor_topbar_help_font).x - 8, 8));
+    font_set_visible(editor_topbar_help_font, video_get_window_size().x > 512);
+
+    /* object properties */
+    snprintf(text_buf, sizeof(text_buf), "$EDITOR_UI_%s ", editor_entity_class(editor_cursor_entity_type));
+    font_set_position(editor_topbar_properties_font, v2d_new(8, 8));
+    font_set_textarguments(editor_topbar_properties_font, 2,
+        text_buf,
+        editor_entity_info(editor_cursor_entity_type, editor_cursor_entity_id)
+    );
+    font_set_text(editor_topbar_properties_font, "$EDITOR_UI_TOOL");
+}
+
+/* renders the top bar */
+void editor_topbar_render()
+{
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    image_rectfill(0, 0, VIDEO_SCREEN_W, 32, EDITOR_UI_COLOR_TRANS(160));
+    font_render(editor_topbar_properties_font, half_screen);
+    font_render(editor_topbar_help_font, half_screen);
 }
 
 
