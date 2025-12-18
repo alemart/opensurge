@@ -4586,11 +4586,11 @@ void editor_grid_release()
 /* updates the grid module */
 void editor_grid_update()
 {
-    static int grid_size[] = { 64, 32, 16, 8, 1 };
+    static int grid_size[] = { 128, 64, 32, 16, 8, 1 };
+    const int n = sizeof(grid_size) / sizeof(grid_size[0]);
 
     /* next grid size */
     if(editorcmd_is_triggered(editor_cmd, "snap-to-grid")) {
-        int n = sizeof(grid_size) / sizeof(grid_size[0]);
         for(int i = 0; i < n; i++) {
             if(editor_grid_size == grid_size[i]) {
                 editor_grid_size = grid_size[(i + 1) % n];
