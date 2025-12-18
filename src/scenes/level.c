@@ -281,7 +281,7 @@ static void editor_render();
 static bool editor_is_enabled();
 static bool editor_want_to_activate();
 static void editor_update_background();
-static void editor_waterline_render(int ycoord, color_t color);
+static void editor_render_waterline();
 static void editor_save();
 static void editor_scroll();
 static bool editor_is_eraser_enabled();
@@ -3759,8 +3759,7 @@ void editor_render()
     editor_grid_render();
 
     /* draw editor water line */
-    v2d_t waterpos = editor_world2screen(v2d_new(0, level_waterlevel()));
-    editor_waterline_render(waterpos.y, color_rgb(255, 255, 255));
+    editor_render_waterline();
 
     /* tooltip */
     editor_tooltip_render();
@@ -3843,6 +3842,7 @@ bool editor_is_enabled()
     return editor_enabled;
 }
 
+
 /*
  * editor_want_to_activate()
  * The level editor wants to be activated!
@@ -3851,6 +3851,7 @@ bool editor_want_to_activate()
 {
     return editorcmd_is_triggered(editor_cmd, "enter");
 }
+
 
 /*
  * editor_update_background()
@@ -3862,17 +3863,18 @@ void editor_update_background()
 }
 
 
-
 /*
- * editor_waterline_render()
+ * editor_render_waterline()
  * Renders the line of the water
  */
-void editor_waterline_render(int ycoord, color_t color)
+void editor_render_waterline()
 {
-    int x, x0 = 19 - (int)(timer_get_elapsed() * 40.0) % 20;
+    color_t color = color_rgb(255, 255, 255);
+    v2d_t pos = editor_world2screen(v2d_new(0, level_waterlevel()));
+    int x0 = 19 - (int)(timer_get_elapsed() * 40.0) % 20, y = pos.y;
 
-    for(x=x0-10; x<VIDEO_SCREEN_W; x+=20)
-        image_line(x, ycoord, x+10, ycoord, color);
+    for(int x = x0 - 10; x < VIDEO_SCREEN_W; x += 20)
+        image_line(x, y, x + 10, y, color);
 }
 
 
