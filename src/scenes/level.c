@@ -286,6 +286,10 @@ static void editor_save();
 static void editor_scroll();
 static bool editor_is_eraser_enabled();
 
+/* utilities */
+static v2d_t editor_screen2world(v2d_t screen_position);
+static v2d_t editor_world2screen(v2d_t world_position);
+
 /* object type */
 enum editor_entity_type {
     EDT_BRICK,
@@ -3319,7 +3323,6 @@ void editor_release()
  */
 void editor_update()
 {
-    v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     brick_list_t* major_bricks;
     item_list_t *major_items;
     enemy_list_t *major_enemies;
@@ -3528,6 +3531,7 @@ void editor_update()
     pick_object = editorcmd_is_triggered(editor_cmd, "pick-item");
     delete_object = editorcmd_is_triggered(editor_cmd, "delete-item") || editor_is_eraser_enabled();
     if(pick_object || delete_object) {
+        v2d_t cursor = editor_screen2world(editor_cursor);
         switch(editor_cursor_entity_type) {
             /* brick */
             case EDT_BRICK: {
@@ -3540,7 +3544,7 @@ void editor_update()
                     v2d_t brk_topleft = brick_position(brick);
                     v2d_t brk_bottomright = v2d_add(brk_topleft, brick_size(brick));
                     float a[4] = { brk_topleft.x, brk_topleft.y, brk_bottomright.x, brk_bottomright.y };
-                    float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
+                    float b[4] = { cursor.x, cursor.y, cursor.x, cursor.y };
 
                     if(bounding_box(a,b)) {
                         const obstacle_t* obstacle = brick_obstacle(brick);
@@ -3584,7 +3588,7 @@ void editor_update()
 
                 for(item_list_t* iti = major_items; iti != NULL; iti = iti->next) {
                     float a[4] = {iti->data->actor->position.x-iti->data->actor->hot_spot.x, iti->data->actor->position.y-iti->data->actor->hot_spot.y, iti->data->actor->position.x-iti->data->actor->hot_spot.x + image_width(actor_image(iti->data->actor)), iti->data->actor->position.y-iti->data->actor->hot_spot.y + image_height(actor_image(iti->data->actor))};
-                    float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
+                    float b[4] = { cursor.x, cursor.y, cursor.x, cursor.y };
 
                     if(bounding_box(a,b)) {
                         if(candidate == NULL || !iti->data->bring_to_back)
@@ -3617,7 +3621,8 @@ void editor_update()
 
                 for(enemy_list_t* ite = major_enemies; ite != NULL; ite = ite->next) {
                     float a[4] = {ite->data->actor->position.x-ite->data->actor->hot_spot.x, ite->data->actor->position.y-ite->data->actor->hot_spot.y, ite->data->actor->position.x-ite->data->actor->hot_spot.x + image_width(actor_image(ite->data->actor)), ite->data->actor->position.y-ite->data->actor->hot_spot.y + image_height(actor_image(ite->data->actor))};
-                    float b[4] = { editor_cursor.x+topleft.x , editor_cursor.y+topleft.y , editor_cursor.x+topleft.x , editor_cursor.y+topleft.y };
+                    float b[4] = { cursor.x, cursor.y, cursor.x, cursor.y };
+
                     int mykey = editor_enemy_name2key(ite->data->name);
                     if(mykey >= 0 && bounding_box(a,b)) {
                         if(candidate == NULL || ite->data->zindex >= candidate->zindex) {
@@ -3739,7 +3744,6 @@ void editor_update()
 void editor_render()
 {
     const image_t *cursor;
-    v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
     item_list_t* major_items = entitymanager_retrieve_active_items();
     enemy_list_t* major_enemies = entitymanager_retrieve_active_objects();
     
@@ -3750,7 +3754,8 @@ void editor_render()
     editor_grid_render();
 
     /* draw editor water line */
-    editor_waterline_render((int)(level_waterlevel() - topleft.y), color_rgb(255, 255, 255));
+    v2d_t waterpos = editor_world2screen(v2d_new(0, level_waterlevel()));
+    editor_waterline_render(waterpos.y, color_rgb(255, 255, 255));
 
     /* top bar */
     image_rectfill(0, 0, VIDEO_SCREEN_W, 32, EDITOR_UI_COLOR_TRANS(160));
@@ -3760,7 +3765,7 @@ void editor_render()
     /* mouse cursor */
     if(!editor_is_eraser_enabled()) {
         /* drawing the object */
-        editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, v2d_subtract(editor_grid_snap(editor_cursor), topleft));
+        editor_draw_object(editor_cursor_entity_type, editor_cursor_entity_id, editor_world2screen(editor_grid_snap(editor_cursor)));
 
         /* drawing the cursor arrow */
         cursor = animation_image(sprite_get_animation("Mouse Cursor", 0), 0);
@@ -3973,7 +3978,23 @@ bool editor_is_eraser_enabled()
 
 /* private stuff (level editor) */
 
+/* convert screen coordinates to world coordinates */
+v2d_t editor_screen2world(v2d_t screen_position)
+{
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
 
+    return v2d_add(screen_position, topleft);
+}
+
+/* convert world coordinates to screen coordinates */
+v2d_t editor_world2screen(v2d_t world_position)
+{
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
+
+    return v2d_subtract(world_position, topleft);
+}
 
 /* returns a string containing a text
  * that corresponds to the given editor class
@@ -4706,11 +4727,14 @@ void editor_tooltip_update()
 void editor_tooltip_render()
 {
     if(font_is_visible(editor_tooltip_font)) {
-        v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-        v2d_t rectpos = v2d_subtract(font_get_position(editor_tooltip_font), v2d_add(topleft, v2d_new(8, 8)));
-        v2d_t rectsize = v2d_add(font_get_textsize(editor_tooltip_font), v2d_new(16, 16));
-        image_rectfill(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, EDITOR_UI_COLOR_TRANS(160));
-        image_rect(rectpos.x, rectpos.y, rectpos.x + rectsize.x, rectpos.y + rectsize.y, EDITOR_UI_COLOR());
+        v2d_t margin = v2d_new(8, 8);
+        v2d_t rect_position = editor_world2screen(font_get_position(editor_tooltip_font));
+        v2d_t rect_size = font_get_textsize(editor_tooltip_font);
+        v2d_t rect_topleft = v2d_subtract(rect_position, margin);
+        v2d_t rect_bottomright = v2d_add(v2d_add(rect_position, rect_size), margin);
+
+        image_rectfill(rect_topleft.x, rect_topleft.y, rect_bottomright.x, rect_bottomright.y, EDITOR_UI_COLOR_TRANS(160));
+        image_rect(rect_topleft.x, rect_topleft.y, rect_bottomright.x, rect_bottomright.y, EDITOR_UI_COLOR());
         font_render(editor_tooltip_font, editor_camera);
     }
 }
@@ -5269,9 +5293,6 @@ void editor_remove_entity(uint64_t entity_id)
 void editor_pick_entity(surgescript_object_t* object, surgescript_object_t** best_candidate)
 {
     if(entity_info_is_persistent(object) && !surgescript_object_has_tag(object, "detached")) {
-        v2d_t topleft = v2d_subtract(editor_camera, v2d_new(VIDEO_SCREEN_W/2, VIDEO_SCREEN_H/2));
-        float a[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        float b[4] = { editor_cursor.x + topleft.x , editor_cursor.y + topleft.y , editor_cursor.x + topleft.x , editor_cursor.y + topleft.y };
 
         /* find the bounding box of the entity */
         const char* name = surgescript_object_name(object);
@@ -5279,15 +5300,22 @@ void editor_pick_entity(surgescript_object_t* object, surgescript_object_t** bes
         const image_t* img = animation_image(anim, 0);
         v2d_t worldpos = scripting_util_world_position(object);
         v2d_t hot_spot = animation_hot_spot(anim);
-        a[0] = worldpos.x - hot_spot.x;
-        a[1] = worldpos.y - hot_spot.y;
-        a[2] = a[0] + image_width(img);
-        a[3] = a[1] + image_height(img);
+        float left = worldpos.x - hot_spot.x;
+        float top = worldpos.y - hot_spot.y;
+        float right = left + image_width(img);
+        float bottom = top + image_height(img);
 
-        /* got collision between the cursor and the entity */
+        /* find the world coordinates of the cursor */
+        v2d_t cursor = editor_screen2world(editor_cursor);
+
+        /* got collision between the cursor and the entity? */
+        float a[4] = { left, top, right, bottom },
+              b[4] = { cursor.x, cursor.y, cursor.x, cursor.y };
+
         if(bounding_box(a, b)) {
             if(NULL == *best_candidate || scripting_util_object_zindex(object) >= scripting_util_object_zindex(*best_candidate))
                 *best_candidate = object;
         }
+
     }
 }
