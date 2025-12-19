@@ -373,8 +373,9 @@ static int editor_brick_id(int index); /* the index-th valid brick - at editor_b
 #define EDITOR_UI_COLOR_TRANS(alpha)   color_premul_rgba(40, 44, 52, (alpha))
 
 /* editor: grid */
+#define EDITOR_GRID_INITIAL_SIZE 16
 static const int EDITOR_GRID_SIZES[] = { 128, 64, 32, 16, 8, 1 };
-static int editor_grid_size = 1;
+static int editor_grid_size = EDITOR_GRID_INITIAL_SIZE;
 STATIC_DARRAY(int, editor_grid_buffer);
 static void editor_grid_init();
 static void editor_grid_release();
@@ -4583,7 +4584,7 @@ int editor_brick_id(int index)
 /* initializes the grid module */
 void editor_grid_init()
 {
-    editor_grid_size = 16;
+    editor_grid_size = EDITOR_GRID_INITIAL_SIZE;
     darray_init(editor_grid_buffer);
 }
 
