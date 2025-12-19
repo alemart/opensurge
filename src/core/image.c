@@ -508,6 +508,40 @@ void image_rectfill(int x1, int y1, int x2, int y2, color_t color)
 
 
 /*
+ * image_trianglefill_batch()
+ * Draws n filled triangles in a batch
+ * Useful to quickly draw many primitives at once
+ * Array xy is [ x0 y0  x1 y1  x2 y2  ... ] and has length >= 6n
+ * n triangles * 3 vertices/triangle * 2 coordinates/vertex = 6n
+ */
+void image_trianglefill_batch(int n, const int* xy, color_t color)
+{
+    /* nothing to do */
+    if(n <= 0)
+        return;
+
+    /* allocate vertices */
+    int vertex_count = 3 * n;
+    size_t size = vertex_count * sizeof(ALLEGRO_VERTEX);
+    ALLEGRO_VERTEX* v = mallocx(size);
+    memset(v, 0, size);
+
+    /* fill vertices */
+    for(int i = 0, j = 0; i < vertex_count; i++, j += 2) {
+        v[i].x = 0.5f + xy[j];
+        v[i].y = 0.5f + xy[j+1];
+        v[i].color = color._color;
+    }
+
+    /* draw primitives */
+    al_draw_prim(v, NULL, NULL, 0, vertex_count, ALLEGRO_PRIM_TRIANGLE_LIST);
+
+    /* deallocate vertices */
+    free(v);
+}
+
+
+/*
  * image_clear()
  * Clears an given image with some color
  */
