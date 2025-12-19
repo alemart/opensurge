@@ -382,9 +382,9 @@ static void editor_grid_update();
 static void editor_grid_render();
 static void editor_grid_render_ex(color_t color, int grid_width, int grid_height);
 static inline v2d_t editor_grid_snap(v2d_t world_pos); /* snap world position to grid with custom grid size */
-static inline v2d_t editor_grid_snap_ex(v2d_t world_pos, int grid_width, int grid_height);
+static inline v2d_t editor_grid_snap_ex(v2d_t world_pos, v2d_t topleft, int grid_width, int grid_height);
 static inline v2d_t editor_grid_screen_snap(v2d_t screen_pos); /* snap screen position to grid with custom grid size */
-static inline v2d_t editor_grid_screen_snap_ex(v2d_t screen_pos, int grid_width, int grid_height);
+static inline v2d_t editor_grid_screen_snap_ex(v2d_t screen_pos, v2d_t topleft, int grid_width, int grid_height);
 static inline bool editor_grid_is_enabled();
 
 /* editor: mouse cursor */
@@ -4638,6 +4638,8 @@ void editor_grid_render()
 void editor_grid_render_ex(color_t color, int grid_width, int grid_height)
 {
     const float dx[6] = { 0, 1, 1, 1, 0, 0 }, dy[6] = { 0, 0, 1, 1, 1, 0 };
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
     int max_x = VIDEO_SCREEN_W + grid_width;
     int max_y = VIDEO_SCREEN_H + grid_height;
 
@@ -4650,7 +4652,7 @@ void editor_grid_render_ex(color_t color, int grid_width, int grid_height)
 
             /* find a vertex of the grid near (x,y) in screen space */
             v2d_t screen_pos = v2d_new(x, y);
-            v2d_t snapped_pos = editor_grid_screen_snap_ex(screen_pos, grid_width, grid_height);
+            v2d_t snapped_pos = editor_grid_screen_snap_ex(screen_pos, topleft, grid_width, grid_height);
 
             /* prepare two triangles per vertex of the grid */
             for(int j = 0; j < 6; j++) {
@@ -4669,20 +4671,24 @@ void editor_grid_render_ex(color_t color, int grid_width, int grid_height)
 /* aligns a world position to the grid */
 v2d_t editor_grid_snap(v2d_t world_pos)
 {
-    return editor_grid_snap_ex(world_pos, editor_grid_size, editor_grid_size);
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
+
+    return editor_grid_snap_ex(world_pos, topleft, editor_grid_size, editor_grid_size);
 }
 
 /* aligns a screen position to the grid */
 v2d_t editor_grid_screen_snap(v2d_t screen_pos)
 {
-    return editor_grid_screen_snap_ex(screen_pos, editor_grid_size, editor_grid_size);
+    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
+    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
+
+    return editor_grid_screen_snap_ex(screen_pos, topleft, editor_grid_size, editor_grid_size);
 }
 
 /* snap world position to grid with custom grid size */
-v2d_t editor_grid_snap_ex(v2d_t world_pos, int grid_width, int grid_height)
+v2d_t editor_grid_snap_ex(v2d_t world_pos, v2d_t topleft, int grid_width, int grid_height)
 {
-    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
-    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
     v2d_t screen_pos = v2d_subtract(world_pos, topleft);
 
     int x = (int)screen_pos.x - (int)screen_pos.x % grid_width - (int)topleft.x % grid_width;
@@ -4692,17 +4698,15 @@ v2d_t editor_grid_snap_ex(v2d_t world_pos, int grid_width, int grid_height)
 }
 
 /* snap screen position to grid with custom grid size */
-v2d_t editor_grid_screen_snap_ex(v2d_t screen_pos, int grid_width, int grid_height)
+v2d_t editor_grid_screen_snap_ex(v2d_t screen_pos, v2d_t topleft, int grid_width, int grid_height)
 {
-    v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
-    v2d_t topleft = v2d_subtract(editor_camera, half_screen);
     v2d_t world_pos = v2d_add(screen_pos, topleft);
 
     int dx = (int)topleft.x % grid_width;
     int dy = (int)topleft.y % grid_height;
 
     v2d_t adjusted_world_pos = v2d_add(world_pos, v2d_new(dx, dy));
-    v2d_t aligned_world_pos = editor_grid_snap_ex(adjusted_world_pos, grid_width, grid_height);
+    v2d_t aligned_world_pos = editor_grid_snap_ex(adjusted_world_pos, topleft, grid_width, grid_height);
     v2d_t aligned_screen_pos = v2d_subtract(aligned_world_pos, topleft);
 
     return aligned_screen_pos;
