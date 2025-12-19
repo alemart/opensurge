@@ -96,7 +96,6 @@ void image_ellipse(int cx, int cy, int radius_x, int radius_y, color_t color);
 void image_ellipsefill(int cx, int cy, int radius_x, int radius_y, color_t color);
 void image_rect(int x1, int y1, int x2, int y2, color_t color);
 void image_rectfill(int x1, int y1, int x2, int y2, color_t color);
-void image_trianglefill_batch(int n, const int* xy, color_t color);
 void image_quick_triangles(const vertexcache_t* cache);
 void image_quick_triangles_ex(const vertexcache_t* cache, const image_t* src);
 
