@@ -47,21 +47,25 @@ enum {
     IC_WRAP_MIRROR  = 1 << 2    /* mirror wrapping (shaders) */
 };
 
-/* image management */
+/* create & destroy */
 image_t* image_create(int width, int height); /* create an image */
-image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height); /* creates a shared sub-image */
 image_t* image_create_ex(int width, int height, int flags); /* create an image with extra options */
 void image_destroy(image_t* img); /* call this after image_create() */
+image_t* image_clone(const image_t* src); /* clone an image */
 
-/* load from file */
+/* load & save */
 image_t* image_load(const char* path); /* will be unloaded automatically */
+void image_save(const image_t* img, const char *path); /* save the image to a file */
 int image_unload(const image_t* img); /* use if you want to save memory... */
+
+/* sub-images */
+image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height); /* create a sub-image */
+const image_t* image_parent(const image_t* img);
+const image_t* image_parent_ex(const image_t* img, int* x, int* y, int* width, int* height);
 
 /* utilities */
 int image_width(const image_t* img); /* the width of the image */
 int image_height(const image_t* img); /* the height of the image */
-void image_save(const image_t* img, const char *path); /* saves the image to a file */
-image_t* image_clone(const image_t* src); /* clones an image */
 void image_enable_linear_filtering(image_t* img); /* enable linear filtering */
 void image_disable_linear_filtering(image_t* img); /* disable linear filtering */
 const char* image_filepath(const image_t* img); /* relative path of the originating file, if defined */

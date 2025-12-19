@@ -49,8 +49,10 @@
 /* image type */
 struct image_t {
     ALLEGRO_BITMAP* data; /* this must be the first field */
-    int w, h;
+    int w, h; /* dimensions */
     char* path; /* relative path */
+    const image_t* parent; /* parent image */
+    int offx, offy; /* offset relative to parent */
 };
 
 /* misc */
@@ -69,17 +71,17 @@ image_t* image_load(const char* path)
         const char* fullpath = asset_path(path);
         logfile_message("Loading image \"%s\"...", fullpath);
 
-        /* build the image object */
+        /* allocate the image */
         img = mallocx(sizeof *img);
 
-        /* loading the image */
+        /* load the image */
         if(NULL == (img->data = al_load_bitmap(fullpath))) {
             fatal_error("Failed to load image \"%s\"", fullpath);
             free(img);
             return NULL;
         }
 
-        /* checking the size */
+        /* validate size */
         img->w = al_get_bitmap_width(img->data);
         img->h = al_get_bitmap_height(img->data);
         if(img->w > MAX_IMAGE_SIZE || img->h > MAX_IMAGE_SIZE) {
@@ -90,10 +92,15 @@ image_t* image_load(const char* path)
             return NULL;
         }
 
-        /* adding the image to the resource manager */
+        /* add image to the resource manager */
         img->path = str_dup(path);
         resourcemanager_add_image(img->path, img);
         resourcemanager_ref_image(img->path);
+
+        /* there is no parent image */
+        img->parent = NULL;
+        img->offx = 0;
+        img->offy = 0;
     }
     else
         resourcemanager_ref_image(path);
@@ -101,7 +108,25 @@ image_t* image_load(const char* path)
     return img;
 }
 
-
+/*
+ * image_unload()
+ * Will try to release the resource from
+ * the memory. You will call this if you
+ * don't need the resource anymore.
+ *
+ * Used for reference counting. Normally you
+ * don't need to bother with this, unless
+ * you care about reducing memory usage.
+ *
+ * Returns the no. of references to the image
+ */
+int image_unload(const image_t* img)
+{
+    if(img->path != NULL)
+       return resourcemanager_unref_image(img->path);
+    else
+        return -1; /* error; the image was not loaded from a file */
+}
 
 /*
  * image_save()
@@ -116,8 +141,6 @@ void image_save(const image_t* img, const char *path)
     else
         logfile_message("Failed to save image to \"%s\"", fullpath);
 }
-
-
 
 /*
  * image_create()
@@ -152,67 +175,10 @@ image_t* image_create(int width, int height)
     img->w = width;
     img->h = height;
     img->path = NULL;
+    img->parent = NULL;
+    img->offx = 0;
+    img->offy = 0;
     
-    return img;
-}
-
-
-/*
- * image_destroy()
- * Destroys an image. This is called automatically
- * while unloading the resource manager.
- */
-void image_destroy(image_t* img)
-{
-    if(img->data != NULL)
-        al_destroy_bitmap(img->data);
-
-    if(img->path != NULL)
-        free(img->path);
-
-    if(target == img)
-        target = NULL;
-
-    free(img);
-}
-
-/*
- * image_create_shared()
- * Creates a sub-image, ie., an image sharing memory with an
- * existing image, but possibly with a different size. Please
- * remember to free the sub-image before freeing the parent
- * image to avoid memory leaks and potential crashes acessing
- * memory which has been freed.
- */
-image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height)
-{
-    image_t* img;
-    int pw, ph;
-
-    if(width <= 0 || height <= 0) {
-        fatal_error("Can't create shared image of size %d x %d", width, height);
-        return NULL;
-    }
-
-    pw = parent->w;
-    ph = parent->h;
-    x = clip(x, 0, pw-1);
-    y = clip(y, 0, ph-1);
-    width = clip(width, 0, pw-x);
-    height = clip(height, 0, ph-y);
-
-    img = mallocx(sizeof *img);
-    img->w = width;
-    img->h = height;
-    if(NULL == (img->data = al_create_sub_bitmap(parent->data, x, y, width, height)))
-        fatal_error("Failed to create shared image of \"%s\": %d, %d, %d, %d", parent->path ? parent->path : "", x, y, width, height);
-
-    img->path = NULL;
-    if(parent->path != NULL) {
-        img->path = str_dup(parent->path);
-        resourcemanager_ref_image(img->path); /* reference it, otherwise the parent may be destroyed */
-    }
-
     return img;
 }
 
@@ -266,23 +232,22 @@ image_t* image_create_ex(int width, int height, int flags)
 }
 
 /*
- * image_unload()
- * Will try to release the resource from
- * the memory. You will call this if you
- * don't need the resource anymore.
- *
- * Used for reference counting. Normally you
- * don't need to bother with this, unless
- * you care about reducing memory usage.
- *
- * Returns the no. of references to the image
+ * image_destroy()
+ * Destroys an image. This is called automatically
+ * while unloading the resource manager.
  */
-int image_unload(const image_t* img)
+void image_destroy(image_t* img)
 {
+    if(img->data != NULL)
+        al_destroy_bitmap(img->data);
+
     if(img->path != NULL)
-       return resourcemanager_unref_image(img->path);
-    else
-        return -1; /* error; the image was not loaded from a file */
+        free(img->path);
+
+    if(target == img)
+        target = NULL;
+
+    free(img);
 }
 
 /*
@@ -296,11 +261,101 @@ image_t* image_clone(const image_t* src)
 
     img->w = src->w;
     img->h = src->h;
-    img->path = NULL;
+    img->path = NULL; /* XXX */
+    img->parent = src->parent;
+    img->offx = src->offx;
+    img->offy = src->offy;
+
     if(NULL == (img->data = al_clone_bitmap(src->data)))
         fatal_error("Failed to clone image \"%s\" sized %dx%d", src->path ? src->path : "", src->w, src->h);
 
     return img;
+}
+
+/*
+ * image_create_shared()
+ * Creates a sub-image, i.e., an image sharing memory with an
+ * existing image, but possibly with a different size. If the
+ * parent image is destroyed, then the image becomes invalid.
+ */
+image_t* image_create_shared(const image_t* parent, int x, int y, int width, int height)
+{
+    image_t* img;
+    int pw, ph;
+
+    if(width <= 0 || height <= 0) {
+        fatal_error("Can't create shared image of size %d x %d", width, height);
+        return NULL;
+    }
+
+    if(parent->parent != NULL) {
+        x += parent->offx;
+        y += parent->offy;
+        parent = parent->parent; /* now parent->parent will be NULL */
+    }
+
+    pw = parent->w;
+    ph = parent->h;
+    x = clip(x, 0, pw-1);
+    y = clip(y, 0, ph-1);
+    width = min(width, pw-x);
+    height = min(height, ph-y);
+
+    img = mallocx(sizeof *img);
+    img->w = width;
+    img->h = height;
+    if(NULL == (img->data = al_create_sub_bitmap(parent->data, x, y, width, height)))
+        fatal_error("Failed to create shared image of \"%s\": %d, %d, %d, %d", parent->path ? parent->path : "", x, y, width, height);
+
+    img->path = NULL;
+    if(parent->path != NULL) {
+        img->path = str_dup(parent->path);
+        resourcemanager_ref_image(img->path); /* reference it, otherwise the parent may be destroyed */
+    }
+
+    img->parent = parent;
+    img->offx = x;
+    img->offy = y;
+
+    return img;
+}
+
+/*
+ * image_parent()
+ * Get the parent image. If there is no parent image, this function returns NULL.
+ * The returned parent may NOT be the parent passed when creating this image. It
+ * may be the parent of that one, if applicable.
+ */
+const image_t* image_parent(const image_t* img)
+{
+    return image_parent_ex(img, NULL, NULL, NULL, NULL);
+}
+
+/*
+ * image_parent_ex()
+ * Get the parent image, the offset of the image relative to the parent, and
+ * its dimensions. If there is no parent image, this function returns NULL. The
+ * returned parent may NOT be the parent passed when creating this image. It may
+ * be the parent of that one, if applicable.
+ */
+const image_t* image_parent_ex(const image_t* img, int* x, int* y, int* width, int* height)
+{
+    if(img->parent == NULL)
+        return NULL;
+
+    if(x != NULL)
+        *x = img->offx;
+
+    if(y != NULL)
+        *y = img->offy;
+
+    if(width != NULL)
+        *width = img->w;
+
+    if(height != NULL)
+        *height = img->h;
+
+    return img->parent;
 }
 
 /*
