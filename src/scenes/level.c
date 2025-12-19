@@ -4625,7 +4625,7 @@ void editor_grid_render()
 
     /* render translucent grid */
     if(editor_grid_size != 128) {
-        color_t translucent_grid_color = color_premul_rgba(255, 255, 255, 48);
+        color_t translucent_grid_color = color_premul_rgba(255, 255, 255, 32);
         editor_grid_render_ex(translucent_grid_color, editor_grid_size, editor_grid_size);
     }
 
@@ -4637,7 +4637,7 @@ void editor_grid_render()
 /* render a grid with custom parameters */
 void editor_grid_render_ex(color_t color, int grid_width, int grid_height)
 {
-    const float dx[6] = { 0, 1, 1, 1, 0, 0 }, dy[6] = { 0, 0, 1, 1, 1, 0 };
+    const float dx[6] = { -1, 1, 1, 1, -1, -1 }, dy[6] = { -1, -1, 1, 1, 1, -1 };
     v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
     v2d_t topleft = v2d_subtract(editor_camera, half_screen);
     int max_x = VIDEO_SCREEN_W + grid_width;
