@@ -375,7 +375,7 @@ void handle_video_event(const ALLEGRO_EVENT* event, void* context)
 void render_simple_effect(int screen_y, color_t color)
 {
     v2d_t screen_size = video_get_screen_size();
-    image_rectfill(0, screen_y, screen_size.x, screen_size.y, premultiply_alpha(watercolor));
+    image_rectfill(0, screen_y, screen_size.x, screen_size.y, premultiply_alpha(color));
 }
 
 /* render the default water effect */
