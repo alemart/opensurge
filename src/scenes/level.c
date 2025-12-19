@@ -373,11 +373,14 @@ static int editor_brick_id(int index); /* the index-th valid brick - at editor_b
 #define EDITOR_UI_COLOR_TRANS(alpha)   color_premul_rgba(40, 44, 52, (alpha))
 
 /* editor: grid */
+static const int EDITOR_GRID_SIZES[] = { 128, 64, 32, 16, 8, 1 };
 static int editor_grid_size = 1;
+STATIC_DARRAY(int, editor_grid_buffer);
 static void editor_grid_init();
 static void editor_grid_release();
 static void editor_grid_update();
 static void editor_grid_render();
+static void editor_grid_render_ex(color_t color, int grid_width, int grid_height);
 static inline v2d_t editor_grid_snap(v2d_t world_pos); /* snap world position to grid with custom grid size */
 static inline v2d_t editor_grid_snap_ex(v2d_t world_pos, int grid_width, int grid_height);
 static inline v2d_t editor_grid_screen_snap(v2d_t screen_pos); /* snap screen position to grid with custom grid size */
@@ -4581,24 +4584,25 @@ int editor_brick_id(int index)
 void editor_grid_init()
 {
     editor_grid_size = 16;
+    darray_init(editor_grid_buffer);
 }
 
 /* releases the grid module */
 void editor_grid_release()
 {
+    darray_release(editor_grid_buffer);
 }
 
 /* updates the grid module */
 void editor_grid_update()
 {
-    static int grid_size[] = { 128, 64, 32, 16, 8, 1 };
-    const int n = sizeof(grid_size) / sizeof(grid_size[0]);
+    const int n = sizeof(EDITOR_GRID_SIZES) / sizeof(EDITOR_GRID_SIZES[0]);
 
     /* next grid size */
     if(editorcmd_is_triggered(editor_cmd, "snap-to-grid")) {
         for(int i = 0; i < n; i++) {
-            if(editor_grid_size == grid_size[i]) {
-                editor_grid_size = grid_size[(i + 1) % n];
+            if(editor_grid_size == EDITOR_GRID_SIZES[i]) {
+                editor_grid_size = EDITOR_GRID_SIZES[(i + 1) % n];
                 break;
             }
         }
@@ -4615,22 +4619,51 @@ void editor_grid_update()
 /* render the grid */
 void editor_grid_render()
 {
-    const color_t grid_color = color_rgb(255, 255, 255);
-    const int grid_size = 128;
-
-    /* no grid */
+    /* no grid? */
     if(!editor_grid_is_enabled())
         return;
 
-    /* render */
-    for(int x = 0; x < VIDEO_SCREEN_W + grid_size; x += grid_size) {
-        for(int y = 0; y < VIDEO_SCREEN_H + grid_size; y += grid_size) {
-            v2d_t screen_pos = v2d_new(x, y);
-            v2d_t snapped_pos = editor_grid_screen_snap_ex(screen_pos, grid_size, grid_size);
+    /* render translucent grid */
+    if(editor_grid_size != 128) {
+        color_t translucent_grid_color = color_premul_rgba(255, 255, 255, 48);
+        editor_grid_render_ex(translucent_grid_color, editor_grid_size, editor_grid_size);
+    }
 
-            image_rectfill(snapped_pos.x, snapped_pos.y, snapped_pos.x + 1, snapped_pos.y + 1, grid_color);
+    /* render reference grid (128x128) */
+    color_t reference_grid_color = color_rgb(255, 255, 255);
+    editor_grid_render_ex(reference_grid_color, 128, 128);
+}
+
+/* render a grid with custom parameters */
+void editor_grid_render_ex(color_t color, int grid_width, int grid_height)
+{
+    const float dx[6] = { 0, 1, 1, 1, 0, 0 }, dy[6] = { 0, 0, 1, 1, 1, 0 };
+    int max_x = VIDEO_SCREEN_W + grid_width;
+    int max_y = VIDEO_SCREEN_H + grid_height;
+
+    /* clear buffer */
+    darray_clear(editor_grid_buffer);
+
+    /* for each point (x,y) */
+    for(int x = 0; x < max_x; x += grid_width) {
+        for(int y = 0; y < max_y; y += grid_height) {
+
+            /* find a vertex of the grid near (x,y) in screen space */
+            v2d_t screen_pos = v2d_new(x, y);
+            v2d_t snapped_pos = editor_grid_screen_snap_ex(screen_pos, grid_width, grid_height);
+
+            /* prepare two triangles per vertex of the grid */
+            for(int j = 0; j < 6; j++) {
+                darray_push(editor_grid_buffer, (int)(snapped_pos.x + dx[j]));
+                darray_push(editor_grid_buffer, (int)(snapped_pos.y + dy[j]));
+            }
+
         }
     }
+
+    /* draw triangles */
+    int triangle_count = darray_length(editor_grid_buffer) / 6;
+    image_trianglefill_batch(triangle_count, editor_grid_buffer, color);
 }
 
 /* aligns a world position to the grid */
