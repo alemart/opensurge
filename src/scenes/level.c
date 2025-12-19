@@ -4668,7 +4668,7 @@ void editor_grid_render_ex(color_t color, int grid_width, int grid_height)
     image_trianglefill_batch(triangle_count, editor_grid_buffer, color);
 }
 
-/* aligns a world position to the grid */
+/* aligns a position in world space to the grid */
 v2d_t editor_grid_snap(v2d_t world_pos)
 {
     v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
@@ -4677,7 +4677,7 @@ v2d_t editor_grid_snap(v2d_t world_pos)
     return editor_grid_snap_ex(world_pos, topleft, editor_grid_size, editor_grid_size);
 }
 
-/* aligns a screen position to the grid */
+/* aligns a position in screen space to the grid */
 v2d_t editor_grid_screen_snap(v2d_t screen_pos)
 {
     v2d_t half_screen = v2d_multiply(video_get_screen_size(), 0.5f);
