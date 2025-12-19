@@ -109,6 +109,12 @@ IF(WANT_GLES)
   LIST(APPEND DEFS "WANT_GLES=1")
 ENDIF()
 
+# FastDraw
+OPTION(WANT_FASTDRAW "Use the FastDraw mini-library" ON)
+IF(WANT_FASTDRAW)
+  LIST(APPEND DEFS "WANT_FASTDRAW=1")
+ENDIF()
+
 # User-specified paths
 SET(ALLEGRO_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for Allegro & its dependencies")
 SET(ALLEGRO_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of Allegro")
@@ -460,7 +466,6 @@ SET(GAME_SRCS
   src/entities/renderqueue.c
   src/entities/waterfx.c
 
-  src/third_party/fast_draw.c
   src/third_party/ignorecase.c
   src/third_party/utf8.c
 
@@ -578,13 +583,17 @@ SET(GAME_HEADERS
   src/entities/sfx.h
   src/entities/waterfx.h
 
-  src/third_party/fast_draw.h
   src/third_party/ignorecase.h
   src/third_party/utf8.h
 
   src/misc/resource.h
   ${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.rc
 )
+
+IF(WANT_FASTDRAW)
+  LIST(APPEND GAME_SRCS src/third_party/fast_draw.c)
+  LIST(APPEND GAME_HEADERS src/third_party/fast_draw.h)
+ENDIF()
 
 # ------------------------------------------
 # Creating the executable
