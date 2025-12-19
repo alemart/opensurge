@@ -166,19 +166,19 @@ object "SurgeTheRabbit - Game State"
         player.score = 0;
     }
 
-    fun transientlyConsumeEntity(entity)
+    fun isEntityConsumed(entity)
     {
-        consumableEntityTracker.transientlyConsume(entity);
+        return consumableEntityTracker.isConsumed(entity);
     }
 
-    fun persistentlyConsumeEntity(entity)
+    fun consumeEntity(entity)
     {
         consumableEntityTracker.persistentlyConsume(entity);
     }
 
-    fun isEntityConsumed(entity)
+    fun consumeEntityUntilLevelChange(entity)
     {
-        return consumableEntityTracker.isConsumed(entity);
+        consumableEntityTracker.transientlyConsume(entity);
     }
 }
 
