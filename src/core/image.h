@@ -32,6 +32,9 @@ typedef struct image_t image_t;
 /* opaque texture handle */
 typedef uint32_t texturehandle_t; /* GLuint */
 
+/* opaque cache of vertices for low-level routines */
+typedef struct vertexcache_t vertexcache_t;
+
 /* image flip flags */
 enum {
     IF_NONE         = 0,        /* no flip */
@@ -46,6 +49,9 @@ enum {
     IC_DEPTH        = 1 << 1,   /* require a depth buffer */
     IC_WRAP_MIRROR  = 1 << 2    /* mirror wrapping (shaders) */
 };
+
+/* retrieve Allegro bitmap */
+#define IMAGE2BITMAP(img)           (*((ALLEGRO_BITMAP**)(img)))
 
 /* create & destroy */
 image_t* image_create(int width, int height); /* create an image */
@@ -91,6 +97,8 @@ void image_ellipsefill(int cx, int cy, int radius_x, int radius_y, color_t color
 void image_rect(int x1, int y1, int x2, int y2, color_t color);
 void image_rectfill(int x1, int y1, int x2, int y2, color_t color);
 void image_trianglefill_batch(int n, const int* xy, color_t color);
+void image_quick_triangles(const vertexcache_t* cache);
+void image_quick_triangles_ex(const vertexcache_t* cache, const image_t* src);
 
 /* rendering */
 void image_blit(const image_t* src, int src_x, int src_y, int dest_x, int dest_y, int width, int height);
@@ -105,7 +113,11 @@ void image_draw_trans(const image_t* src, int x, int y, float alpha, int flags);
 void image_draw_lit(const image_t* src, int x, int y, color_t color, int flags);
 void image_draw_tinted(const image_t* src, int x, int y, color_t color, int flags);
 
-/* retrieve Allegro bitmap */
-#define IMAGE2BITMAP(img)           (*((ALLEGRO_BITMAP**)(img)))
+/* cache for low-level drawing */
+vertexcache_t* vertexcache_create();
+void vertexcache_destroy(vertexcache_t* cache);
+void vertexcache_clear(vertexcache_t* cache);
+void vertexcache_push(vertexcache_t* cache, int x, int y, color_t color);
+void vertexcache_push_ex(vertexcache_t* cache, int x, int y, int u, int v, color_t color);
 
 #endif

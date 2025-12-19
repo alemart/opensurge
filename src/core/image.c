@@ -33,6 +33,7 @@
 #include "resourcemanager.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../util/darray.h"
 
 #if ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
 #define WANT_WRAP 1
@@ -53,6 +54,11 @@ struct image_t {
     char* path; /* relative path */
     const image_t* parent; /* parent image */
     int offx, offy; /* offset relative to parent */
+};
+
+/* a cache of vertices for low-level drawing */
+struct vertexcache_t {
+    DARRAY(ALLEGRO_VERTEX, vertices);
 };
 
 /* misc */
@@ -597,6 +603,38 @@ void image_trianglefill_batch(int n, const int* xy, color_t color)
 
 
 /*
+ * image_quick_triangles()
+ * Quickly draw many filled triangles at once (batching)
+ */
+void image_quick_triangles(const vertexcache_t* cache)
+{
+    image_quick_triangles_ex(cache, NULL);
+}
+
+
+/*
+ * image_quick_triangles_ex()
+ * Quickly draw many filled triangles at once (batching)
+ * When no texture is needed, set parameter src to NULL
+ */
+void image_quick_triangles_ex(const vertexcache_t* cache, const image_t* src)
+{
+    int vertex_count = darray_length(cache->vertices);
+
+    /* make sure we've got triangles */
+    vertex_count -= vertex_count % 3;
+
+    /* nothing to do */
+    if(vertex_count == 0)
+        return;
+
+    /* draw triangles */
+    ALLEGRO_BITMAP* texture = (src != NULL) ? src->data : NULL;
+    al_draw_prim(cache->vertices, NULL, texture, 0, vertex_count, ALLEGRO_PRIM_TRIANGLE_LIST);
+}
+
+
+/*
  * image_clear()
  * Clears an given image with some color
  */
@@ -908,4 +946,66 @@ texturehandle_t image_texture(const image_t* img)
     /* we require ALLEGRO_OPENGL to be a display flag */
     texturehandle_t tex = al_get_opengl_texture(img->data);
     return tex;
+}
+
+/*
+ * vertexcache_create()
+ * Create a cache of vertices for low-level drawing
+ */
+vertexcache_t* vertexcache_create()
+{
+    vertexcache_t* cache = mallocx(sizeof *cache);
+    darray_init(cache->vertices);
+    return cache;
+}
+
+/*
+ * vertexcache_destroy()
+ * Destroy a cache of vertices
+ */
+void vertexcache_destroy(vertexcache_t* cache)
+{
+    darray_release(cache->vertices);
+    free(cache);
+}
+
+/*
+ * vertexcache_clear()
+ * Clear a cache of vertices
+ */
+void vertexcache_clear(vertexcache_t* cache)
+{
+    darray_clear(cache->vertices);
+}
+
+/*
+ * vertexcache_push()
+ * Add a vertex to a cache
+ * x, y are given in pixel coordinates
+ * The default color is white
+ */
+void vertexcache_push(vertexcache_t* cache, int x, int y, color_t color)
+{
+    vertexcache_push_ex(cache, x, y, 0, 0, color);
+}
+
+/*
+ * vertexcache_push_ex()
+ * Add a vertex to a cache
+ * x, y, u, v are given in pixel coordinates
+ * The default color is white
+ * If you're not using textures, u and v can be set to zero
+ */
+void vertexcache_push_ex(vertexcache_t* cache, int x, int y, int u, int v, color_t color)
+{
+    ALLEGRO_VERTEX vertex = {
+        .x = 0.5f + x,
+        .y = 0.5f + y,
+        .z = 0.0f,
+        .u = 0.5f + u,
+        .v = 0.5f + v,
+        .color = color._color
+    };
+
+    darray_push(cache->vertices, vertex);
 }
