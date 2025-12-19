@@ -53,7 +53,8 @@ void renderqueue_enqueue_ssobject_gizmo(struct surgescript_object_t* object);
 void renderqueue_enqueue_ssobject_debug(struct surgescript_object_t* object);
 void renderqueue_enqueue_background(struct bgtheme_t* background);
 void renderqueue_enqueue_foreground(struct bgtheme_t* foreground);
-void renderqueue_enqueue_water();
+void renderqueue_enqueue_waterbg();
+void renderqueue_enqueue_waterfg();
 
 /* misc */
 bool renderqueue_toggle_stats_report();

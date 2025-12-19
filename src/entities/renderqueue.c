@@ -56,7 +56,8 @@ enum {
 
     TYPE_BACKGROUND,
     TYPE_FOREGROUND,
-    TYPE_WATER,
+    TYPE_WATERBG,
+    TYPE_WATERFG,
 
     TYPE_ITEM, /* legacy item */
     TYPE_OBJECT /* legacy object */
@@ -123,7 +124,8 @@ static float zindex_ssobject_gizmo(renderable_t r);
 static float zindex_ssobject_debug(renderable_t r);
 static float zindex_background(renderable_t r);
 static float zindex_foreground(renderable_t r);
-static float zindex_water(renderable_t r);
+static float zindex_waterbg(renderable_t r);
+static float zindex_waterfg(renderable_t r);
 
 static void render_player(renderable_t r, v2d_t camera_position);
 static void render_item(renderable_t r, v2d_t camera_position);
@@ -137,7 +139,8 @@ static void render_ssobject_gizmo(renderable_t r, v2d_t camera_position);
 static void render_ssobject_debug(renderable_t r, v2d_t camera_position);
 static void render_background(renderable_t r, v2d_t camera_position);
 static void render_foreground(renderable_t r, v2d_t camera_position);
-static void render_water(renderable_t r, v2d_t camera_position);
+static void render_waterbg(renderable_t r, v2d_t camera_position);
+static void render_waterfg(renderable_t r, v2d_t camera_position);
 
 static int ypos_player(renderable_t r);
 static int ypos_item(renderable_t r);
@@ -151,7 +154,8 @@ static int ypos_ssobject_gizmo(renderable_t r);
 static int ypos_ssobject_debug(renderable_t r);
 static int ypos_background(renderable_t r);
 static int ypos_foreground(renderable_t r);
-static int ypos_water(renderable_t r);
+static int ypos_waterbg(renderable_t r);
+static int ypos_waterfg(renderable_t r);
 
 static texturehandle_t texture_player(renderable_t r);
 static texturehandle_t texture_item(renderable_t r);
@@ -165,7 +169,8 @@ static texturehandle_t texture_ssobject_gizmo(renderable_t r);
 static texturehandle_t texture_ssobject_debug(renderable_t r);
 static texturehandle_t texture_background(renderable_t r);
 static texturehandle_t texture_foreground(renderable_t r);
-static texturehandle_t texture_water(renderable_t r);
+static texturehandle_t texture_waterbg(renderable_t r);
+static texturehandle_t texture_waterfg(renderable_t r);
 
 static const char* path_player(renderable_t r, char* dest, size_t dest_size);
 static const char* path_item(renderable_t r, char* dest, size_t dest_size);
@@ -179,7 +184,8 @@ static const char* path_ssobject_gizmo(renderable_t r, char* dest, size_t dest_s
 static const char* path_ssobject_debug(renderable_t r, char* dest, size_t dest_size);
 static const char* path_background(renderable_t r, char* dest, size_t dest_size);
 static const char* path_foreground(renderable_t r, char* dest, size_t dest_size);
-static const char* path_water(renderable_t r, char* dest, size_t dest_size);
+static const char* path_waterbg(renderable_t r, char* dest, size_t dest_size);
+static const char* path_waterfg(renderable_t r, char* dest, size_t dest_size);
 
 static int type_player(renderable_t r);
 static int type_item(renderable_t r);
@@ -193,7 +199,8 @@ static int type_ssobject_gizmo(renderable_t r);
 static int type_ssobject_debug(renderable_t r);
 static int type_background(renderable_t r);
 static int type_foreground(renderable_t r);
-static int type_water(renderable_t r);
+static int type_waterbg(renderable_t r);
+static int type_waterfg(renderable_t r);
 
 static bool is_translucent_player(renderable_t r);
 static bool is_translucent_item(renderable_t r);
@@ -207,7 +214,8 @@ static bool is_translucent_ssobject_gizmo(renderable_t r);
 static bool is_translucent_ssobject_debug(renderable_t r);
 static bool is_translucent_background(renderable_t r);
 static bool is_translucent_foreground(renderable_t r);
-static bool is_translucent_water(renderable_t r);
+static bool is_translucent_waterbg(renderable_t r);
+static bool is_translucent_waterfg(renderable_t r);
 
 static const renderable_vtable_t VTABLE[] = {
     [TYPE_BRICK] = {
@@ -330,14 +338,24 @@ static const renderable_vtable_t VTABLE[] = {
         .is_translucent = is_translucent_foreground
     },
 
-    [TYPE_WATER] = {
-        .zindex = zindex_water,
-        .render = render_water,
-        .ypos = ypos_water,
-        .texture = texture_water,
-        .path = path_water,
-        .type = type_water,
-        .is_translucent = is_translucent_water
+    [TYPE_WATERBG] = {
+        .zindex = zindex_waterbg,
+        .render = render_waterbg,
+        .ypos = ypos_waterbg,
+        .texture = texture_waterbg,
+        .path = path_waterbg,
+        .type = type_waterbg,
+        .is_translucent = is_translucent_waterbg
+    },
+
+    [TYPE_WATERFG] = {
+        .zindex = zindex_waterfg,
+        .render = render_waterfg,
+        .ypos = ypos_waterfg,
+        .texture = texture_waterfg,
+        .path = path_waterfg,
+        .type = type_waterfg,
+        .is_translucent = is_translucent_waterfg
     }
 };
 
@@ -972,21 +990,46 @@ void renderqueue_enqueue_foreground(bgtheme_t* foreground)
 }
 
 /*
- * renderqueue_enqueue_water()
- * Enqueues the water
+ * renderqueue_enqueue_waterbg()
+ * Enqueues the background of the water
  */
-void renderqueue_enqueue_water()
+void renderqueue_enqueue_waterbg()
 {
     renderqueue_entry_t entry = {
         .renderable.dummy = NULL,
-        .vtable = &VTABLE[TYPE_WATER]
+        .vtable = &VTABLE[TYPE_WATERBG]
     };
 
-    /* clip out */
-    int y = level_waterlevel() - ((int)camera.y - VIDEO_SCREEN_H / 2);
-    if(y >= VIDEO_SCREEN_H)
+    /* clip out? */
+    int screen_height = VIDEO_SCREEN_H;
+    int camera_top = (int)camera.y - screen_height / 2;
+    int waterlevel_in_screen_space = level_waterlevel() - camera_top;
+    if(waterlevel_in_screen_space >= screen_height)
         return;
 
+    /* enqueue */
+    enqueue(&entry);
+}
+
+/*
+ * renderqueue_enqueue_waterfg()
+ * Enqueues the foreground of the water
+ */
+void renderqueue_enqueue_waterfg()
+{
+    renderqueue_entry_t entry = {
+        .renderable.dummy = NULL,
+        .vtable = &VTABLE[TYPE_WATERFG]
+    };
+
+    /* clip out? */
+    int screen_height = VIDEO_SCREEN_H;
+    int camera_top = (int)camera.y - screen_height / 2;
+    int waterlevel_in_screen_space = level_waterlevel() - camera_top;
+    if(waterlevel_in_screen_space >= screen_height)
+        return;
+
+    /* enqueue */
     enqueue(&entry);
 }
 
@@ -1188,7 +1231,8 @@ int type_ssobject_debug(renderable_t r) { return TYPE_SSOBJECT_DEBUG; }
 int type_ssobject_gizmo(renderable_t r) { return TYPE_SSOBJECT_GIZMO; }
 int type_background(renderable_t r) { return TYPE_BACKGROUND; }
 int type_foreground(renderable_t r) { return TYPE_FOREGROUND; }
-int type_water(renderable_t r) { return TYPE_WATER; }
+int type_waterbg(renderable_t r) { return TYPE_WATERBG; }
+int type_waterfg(renderable_t r) { return TYPE_WATERFG; }
 
 float zindex_player(renderable_t r) { return player_is_dying(r.player) ? (1.0f - ZINDEX_OFFSET(1)) : 0.5f; }
 float zindex_item(renderable_t r) { return 0.5f - (r.item->bring_to_back ? ZINDEX_OFFSET(1) : 0.0f); }
@@ -1202,7 +1246,8 @@ float zindex_ssobject_debug(renderable_t r) { return zindex_ssobject(r); } /* TO
 float zindex_ssobject_gizmo(renderable_t r) { return ZINDEX_LARGE + zindex_ssobject(r); }
 float zindex_background(renderable_t r) { return 0.0f; }
 float zindex_foreground(renderable_t r) { return 1.0f; }
-float zindex_water(renderable_t r) { return 1.0f; }
+float zindex_waterbg(renderable_t r) { return 0.0f; } /* same as background */
+float zindex_waterfg(renderable_t r) { return 1.0f; } /* same as foreground */
 
 int ypos_player(renderable_t r) { return 0; } /*(int)(player_position(r.player).y);*/
 int ypos_item(renderable_t r) { return (int)(r.item->actor->position.y); }
@@ -1216,7 +1261,8 @@ int ypos_ssobject_debug(renderable_t r) { return ypos_ssobject(r); }
 int ypos_ssobject_gizmo(renderable_t r) { return ypos_ssobject(r); }
 int ypos_background(renderable_t r) { return 0; } /* preserve relative indexes */
 int ypos_foreground(renderable_t r) { return 0; } /* preserve relative indexes */
-int ypos_water(renderable_t r) { return 0; } /* not needed */
+int ypos_waterbg(renderable_t r) { return 0; } /* not needed */
+int ypos_waterfg(renderable_t r) { return 0; } /* not needed */
 
 bool is_translucent_player(renderable_t r) { return true; /* invincibility stars, shields, maybe even the sprite itself... */ }
 bool is_translucent_item(renderable_t r) { return false; }
@@ -1227,8 +1273,9 @@ bool is_translucent_brick_debug(renderable_t r) { return false; }
 bool is_translucent_brick_path(renderable_t r) { return false; }
 bool is_translucent_background(renderable_t r) { return false; }
 bool is_translucent_foreground(renderable_t r) { return false; }
+bool is_translucent_waterbg(renderable_t r) { return true; }
+bool is_translucent_waterfg(renderable_t r) { return true; }
 
-bool is_translucent_water(renderable_t r) { return true; }
 bool is_translucent_ssobject_gizmo(renderable_t r) { return false; }
 bool is_translucent_ssobject_debug(renderable_t r) { return false; /*is_translucent_ssobject(r);*/ /* no state changes within SurgeScript */ }
 bool is_translucent_ssobject(renderable_t r)
@@ -1255,7 +1302,8 @@ const char* path_brick_debug(renderable_t r, char* dest, size_t dest_size) { ret
 const char* path_brick_path(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, random_path('P'), dest_size); }
 const char* path_background(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<background>", dest_size); }
 const char* path_foreground(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<foreground>", dest_size); }
-const char* path_water(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<water>", dest_size); }
+const char* path_waterbg(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<waterbg>", dest_size); }
+const char* path_waterfg(renderable_t r, char* dest, size_t dest_size) { return str_cpy(dest, "<waterfg>", dest_size); }
 
 const char* path_ssobject(renderable_t r, char* dest, size_t dest_size)
 {
@@ -1296,7 +1344,8 @@ texturehandle_t texture_brick_path(renderable_t r) { return NO_TEXTURE; }
 texturehandle_t texture_ssobject_gizmo(renderable_t r) { return NO_TEXTURE; }
 texturehandle_t texture_background(renderable_t r) { return NO_TEXTURE; }
 texturehandle_t texture_foreground(renderable_t r) { return NO_TEXTURE; }
-texturehandle_t texture_water(renderable_t r) { return NO_TEXTURE; }
+texturehandle_t texture_waterbg(renderable_t r) { return NO_TEXTURE; }
+texturehandle_t texture_waterfg(renderable_t r) { return NO_TEXTURE; }
 
 texturehandle_t texture_brick(renderable_t r)
 {
@@ -1421,7 +1470,6 @@ void render_ssobject_debug(renderable_t r, v2d_t camera_position)
 void render_background(renderable_t r, v2d_t camera_position)
 {
     background_render_bg(r.theme, camera_position);
-    waterfx_render_bg(camera_position);
 }
 
 void render_foreground(renderable_t r, v2d_t camera_position)
@@ -1429,7 +1477,12 @@ void render_foreground(renderable_t r, v2d_t camera_position)
     background_render_fg(r.theme, camera_position);
 }
 
-void render_water(renderable_t r, v2d_t camera_position)
+void render_waterbg(renderable_t r, v2d_t camera_position)
+{
+    waterfx_render_bg(camera_position);
+}
+
+void render_waterfg(renderable_t r, v2d_t camera_position)
 {
     waterfx_render_fg(camera_position);
 }

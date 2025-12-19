@@ -2461,10 +2461,14 @@ void render_level(const item_list_t *major_items, const enemy_list_t *major_enem
     /* starting up the render queue... */
     renderqueue_begin( camera_get_position() );
 
-        /* render background */
+        /* render the background */
         renderqueue_enqueue_background(backgroundtheme);
 
-        /* render bricks */
+        /* render the background of the water */
+        if(!editor_is_enabled())
+            renderqueue_enqueue_waterbg();
+
+        /* render the bricks */
         if(editor_is_enabled() || level_is_in_debug_mode())
             render_bricks_debug();
         else
@@ -2476,11 +2480,11 @@ void render_level(const item_list_t *major_items, const enemy_list_t *major_enem
         /* render the players */
         render_players();
 
-        /* render the water */
+        /* render the foreground of the water */
         if(!editor_is_enabled())
-            renderqueue_enqueue_water();
+            renderqueue_enqueue_waterfg();
 
-        /* render foreground */
+        /* render the foreground */
         renderqueue_enqueue_foreground(backgroundtheme);
 
         /* render legacy items */
