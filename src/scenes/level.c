@@ -376,7 +376,7 @@ static int editor_brick_id(int index); /* the index-th valid brick - at editor_b
 #define EDITOR_GRID_INITIAL_SIZE 16
 static const int EDITOR_GRID_SIZES[] = { 128, 64, 32, 16, 8, 1 };
 static int editor_grid_size = EDITOR_GRID_INITIAL_SIZE;
-STATIC_DARRAY(int, editor_grid_buffer);
+static vertexcache_t* editor_grid_cache;
 static void editor_grid_init();
 static void editor_grid_release();
 static void editor_grid_update();
@@ -4589,13 +4589,13 @@ int editor_brick_id(int index)
 void editor_grid_init()
 {
     editor_grid_size = EDITOR_GRID_INITIAL_SIZE;
-    darray_init(editor_grid_buffer);
+    editor_grid_cache = vertexcache_create();
 }
 
 /* releases the grid module */
 void editor_grid_release()
 {
-    darray_release(editor_grid_buffer);
+    vertexcache_destroy(editor_grid_cache);
 }
 
 /* updates the grid module */
@@ -4648,8 +4648,8 @@ void editor_grid_render_ex(color_t color, int grid_width, int grid_height)
     int max_x = VIDEO_SCREEN_W + grid_width;
     int max_y = VIDEO_SCREEN_H + grid_height;
 
-    /* clear buffer */
-    darray_clear(editor_grid_buffer);
+    /* clear cache */
+    vertexcache_clear(editor_grid_cache);
 
     /* for each point (x,y) */
     for(int x = 0; x < max_x; x += grid_width) {
@@ -4661,16 +4661,16 @@ void editor_grid_render_ex(color_t color, int grid_width, int grid_height)
 
             /* prepare two triangles per vertex of the grid */
             for(int j = 0; j < 6; j++) {
-                darray_push(editor_grid_buffer, (int)(snapped_pos.x + dx[j]));
-                darray_push(editor_grid_buffer, (int)(snapped_pos.y + dy[j]));
+                int vertex_x = (int)(snapped_pos.x + dx[j]);
+                int vertex_y = (int)(snapped_pos.y + dy[j]);
+                vertexcache_push(editor_grid_cache, vertex_x, vertex_y, color);
             }
 
         }
     }
 
     /* draw triangles */
-    int triangle_count = darray_length(editor_grid_buffer) / 6;
-    image_trianglefill_batch(triangle_count, editor_grid_buffer, color);
+    image_quick_triangles(editor_grid_cache);
 }
 
 /* aligns a position in world space to the grid */
