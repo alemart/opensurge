@@ -544,7 +544,7 @@ void render_with_cache(const image_t* image, v2d_t position, void* data)
 
 /* preprocessing */
 
-/* sort layers by their z-indexes */
+/* sort layers by their z-index */
 void sort_layers(bgtheme_t *bgtheme)
 {
     /* merge_sort is a stable sorting algorithm. stdlib's qsort may not be. */
@@ -570,7 +570,7 @@ void split_layers(bgtheme_t *bgtheme)
      * bgtheme->layer[] is partitioned into background and foreground layers:
      *
      * layer[0 .. background_count-1] are the background layers
-     * layer[background_count-1 .. layer_count-1] are the foreground layers
+     * layer[background_count .. layer_count-1] are the foreground layers
      */
 
     bgtheme->foreground_count = 0;
@@ -579,7 +579,7 @@ void split_layers(bgtheme_t *bgtheme)
         if(IS_FOREGROUND_LAYER(bgtheme->layer[i]))
             bgtheme->foreground_count++;
         else
-            break; /* the array is assumed to be sorted */
+            break; /* the array is assumed to be sorted by z-index */
     }
 
     bgtheme->background_count = bgtheme->layer_count - bgtheme->foreground_count;
