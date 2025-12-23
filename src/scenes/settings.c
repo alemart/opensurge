@@ -265,7 +265,7 @@ static void enter_credits(settings_entry_t* e);
 /* MODs */
 #define vt_mods (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, display_mods }
 static bool want_zipped_mods = false;
-static bool want_compatibility_mode = true;
+static bool want_compatibility_mode = false;
 static int wanted_compatibility_version = 0;
 static bool display_mods(settings_entry_t* e);
 static bool display_mods_from_base_game(settings_entry_t* e);
@@ -352,7 +352,7 @@ static const struct
     { TYPE_SUBTITLE, "$OPTIONS_COLORED_MODS", (const char*[]) { NULL }, 0, vt_mods, 8 },
     { TYPE_SETTING, "$OPTIONS_PLAYMOD", (const char*[]) { NULL }, 0, vt_playgame, 8 },
     { TYPE_SETTING, "$OPTIONS_MODSTORAGE", (const char*[]) { "$OPTIONS_MODSTORAGE_ARCHIVE", "$OPTIONS_MODSTORAGE_FOLDER", NULL }, 0, vt_modstorage, 0 },
-    { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", "0.6.1", "0.6.0", "0.5.2", NULL }, 1, vt_compatibilitymode, 0 },
+    { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", "0.6.1", "0.6.0", "0.5.2", NULL }, 0, vt_compatibilitymode, 0 },
     { TYPE_SETTING, "$OPTIONS_BACKTOBASEGAME", (const char*[]) { NULL }, 0, vt_backtobasegame, 8 },
 
     /* Engine */
@@ -418,7 +418,7 @@ void settings_init(void* data)
     /* options */
     enable_developermode = false;
     want_zipped_mods = true;
-    want_compatibility_mode = true;
+    want_compatibility_mode = false;
     wanted_compatibility_version = 0;
 
     /* initialize objects */
@@ -1618,6 +1618,7 @@ void change_compatibilitymode(settings_entry_t* e)
 
 void dehighlight_compatibilitymode(settings_entry_t* e)
 {
+#if 0
     /* warn the user if the compatibility mode is disabled */
     if(!want_compatibility_mode) {
         sound_play(SFX_QUESTION);
@@ -1632,6 +1633,7 @@ void dehighlight_compatibilitymode(settings_entry_t* e)
         else
             sound_play(SFX_CONFIRM);
     }
+#endif
 }
 
 void enter_backtobasegame(settings_entry_t* e)
