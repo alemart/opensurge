@@ -812,7 +812,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
 {
     switch(command) {
     case LEVCOMMAND_NAME: {
-        if(param_count == 1)
+        if(param_count >= 1)
             str_cpy(name, param[0], sizeof(name));
         else
             logfile_message("Level loader - command '%s' expects one parameter: level name. Did you forget to double quote the level name?", command_name);
@@ -821,7 +821,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_AUTHOR: {
-        if(param_count == 1)
+        if(param_count >= 1)
             str_cpy(author, param[0], sizeof(name));
         else
             logfile_message("Level loader - command '%s' expects one parameter: author name. Did you forget to double quote the author name?", command_name);
@@ -830,7 +830,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_VERSION: {
-        if(param_count == 1)
+        if(param_count >= 1)
             str_cpy(version, param[0], sizeof(name));
         else
             logfile_message("Level loader - command '%s' expects one parameter: level version", command_name);
@@ -839,7 +839,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_LICENSE: {
-        if(param_count == 1)
+        if(param_count >= 1)
             str_cpy(license, param[0], sizeof(license));
         else
             logfile_message("Level loader - command '%s' expects one parameter: license name. Did you forget to double quote the license parameter?", command_name);
@@ -848,7 +848,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_REQUIRES: {
-        if(param_count == 1) {
+        if(param_count >= 1) {
             requires[0] = requires[1] = requires[2] = 0;
             sscanf(param[0], "%d.%d.%d", &requires[0], &requires[1], &requires[2]);
             for(int i = 0; i < 3; i++)
@@ -868,7 +868,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_ACT: {
-        if(param_count == 1)
+        if(param_count >= 1)
             level_set_act(atoi(param[0]));
         else
             logfile_message("Level loader - command '%s' expects one parameter: act number", command_name);
@@ -877,16 +877,12 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_READONLY: {
-        if(param_count == 0)
-            readonly = true;
-        else
-            logfile_message("Level loader - command '%s' expects no parameters", command_name);
-
+        readonly = true;
         break;
     }
 
     case LEVCOMMAND_THEME: {
-        if(param_count == 1)
+        if(param_count >= 1)
             str_cpy(theme, param[0], sizeof(theme));
         else
             logfile_message("Level loader - command '%s' expects one parameter: brickset filepath. Did you forget to double quote the brickset filepath?", command_name);
@@ -895,7 +891,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_BGTHEME: {
-        if(param_count == 1)
+        if(param_count >= 1)
             str_cpy(bgtheme, param[0], sizeof(bgtheme));
         else
             logfile_message("Level loader - command '%s' expects one parameter: background filepath. Did you forget to double quote the background filepath?", command_name);
@@ -904,7 +900,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_GROUPTHEME: /* deprecated */ {
-        if(param_count == 1)
+        if(param_count >= 1)
             str_cpy(grouptheme, param[0], sizeof(grouptheme));
         else
             logfile_message("Level loader - command '%s' expects one parameter: grouptheme filepath. Did you forget to double quote the grouptheme filepath?", command_name);
@@ -913,7 +909,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_MUSIC: {
-        if(param_count == 1)
+        if(param_count >= 1)
             str_cpy(musicfile, param[0], sizeof(musicfile));
         else
             logfile_message("Level loader - command '%s' expects one parameter: music filepath. Did you forget to double quote the music filepath?", command_name);
@@ -922,7 +918,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_WATERLEVEL: {
-        if(param_count == 1) {
+        if(param_count >= 1) {
             int waterlevel = atoi(param[0]);
             level_set_waterlevel(waterlevel);
         }
@@ -941,7 +937,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
                 128
             ));
         }
-        else if(param_count == 4) {
+        else if(param_count >= 4) {
             level_set_watercolor(color_rgba(
                 clip(atoi(param[0]), 0, 255),
                 clip(atoi(param[1]), 0, 255),
@@ -956,7 +952,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_SPAWNPOINT: {
-        if(param_count == 2) {
+        if(param_count >= 2) {
             int x = atoi(param[0]);
             int y = atoi(param[1]);
             spawn_point = v2d_new(x, y);
@@ -981,8 +977,11 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
                         team[team_size] = player_create(team_size, param[i]);
                         team_size++;
                     }
-                    else
-                        fatal_error("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filepath, fileline);
+                    else {
+                        logfile_message("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filepath, fileline);
+                        video_showmessage("Level loader - can't have more than %d players per level in '%s' near line %d", TEAM_MAX, filepath, fileline);
+                        break;
+                    }
                 }
             }
             else
@@ -1010,7 +1009,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     }
 
     case LEVCOMMAND_DIALOGBOX: {
-        if(param_count == 6) {
+        if(param_count >= 6) {
             if(dialogregion_size < DIALOGREGION_MAX) {
                 dialogregion_t *d = &(dialogregion[dialogregion_size++]);
                 d->disabled = FALSE;
@@ -1054,7 +1053,7 @@ bool level_interpret_body_line(const char* filepath, int fileline, levparser_com
 {
     switch(command) {
     case LEVCOMMAND_BRICK: {
-        if(param_count >= 3 && param_count <= 5) {
+        if(param_count >= 3) {
             if(*theme != '\0') {
                 bricklayer_t layer = BRL_DEFAULT;
                 brickflip_t flip = BRF_NOFLIP;
@@ -1084,7 +1083,7 @@ bool level_interpret_body_line(const char* filepath, int fileline, levparser_com
     }
 
     case LEVCOMMAND_ENTITY: {
-        if(param_count == 3 || param_count == 4) {
+        if(param_count >= 3) {
             const char* name = param[0];
             int x = atoi(param[1]);
             int y = atoi(param[2]);
@@ -1109,7 +1108,7 @@ bool level_interpret_body_line(const char* filepath, int fileline, levparser_com
     }
 
     case LEVCOMMAND_LEGACYOBJECT: {
-        if(param_count == 3) {
+        if(param_count >= 3) {
             const char* name = param[0];
             int x = atoi(param[1]);
             int y = atoi(param[2]);
@@ -1136,7 +1135,7 @@ bool level_interpret_body_line(const char* filepath, int fileline, levparser_com
     }
 
     case LEVCOMMAND_LEGACYITEM: {
-        if(param_count == 3) {
+        if(param_count >= 3) {
             int type = atoi(param[0]);
             int x = atoi(param[1]);
             int y = atoi(param[2]);
