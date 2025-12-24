@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * editorpal.h - level editor: item palette
- * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
+ * Copyright 2008-2025 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

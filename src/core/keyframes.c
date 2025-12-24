@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * keyframes.c - keyframe-based animations (a.k.a. programmatic animations)
- * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
+ * Copyright 2008-2025 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

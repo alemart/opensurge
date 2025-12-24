@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * MainActivity.java - Main Activity
- * Copyright (C) 2008-2024 Alexandre Martins <alemartf@gmail.com>
+ * Copyright 2008-2025 Alexandre Martins <alemartf@gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify

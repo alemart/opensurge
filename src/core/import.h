@@ -1,7 +1,7 @@
 /*
  * Open Surge Engine
  * import.h - a utility to import Open Surge games into this version of the engine
- * Copyright 2008-2024 Alexandre Martins <alemartf(at)gmail.com>
+ * Copyright 2008-2025 Alexandre Martins <alemartf(at)gmail.com>
  * http://opensurge2d.org
  *
  * This program is free software; you can redistribute it and/or modify
