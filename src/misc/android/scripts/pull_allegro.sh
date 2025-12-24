@@ -21,7 +21,7 @@ if [[ ! -d "$src_dir" ]]; then
     # remote copy
     "$git_pull" \
         --repository https://github.com/liballeg/allegro5.git \
-        --commit c4bc6dcb72f4a338c870de75f800d245c241e6c1 \
+        --tag 5.2.11.1 \
     ;
 
 else

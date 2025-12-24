@@ -24,17 +24,17 @@ function sha256check()
 pushd build/parts/deps/src
 
 echo "Pulling libfreetype..."
-wget http://downloads.sourceforge.net/project/freetype/freetype2/2.12.1/freetype-2.12.1.tar.gz
+wget https://download.sourceforge.net/freetype/freetype-2.14.1.tar.gz
 libfreetype=$(basename --suffix=.tar.gz ./freetype-*.tar.gz)
-sha256check $libfreetype.tar.gz efe71fd4b8246f1b0b1b9bfca13cfff1c9ad85930340c27df469733bbb620938
+sha256check $libfreetype.tar.gz 174d9e53402e1bf9ec7277e22ec199ba3e55a6be2c0740cb18c0ee9850fc8c34
 tar xvzf $libfreetype.tar.gz
 mv $libfreetype libfreetype
 rm -f $libfreetype.tar.gz
 
 echo "Pulling libogg..."
-wget https://downloads.xiph.org/releases/ogg/libogg-1.3.5.tar.gz
+wget https://downloads.xiph.org/releases/ogg/libogg-1.3.6.tar.gz
 libogg=$(basename --suffix=.tar.gz ./libogg-*.tar.gz)
-sha256check $libogg.tar.gz 0eb4b4b9420a0f51db142ba3f9c64b333f826532dc0f48c6410ae51f4799b664
+sha256check $libogg.tar.gz 83e6704730683d004d20e21b8f7f55dcb3383cdf84c0daedf30bde175f774638
 tar xvzf $libogg.tar.gz
 mv $libogg libogg
 rm -f $libogg.tar.gz

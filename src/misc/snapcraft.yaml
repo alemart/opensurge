@@ -32,7 +32,7 @@ parts:
   opensurge:
     after: [libphysfs, liballegro5, surgescript]
     source: https://github.com/alemart/opensurge.git
-    source-tag: v0.6.1.2
+    source-tag: v0.6.1.3
     #source-commit: 
     plugin: cmake
     parse-info: [usr/share/metainfo/opensurge.appdata.xml]
@@ -127,8 +127,8 @@ parts:
 
   liballegro5:
     after: [libphysfs]
-    source: https://github.com/liballeg/allegro5/releases/download/5.2.9.1/allegro-5.2.9.1.tar.gz
-    source-checksum: sha256/0ee3fc22ae74601ad36c70afd793ff062f0f7187eeb6e78f8a24e5bf69170d30
+    source: https://github.com/liballeg/allegro5/releases/download/5.2.11.1/allegro-5.2.11.1.tar.gz
+    source-checksum: sha256/ab9582b3a8040cf4c086f4f1073dfe38b96fc3343a89b43765b892560437c7e0
     plugin: cmake
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=Release
