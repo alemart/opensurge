@@ -110,12 +110,14 @@ object "Spring Booster" is "private", "entity"
 
     fun boost(player)
     {
+        // find the effective direction of this boost
+        slopeDirection = Math.sign(Math.cos(Math.deg2rad(player.slope)));
+        boostDirection = direction * slopeDirection;
+
         // change speed
         oldSpeed = Math.abs(player.speed);
-        if(boostSpeed > oldSpeed) {
-            slopeDirection = Math.sign(Math.sin(Math.deg2rad(player.slope)));
-            player.speed = direction * slopeDirection * boostSpeed;
-        }
+        if(boostSpeed > oldSpeed || boostDirection * player.speed < 0)
+            player.speed = boostDirection * boostSpeed;
 
         // prevent braking
         player.hlock(0.27);
