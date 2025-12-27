@@ -64,7 +64,7 @@
 #include <allegro5/allegro_native_dialog.h>
 
 /* minimum Allegro version */
-#if ALLEGRO_VERSION_INT < ALLEGRO_MIN_VERSION_INT
+#if AL_ID(ALLEGRO_VERSION, ALLEGRO_SUB_VERSION, ALLEGRO_WIP_VERSION, 0) < AL_ID(ALLEGRO_MIN_SUP, ALLEGRO_MIN_SUB, ALLEGRO_MIN_WIP, 0)
 #error "This build requires a newer version of Allegro"
 #endif
 

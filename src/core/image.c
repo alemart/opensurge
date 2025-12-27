@@ -35,7 +35,7 @@
 #include "../util/stringutil.h"
 #include "../util/darray.h"
 
-#if ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
+#if AL_ID(ALLEGRO_VERSION, ALLEGRO_SUB_VERSION, ALLEGRO_WIP_VERSION, 0) >= AL_ID(5,2,8,0)
 #define WANT_WRAP 1
 #else
 #define WANT_WRAP 0

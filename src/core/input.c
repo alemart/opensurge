@@ -87,7 +87,7 @@ static struct {
 #define REQUIRED_AXES    2 /* required number of axes of a stick */
 enum { AXIS_X = 0, AXIS_Y = 1 }; /* axes of a stick */
 
-#if defined(ALLEGRO_UNIX) && ALLEGRO_VERSION_INT < AL_ID(5,2,10,0)
+#if defined(ALLEGRO_UNIX) && AL_ID(ALLEGRO_VERSION, ALLEGRO_SUB_VERSION, ALLEGRO_WIP_VERSION, 0) < AL_ID(5,2,10,0)
 #define JOY_INIT_QUIRK   1
 #endif
 

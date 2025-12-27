@@ -932,7 +932,7 @@ bool create_display(int width, int height)
     else
         al_set_new_display_option(ALLEGRO_SUPPORTED_ORIENTATIONS, ALLEGRO_DISPLAY_ORIENTATION_PORTRAIT, ALLEGRO_SUGGEST);
 
-#if ALLEGRO_VERSION_INT >= AL_ID(5,2,8,0)
+#if AL_ID(ALLEGRO_VERSION, ALLEGRO_SUB_VERSION, ALLEGRO_WIP_VERSION, 0) >= AL_ID(5,2,8,0)
     al_set_new_display_option(ALLEGRO_DEFAULT_SHADER_PLATFORM, ALLEGRO_SHADER_GLSL_MINIMAL, ALLEGRO_REQUIRE); /* faster shader with no alpha testing */
 #endif
 
@@ -1290,7 +1290,7 @@ void compute_screen_size(videomode_t mode, int* screen_width, int* screen_height
 /* Polyfill for al_get_display_adapter() (since Allegro 5.2.10) */
 int get_display_adapter(ALLEGRO_DISPLAY* display)
 {
-#if ALLEGRO_VERSION_INT < AL_ID(5,2,10,0)
+#if AL_ID(ALLEGRO_VERSION, ALLEGRO_SUB_VERSION, ALLEGRO_WIP_VERSION, 0) < AL_ID(5,2,10,0)
     int x, y, n = al_get_num_video_adapters();
     al_get_window_position(display, &x, &y);
 
