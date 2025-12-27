@@ -68,6 +68,11 @@ struct input_list_t {
 
 
 
+
+/* private data */
+static const char DEFAULT_INPUTMAP_NAME[] = "default";
+static input_list_t* input_list = NULL; /* list of registered inputs */
+
 /* keyboard input */
 static bool a5_key[ALLEGRO_KEY_MAX] = { false };
 
@@ -87,10 +92,6 @@ static struct {
 #define REQUIRED_AXES    2 /* required number of axes of a stick */
 enum { AXIS_X = 0, AXIS_Y = 1 }; /* axes of a stick */
 
-#if defined(ALLEGRO_UNIX) && AL_ID(ALLEGRO_VERSION, ALLEGRO_SUB_VERSION, ALLEGRO_WIP_VERSION, 0) < AL_ID(5,2,10,0)
-#define JOY_INIT_QUIRK   1
-#endif
-
 typedef struct joystick_input_t joystick_input_t;
 struct joystick_input_t {
     float axis[REQUIRED_AXES]; /* -1.0 <= axis[i] <= 1.0 */
@@ -98,18 +99,11 @@ struct joystick_input_t {
 };
 
 static joystick_input_t joy[MAX_JOYS];
-static joystick_input_t *wanted_joy[MAX_JOYS];
-
+static joystick_input_t *wanted_joy[MAX_JOYS]; /* remap of joy[] */
 static bool ignore_joystick = false;
-
-/* dead-zone for analog input */
-static const float DEADZONE_THRESHOLD = 0.2f;
-
-/* analog sticks: sensitivity threshold */
-static const float ANALOG_SENSITIVITY_THRESHOLD = 0.5f; /* a value in [0,1] */
-
-/* analog sticks: thresholds for the (x,y) axes */
-static const float ANALOG_AXIS_THRESHOLD[REQUIRED_AXES] = {
+static const float DEADZONE_THRESHOLD = 0.2f; /* dead-zone for analog input */
+static const float ANALOG_SENSITIVITY_THRESHOLD = 0.5f; /* analog sticks: sensitivity threshold, a value in [0,1] */
+static const float ANALOG_AXIS_THRESHOLD[REQUIRED_AXES] = { /* analog sticks: thresholds for the (x,y) axes */
 
     /* Pressing up + jump won't make the player jump */
     [AXIS_X] = 0.609f,/* cos(52.5 degrees) ~ 105 degrees horizontally */
@@ -117,6 +111,11 @@ static const float ANALOG_AXIS_THRESHOLD[REQUIRED_AXES] = {
     /*[AXIS_Y] = 0.707f*/ /* sin(45 degrees) ~ 90 degrees vertically */
 
 };
+
+#if defined(ALLEGRO_UNIX) && AL_ID(ALLEGRO_VERSION, ALLEGRO_SUB_VERSION, ALLEGRO_WIP_VERSION, 0) < AL_ID(5,2,10,0)
+/* bugfix for Allegro 5.2.9 or older */
+#define WANT_JOYINIT_QUIRK 1
+#endif
 
 /* the joystick pool is used to keep consistent joystick IDs across reconfigurations */
 #define POOL_CAPACITY    MAX_JOYS /* how many different joysticks we can connect */
@@ -128,10 +127,6 @@ static void joystick_pool_clear();
 static void joystick_pool_refresh();
 static void joystick_pool_recycle();
 static int joystick_pool_count();
-
-/* private data */
-static const char DEFAULT_INPUTMAP_NAME[] = "default";
-static input_list_t* input_list = NULL;
 
 /* private methods */
 static void input_register(input_t *in);
@@ -199,7 +194,7 @@ void input_init()
         al_set_config_value(al_get_system_config(), "joystick", "driver", "XINPUT");
 #endif
 
-#if defined(JOY_INIT_QUIRK)
+#if WANT_JOYINIT_QUIRK
     /*
 
     Handle a quirk of Allegro 5.2.9 and below.
@@ -222,7 +217,7 @@ void input_init()
     engine_add_event_source(al_get_joystick_event_source());
     engine_add_event_listener(ALLEGRO_EVENT_JOYSTICK_CONFIGURATION, NULL, a5_handle_joystick_event);
 
-#if defined(JOY_INIT_QUIRK)
+#if WANT_JOYINIT_QUIRK
     /* restore the file system interface */
     al_set_fs_interface(fs_interface);
 #endif
@@ -289,7 +284,10 @@ void input_init()
  */
 void input_update()
 {
-    int num_joys = min(al_get_num_joysticks(), MAX_JOYS);
+    /* read the number of joysticks */
+    int num_joys = al_get_num_joysticks();
+    if(num_joys > MAX_JOYS)
+        num_joys = MAX_JOYS;
 
     /* read joystick input */
     for(int j = 0; j < num_joys; j++) {
@@ -386,7 +384,7 @@ void input_update()
 
         }
 
-        /* clamp values to [0,1] */
+        /* clamp values to [-1,1] */
         joy[j].axis[AXIS_X] = clip(joy[j].axis[AXIS_X], -1.0f, 1.0f);
         joy[j].axis[AXIS_Y] = clip(joy[j].axis[AXIS_Y], -1.0f, 1.0f);
     }
@@ -811,15 +809,9 @@ const char* input_get_mapping_name(inputuserdefined_t *in)
 
 
 
-
-
-
-
-
 /*
- * private stuff
+ * private input methods
  */
-
 
 /* registers an input device */
 void input_register(input_t *in)
@@ -945,133 +937,12 @@ void inputuserdefined_update(input_t* in)
     }
 }
 
-/* remap joystick buttons according to the underlying platform.
-   We want to maintain consistency across platforms */
-void remap_joystick_buttons(joystick_input_t* joy)
-{
-    /* Allegro's numbers for XINPUT button input
-       from: src/win/wjoyxi.c (Allegro's source code) */
-    enum {
-        XINPUT_A = 0,
-        XINPUT_B = 1,
-        XINPUT_X = 2,
-        XINPUT_Y = 3,
-        XINPUT_RB = 4,
-        XINPUT_LB = 5,
-        XINPUT_RT = 6,
-        XINPUT_LT = 7,
-        XINPUT_BACK = 8,
-        XINPUT_START = 9,
-        XINPUT_DPAD_R = 10,
-        XINPUT_DPAD_L = 11,
-        XINPUT_DPAD_D = 12,
-        XINPUT_DPAD_U = 13
-    };
 
-#if defined(__ANDROID__)
-    /*
 
-    Remap Allegro's JS_* button constants to Allegro's buttons of the Windows XInput driver.
 
-    The following JS_* constants are defined in the source code of MODIFIED Allegro 5.2.9 at:
-    android/gradle_project/allegro/src/main/java/org/liballeg/android/AllegroActivity.java
-
-    My joystick-related modifications to Allegro 5.2.9:
-    1) https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1483.patch
-    2) https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1507.patch (apply with fuzz=3)
-
-    */
-    enum {
-        JS_A = 0,
-        JS_B = 1,
-        JS_X = 2,
-        JS_Y = 3,
-        JS_L1 = 4,
-        JS_R1 = 5,
-        JS_DPAD_L = 6,
-        JS_DPAD_R = 7,
-        JS_DPAD_U = 8,
-        JS_DPAD_D = 9,
-        JS_START = 10,
-        JS_SELECT = 11,
-        JS_MODE = 12,
-        JS_THUMBL = 13,
-        JS_THUMBR = 14,
-        JS_L2 = 15,
-        JS_R2 = 16,
-        JS_C = 17,
-        JS_Z = 18,
-        JS_DPAD_CENTER = 19
-    };
-
-    const int remap[] = {
-        [JS_A] = XINPUT_A, /* BUTTON_A := primary action button */
-        [JS_B] = XINPUT_B,
-        [JS_X] = XINPUT_X,
-        [JS_Y] = XINPUT_Y,
-        [JS_L1] = XINPUT_LB,
-        [JS_R1] = XINPUT_RB,
-        [JS_DPAD_L] = XINPUT_DPAD_L,
-        [JS_DPAD_R] = XINPUT_DPAD_R,
-        [JS_DPAD_U] = XINPUT_DPAD_U,
-        [JS_DPAD_D] = XINPUT_DPAD_D,
-        [JS_START] = XINPUT_START,
-        [JS_SELECT] = XINPUT_BACK,
-        [JS_MODE] = -1, /* unused */
-        [JS_THUMBL] = XINPUT_RT,
-        [JS_THUMBR] = XINPUT_LT,
-        [JS_L2] = -1, /* unused */
-        [JS_R2] = -1, /* unused */
-        [JS_C] = -1, /* unused */
-        [JS_Z] = -1, /* unused */
-        [JS_DPAD_CENTER] = XINPUT_A
-    };
-
-    const int n = sizeof(remap) / sizeof(int);
-
-    /* store the state of the buttons */
-    uint32_t buttons = joy->button;
-
-    /* clear the state of the buttons */
-    joy->button = 0;
-
-    /* remap buttons */
-    for(int js = 0; js < n; js++) {
-        if((buttons & (1 << js)) != 0) {
-            if(remap[js] >= 0)
-                joy->button |= (1 << remap[js]);
-        }
-    }
-
-    /*
-
-    See also: recommended game actions for gamepad buttons
-    https://developer.android.com/develop/ui/views/touch-and-input/game-controllers/controller-input#button
-    https://developer.android.com/training/tv/start/controllers#tv-ui-events
-
-    */
-
-#else
-
-    /* do nothing */
-    (void)XINPUT_A;
-    (void)XINPUT_B;
-    (void)XINPUT_X;
-    (void)XINPUT_Y;
-    (void)XINPUT_RB;
-    (void)XINPUT_LB;
-    (void)XINPUT_RT;
-    (void)XINPUT_LT;
-    (void)XINPUT_BACK;
-    (void)XINPUT_START;
-    (void)XINPUT_DPAD_R;
-    (void)XINPUT_DPAD_L;
-    (void)XINPUT_DPAD_D;
-    (void)XINPUT_DPAD_U;
-    (void)joy;
-
-#endif
-}
+/*
+ * joystick pool
+ */
 
 /* clear the joystick pool */
 void joystick_pool_clear()
@@ -1209,6 +1080,13 @@ int joystick_pool_count()
 
     return count;
 }
+
+
+
+
+/*
+ * event handlers
+ */
 
 /* handle a keyboard event */
 void a5_handle_keyboard_event(const ALLEGRO_EVENT* event, void* data)
@@ -1378,6 +1256,141 @@ void a5_handle_touch_event(const ALLEGRO_EVENT* event, void* data)
         else if(event->type == ALLEGRO_EVENT_TOUCH_END || event->type == ALLEGRO_EVENT_TOUCH_CANCEL)
             emulated_mouse.tracked_touch_id = -1;
     }
+}
+
+
+
+
+/*
+ * misc
+ */
+
+/* remap joystick buttons according to the underlying platform.
+   We want to maintain consistency across platforms */
+void remap_joystick_buttons(joystick_input_t* joy)
+{
+    /* Allegro's numbers for XINPUT button input
+       from: src/win/wjoyxi.c (Allegro's source code) */
+    enum {
+        XINPUT_A = 0,
+        XINPUT_B = 1,
+        XINPUT_X = 2,
+        XINPUT_Y = 3,
+        XINPUT_RB = 4,
+        XINPUT_LB = 5,
+        XINPUT_RT = 6,
+        XINPUT_LT = 7,
+        XINPUT_BACK = 8,
+        XINPUT_START = 9,
+        XINPUT_DPAD_R = 10,
+        XINPUT_DPAD_L = 11,
+        XINPUT_DPAD_D = 12,
+        XINPUT_DPAD_U = 13
+    };
+
+#if defined(__ANDROID__)
+    /*
+
+    Remap Allegro's JS_* button constants to Allegro's buttons of the Windows XInput driver.
+
+    The following JS_* constants are defined in the source code of MODIFIED Allegro 5.2.9 at:
+    android/gradle_project/allegro/src/main/java/org/liballeg/android/AllegroActivity.java
+
+    My joystick-related modifications to Allegro 5.2.9:
+    1) https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1483.patch
+    2) https://patch-diff.githubusercontent.com/raw/liballeg/allegro5/pull/1507.patch (apply with fuzz=3)
+
+    */
+    enum {
+        JS_A = 0,
+        JS_B = 1,
+        JS_X = 2,
+        JS_Y = 3,
+        JS_L1 = 4,
+        JS_R1 = 5,
+        JS_DPAD_L = 6,
+        JS_DPAD_R = 7,
+        JS_DPAD_U = 8,
+        JS_DPAD_D = 9,
+        JS_START = 10,
+        JS_SELECT = 11,
+        JS_MODE = 12,
+        JS_THUMBL = 13,
+        JS_THUMBR = 14,
+        JS_L2 = 15,
+        JS_R2 = 16,
+        JS_C = 17,
+        JS_Z = 18,
+        JS_DPAD_CENTER = 19
+    };
+
+    const int remap[] = {
+        [JS_A] = XINPUT_A, /* BUTTON_A := primary action button */
+        [JS_B] = XINPUT_B,
+        [JS_X] = XINPUT_X,
+        [JS_Y] = XINPUT_Y,
+        [JS_L1] = XINPUT_LB,
+        [JS_R1] = XINPUT_RB,
+        [JS_DPAD_L] = XINPUT_DPAD_L,
+        [JS_DPAD_R] = XINPUT_DPAD_R,
+        [JS_DPAD_U] = XINPUT_DPAD_U,
+        [JS_DPAD_D] = XINPUT_DPAD_D,
+        [JS_START] = XINPUT_START,
+        [JS_SELECT] = XINPUT_BACK,
+        [JS_MODE] = -1, /* unused */
+        [JS_THUMBL] = XINPUT_RT,
+        [JS_THUMBR] = XINPUT_LT,
+        [JS_L2] = -1, /* unused */
+        [JS_R2] = -1, /* unused */
+        [JS_C] = -1, /* unused */
+        [JS_Z] = -1, /* unused */
+        [JS_DPAD_CENTER] = XINPUT_A
+    };
+
+    const int n = sizeof(remap) / sizeof(int);
+
+    /* store the state of the buttons */
+    uint32_t buttons = joy->button;
+
+    /* clear the state of the buttons */
+    joy->button = 0;
+
+    /* remap buttons */
+    for(int js = 0; js < n; js++) {
+        if((buttons & (1 << js)) != 0) {
+            if(remap[js] >= 0)
+                joy->button |= (1 << remap[js]);
+        }
+    }
+
+    /*
+
+    See also: recommended game actions for gamepad buttons
+    https://developer.android.com/develop/ui/views/touch-and-input/game-controllers/controller-input#button
+    https://developer.android.com/training/tv/start/controllers#tv-ui-events
+
+    */
+
+#else
+
+    /* do nothing */
+    (void)XINPUT_A;
+    (void)XINPUT_B;
+    (void)XINPUT_X;
+    (void)XINPUT_Y;
+    (void)XINPUT_RB;
+    (void)XINPUT_LB;
+    (void)XINPUT_RT;
+    (void)XINPUT_LT;
+    (void)XINPUT_BACK;
+    (void)XINPUT_START;
+    (void)XINPUT_DPAD_R;
+    (void)XINPUT_DPAD_L;
+    (void)XINPUT_DPAD_D;
+    (void)XINPUT_DPAD_U;
+    (void)joy;
+
+#endif
 }
 
 /* log joysticks */
