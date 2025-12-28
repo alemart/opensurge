@@ -1097,8 +1097,12 @@ void set_display_icon(ALLEGRO_DISPLAY* display)
 
     extern const unsigned char ICON_PNG[];
     extern const size_t ICON_SIZE;
+
     ALLEGRO_FILE* f = al_open_memfile((void*)ICON_PNG, ICON_SIZE, "rb");
+    if(!f) return;
+
     ALLEGRO_BITMAP* icon = al_load_bitmap_f(f, ".png");
+    if(!icon) { al_fclose(f); return; }
 
     if(display != NULL)
         al_set_display_icon(display, icon);
