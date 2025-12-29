@@ -917,7 +917,7 @@ void input_change_mapping(inputuserdefined_t *in, const char* inputmap_name)
  * input_get_mapping_name()
  * Returns the mapping name associated to this user-defined input device
  */
-const char* input_get_mapping_name(inputuserdefined_t *in)
+const char* input_get_mapping_name(const inputuserdefined_t *in)
 {
     return in->inputmap->name;
 }

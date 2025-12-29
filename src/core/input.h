@@ -25,36 +25,39 @@
 #include "../util/v2d.h"
 
 /* forward declarations */
-typedef enum inputbutton_t inputbutton_t;
 typedef struct input_t input_t; /* input_t is the base class */
-typedef struct inputmouse_t inputmouse_t; /* the following are derived from input_t */
+typedef struct inputmouse_t inputmouse_t;
 typedef struct inputcomputer_t inputcomputer_t;
 typedef struct inputuserdefined_t inputuserdefined_t;
 
 /* constants */
 #define MAX_JOYSTICK_BUTTONS 32 /* bit vector uint32_t */
 
-/* available buttons */
-enum inputbutton_t {
-    /* enum */  /* suggested action */
-    /* -----*/  /* ----------------- */
+/* buttons */
+typedef enum inputbutton_t {
+
+    /* directionals */
     IB_UP,      /* up */
     IB_RIGHT,   /* right */
     IB_DOWN,    /* down */
     IB_LEFT,    /* left */
 
-    IB_FIRE1,   /* action button */
+    /* basic controller */
+    IB_FIRE1,   /* primary action button */
     IB_FIRE2,   /* secondary action button */
-    IB_FIRE3,   /* start, confirm, pause */
-    IB_FIRE4,   /* back, cancel, quit */
+    IB_FIRE3,   /* start button */
+    IB_FIRE4,   /* back / select button */
 
-    IB_FIRE5,   /* tertiary action button */
-    IB_FIRE6,   /* quaternary action button */
-    IB_FIRE7,   /* left shoulder button */
-    IB_FIRE8,   /* right shoulder button */
+    /* extended controller */
+    IB_FIRE5,
+    IB_FIRE6,
+    IB_FIRE7,
+    IB_FIRE8,
 
-    IB_MAX      /* number of buttons */
-};
+    /* number of buttons */
+    IB_MAX
+
+} inputbutton_t;
 
 /* public methods */
 void input_init();
@@ -93,11 +96,9 @@ bool input_is_blocked(const input_t *in);
 void input_block(input_t *in);
 void input_unblock(input_t *in);
 
-/* these will only work for a mouse input device */
 v2d_t input_get_xy(const inputmouse_t *in);
 
-/* the following will only work for a user customized input device */
 void input_change_mapping(inputuserdefined_t *in, const char* inputmap_name); /* set inputmap_name to NULL to use a default mapping */
-const char* input_get_mapping_name(inputuserdefined_t *in);
+const char* input_get_mapping_name(const inputuserdefined_t *in);
 
 #endif
