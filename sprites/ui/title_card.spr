@@ -47,6 +47,9 @@ sprite "Default Title Card"
 
         // the font used to display the name of the level
         level_name_font         "GoodNeighborsLarge"
+
+        // the alignment of the font used to display the name of the level
+        level_name_alignment    "center"
     }
 
     // warming up
@@ -241,7 +244,7 @@ sprite "Default Title Card - Layer 1"
     custom_properties
     {
         // the position of this layer in screen space
-        layer_position      464 64
+        layer_position      664 64
     }
 
     // warming up
@@ -307,7 +310,7 @@ sprite "Default Title Card - Layer 1"
 
         keyframe 100%
         {
-            translation -200 0
+            translation -400 0
         }
     }
 
@@ -317,7 +320,7 @@ sprite "Default Title Card - Layer 1"
 
         keyframe 0%
         {
-            translation -200 0
+            translation -400 0
         }
     }
 
@@ -328,7 +331,7 @@ sprite "Default Title Card - Layer 1"
 
         keyframe 0%
         {
-            translation -200 0
+            translation -400 0
         }
 
         keyframe 100%
@@ -362,7 +365,7 @@ sprite "Default Title Card - Layer 2"
     custom_properties
     {
         // the position of this layer in screen space
-        layer_position      432 112
+        layer_position      632 112
     }
 
     // warming up
@@ -428,7 +431,7 @@ sprite "Default Title Card - Layer 2"
 
         keyframe 100%
         {
-            translation -200 0
+            translation -400 0
         }
     }
 
@@ -438,7 +441,7 @@ sprite "Default Title Card - Layer 2"
 
         keyframe 0%
         {
-            translation -200 0
+            translation -400 0
         }
     }
 
@@ -449,7 +452,7 @@ sprite "Default Title Card - Layer 2"
 
         keyframe 0%
         {
-            translation -200 0
+            translation -400 0
         }
 
         keyframe 100%

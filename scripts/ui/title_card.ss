@@ -147,8 +147,10 @@ object "Default Title Card" is "entity", "awake", "detached", "private"
         levelName.setLayer(titleLayer);
 
         // set the font of the level name
-        titleLayerFont = String(actor.animation.prop("level_name_font") || "GoodNeighborsLarge");
-        levelName.setFontName(titleLayerFont);
+        titleFontAlignment = String(actor.animation.prop("level_name_alignment") || "center");
+        titleFontName = String(actor.animation.prop("level_name_font") || "GoodNeighborsLarge");
+        levelName.setFontAlignment(titleFontAlignment);
+        levelName.setFontName(titleFontName);
 
         // attach the zone number to a layer
         zoneLayerNumber = Math.floor(Number(actor.animation.prop("level_zone_layer")));
@@ -239,6 +241,7 @@ object "Default Title Card - Level Name" is "entity", "awake", "detached", "priv
     transform = Transform();
     label = null;
     layer = null;
+    align = "center";
 
     state "main"
     {
@@ -257,8 +260,18 @@ object "Default Title Card - Level Name" is "entity", "awake", "detached", "priv
         label = Text(fontName);
 
         label.text = Level.name;
-        label.align = "center";
+        label.align = align;
         label.zindex = parent.zindex + 1.1;
+
+        return this;
+    }
+
+    fun setFontAlignment(alignment)
+    {
+        align = alignment;
+
+        if(label !== null)
+            label.align = align;
 
         return this;
     }
