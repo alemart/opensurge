@@ -370,7 +370,10 @@ void pause_init(void *_)
     /* should we use the legacy mode? */
     legacy_mode = want_legacy_mode();
     if(legacy_mode) {
-        sound_play(sound_load(LEGACY_SOUND_PATH));
+        music_pause();
+        sound_swap_mixers();
+        if(asset_exists(LEGACY_SOUND_PATH))
+            sound_play(sound_load(LEGACY_SOUND_PATH));
         return;
     }
 
@@ -498,10 +501,19 @@ void pause_release()
     /* resume scripting */
     scripting_resume_vm();
 
-    /* resume music & sounds */
+    /* resume the sounds of the game */
     sound_stop_all();
     sound_swap_mixers();
-    music_resume();
+
+    /* are we continuing to play? */
+    if(option == OPTION_CONTINUE) {
+        /* yes. resume the music of the level */
+        music_resume();
+    }
+    else {
+        /* no. stop the sounds of the level */
+        sound_stop_all();
+    }
 }
 
 
@@ -930,12 +942,14 @@ void legacy_update()
 
     /* exit game */
     if(input_button_pressed(input, IB_FIRE4)) {
+        option = OPTION_EXIT;
         fadefx_out(color_rgb(0,0,0), LEGACY_FADEOUT_TIME);
         return;
     }
 
-    /* unpause */
+    /* go back to the game */
     if(input_button_pressed(input, IB_FIRE3)) {
+        option = OPTION_CONTINUE;
         scenestack_pop();
         return;
     }
@@ -944,11 +958,13 @@ void legacy_update()
     if(mobilegamepad_is_visible() && input_button_pressed(input, IB_FIRE1)) {
         if(!input_button_down(input, IB_UP)) {
             /* go back to the game */
+            option = OPTION_CONTINUE;
             scenestack_pop();
             return;
         }
         else {
             /* enter the mobile menu */
+            option = OPTION_EXIT;
             scenestack_pop();
             scenestack_push(storyboard_get_scene(SCENE_MOBILEMENU), snapshot);
             return;
