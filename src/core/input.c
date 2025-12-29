@@ -18,13 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define ALLEGRO_UNSTABLE
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_memfile.h>
 #include "input.h"
 #include "engine.h"
 #include "video.h"
 #include "logfile.h"
 #include "timer.h"
 #include "inputmap.h"
+#include "asset.h"
 #include "../entities/mobilegamepad.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
@@ -70,32 +73,36 @@ struct input_list_t {
 
 
 /* private data */
-static const char DEFAULT_INPUTMAP_NAME[] = "default";
 static input_list_t* input_list = NULL; /* list of registered inputs */
+static const char DEFAULT_INPUTMAP_NAME[] = "default";
+static const char GAME_CONTROLLER_DB_PATH[] = "inputs/gamecontrollerdb.txt";
 
 /* keyboard input */
 static bool a5_key[ALLEGRO_KEY_MAX] = { false };
 
 /* mouse input */
-#define LEFT_MOUSE_BUTTON   1 /* primary button, 1 << 0 */
-#define RIGHT_MOUSE_BUTTON  2 /* secondary button, 1 << 1 */
-#define MIDDLE_MOUSE_BUTTON 4 /* tertiary button, 1 << 2 */
+enum {
+    LEFT_MOUSE_BUTTON   = 1 << 0, /* primary mouse button */
+    RIGHT_MOUSE_BUTTON  = 1 << 1, /* secondary mouse button */
+    MIDDLE_MOUSE_BUTTON = 1 << 2  /* tertiary mouse button */
+};
 static struct {
     int x, y, z; /* position of the cursor */
     int dx, dy, dz; /* deltas */
-    int b; /* bit vector of active buttons */
+    int b; /* bit vector of pressed buttons */
 } a5_mouse = { 0 };
 
 /* joystick input */
 #define MAX_JOYS         8 /* maximum number of joysticks */
-#define MIN_BUTTONS      4 /* minimum number of buttons for a joystick to be considered a gamepad */
 #define REQUIRED_AXES    2 /* required number of axes of a stick */
+#define MIN_BUTTONS      4 /* minimum number of buttons for a joystick to be considered a gamepad */
+#define MAX_BUTTONS      MAX_JOYSTICK_BUTTONS /* maximum supported number of buttons */
 enum { AXIS_X = 0, AXIS_Y = 1 }; /* axes of a stick */
 
 typedef struct joystick_input_t joystick_input_t;
 struct joystick_input_t {
     float axis[REQUIRED_AXES]; /* -1.0 <= axis[i] <= 1.0 */
-    uint32_t button; /* bit vector */
+    uint32_t buttons; /* bit vector of pressed buttons */
 };
 
 static joystick_input_t joy[MAX_JOYS];
@@ -112,9 +119,55 @@ static const float ANALOG_AXIS_THRESHOLD[REQUIRED_AXES] = { /* analog sticks: th
 
 };
 
+/* XInput button numbers from Allegro's source code at src/win/wjoyxi.c
+   Historically, we've been using this layout. Here I type the numbers explicitly. */
+enum {
+    BUTTON_A              = 0,
+    BUTTON_B              = 1,
+    BUTTON_X              = 2,
+    BUTTON_Y              = 3,
+    BUTTON_RIGHT_SHOULDER = 4,
+    BUTTON_LEFT_SHOULDER  = 5,
+    BUTTON_RIGHT_THUMB    = 6,
+    BUTTON_LEFT_THUMB     = 7,
+    BUTTON_BACK           = 8,
+    BUTTON_START          = 9,
+    BUTTON_DPAD_RIGHT     = 10,
+    BUTTON_DPAD_LEFT      = 11,
+    BUTTON_DPAD_DOWN      = 12,
+    BUTTON_DPAD_UP        = 13
+};
+
+/*
+
+See also: recommended game actions for gamepad buttons
+https://developer.android.com/develop/ui/views/touch-and-input/game-controllers/controller-input#button
+https://developer.android.com/training/tv/start/controllers#tv-ui-events
+
+*/
+
+/* Joystick initialization fix for Allegro 5.2.9.x or older on Unix */
 #if defined(ALLEGRO_UNIX) && AL_ID(ALLEGRO_VERSION, ALLEGRO_SUB_VERSION, ALLEGRO_WIP_VERSION, 0) < AL_ID(5,2,10,0)
-/* bugfix for Allegro 5.2.9 or older */
-#define WANT_JOYINIT_QUIRK 1
+# define WANT_JOYINIT_QUIRK 1
+#endif
+
+/* the new Gamepad system requires Allegro 5.2.11 or newer */
+#if AL_ID(ALLEGRO_VERSION, ALLEGRO_SUB_VERSION, ALLEGRO_WIP_VERSION, 0) >= AL_ID(5,2,11,0)
+# define HAVE_GAMEPAD_API 1
+#endif
+
+/* remap the new Gamepad button layout of Allegro to the XInput button layout we've been using historically */
+#if WANT_BETTER_GAMEPAD && HAVE_GAMEPAD_API
+# define WANT_BACKWARDS_COMPATIBLE_GAMEPAD 1
+#endif
+
+#if WANT_BETTER_GAMEPAD && !HAVE_GAMEPAD_API
+# error "Compile-time option WANT_BETTER_GAMEPAD requires Allegro 5.2.11 or newer"
+#endif
+
+#if WANT_BETTER_GAMEPAD && defined(__ANDROID__)
+# error "Compile-time option WANT_BETTER_GAMEPAD is currently unavailable for Android"
+/* requires Allegro 5.2.x or newer on Android */
 #endif
 
 /* the joystick pool is used to keep consistent joystick IDs across reconfigurations */
@@ -132,9 +185,11 @@ static int joystick_pool_count();
 static void input_register(input_t *in);
 static void input_unregister(input_t *in);
 static void input_clear(input_t *in);
-static void remap_joystick_buttons(joystick_input_t* joy);
+static bool remap_joystick_buttons(uint32_t* buttons, ALLEGRO_JOYSTICK* joystick);
+static bool remap_joystick_button(int* out, int button_number, ALLEGRO_JOYSTICK* joystick);
 static void log_joysticks();
 static void log_joystick(ALLEGRO_JOYSTICK* joystick);
+static const char* joyguid2str(ALLEGRO_JOYSTICK* joystick);
 
 /* Allegro 5 events */
 static void a5_handle_keyboard_event(const ALLEGRO_EVENT* event, void* data);
@@ -188,10 +243,52 @@ void input_init()
 
     /* initialize the joystick */
 #if defined(_WIN32)
-    /* Joysticks: use the XInput driver on Windows */
+    /* use the XInput driver on Windows */
     const char* windrv = al_get_config_value(al_get_system_config(), "joystick", "driver");
     if(windrv == NULL || *windrv == '\0')
         al_set_config_value(al_get_system_config(), "joystick", "driver", "XINPUT");
+#endif
+
+#if WANT_BACKWARDS_COMPATIBLE_GAMEPAD
+    /*
+
+    Let's set up a consistent cross-platform gamepad layout
+
+    al_set_joystick_mappings_f() should be called before al_install_joystick()
+    according to the Allegro manual
+
+    */
+
+    /* read a built-in gamecontrollerdb.txt */
+    extern const char GAME_CONTROLLER_DB[];
+    extern const size_t GAME_CONTROLLER_DB_SIZE;
+    ALLEGRO_FILE* db = al_open_memfile((void*)GAME_CONTROLLER_DB, GAME_CONTROLLER_DB_SIZE, "r");
+
+    if(db != NULL) {
+        if(!al_set_joystick_mappings_f(db)) {
+            logfile_message("Can't use the built-in joystick mappings");
+            video_showmessage("Can't use the built-in joystick mappings");
+        }
+        al_fclose(db);
+    }
+    else
+        logfile_message("Can't read the built-in joystick mappings");
+
+    /* append an external, additional gamecontrollerdb.txt
+       Perhaps it's up-to-date. Perhaps it's older than the built-in db. Perhaps it's customized by the user */
+    if(asset_exists(GAME_CONTROLLER_DB_PATH)) {
+        const char* fullpath = asset_path(GAME_CONTROLLER_DB_PATH);
+        logfile_message("Found additional joystick mappings at %s", GAME_CONTROLLER_DB_PATH);
+        if(!al_set_joystick_mappings(fullpath)) {
+            logfile_message("Can't use the additional joystick mappings");
+            video_showmessage("Can't use the additional joystick mappings");
+        }
+    }
+    else
+        logfile_message("No additional joystick mappings found at %s", GAME_CONTROLLER_DB_PATH);
+#else
+    logfile_message("Joystick mappings are unavailable in this build");
+    (void)GAME_CONTROLLER_DB_PATH;
 #endif
 
 #if WANT_JOYINIT_QUIRK
@@ -296,20 +393,20 @@ void input_update()
         int num_buttons = al_get_joystick_num_buttons(joystick);
 
         /* cap the number of buttons */
-        if(num_buttons > MAX_JOYSTICK_BUTTONS)
-            num_buttons = MAX_JOYSTICK_BUTTONS;
+        if(num_buttons > MAX_BUTTONS)
+            num_buttons = MAX_BUTTONS;
 
         /* read the current state */
         ALLEGRO_JOYSTICK_STATE state;
         al_get_joystick_state(joystick, &state);
 
         /* read buttons */
-        joy[j].button = 0;
+        joy[j].buttons = 0u;
         for(int b = 0; b < num_buttons; b++)
-            joy[j].button |= (state.button[b] != 0) << b;
+            joy[j].buttons |= (uint32_t)(state.button[b] != 0) << b;
 
-        /* platform-specific remapping */
-        remap_joystick_buttons(&joy[j]);
+        /* remap buttons */
+        remap_joystick_buttons(&(joy[j].buttons), joystick);
 
         /*
 
@@ -332,7 +429,11 @@ void input_update()
         stick*. Further testing is desirable. How does Allegro divide the analog
         input in sticks**? jstest only reports axes and buttons.
 
-        https://github.com/gabomdq/SDL_GameControllerDB
+        https://github.com/mdqinc/SDL_GameControllerDB
+
+        Update: in the new Gamepad system introduced in Allegro 5.2.11, the first
+        stick (stick_id = 0) is the D-Pad. The second stick (stick_id = 1) is the
+        left analog. So we test multiple sticks.
 
         (*) Yes, it can if we use Allegro's XInput driver on Windows. Stick 0
             is the "Left Thumbstick" and stick 1 is the "Right Thumbstick". See
@@ -358,20 +459,33 @@ void input_update()
         for(int stick_id = 0; stick_id < num_sticks; stick_id++) {
 
             /* safety check */
-            /* I use <= because I think al_get_joystick_num_axes() cannot be
-               fully trusted with controllers in DInput mode.
+            /* I use <= because I think that al_get_joystick_num_axes() cannot
+               be fully trusted with controllers in DInput mode.
                https://www.allegro.cc/forums/thread/614996/1 */
             if(REQUIRED_AXES <= al_get_joystick_num_axes(joystick, stick_id)) {
 
                 float x = state.stick[stick_id].axis[0];
                 float y = state.stick[stick_id].axis[1];
 
+#if HAVE_GAMEPAD_API
+                /* ignore the right analog stick */
+                if(al_get_joystick_type(joystick) == ALLEGRO_JOYSTICK_TYPE_GAMEPAD) {
+                    if(stick_id == ALLEGRO_GAMEPAD_STICK_RIGHT_THUMB)
+                        continue;
+                }
+                else {
+#endif
+
                 /* ignore what is probably the right analog stick (stick_id = 1
                    with 2 axes), but not a D-Pad that is mapped to a stick
-                   (probably the first stick with stick_id >= 2 and 2 axes). */
+                   (probably the first stick having stick_id >= 2 and 2 axes). */
                 int flags = al_get_joystick_stick_flags(joystick, stick_id);
                 if(stick_id == 1 && !(flags & ALLEGRO_JOYFLAG_DIGITAL))
                     continue;
+
+#if HAVE_GAMEPAD_API
+                }
+#endif
 
                 /* ignore the dead-zone and normalize the data back to [-1,1] */
                 const float NORMALIZER = 1.0f - DEADZONE_THRESHOLD;
@@ -759,11 +873,12 @@ void input_print_joysticks()
 {
     int n = input_number_of_joysticks();
 
-    if(n > 0)
-        video_showmessage("Found %d joystick%s", n, n != 1 ? "s" : "");
-    else
+    if(n == 0) {
         video_showmessage("No joysticks have been detected");
+        return;
+    }
 
+    video_showmessage("Found %d joystick%s", n, n != 1 ? "s" : "");
     for(int j = 0; j < POOL_CAPACITY; j++) {
         ALLEGRO_JOYSTICK* joystick = joystick_pool_query(j);
 
@@ -917,7 +1032,7 @@ void inputuserdefined_update(input_t* in)
 
             for(inputbutton_t button = 0; button < IB_MAX; button++) {
                 uint32_t button_mask = im->joystick.button_mask[(int)button];
-                in->state[button] = in->state[button] || ((wanted_joy[joy_id]->button & button_mask) != 0);
+                in->state[button] = in->state[button] || ((wanted_joy[joy_id]->buttons & button_mask) != 0);
             }
         }
     }
@@ -1244,7 +1359,7 @@ void a5_handle_touch_event(const ALLEGRO_EVENT* event, void* data)
         al_emit_user_event(my_event_source, &my_event, NULL);
 
         /*
-            According to the Allegro docs, al_emit_user_event():
+            According to the Allegro manual, al_emit_user_event():
 
             "Events are copied in and out of event queues, so after this function
             returns the memory pointed to by event may be freed or reused."
@@ -1265,30 +1380,75 @@ void a5_handle_touch_event(const ALLEGRO_EVENT* event, void* data)
  * misc
  */
 
-/* remap joystick buttons according to the underlying platform.
-   We want to maintain consistency across platforms */
-void remap_joystick_buttons(joystick_input_t* joy)
+/* remap joystick buttons according to the underlying platform
+   we want to maintain consistency across platforms
+   argument buttons is an input and output parameter */
+bool remap_joystick_buttons(uint32_t* buttons, ALLEGRO_JOYSTICK* joystick)
 {
-    /* Allegro's numbers for XINPUT button input
-       from: src/win/wjoyxi.c (Allegro's source code) */
-    enum {
-        XINPUT_A = 0,
-        XINPUT_B = 1,
-        XINPUT_X = 2,
-        XINPUT_Y = 3,
-        XINPUT_RB = 4,
-        XINPUT_LB = 5,
-        XINPUT_RT = 6,
-        XINPUT_LT = 7,
-        XINPUT_BACK = 8,
-        XINPUT_START = 9,
-        XINPUT_DPAD_R = 10,
-        XINPUT_DPAD_L = 11,
-        XINPUT_DPAD_D = 12,
-        XINPUT_DPAD_U = 13
+    /* bit vector of remapped buttons */
+    uint32_t remapped_buttons = 0u;
+
+    /* for each button b */
+    for(int c, b = 0; b < MAX_BUTTONS; b++) {
+
+        /* is b pressed? */
+        if((*buttons & (1u << b)) != 0u) {
+
+            /* can we remap b? */
+            if(remap_joystick_button(&c, b, joystick)) {
+
+                /* remap b to c */
+                remapped_buttons |= 1u << c;
+
+            }
+
+        }
+
+    }
+
+    /* exit if we have remapped nothing: either no buttons are pressed
+       or we couldn't remap anything (e.g., if joystick type != gamepad ?) */
+    if(!remapped_buttons)
+        return false;
+
+    /* save the changed bit vector if we have remapped something */
+    *buttons = remapped_buttons;
+    return true;
+}
+
+/* returns true if there is a remapping for a button of the target joystick
+   the output parameter is undefined if this function returns false */
+bool remap_joystick_button(int* out, int button_number, ALLEGRO_JOYSTICK* joystick)
+{
+#if WANT_BACKWARDS_COMPATIBLE_GAMEPAD
+
+    /*
+
+    Remap Allegro's new Gamepad buttons to the buttons of the Windows XInput
+    driver we've been using historically - for backwards compatibility.
+
+    */
+
+    static const int remap[] = {
+        [ALLEGRO_GAMEPAD_BUTTON_A] = BUTTON_A,
+        [ALLEGRO_GAMEPAD_BUTTON_B] = BUTTON_B,
+        [ALLEGRO_GAMEPAD_BUTTON_X] = BUTTON_X,
+        [ALLEGRO_GAMEPAD_BUTTON_Y] = BUTTON_Y,
+        [ALLEGRO_GAMEPAD_BUTTON_LEFT_SHOULDER] = BUTTON_LEFT_SHOULDER,
+        [ALLEGRO_GAMEPAD_BUTTON_RIGHT_SHOULDER] = BUTTON_RIGHT_SHOULDER,
+        [ALLEGRO_GAMEPAD_BUTTON_BACK] = BUTTON_BACK,
+        [ALLEGRO_GAMEPAD_BUTTON_START] = BUTTON_START,
+        [ALLEGRO_GAMEPAD_BUTTON_GUIDE] = -1, /* unused; unreliable according to the Allegro manual */
+        [ALLEGRO_GAMEPAD_BUTTON_LEFT_THUMB] = BUTTON_LEFT_THUMB,
+        [ALLEGRO_GAMEPAD_BUTTON_RIGHT_THUMB] = BUTTON_RIGHT_THUMB
     };
 
-#if defined(__ANDROID__)
+    /* skip if remapping isn't applicable */
+    if(al_get_joystick_type(joystick) != ALLEGRO_JOYSTICK_TYPE_GAMEPAD)
+        return false;
+
+#elif defined(__ANDROID__)
+
     /*
 
     Remap Allegro's JS_* button constants to Allegro's buttons of the Windows XInput driver.
@@ -1324,73 +1484,49 @@ void remap_joystick_buttons(joystick_input_t* joy)
         JS_DPAD_CENTER = 19
     };
 
-    const int remap[] = {
-        [JS_A] = XINPUT_A, /* BUTTON_A := primary action button */
-        [JS_B] = XINPUT_B,
-        [JS_X] = XINPUT_X,
-        [JS_Y] = XINPUT_Y,
-        [JS_L1] = XINPUT_LB,
-        [JS_R1] = XINPUT_RB,
-        [JS_DPAD_L] = XINPUT_DPAD_L,
-        [JS_DPAD_R] = XINPUT_DPAD_R,
-        [JS_DPAD_U] = XINPUT_DPAD_U,
-        [JS_DPAD_D] = XINPUT_DPAD_D,
-        [JS_START] = XINPUT_START,
-        [JS_SELECT] = XINPUT_BACK,
+    static const int remap[] = {
+        [JS_A] = BUTTON_A,
+        [JS_B] = BUTTON_B,
+        [JS_X] = BUTTON_X,
+        [JS_Y] = BUTTON_Y,
+        [JS_L1] = BUTTON_LEFT_SHOULDER,
+        [JS_R1] = BUTTON_RIGHT_SHOULDER,
+        [JS_DPAD_L] = BUTTON_DPAD_LEFT,
+        [JS_DPAD_R] = BUTTON_DPAD_RIGHT,
+        [JS_DPAD_U] = BUTTON_DPAD_UP,
+        [JS_DPAD_D] = BUTTON_DPAD_DOWN,
+        [JS_START] = BUTTON_START,
+        [JS_SELECT] = BUTTON_BACK,
         [JS_MODE] = -1, /* unused */
-        [JS_THUMBL] = XINPUT_RT,
-        [JS_THUMBR] = XINPUT_LT,
+        [JS_THUMBL] = BUTTON_LEFT_THUMB,
+        [JS_THUMBR] = BUTTON_RIGHT_THUMB,
         [JS_L2] = -1, /* unused */
         [JS_R2] = -1, /* unused */
         [JS_C] = -1, /* unused */
         [JS_Z] = -1, /* unused */
-        [JS_DPAD_CENTER] = XINPUT_A
+        [JS_DPAD_CENTER] = BUTTON_A
     };
-
-    const int n = sizeof(remap) / sizeof(int);
-
-    /* store the state of the buttons */
-    uint32_t buttons = joy->button;
-
-    /* clear the state of the buttons */
-    joy->button = 0;
-
-    /* remap buttons */
-    for(int js = 0; js < n; js++) {
-        if((buttons & (1 << js)) != 0) {
-            if(remap[js] >= 0)
-                joy->button |= (1 << remap[js]);
-        }
-    }
-
-    /*
-
-    See also: recommended game actions for gamepad buttons
-    https://developer.android.com/develop/ui/views/touch-and-input/game-controllers/controller-input#button
-    https://developer.android.com/training/tv/start/controllers#tv-ui-events
-
-    */
 
 #else
 
-    /* do nothing */
-    (void)XINPUT_A;
-    (void)XINPUT_B;
-    (void)XINPUT_X;
-    (void)XINPUT_Y;
-    (void)XINPUT_RB;
-    (void)XINPUT_LB;
-    (void)XINPUT_RT;
-    (void)XINPUT_LT;
-    (void)XINPUT_BACK;
-    (void)XINPUT_START;
-    (void)XINPUT_DPAD_R;
-    (void)XINPUT_DPAD_L;
-    (void)XINPUT_DPAD_D;
-    (void)XINPUT_DPAD_U;
-    (void)joy;
+    /* nothing to do */
+    static const int remap[] = { };
 
 #endif
+
+    const int n = sizeof(remap) / sizeof(int);
+
+    /* invalid button number? */
+    if(button_number < 0 || button_number >= n)
+        return false;
+
+    /* unused button number? */
+    if(remap[button_number] < 0)
+        return false;
+
+    /* remap button number */
+    *out = remap[button_number];
+    return true;
 }
 
 /* log joysticks */
@@ -1406,7 +1542,7 @@ void log_joysticks()
     logfile_message("Found %d joystick%s", num_joysticks, num_joysticks == 1 ? "" : "s");
     for(int j = 0; j < num_joysticks; j++) {
         ALLEGRO_JOYSTICK* joystick = al_get_joystick(j);
-        logfile_message("[Joystick j=%d]", j);
+        logfile_message("joystick[%d]:", j);
         log_joystick(joystick);
     }
 }
@@ -1414,20 +1550,77 @@ void log_joysticks()
 /* log joystick info */
 void log_joystick(ALLEGRO_JOYSTICK* joystick)
 {
-    const char* joy_flag[4] = { "", "digital", "analog", "" };
+#if HAVE_GAMEPAD_API
+    ALLEGRO_JOYSTICK_TYPE type = al_get_joystick_type(joystick);
+    bool is_gamepad = (type == ALLEGRO_JOYSTICK_TYPE_GAMEPAD);
+#else
+    int type = 0; /* ALLEGRO_JOYSTICK_TYPE_UNKNOWN */
+    bool is_gamepad = false;
+#endif
 
-    logfile_message("- name: \"%s\"", al_get_joystick_name(joystick));
-    logfile_message("-- %d sticks, %d buttons", al_get_joystick_num_sticks(joystick), al_get_joystick_num_buttons(joystick));
+    /* header */
+    logfile_message("  name: \"%s\"", al_get_joystick_name(joystick));
+    logfile_message("  guid: %s", joyguid2str(joystick));
+    logfile_message("  type: %s (%d)", is_gamepad ? "gamepad" : "unknown", type);
 
-    for(int s = 0; s < al_get_joystick_num_sticks(joystick); s++) {
-        logfile_message("-- stick %d (\"%s\")", s, al_get_joystick_stick_name(joystick, s));
-        logfile_message("--- flags: 0x%X %s", al_get_joystick_stick_flags(joystick, s), joy_flag[al_get_joystick_stick_flags(joystick, s) & 0x3]);
-        logfile_message("--- number of axes: %d", al_get_joystick_num_axes(joystick, s));
+    /* list the buttons and their mappings as expected in input\*.in files */
+    logfile_message("  buttons:");
 
-        for(int a = 0; a < al_get_joystick_num_axes(joystick, s); a++)
-            logfile_message("---- axis %d (\"%s\")", a, al_get_joystick_axis_name(joystick, s, a));
+    int num_buttons = al_get_joystick_num_buttons(joystick);
+    if(num_buttons > MAX_BUTTONS)
+        num_buttons = MAX_BUTTONS;
+    else if(num_buttons == 0)
+        logfile_message("    none");
+
+    for(int c, b = 0; b < num_buttons; b++) {
+        if(remap_joystick_button(&c, b, joystick))
+            logfile_message("    \"%s\" => BUTTON_%d", al_get_joystick_button_name(joystick, b), 1+c);
+        else if(!is_gamepad)
+            logfile_message("    \"%s\" => BUTTON_%d", al_get_joystick_button_name(joystick, b), 1+b);
+        /* else: unused button of a gamepad; ignore */
     }
 
-    for(int b = 0; b < al_get_joystick_num_buttons(joystick); b++)
-        logfile_message("-- button %d (\"%s\")", b, al_get_joystick_button_name(joystick, b));
+    /* list the sticks and their axes */
+    logfile_message("  sticks:");
+
+    int num_sticks = al_get_joystick_num_sticks(joystick);
+    if(num_sticks == 0)
+        logfile_message("    none");
+
+    for(int s = 0; s < num_sticks; s++) {
+        static const char* stick_type_name[4] = { "", "digital", "analog", "" };
+        int flags = al_get_joystick_stick_flags(joystick, s);
+
+        logfile_message("    \"%s\":", al_get_joystick_stick_name(joystick, s));
+        logfile_message("      type: %s (%d)", stick_type_name[flags & 0x3], flags);
+        logfile_message("      axes: %d", al_get_joystick_num_axes(joystick, s));
+    }
+}
+
+/* convert the GUID of a joystick to a statically allocated string */
+const char* joyguid2str(ALLEGRO_JOYSTICK* joystick)
+{
+#if HAVE_GAMEPAD_API
+
+    ALLEGRO_JOYSTICK_GUID guid = al_get_joystick_guid(joystick);
+    STATIC_ASSERTX(sizeof(guid.val) == 16);
+
+    static const char nibble2char[] = "0123456789abcdef";
+    static char buffer[33] = { 0 };
+    char* p = buffer;
+
+    for(int i = 0; i < 16; i++) {
+        uint8_t byte = guid.val[i];
+        *p++ = nibble2char[byte >> 4];
+        *p++ = nibble2char[byte & 0xF];
+    }
+    *p = '\0'; /* unnecessary due to initialization, but why not make it explicit? */
+
+    return buffer;
+
+#else
+
+    return "<unavailable>";
+
+#endif
 }

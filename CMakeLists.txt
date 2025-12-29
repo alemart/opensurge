@@ -81,6 +81,13 @@ IF(UNIX AND NOT ANDROID)
   OPTION(DESKTOP_INSTALL "Add Open Surge to the Desktop menu when installing" ON)
 ENDIF()
 
+# Run in place? (i.e., read assets from the directory of the executable)
+OPTION(GAME_RUNINPLACE "Read assets only from the directory of the executable. For testing & development." OFF)
+IF(GAME_RUNINPLACE)
+  LIST(APPEND DEFS "GAME_RUNINPLACE=1")
+  MESSAGE(STATUS "Detected the RUN IN PLACE flag")
+ENDIF()
+
 # Set the build type & version (optional; this helps identify the platform and the development builds)
 SET(GAME_BUILD_VERSION "" CACHE STRING "Build type & version (optional)")
 IF(NOT GAME_BUILD_VERSION STREQUAL "")
@@ -115,6 +122,12 @@ IF(WANT_FASTDRAW)
   LIST(APPEND DEFS "WANT_FASTDRAW=1")
 ENDIF()
 
+# Improved Gamepad support
+OPTION(WANT_BETTER_GAMEPAD "Autodetect gamepad layouts for consistent cross-platform behavior" ON)
+IF(WANT_BETTER_GAMEPAD)
+  LIST(APPEND DEFS "WANT_BETTER_GAMEPAD=1")
+ENDIF()
+
 # User-specified paths
 SET(ALLEGRO_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for Allegro & its dependencies")
 SET(ALLEGRO_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of Allegro")
@@ -131,13 +144,6 @@ IF(UNIX)
     SET(DESKTOP_ENTRY_PATH "/usr/share/applications" CACHE PATH "Where to install the .desktop file")
     SET(DESKTOP_METAINFO_PATH "/usr/share/metainfo" CACHE PATH "Where to install the metainfo file. You shouldn't change this (check the AppStream spec).")
   ENDIF()
-ENDIF()
-
-# Run in place? (i.e., read assets from the directory of the executable)
-OPTION(GAME_RUNINPLACE "Read assets only from the directory of the executable. For testing & development." OFF)
-IF(GAME_RUNINPLACE)
-  LIST(APPEND DEFS "GAME_RUNINPLACE=1")
-  MESSAGE(STATUS "Detected the RUN IN PLACE flag")
 ENDIF()
 
 # data folders (game assets)
@@ -589,6 +595,10 @@ SET(GAME_HEADERS
   src/misc/resource.h
   ${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.rc
 )
+
+IF(WANT_BETTER_GAMEPAD)
+  LIST(APPEND GAME_SRCS src/misc/gamecontrollerdb.c)
+ENDIF()
 
 IF(WANT_FASTDRAW)
   LIST(APPEND GAME_SRCS src/third_party/fast_draw.c)
