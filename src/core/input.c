@@ -1502,8 +1502,8 @@ bool remap_joystick_button(int* out, int button_number, ALLEGRO_JOYSTICK* joysti
         [JS_THUMBR] = BUTTON_RIGHT_THUMB,
         [JS_L2] = -1, /* unused */
         [JS_R2] = -1, /* unused */
-        [JS_C] = -1, /* unused */
-        [JS_Z] = -1, /* unused */
+        [JS_C] = BUTTON_RIGHT_THUMB,
+        [JS_Z] = BUTTON_LEFT_THUMB,
         [JS_DPAD_CENTER] = BUTTON_A
     };
 
