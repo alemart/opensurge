@@ -555,10 +555,14 @@ void font_render(font_t* f, v2d_t camera_position)
         int target_height = image_height(target);
         rect_t target_rect = rect_new(0, 0, target_width, target_height);
 
-        /* clip out the entire text if possible */
+        /* compute the total size and the initial position of the text */
         point2d_t initial_position = point2d_new(floorf(position.x + 0.5f), floorf(position.y + 0.5f));
         v2d_t total_size = f->preprocessed_text.total_size;
-        rect_t bounding_box = rect_new(initial_position.x, initial_position.y, total_size.x, total_size.y);
+
+        /* clip out the entire text if possible */
+        float alignment_multiplier = (float)(f->align == FONTALIGN_CENTER) * 0.5f + (float)(f->align == FONTALIGN_RIGHT);
+        point2d_t adjusted_position = point2d_new(initial_position.x - alignment_multiplier * total_size.x, initial_position.y);
+        rect_t bounding_box = rect_new(adjusted_position.x, adjusted_position.y, total_size.x, total_size.y);
         if(!rect_overlaps(target_rect, bounding_box))
             break;
 
