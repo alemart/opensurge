@@ -127,7 +127,7 @@ inputmap "default"
 
         fire5           BUTTON_6                        // L1
         fire6           BUTTON_5                        // R1
-        fire7           BUTTON_8                        // THUMBL
-        fire8           BUTTON_7                        // THUMBR
+        fire7           BUTTON_8                        // LEFT THUMB
+        fire8           BUTTON_7                        // RIGHT THUMB
     }
 }

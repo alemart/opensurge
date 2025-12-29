@@ -120,7 +120,8 @@ static const float ANALOG_AXIS_THRESHOLD[REQUIRED_AXES] = { /* analog sticks: th
 };
 
 /* XInput button numbers from Allegro's source code at src/win/wjoyxi.c
-   Historically, we've been using this layout. Here I type the numbers explicitly. */
+   Historically, we've been using this layout based on the Xbox controller
+   Here I type the numbers explicitly */
 enum {
     BUTTON_A              = 0,
     BUTTON_B              = 1,
@@ -1520,11 +1521,11 @@ bool remap_joystick_button(int* out, int button_number, ALLEGRO_JOYSTICK* joysti
     if(button_number < 0 || button_number >= n)
         return false;
 
-    /* unused button number? */
+    /* unused button? */
     if(remap[button_number] < 0)
         return false;
 
-    /* remap button number */
+    /* remap button */
     *out = remap[button_number];
     return true;
 }
@@ -1564,7 +1565,7 @@ void log_joystick(ALLEGRO_JOYSTICK* joystick)
     logfile_message("  type: %s (%d)", is_gamepad ? "gamepad" : "unknown", type);
 
     /* list the buttons and their mappings as expected in input\*.in files */
-    logfile_message("  buttons:");
+    logfile_message("  buttons%s:", is_gamepad ? " mapped to the Xbox layout" : "");
 
     int num_buttons = al_get_joystick_num_buttons(joystick);
     if(num_buttons > MAX_BUTTONS)
@@ -1581,7 +1582,7 @@ void log_joystick(ALLEGRO_JOYSTICK* joystick)
     }
 
     /* list the sticks and their axes */
-    logfile_message("  sticks:");
+    logfile_message("  sticks%s:", is_gamepad ? " mapped to the Xbox layout" : "");
 
     int num_sticks = al_get_joystick_num_sticks(joystick);
     if(num_sticks == 0)
