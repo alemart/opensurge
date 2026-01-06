@@ -267,7 +267,7 @@ image_t* image_clone(const image_t* src)
 
     img->w = src->w;
     img->h = src->h;
-    img->path = NULL; /* XXX */
+    img->path = NULL; /* XXX resourcemanager_ref_image */
     img->parent = src->parent;
     img->offx = src->offx;
     img->offy = src->offy;
@@ -835,8 +835,7 @@ void image_draw_lit(const image_t* src, int x, int y, color_t color, int flags)
 
 /*
  * image_draw_tinted()
- * Image blending: multiplication mode
- * 0.0 <= alpha <= 1.0
+ * Image blending: multiply
  */
 void image_draw_tinted(const image_t* src, int x, int y, color_t color, int flags)
 {
