@@ -1037,6 +1037,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
         break;
 
     default:
+        /* warn, but do not crash - forward compatibility? */
         logfile_message("Level loader - unknown command '%s' in '%s' near line %d", command_name, filepath, fileline);
         break;
     }
