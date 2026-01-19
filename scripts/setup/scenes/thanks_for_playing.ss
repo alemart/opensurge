@@ -10,6 +10,7 @@ using SurgeEngine.Level;
 using SurgeEngine.UI.Text;
 using SurgeEngine.Video.Screen;
 using SurgeEngine.Platform;
+using SurgeEngine.Prefs;
 using SurgeEngine;
 using SurgeTheRabbit;
 using SurgeEngine.Camera;
@@ -22,7 +23,7 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
             .setPosition(Vector2(Screen.width / 2, 1));
 
     text = spawn("Thanks for Playing - Text")
-            .setPosition(Vector2(Screen.width / 2, 64));
+           .setPosition(Vector2(Screen.width / 2, 64));
 
     menu = spawn("Simple Menu Builder")
            .addOption("yes", "$THANKSFORPLAYING_YES",  Vector2.zero)
@@ -37,6 +38,8 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
            .setChooseSound("samples/pause_confirm.wav")
            .build();
 
+    memorizedTime = spawn("Thanks for Playing - Memorized Time");
+
     state "main"
     {
     }
@@ -49,8 +52,10 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
 
     state "fading"
     {
-        if(timeout(fader.fadeTime))
+        if(timeout(fader.fadeTime)) {
+            memorizedTime.memorize();
             Level.loadNext();
+        }
     }
 
     fun quit()
@@ -74,6 +79,12 @@ object "Thanks for Playing" is "setup", "private", "detached", "entity"
 
     fun constructor()
     {
+        // skip the screen?
+        if(memorizedTime.isRecent()) {
+            Level.loadNext();
+            return;
+        }
+
         fader.fadeIn();
     }
 }
@@ -112,5 +123,37 @@ object "Thanks for Playing - Text" is "private", "detached", "entity"
     {
         transform.position = position;
         return this;
+    }
+}
+
+// This object memorizes the time when the user sees the scene
+object "Thanks for Playing - Memorized Time"
+{
+    key = generateKey("share-screen-time");
+    secondsInADay = 86400;
+    timeLimit = secondsInADay; // ask every day
+
+    fun memorize()
+    {
+        Prefs[key] = Date.unixtime;
+    }
+
+    fun forget()
+    {
+        Prefs.delete(key);
+    }
+
+    fun isRecent()
+    {
+        currentTime = Date.unixtime;
+        storedTime = Prefs.has(key) ? Number(Prefs[key]) : 0;
+        deltaTime = Math.max(currentTime - storedTime, 0);
+
+        return deltaTime < timeLimit;
+    }
+
+    fun generateKey(prefix)
+    {
+        return prefix + "-" + SurgeEngine.version;
     }
 }
