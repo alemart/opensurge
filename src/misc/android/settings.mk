@@ -61,7 +61,7 @@ NDK := $(ANDROID_NDK_ROOT)
 #
 
 # must be greater than or equal to the targetSdkVersion declared in the manifest
-COMPILE_SDK_VERSION ?= 33
+COMPILE_SDK_VERSION ?= 36
 
 # a directory name in $ANDROID_HOME/build-tools
 BUILD_TOOLS_VERSION ?=
