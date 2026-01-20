@@ -38,7 +38,7 @@ object "Powerup Collectibles" is "entity", "basic", "powerup"
         sfx.play();
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -60,7 +60,7 @@ object "Powerup Invincibility" is "entity", "basic", "powerup"
         music.play();
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -81,7 +81,7 @@ object "Powerup Speed" is "entity", "basic", "powerup"
         Level.spawn("Powerup Speed - Music Watcher").setPlayer(player);
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -178,7 +178,7 @@ object "Powerup 1up" is "entity", "basic", "powerup"
         state = "crushed";
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -221,7 +221,7 @@ object "Powerup Shield" is "entity", "basic", "powerup"
         sfx.play();
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -243,7 +243,7 @@ object "Powerup Shield Fire" is "entity", "basic", "powerup"
         sfx.play();
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -265,7 +265,7 @@ object "Powerup Shield Thunder" is "entity", "basic", "powerup"
         sfx.play();
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -287,7 +287,7 @@ object "Powerup Shield Water" is "entity", "basic", "powerup"
         sfx.play();
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -309,7 +309,7 @@ object "Powerup Shield Acid" is "entity", "basic", "powerup"
         sfx.play();
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -331,7 +331,7 @@ object "Powerup Shield Wind" is "entity", "basic", "powerup"
         sfx.play();
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -351,7 +351,7 @@ object "Powerup Trap" is "entity", "basic", "powerup"
         player.getHit(null);
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -374,7 +374,7 @@ object "Powerup Lucky Bonus" is "entity", "basic", "powerup"
         lucky.player = player;
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -423,7 +423,7 @@ object "Powerup Transformation" is "entity", "basic", "powerup"
                .setDuration(duration >= 0 ? duration : Math.infinity);
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
@@ -548,7 +548,7 @@ object "Powerup Event Trigger" is "entity", "basic", "powerup"
         onTrigger();
     }
 
-    fun get_crushed()
+    fun get_collected()
     {
         return itemBox.isCrushed();
     }
