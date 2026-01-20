@@ -4948,8 +4948,15 @@ void editor_tooltip_ssproperties_add(const char* fun_name, void* data)
 
     /* are we dealing with a property? */
     if(strncmp(fun_name, "get_", 4) == 0) {
+        surgescript_program_t* property_getter = surgescript_programpool_get(helper->pool, surgescript_object_name(helper->object), fun_name);
+        assertx(property_getter != NULL);
+
+        int fun_arity = surgescript_program_arity(property_getter);
         const char* property_name = fun_name + 4;
-        if(property_name[0] != '_') { /* properties starting with '_' are hidden */
+
+        /* properties starting with '_' are hidden
+           we also validate the arity just to be sure */
+        if(property_name[0] != '_' && fun_arity == 0) {
             static char setter[128] = "set_";
             bool readonly = false;
 
