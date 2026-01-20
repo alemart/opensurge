@@ -220,7 +220,7 @@ static void render_players();
 static void spawn_players();
 static void render_level(const item_list_t *major_items, const enemy_list_t *major_enemies); /* render bricks, items, enemies, players, etc. */
 static void render_hud(); /* gui / hud related */
-static void render_dlgbox(); /* dialog boxes */
+static void render_dlgbox(v2d_t camera_position); /* dialog boxes */
 static void update_dlgbox(); /* dialog boxes */
 static void reconfigure_players_input_devices();
 
