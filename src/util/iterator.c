@@ -27,7 +27,7 @@
 /* iterator struct */
 struct iterator_t
 {
-    iterator_state_t* state; /* first element */
+    iterator_state_t* state; /* first element of the iterator struct */
     void (*state_dtor)(iterator_state_t*);
 
     void* (*next)(iterator_state_t*);
