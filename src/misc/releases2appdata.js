@@ -7,12 +7,12 @@
 // -----------------------------------------------------------------------------
 
 // How to use:
-// ./releases2appdata.js < /path/to/CHANGES.md
+// ./releases2appdata.js < /path/to/CHANGELOG.md
 const readline = require("readline");
 const rl = readline.createInterface(process.stdin);
 parse(rl).then(printXML);
 
-// Parses CHANGES.md
+// Parses CHANGELOG.md
 function parse(rl)
 {
     const match = (s, r) => { const x = r.exec(s) || []; return k => x[k] || ""; };

@@ -151,6 +151,7 @@ static const char* BLACKLIST[] = {
     PREFIX("build/"),
 
     EXACT("CHANGES.md"),
+    EXACT("CHANGELOG.md"),
     EXACT("CONTRIBUTING.md"),
     EXACT("README.md"),
     EXACT("LICENSE"),

@@ -689,7 +689,7 @@ SET_TARGET_PROPERTIES(${GAME_UNIXNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CM
 IF(UNIX)
 
   # Game assets
-  INSTALL(FILES LICENSE README.md CHANGES.md CONTRIBUTING.md logo.png surge.png surge.rocks surge.cfg DESTINATION "${GAME_DATADIR}")
+  INSTALL(FILES LICENSE README.md CHANGELOG.md CONTRIBUTING.md logo.png surge.png surge.rocks surge.cfg DESTINATION "${GAME_DATADIR}")
   INSTALL(DIRECTORY characters scripts sprites images levels musics quests samples themes languages fonts inputs licenses DESTINATION "${GAME_DATADIR}" PATTERN ".git" EXCLUDE)
 
   # AppStream / freedesktop.org
