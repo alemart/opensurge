@@ -49,7 +49,6 @@ char *str_to_upper(const char *str, char *buffer, size_t buffer_size)
 }
 
 
-
 /*
  * str_to_lower()
  * Convert to lowercase
@@ -196,6 +195,31 @@ int str_pathcmp(const char* s1, const char* s2)
 
 
 /*
+ * str_pathextension()
+ * Finds the extension of a filepath. If no extension exists, it
+ * returns an empty string. Otherwise, it returns the extension,
+ * including the leading dot '.'
+ */
+const char* str_pathextension(const char* filepath)
+{
+    const char* ext = strrchr(filepath, '.');
+    return ext != NULL ? ext : "";
+}
+
+
+/*
+ * str_pathhasextension()
+ * Checks if a filepath has a particular extension.
+ * The extension parameter must include the leading dot '.'
+ */
+bool str_pathhasextension(const char* filepath, const char* extension)
+{
+    const char* ext = str_pathextension(filepath);
+    return 0 == str_pathcmp(ext, extension);
+}
+
+
+/*
  * str_is_numeric()
  * Checks if str is numeric
  */
@@ -252,7 +276,6 @@ char* str_cpy(char* dest, const char* src, size_t dest_size)
 }
 
 
-
 /*
  * str_trim()
  * Trim string
@@ -272,6 +295,7 @@ char* str_trim(char* dest, const char* src, size_t dest_size)
     return dest;
 }
 
+
 /*
  * str_dup()
  * Duplicates a string. You must free() the returned pointer after usage.
@@ -283,6 +307,7 @@ char* str_dup(const char* str)
 
     return memcpy(p, str, n);
 }
+
 
 /*
  * str_addslashes()
@@ -314,6 +339,7 @@ char* str_addslashes(const char *str, char *buffer, size_t buffer_size)
 
     return buffer;
 }
+
 
 /*
  * str_normalize_slashes()

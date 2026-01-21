@@ -42,7 +42,6 @@ struct quest_t {
 
 /* private stuff */
 static int traverse_quest(const parsetree_statement_t* stmt, void *quest);
-static bool has_extension(const char* filepath, const char* extension);
 static quest_t* create_single_level_quest(const char* path_to_lev_file);
 
 
@@ -58,7 +57,7 @@ quest_t *quest_load(const char *filepath)
     logfile_message("Loading quest \"%s\"...", filepath);
 
     /* reading the quest */
-    if(has_extension(filepath, ".qst")) {
+    if(str_pathhasextension(filepath, ".qst")) {
 
         /* create a new quest with default values */
         q = mallocx(sizeof *q);
@@ -73,7 +72,7 @@ quest_t *quest_load(const char *filepath)
         nanoparser_deconstruct_tree(prog);
 
     }
-    else if(has_extension(filepath, ".lev")) {
+    else if(str_pathhasextension(filepath, ".lev")) {
 
         /* implicitly create a quest with a single level */
         q = create_single_level_quest(filepath);
@@ -177,7 +176,7 @@ int quest_index_of_entry(const quest_t* quest, const char* filepath)
 bool quest_entry_is_level(const quest_t* quest, int index)
 {
     const char* path = quest_entry_path(quest, index);
-    return (path != NULL) && has_extension(path, ".lev");
+    return (path != NULL) && str_pathhasextension(path, ".lev");
 }
 
 /*
@@ -187,7 +186,7 @@ bool quest_entry_is_level(const quest_t* quest, int index)
 bool quest_entry_is_quest(const quest_t* quest, int index)
 {
     const char* path = quest_entry_path(quest, index);
-    return (path != NULL) && has_extension(path, ".qst");
+    return (path != NULL) && str_pathhasextension(path, ".qst");
 }
 
 /*
@@ -219,7 +218,7 @@ int traverse_quest(const parsetree_statement_t* stmt, void *quest)
         const char* required_extension = tolower(*id) == 'l' ? ".lev" : ".qst";
         nanoparser_expect_string(p, "Quest loader: expected file path");
 
-        if(has_extension(nanoparser_get_string(p), required_extension))
+        if(str_pathhasextension(nanoparser_get_string(p), required_extension))
             darray_push(q->entry, str_dup(nanoparser_get_string(p)));
         else
             fatal_error("Quest loader: command %s expects a %s file at %s:%d", str_to_lower(id, NULL, 0), required_extension, nanoparser_get_file(stmt), nanoparser_get_line_number(stmt));
@@ -281,11 +280,4 @@ quest_t* create_single_level_quest(const char* path_to_lev_file)
     darray_push(q->entry, str_dup(path_to_lev_file));
 
     return q;
-}
-
-/* checks if the provided filepath has the given extension (include the '.' at the extension) */
-bool has_extension(const char* filepath, const char* extension)
-{
-    const char* ext = strrchr(filepath, '.');
-    return (ext != NULL) && (0 == str_pathcmp(ext, extension));
 }

@@ -87,7 +87,6 @@ static ALLEGRO_PATH* find_user_datadir(const char* dirname);
 
 static bool create_dir(const ALLEGRO_PATH* path);
 static uint32_t get_fs_mode(const char* path);
-static const char* find_extension(const char* path);
 static char* find_gamedirname(const char* gamedir, char* buffer, size_t buffer_size);
 static const char* case_insensitive_fix(const char* virtual_path);
 static bool foreach_file(ALLEGRO_PATH* dirpath, const char* extension_filter, int (*callback)(const char* virtual_path, void* user_data), void* user_data, bool recursive);
@@ -1129,7 +1128,7 @@ bool foreach_file(ALLEGRO_PATH* path, const char* extension_filter, int (*callba
 
         /* does the extension filter match the name of the file? */
         if(extension_filter != NULL) {
-            if(str_pathcmp(extension_filter, find_extension(*it)) != 0)
+            if(!str_pathhasextension(*it, extension_filter))
                 continue;
         }
 
@@ -1141,17 +1140,6 @@ bool foreach_file(ALLEGRO_PATH* path, const char* extension_filter, int (*callba
     al_set_path_filename(path, NULL);
     PHYSFS_freeList(list);
     return stop;
-}
-
-/*
- * find_extension()
- * Find the extension of a path. If no extension exists, return an empty string.
- * Otherwise, return the extension - including the dot '.'
- */
-const char* find_extension(const char* path)
-{
-    const char* ext = strrchr(path, '.');
-    return ext != NULL ? ext : "";
 }
 
 /*

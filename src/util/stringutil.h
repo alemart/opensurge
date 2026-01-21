@@ -34,7 +34,10 @@ bool str_startswith(const char* str, const char* prefix); /* checks if str start
 bool str_endswith(const char* str, const char* suffix); /* checks if str ends with the given suffix */
 bool str_istartswith(const char* str, const char* prefix); /* checks if str starts with the given prefix with a case-insensitive match */
 bool str_iendswith(const char* str, const char* suffix); /* checks if str ends with the given suffix with a case-insensitive match */
+
 int str_pathcmp(const char* s1, const char* s2); /* compare two file paths */
+const char* str_pathextension(const char* filepath); /* the extension of a filepath, including the dot '.' */
+bool str_pathhasextension(const char* filepath, const char* extension); /* checks if a filepath has an extension with the dot '.' */
 
 bool str_is_numeric(const char* str); /* checks if str is numeric */
 bool str_is_boolean(const char* str); /* checks if str is a boolean */
