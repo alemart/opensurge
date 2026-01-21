@@ -163,7 +163,7 @@ const char* quest_entry_path(const quest_t* quest, int index)
 int quest_index_of_entry(const quest_t* quest, const char* filepath)
 {
     for(int i = 0; i < darray_length(quest->entry); i++) {
-        if(0 == str_icmp(quest->entry[i], filepath))
+        if(0 == str_pathcmp(quest->entry[i], filepath))
             return i;
     }
 
@@ -287,5 +287,5 @@ quest_t* create_single_level_quest(const char* path_to_lev_file)
 bool has_extension(const char* filepath, const char* extension)
 {
     const char* ext = strrchr(filepath, '.');
-    return (ext != NULL) && (0 == str_icmp(ext, extension));
+    return (ext != NULL) && (0 == str_pathcmp(ext, extension));
 }

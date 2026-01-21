@@ -947,7 +947,7 @@ int pathcmp(const char* a, const char* b)
     ALLEGRO_PATH* p = al_create_path_for_directory(a);
     ALLEGRO_PATH* q = al_create_path_for_directory(b);
 
-    int result = str_icmp(
+    int result = str_pathcmp(
         al_path_cstr(p, ALLEGRO_NATIVE_PATH_SEP),
         al_path_cstr(q, ALLEGRO_NATIVE_PATH_SEP)
     );

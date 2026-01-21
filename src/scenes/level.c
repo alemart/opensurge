@@ -2322,7 +2322,7 @@ void level_quit_with_gameover()
  */
 void level_change_background(const char* filepath)
 {
-    if(str_icmp(filepath, background_filepath(backgroundtheme)) != 0) {
+    if(str_pathcmp(filepath, background_filepath(backgroundtheme)) != 0) {
         /* string bgtheme (original path) is untouched */
         logfile_message("Changing level background to \"%s\"...", filepath);
         background_unload(backgroundtheme);

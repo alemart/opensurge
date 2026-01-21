@@ -115,7 +115,7 @@ void lang_loadfile(const char* filepath)
     if(!asset_exists(path)) {
 
         /* Crash if the default language file is missing */
-        if(0 == str_icmp(path, DEFAULT_LANGUAGE_FILEPATH))
+        if(0 == str_pathcmp(path, DEFAULT_LANGUAGE_FILEPATH))
             fatal_error("Missing default language file: \"%s\". Please reinstall the game.", DEFAULT_LANGUAGE_FILEPATH);
 
         /* If some other language file is missing, we don't crash the application,
@@ -140,7 +140,7 @@ void lang_loadfile(const char* filepath)
         fatal_error("Language file \"%s\" (version %d.%d.%d) is not compatible with this version of the engine (%s)!", path, supver, subver, wipver, GAME_VERSION_STRING);
 
     /* Read the default language file to fill in any missing strings */
-    if(str_icmp(path, DEFAULT_LANGUAGE_FILEPATH) != 0)
+    if(str_pathcmp(path, DEFAULT_LANGUAGE_FILEPATH) != 0)
         lang_loadfile(DEFAULT_LANGUAGE_FILEPATH);
 
     /* Read language file to memory */

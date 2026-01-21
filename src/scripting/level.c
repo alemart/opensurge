@@ -720,7 +720,7 @@ surgescript_var_t* fun_load(surgescript_object_t* object, const surgescript_var_
     surgescript_objectmanager_t* manager = surgescript_object_manager(object);
     char* filepath = surgescript_var_get_string(param[0], manager);
     const char* ext = strrchr(filepath, '.');
-    bool is_quest = (ext != NULL && str_icmp(ext, ".qst") == 0);
+    bool is_quest = (ext != NULL && str_pathcmp(ext, ".qst") == 0);
 
     if(!is_quest)
         level_change(filepath);

@@ -1449,7 +1449,7 @@ void create_collisionmasks()
             int frame_height = spriteinfo_frame_height(sprite);
             int flags = (brickdata[i]->type == BRK_CLOUD) ? CMF_CLOUDIFY : 0;
 
-            if(mask == NULL || 0 != str_icmp(prev_maskfile, maskfile)) {
+            if(mask == NULL || 0 != str_pathcmp(prev_maskfile, maskfile)) {
                 if(mask != NULL) {
                     image_unlock(mask);
                     image_unload(mask);

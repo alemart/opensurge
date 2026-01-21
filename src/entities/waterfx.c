@@ -207,7 +207,7 @@ void waterfx_update()
     const player_t* player = level_player();
     bool is_underwater = player_is_underwater(player);
     bool is_almost_drowning = music_current() != NULL &&
-        0 == str_icmp("drowning.ogg", str_basename(music_path(music_current()))); /* hard coded hack :( */
+        0 == str_pathcmp("drowning.ogg", str_basename(music_path(music_current()))); /* hard coded hack :( */
 
     if(!is_underwater)
         audio_muffler_activate(MUFFLE_NOTHING);

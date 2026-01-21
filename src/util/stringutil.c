@@ -169,6 +169,33 @@ bool str_iendswith(const char* str, const char* suffix)
 
 
 /*
+ * str_pathcmp()
+ * Case-insensitive comparison of paths
+ * Path normalization isn't performed at this time
+ * Returns 0 if s1==s2, <0 if s1<s2 or >0 if s1>s2
+ */
+int str_pathcmp(const char* s1, const char* s2)
+{
+    const char *p, *q;
+
+    for(p = s1, q = s2; *p && *q; p++, q++) {
+        int a = (*p == '\\') ? '/' : tolower(*p);
+        int b = (*q == '\\') ? '/' : tolower(*q);
+
+        if(a != b)
+            return a - b;
+    }
+
+    if(!*p && *q)
+        return -1;
+    else if(*p && !*q)
+        return 1;
+    else
+        return 0;
+}
+
+
+/*
  * str_is_numeric()
  * Checks if str is numeric
  */

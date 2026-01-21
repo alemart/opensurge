@@ -1129,7 +1129,7 @@ bool foreach_file(ALLEGRO_PATH* path, const char* extension_filter, int (*callba
 
         /* does the extension filter match the name of the file? */
         if(extension_filter != NULL) {
-            if(str_icmp(extension_filter, find_extension(*it)) != 0)
+            if(str_pathcmp(extension_filter, find_extension(*it)) != 0)
                 continue;
         }
 
