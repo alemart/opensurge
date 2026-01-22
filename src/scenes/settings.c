@@ -352,7 +352,7 @@ static const struct
     { TYPE_SUBTITLE, "$OPTIONS_COLORED_MODS", (const char*[]) { NULL }, 0, vt_mods, 8 },
     { TYPE_SETTING, "$OPTIONS_PLAYMOD", (const char*[]) { NULL }, 0, vt_playgame, 8 },
     { TYPE_SETTING, "$OPTIONS_MODSTORAGE", (const char*[]) { "$OPTIONS_MODSTORAGE_ARCHIVE", "$OPTIONS_MODSTORAGE_FOLDER", NULL }, 0, vt_modstorage, 0 },
-    { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", "0.6.1", "0.6.0", "0.5.2", NULL }, 0, vt_compatibilitymode, 0 },
+    { TYPE_SETTING, "$OPTIONS_COMPATIBILITYMODE", (const char*[]) { "$OPTIONS_OFF", "$OPTIONS_ON", "0.6.1", "0.6.0", "0.5.2", NULL }, 1, vt_compatibilitymode, 0 },
     { TYPE_SETTING, "$OPTIONS_BACKTOBASEGAME", (const char*[]) { NULL }, 0, vt_backtobasegame, 8 },
 
     /* Engine */
