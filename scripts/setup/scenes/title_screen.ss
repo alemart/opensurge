@@ -304,8 +304,8 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
         items.push(spawn("Title Screen - Menu Item - Options"));
         items.push(spawn("Title Screen - Menu Item - Create"));
 
-        if(!SurgeEngine.mobile)
-            items.push(spawn("Title Screen - Menu Item - Mobile"));
+        /*if(!SurgeEngine.mobile)
+            items.push(spawn("Title Screen - Menu Item - Mobile"));*/
 
         items.push(spawn("Title Screen - Menu Item - Share"));
 
