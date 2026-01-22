@@ -14,4 +14,4 @@ Terminal=false
 Keywords=game;open;source;engine;bunny;rabbit;cool;retro;pixel;art;2d;
 Keywords[ru]=game;open;source;engine;bunny;rabbit;cool;retro;pixel;art;2d;игра;открытый;исходный;движок;заец;кролик;крутой;ретро;пиксель;арт;2д;
 Keywords[uk]=game;open;source;engine;bunny;rabbit;cool;retro;pixel;art;2d;гра;відкритий;джерельний;рушій;заєць;кролик;крутий;ретро;піксель;арт;2д;
-Categories=Game;Utility;Education;Building;2DGraphics;ActionGame;ArcadeGame;
+Categories=Game;Development;Utility;Education;Building;ActionGame;ArcadeGame;ComputerScience;
