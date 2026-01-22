@@ -86,7 +86,7 @@ done
 #
 # Source: https://developer.android.com/tools/zipalign
 echo "Zipaligning..."
-"$SDK_BUILD_TOOLS/zipalign" -p -f -v 4 "$UNALIGNED_APK" "$ALIGNED_APK"
+"$SDK_BUILD_TOOLS/zipalign" -P 16 -f -v 4 "$UNALIGNED_APK" "$ALIGNED_APK"
 rm -f "$UNALIGNED_APK"
 
 # Inspect the APK
