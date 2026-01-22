@@ -1,5 +1,5 @@
 name: opensurge
-base: core22
+base: core24
 adopt-info: opensurge
 
 grade: stable
@@ -10,11 +10,11 @@ apps:
     command: snap/command-chain/desktop-launch $SNAP/usr/games/opensurge
     desktop: usr/share/applications/opensurge.desktop
     common-id: org.opensurge2d.OpenSurge
-    extensions:
-      - gnome # core22
+    extensions: [ gnome ]
     environment:
       DISABLE_WAYLAND: '1'
       GTK_USE_PORTAL: '1'
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libproxy # core24
     plugs:
       - home
       - desktop
@@ -30,12 +30,12 @@ layout:
 
 parts:
   opensurge:
-    after: [libphysfs, liballegro5, surgescript]
+    after: [ libphysfs, liballegro5, surgescript ]
     source: https://github.com/alemart/opensurge.git
     source-tag: v0.6.1.3
     #source-commit: 
     plugin: cmake
-    parse-info: [usr/share/metainfo/opensurge.appdata.xml]
+    parse-info: [ usr/share/metainfo/opensurge.appdata.xml ]
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - -DGAME_BUILD_VERSION=snap
@@ -47,12 +47,12 @@ parts:
       - -DDESKTOP_ENTRY_PATH=/usr/share/applications
       - -DDESKTOP_ICON_PATH=/usr/share/pixmaps
       - -DDESKTOP_METAINFO_PATH=/usr/share/metainfo
-      - -DPHYSFS_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include
-      - -DPHYSFS_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET
-      - -DALLEGRO_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include
-      - -DALLEGRO_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/
-      - -DSURGESCRIPT_INCLUDE_PATH=$SNAPCRAFT_STAGE/usr/include
-      - -DSURGESCRIPT_LIBRARY_PATH=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET
+      - -DPHYSFS_INCLUDE_PATH=$CRAFT_STAGE/usr/include
+      - -DPHYSFS_LIBRARY_PATH=$CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR
+      - -DALLEGRO_INCLUDE_PATH=$CRAFT_STAGE/usr/include
+      - -DALLEGRO_LIBRARY_PATH=$CRAFT_STAGE/usr/lib/
+      - -DSURGESCRIPT_INCLUDE_PATH=$CRAFT_STAGE/usr/include
+      - -DSURGESCRIPT_LIBRARY_PATH=$CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR
     build-packages:
       - build-essential
     stage-packages:
@@ -60,7 +60,7 @@ parts:
       - libatk1.0-0
       - libcairo2
       - libdatrie1
-      - libflac8
+      - libflac12
       - libfontconfig1
       - libfreetype6
       - libgdk-pixbuf2.0-0
@@ -98,6 +98,7 @@ parts:
       - libxinerama1
       - libxrandr2
       - libxrender1
+      - libproxy1v5 # core24
 
   surgescript:
     source: https://github.com/alemart/surgescript.git
@@ -126,9 +127,9 @@ parts:
       - build-essential
 
   liballegro5:
-    after: [libphysfs]
-    source: https://github.com/liballeg/allegro5/releases/download/5.2.11.1/allegro-5.2.11.1.tar.gz
-    source-checksum: sha256/ab9582b3a8040cf4c086f4f1073dfe38b96fc3343a89b43765b892560437c7e0
+    after: [ libphysfs ]
+    source: https://github.com/liballeg/allegro5/releases/download/5.2.11.2/allegro-5.2.11.2.tar.gz
+    source-checksum: sha256/f035fe128dd5f2412c32add41ed4058ad8154f6e9571084574487d67dbdbaae0
     plugin: cmake
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=Release
@@ -137,8 +138,12 @@ parts:
       - -DWANT_DOCS=OFF
       - -DWANT_EXAMPLES=OFF
       - -DWANT_TESTS=OFF
-      - -DPHYSFS_INCLUDE_DIR=$SNAPCRAFT_STAGE/usr/include
-      - -DPHYSFS_LIBRARY=$SNAPCRAFT_STAGE/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libphysfs.so
+      - -DWANT_MP3=OFF
+      - -DWANT_DUMB=OFF
+      - -DWANT_FLAC=OFF
+      - -DWANT_VIDEO=OFF
+      - -DPHYSFS_INCLUDE_DIR=$CRAFT_STAGE/usr/include
+      - -DPHYSFS_LIBRARY=$CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libphysfs.so
     build-packages: # lean A5
       - build-essential
       - zlib1g-dev
@@ -160,7 +165,7 @@ parts:
       - libcairo2
       - libdatrie1
       - libepoxy0
-      - libflac8
+      - libflac12
       - libfontconfig1
       - libfreetype6
       - libfribidi0
