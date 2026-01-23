@@ -967,6 +967,7 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     /* changed sigma? */
     static float prev_sigma = 0.0f;
     bool changed_sigma = (fabsf(sigma - prev_sigma) > 1e-5);
+    prev_sigma = sigma;
 
     /* calculate a Gaussian */
     static float g0[1 + 2 * (3 * MAX_SIGMA)] = { 0.0f };
@@ -977,7 +978,6 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     if(changed_sigma) {
         memset(g0, 0, sizeof g0);
         w = normalized_gaussian(g0, sigma, n);
-        prev_sigma = sigma;
     }
 
     if(w < 0) /* this shouldn't happen */
@@ -1019,7 +1019,7 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
         const float* f = f0 + i; /* f points to L because start+i is even */
         for(int x = -w; x <= w; x++) {
 
-            /* unroll loop for better readability (2 channels) */
+            /* we unroll the loop for better readability (2 channels) */
             h[i] += f[2*x] * g[x];     /* f[2*x] is L */
             h[i+1] += f[2*x+1] * g[x]; /* f[2*x+1] is R */
 
