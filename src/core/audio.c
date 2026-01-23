@@ -921,20 +921,19 @@ const float* muffler_sigma(mufflerprofile_t profile)
     /* these values were picked for a frequency of 44100 Hz */
     static const float sigma[] = {
         [MUFFLER_OFF] = 0.0f,
-        [MUFFLER_LOW] = 12.5f,
-        [MUFFLER_MEDIUM] = 20.0f,
-        [MUFFLER_HIGH] = 25.0f /* 25: sounds good. 30: too much. */
+        [MUFFLER_LOW] = 8.0f,
+        [MUFFLER_MEDIUM] = 13.0f,
+        [MUFFLER_HIGH] = 18.0f
     };
 
     switch(profile) {
-        case MUFFLER_OFF:
         case MUFFLER_LOW:
         case MUFFLER_MEDIUM:
         case MUFFLER_HIGH:
             return &sigma[profile];
 
         default:
-            return &sigma[DEFAULT_MUFFLER_PROFILE];
+            return &sigma[MUFFLER_OFF];
     }
 }
 
@@ -954,18 +953,9 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     /* read input */
     float sigma = *((const float*)data); /* no need of mutexes */
 
-#if 0
-    /* nothing to do */
-    static bool is_initialized = false;
-    if(sigma == 0.0f) {
-        is_initialized = false;
-        return;
-    }
-#else
     /* nothing to do */
     if(sigma == 0.0f)
         return;
-#endif
 
     /* validate */
     if(sigma > MAX_SIGMA)
@@ -974,14 +964,17 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     if(num_samples > MAX_SAMPLES)
         return;
 
+    /* changed sigma? */
+    static float prev_sigma = 0.0f;
+    bool changed_sigma = (fabsf(sigma - prev_sigma) > 1e-5);
+
     /* calculate a Gaussian */
     static float g0[1 + 2 * (3 * MAX_SIGMA)] = { 0.0f };
     const size_t n = sizeof(g0) / sizeof(float);
     const int c = (n-1) / 2;
     static int w = -1;
-    static float prev_sigma = 0.0f;
 
-    if(fabsf(sigma - prev_sigma) > 1e-5) {
+    if(changed_sigma) {
         memset(g0, 0, sizeof g0);
         w = normalized_gaussian(g0, sigma, n);
         prev_sigma = sigma;
@@ -997,18 +990,10 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     memcpy(samples, samples + num_samples * NUM_CHANNELS, buf_size);
     memcpy(samples + num_samples * NUM_CHANNELS, buf, buf_size);
 
-#if 0
-    /* do we really need this? no audible difference... */
-    if(!is_initialized) { /* wait one more frame */
-        is_initialized = true;
-        return;
-    }
-#endif
-
     /* find the initial index of the output. We introduce a small delay.
        start is an even number (NUM_CHANNELS is 2) and points to a L sample */
     int window_size = 2*w + 1;
-    int start = (num_samples - w) * NUM_CHANNELS; /* inclusive */
+    int start = (num_samples - 1 - w) * NUM_CHANNELS; /* inclusive */
 
     if(window_size >= num_samples) /* this shouldn't happen */
         return;
@@ -1031,10 +1016,21 @@ void muffler_postprocess(void* buf, unsigned int num_samples, void* data)
     memset(buf, 0, buf_size);
 
     for(int i = 0; i < m; i += NUM_CHANNELS) {
-        const float* f = f0 + i;
+        const float* f = f0 + i; /* f points to L because start+i is even */
         for(int x = -w; x <= w; x++) {
-            h[i] += f[x] * g[x]; /* g[x] == g[-x] */
-            h[i+1] += f[x+1] * g[x];
+
+            /* unroll loop for better readability (2 channels) */
+            h[i] += f[2*x] * g[x];     /* f[2*x] is L */
+            h[i+1] += f[2*x+1] * g[x]; /* f[2*x+1] is R */
+
+            /* note that g[x] == g[-x] */
+
+            /*
+            // not as readable...
+            for(int j = 0; j < NUM_CHANNELS; j++)
+                h[i+j] = f[NUM_CHANNELS * x + j] * g[x];
+            */
+
         }
     }
 }
