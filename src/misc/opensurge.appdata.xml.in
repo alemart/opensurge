@@ -52,6 +52,10 @@
     <category>Game</category>
     <category>ActionGame</category>
     <category>ArcadeGame</category>
+    <category>Development</category>
+    <category>Building</category>
+    <category>Education</category>
+    <category>ComputerScience</category>
   </categories>
   <keywords>
     <keyword>game</keyword>
@@ -60,15 +64,22 @@
     <keyword>arcade</keyword>
     <keyword>platformer</keyword>
     <keyword>jump'n'run</keyword>
+    <keyword>jump-and-run</keyword>
     <keyword>side-scroller</keyword>
     <keyword>retro</keyword>
     <keyword>old-school</keyword>
     <keyword>allegro</keyword>
     <keyword>gamedev</keyword>
     <keyword>engine</keyword>
+    <keyword>development</keyword>
+    <keyword>programming</keyword>
+    <keyword>pixel-art</keyword>
+    <keyword>create</keyword>
     <keyword>surge</keyword>
     <keyword>sonic</keyword>
+    <keyword>teens</keyword>
     <keyword>kids</keyword>
+    <keyword>children</keyword>
     <keyword>2d</keyword>
   </keywords>
   <branding>
