@@ -922,8 +922,8 @@ const float* muffler_sigma(mufflerprofile_t profile)
     static const float sigma[] = {
         [MUFFLER_OFF] = 0.0f,
         [MUFFLER_LOW] = 8.0f,
-        [MUFFLER_MEDIUM] = 13.0f,
-        [MUFFLER_HIGH] = 18.0f
+        [MUFFLER_MEDIUM] = 10.5f,
+        [MUFFLER_HIGH] = 15.0f
     };
 
     switch(profile) {
