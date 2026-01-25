@@ -1063,7 +1063,7 @@ uint32_t get_fs_mode(const char* path)
  */
 const char* case_insensitive_fix(const char* virtual_path)
 {
-    static char buffer[ASSET_PATH_MAX];
+    static char buffer[ASSET_PATH_MAX]; /* to be returned */
 
     assertx(strlen(virtual_path) < sizeof(buffer)); /* really?! */
     str_cpy(buffer, virtual_path, sizeof(buffer));
