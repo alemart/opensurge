@@ -597,10 +597,6 @@ void video_set_quality(videoquality_t quality)
     LOG("Setting the video quality to %s", VIDEOQUALITY_NAME[quality]);
     settings.quality = quality;
 
-    /* TODO */
-    if(quality > VIDEOQUALITY_MEDIUM)
-        video_showmessage("%s video quality: coming soon!", VIDEOQUALITY_NAME[quality]);
-
     /* maybe we will or won't need a depth buffer */
     reconfigure_backbuffer();
 }

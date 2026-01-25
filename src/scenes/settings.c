@@ -325,7 +325,7 @@ static const struct
 
     /* Graphics */
     { TYPE_SUBTITLE, "$OPTIONS_COLORED_GRAPHICS", (const char*[]){ NULL }, 0, vt_graphics, 8 },
-    { TYPE_SETTING, "$OPTIONS_QUALITY", (const char*[]){ "$OPTIONS_QUALITY_LOW", "$OPTIONS_QUALITY_MEDIUM", "$OPTIONS_QUALITY_HIGH", NULL }, 1, vt_quality, 8 },
+    { TYPE_SETTING, "$OPTIONS_QUALITY", (const char*[]){ "$OPTIONS_QUALITY_LOW", "$OPTIONS_QUALITY_MEDIUM", "<color=808080>$OPTIONS_QUALITY_HIGH</color>", NULL }, 1, vt_quality, 8 },
     { TYPE_SETTING, "$OPTIONS_RESOLUTION", (const char*[]){ TIMES(1), TIMES(2), TIMES(3), TIMES(4), NULL }, 1, vt_resolution, 0 },
     { TYPE_SETTING, "$OPTIONS_FULLSCREEN", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_fullscreen, 0 },
     { TYPE_SETTING, "$OPTIONS_FPS", (const char*[]){ "$OPTIONS_NO", "$OPTIONS_YES", NULL }, 0, vt_showfps, 0 },
@@ -997,7 +997,7 @@ void change_quality(settings_entry_t* e)
     /* coming soon */
     if(new_quality[i] == VIDEOQUALITY_HIGH) {
         sound_play(SFX_DENY);
-        alert("%s", lang_get("OPTIONS_COMINGSOON"));
+        video_showmessage("Coming soon!");
     }
 }
 
