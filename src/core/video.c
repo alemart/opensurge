@@ -57,6 +57,10 @@
 #define WANT_GLES 0
 #endif
 
+#if !(WANT_GLES) && defined(__ANDROID__)
+# error "Compile-time option WANT_GLES is required on Android"
+#endif
+
 /* Display (window) */
 #define DEFAULT_WINDOW_TITLE (GAME_TITLE " " GAME_VERSION_STRING)
 static char window_title[256] = DEFAULT_WINDOW_TITLE;
