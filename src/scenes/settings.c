@@ -295,6 +295,9 @@ static void show_info(settings_entry_t* e);
 #define vt_share (settings_entryvt_t){ nop, share, nop, nop, nop, nop, nop, visible }
 static void share(settings_entry_t* e);
 
+#define vt_donate (settings_entryvt_t){ nop, donate, nop, nop, nop, nop, nop, visible }
+static void donate(settings_entry_t* e);
+
 #define vt_download (settings_entryvt_t){ nop, download, nop, nop, nop, nop, nop, visible }
 static void download(settings_entry_t* e);
 
@@ -359,6 +362,7 @@ static const struct
     { TYPE_SUBTITLE, "$OPTIONS_COLORED_ENGINE", (const char*[]){ NULL }, 0, vt_engine, 8 },
     { TYPE_SETTING, "$OPTIONS_ABOUT", (const char*[]){ NULL }, 0, vt_about, 8 },
     { TYPE_SETTING, "$OPTIONS_SHARE", (const char*[]){ NULL }, 0, vt_share, 0 },
+    { TYPE_SETTING, "$OPTIONS_DONATE", (const char*[]){ NULL }, 0, vt_donate, 0 },
     { TYPE_SETTING, "$OPTIONS_REPORTISSUE", (const char*[]){ NULL }, 0, vt_reportissue, 0 },
 #if IS_MOBILE_PLATFORM
     { TYPE_SETTING, "$OPTIONS_RATEAPP", (const char*[]){ NULL }, 0, vt_submitfeedback, 0 },
@@ -1470,6 +1474,17 @@ void share(settings_entry_t* e)
     launch_url(create_url("/share"));
     (void)e;
 #endif
+}
+
+
+/*
+ * Donate to the engine
+ */
+
+void donate(settings_entry_t* e)
+{
+    launch_url(create_url("/contribute"));
+    (void)e;
 }
 
 
