@@ -53,13 +53,6 @@ object "SurgeTheRabbit"
         if(!isBaseGame())
             return;
 
-        if(Platform.isAndroid) {
-            if(isBuild("googleplay")) {
-                Web.launchURL("https://play.google.com/store/apps/details?id=org.opensurge2d.surgeengine");
-                return;
-            }
-        }
-
         openWebsite("/feedback", {
             "platform": platformName()
         });

@@ -1409,17 +1409,6 @@ void download(settings_entry_t* e)
 
 void submitfeedback(settings_entry_t* e)
 {
-#if defined(__ANDROID__)
-    if(is_base_game()) {
-        char app_id[64];
-        application_id(app_id, sizeof(app_id));
-        if(0 == strcmp(app_id, "org.opensurge2d.surgeengine") && NULL != strstr(GAME_VERSION_STRING, "googleplay")) {
-            launch_url("https://play.google.com/store/apps/details?id=org.opensurge2d.surgeengine");
-            return;
-        }
-    }
-#endif
-
     launch_url(create_url("/feedback"));
     (void)e;
 }
