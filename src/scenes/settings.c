@@ -1415,8 +1415,8 @@ void submitfeedback(settings_entry_t* e)
 
 bool display_submitfeedback(settings_entry_t* e)
 {
-    (void)e;
     return is_base_game();
+    (void)e;
 }
 
 
@@ -1432,8 +1432,8 @@ void reportissue(settings_entry_t* e)
 
 bool display_reportissue(settings_entry_t* e)
 {
-    (void)e;
     return is_base_game();
+    (void)e;
 }
 
 
