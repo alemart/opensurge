@@ -304,18 +304,21 @@ object "Title Screen - Menu Item Group" is "private", "detached", "entity"
         items.push(spawn("Title Screen - Menu Item - Options"));
         items.push(spawn("Title Screen - Menu Item - Create"));
 
-        /*if(!SurgeEngine.mobile)
-            items.push(spawn("Title Screen - Menu Item - Mobile"));*/
+        /*
+        if(!SurgeEngine.mobile)
+            items.push(spawn("Title Screen - Menu Item - Mobile"));
 
         items.push(spawn("Title Screen - Menu Item - Share"));
 
         if(SurgeTheRabbit.canAcceptDonations())
             items.push(spawn("Title Screen - Menu Item - Donate"));
 
-        /*if(SurgeEngine.mobile)
-            items.push(spawn("Title Screen - Menu Item - Report Issue"));*/
+        if(SurgeEngine.mobile)
+            items.push(spawn("Title Screen - Menu Item - Report Issue"));
 
         items.push(spawn("Title Screen - Menu Item - Submit Feedback"));
+        */
+
         items.push(spawn("Title Screen - Menu Item - Quit"));
 
         // compute offsets of the menu items
