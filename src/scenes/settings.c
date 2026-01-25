@@ -265,7 +265,7 @@ static void enter_credits(settings_entry_t* e);
 /* MODs */
 #define vt_mods (settings_entryvt_t){ nop, nop, nop, nop, nop, nop, nop, display_mods }
 static bool want_zipped_mods = false;
-static bool want_compatibility_mode = false;
+static bool want_compatibility_mode = true;
 static int wanted_compatibility_version = 0;
 static bool display_mods(settings_entry_t* e);
 static bool display_mods_from_base_game(settings_entry_t* e);
@@ -422,7 +422,7 @@ void settings_init(void* data)
     /* options */
     enable_developermode = false;
     want_zipped_mods = true;
-    want_compatibility_mode = false;
+    want_compatibility_mode = true;
     wanted_compatibility_version = 0;
 
     /* initialize objects */
