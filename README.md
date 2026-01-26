@@ -1,8 +1,9 @@
 <div align="center"><br>
 <img src="https://opensurge2d.org/img/surge_profile.webp" height="256">
-<h1>Surge Engine</h1>
 
-A retro game engine with a fun platformer for making your dreams come true!
+<h1>Surge Engine</h1>
+<h3>Make your dreams come true!</h3>
+<br>
 
 [![Latest release](https://img.shields.io/github/v/release/alemart/opensurge?color=blue)](https://github.com/alemart/opensurge/releases)
 [![License](https://img.shields.io/github/license/alemart/opensurge?color=brightgreen)](#license)
@@ -13,9 +14,9 @@ A retro game engine with a fun platformer for making your dreams come true!
 <br><br>
 </div>
 
-## It's so cool!
+## Overview
 
-**Make your dreams come true!** Open Surge Engine is an open-source 2D retro game engine for creating games and making your dreams come true!
+**Make your dreams come true!** Open Surge Engine is an open-source 2D retro game engine designed to make your dreams come true!
 
 **It's a ton of fun!** Surge the Rabbit is a featured jump 'n' run created with the Open Surge Engine. It's made in the spirit of classic 16-bit Sonic platformers of the 1990s. Play as Surge in fun and exciting levels filled with challenges!
 
@@ -29,19 +30,19 @@ Official website: <https://opensurge2d.org>
 
 ## Download
 
-[<img src="https://opensurge2d.org/img/badge_github.png" height="120" alt="Get it on GitHub">](https://github.com/alemart/opensurge/releases)
-[<img src="https://opensurge2d.org/img/badge_fdroid.png" height="120" alt="Get it on F-Droid">](https://f-droid.org/packages/org.opensurge2d.surgeengine)
+By purchasing your copy, you can show your appreciation and support future development, user assistance and teaching with our game engine.
 
-[<img src="https://opensurge2d.org/img/badge_flathub.png" height="120" alt="Get it on Flathub">](https://flathub.org/apps/org.opensurge2d.OpenSurge)
-[<img src="https://opensurge2d.org/img/badge_snapcraft.png" height="120" alt="Get it from the Snap Store">](https://snapcraft.io/opensurge)
+[<img src="https://opensurge2d.org/img/badge_itchio.png" height="120" alt="Get it on itch.io">](https://alemart.itch.io/opensurge)
+
+## Packaging
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/opensurge.svg?columns=3&minversion=0.6.1.0)](https://repology.org/project/opensurge/versions)
 
-## Support the project
+## Documentation
 
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/alemart?style=social&logo=github&label=Sponsors)](https://github.com/sponsors/alemart)
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J41O00K)
+* [SurgeScript documentation](https://docs.opensurge2d.org)
+* [Open Surge Wiki](https://github.com/alemart/opensurge/wiki)
+* [How to contribute](https://github.com/alemart/opensurge/blob/master/CONTRIBUTING.md)
 
 ## Modding
 
@@ -70,13 +71,6 @@ Official website: <https://opensurge2d.org>
 ### How can I create a MOD?
 
 Read [Introduction to Modding](https://github.com/alemart/opensurge/wiki/introduction) at the Wiki.
-
-## Documentation
-
-* [Open Surge Wiki](https://github.com/alemart/opensurge/wiki)
-* [Introduction to Modding](https://github.com/alemart/opensurge/wiki/introduction)
-* [SurgeScript documentation](https://docs.opensurge2d.org)
-* [How to contribute](https://github.com/alemart/opensurge/blob/master/CONTRIBUTING.md)
 
 ## About
 
@@ -141,15 +135,13 @@ Tip: you can also use the command-line option `--verbose`. The directories will 
 
 Dependencies:
 
-* [Allegro](http://liballeg.org)
-    * Recommended version: 5.2.11
-    * Minimum version: 5.2.7 (5.2.10 on Android)
-* [SurgeScript](http://github.com/alemart/surgescript)
-    * Recommended version: 0.6.1
-    * Minimum version: 0.6.1
-* [PhysicsFS](https://github.com/icculus/physfs)
-    * Recommended version: 3.2.0
-    * Minimum version: 3.0.2
+| | Recommended | Minimum |
+|-|-------------|---------|
+| [Allegro](http://liballeg.org) | 5.2.11 | 5.2.7 \* |
+| [SurgeScript](http://github.com/alemart/surgescript) | 0.6.1 | 0.6.1 |
+| [PhysicsFS](https://github.com/icculus/physfs) | 3.2.0 | 3.0.2 |
+
+\* Minimum version on Android: 5.2.10
 
 Compile as usual:
 
@@ -157,8 +149,8 @@ Compile as usual:
 cd /path/to/opensurge/
 mkdir build && cd build
 cmake ..
-make -j4
+make -j`nproc`
 sudo make install
 ```
 
-Use `cmake-gui` or `ccmake` for tweaking, like installing the engine to or finding the dependencies on non-standard paths.
+Use `cmake-gui` or `ccmake` to tweak the compile-time options.
