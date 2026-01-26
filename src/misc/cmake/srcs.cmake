@@ -1,0 +1,266 @@
+set(GAME_SRCS
+  src/core/animation.c
+  src/core/asset.c
+  src/core/audio.c
+  src/core/color.c
+  src/core/commandline.c
+  src/core/config.c
+  src/core/engine.c
+  src/core/fadefx.c
+  src/core/font.c
+  src/core/image.c
+  src/core/import.c
+  src/core/input.c
+  src/core/inputmap.c
+  src/core/keyframes.c
+  src/core/lang.c
+  src/core/logfile.c
+  src/core/modutils.c
+  src/core/nanoparser.c
+  src/core/prefs.c
+  src/core/quest.c
+  src/core/resourcemanager.c
+  src/core/scene.c
+  src/core/screenshot.c
+  src/core/shader.c
+  src/core/sprite.c
+  src/core/storyboard.c
+  src/core/timer.c
+  src/core/video.c
+  src/core/web.c
+
+  src/util/csv.c
+  src/util/dictionary.c
+  src/util/fasthash.c
+  src/util/iterator.c
+  src/util/numeric.c
+  src/util/stringutil.c
+  src/util/util.c
+  src/util/v2d.c
+  src/util/transform.c
+
+  src/scenes/mobile/subscenes/info.c
+  src/scenes/mobile/subscenes/credits.c
+  src/scenes/mobile/subscenes/screenshot.c
+  src/scenes/mobile/util/touch.c
+  src/scenes/mobile/menu.c
+  src/scenes/mobile/popup.c
+  src/scenes/util/editorcmd.c
+  src/scenes/util/editorgrp.c
+  src/scenes/util/levparser.c
+  src/scenes/confirmbox.c
+  src/scenes/credits.c
+  src/scenes/editorhelp.c
+  src/scenes/editorpal.c
+  src/scenes/gameover.c
+  src/scenes/info.c
+  src/scenes/intro.c
+  src/scenes/langselect.c
+  src/scenes/level.c
+  src/scenes/modloader.c
+  src/scenes/pause.c
+  src/scenes/quest.c
+  src/scenes/stageselect.c
+  src/scenes/settings.c
+
+  src/scripting/util/iterators.c
+  src/scripting/scripting.c
+  src/scripting/application.c
+  src/scripting/surgeengine.c
+  src/scripting/actor.c
+  src/scripting/androidplatform.c
+  src/scripting/animation.c
+  src/scripting/brick.c
+  src/scripting/brickparticle.c
+  src/scripting/camera.c
+  src/scripting/collisions.c
+  src/scripting/console.c
+  src/scripting/entitycontainer.c
+  src/scripting/entitymanager.c
+  src/scripting/entitytree.c
+  src/scripting/events.c
+  src/scripting/game.c
+  src/scripting/input.c
+  src/scripting/lang.c
+  src/scripting/level.c
+  src/scripting/levelmanager.c
+  src/scripting/levelobjectcontainer.c
+  src/scripting/loaderthread.c
+  src/scripting/mobilegamepad.c
+  src/scripting/mouse.c
+  src/scripting/music.c
+  src/scripting/object.c
+  src/scripting/obstaclemap.c
+  src/scripting/platform.c
+  src/scripting/player.c
+  src/scripting/playermanager.c
+  src/scripting/prefs.c
+  src/scripting/screen.c
+  src/scripting/sensor.c
+  src/scripting/sound.c
+  src/scripting/text.c
+  src/scripting/time.c
+  src/scripting/transform.c
+  src/scripting/vector2.c
+  src/scripting/video.c
+  src/scripting/web.c
+  src/physics/obstacle.c
+  src/physics/obstaclemap.c
+  src/physics/physicsactor.c
+  src/physics/sensor.c
+  src/physics/sensorstate.c
+  src/physics/collisionmask.c
+
+  src/entities/legacy/entitymanager.c
+  src/entities/legacy/enemy.c
+  src/entities/legacy/item.c
+  src/entities/legacy/object_compiler.c
+  src/entities/legacy/object_decorators.c
+  src/entities/legacy/object_machine.c
+  src/entities/legacy/object_vm.c
+  src/entities/legacy/nanocalc/nanocalc.c
+  src/entities/legacy/nanocalc/nanocalc_addons.c
+  src/entities/legacy/nanocalc/nanocalcext.c
+
+  src/entities/actor.c
+  src/entities/background.c
+  src/entities/brick.c
+  src/entities/brickmanager.c
+  src/entities/camera.c
+  src/entities/character.c
+  src/entities/mobilegamepad.c
+  src/entities/player.c
+  src/entities/renderqueue.c
+  src/entities/waterfx.c
+
+  src/third_party/ignorecase.c
+  src/third_party/utf8.c
+
+  src/misc/icon.c
+  src/misc/license.c
+  ${CMAKE_CURRENT_BINARY_DIR}/src/misc/credits.c
+
+  src/main.c
+)
+
+set(GAME_HEADERS
+  src/core/animation.h
+  src/core/asset.h
+  src/core/audio.h
+  src/core/color.h
+  src/core/commandline.h
+  src/core/config.h
+  src/core/engine.h
+  src/core/fadefx.h
+  src/core/font.h
+  src/core/global.h
+  src/core/image.h
+  src/core/import.h
+  src/core/input.h
+  src/core/inputmap.h
+  src/core/keyframes.h
+  src/core/lang.h
+  src/core/logfile.h
+  src/core/modutils.h
+  src/core/nanoparser.h
+  src/core/prefs.h
+  src/core/quest.h
+  src/core/resourcemanager.h
+  src/core/scene.h
+  src/core/screenshot.h
+  src/core/shader.h
+  src/core/sprite.h
+  src/core/storyboard.h
+  src/core/timer.h
+  src/core/video.h
+  src/core/web.h
+
+  src/util/csv.h
+  src/util/darray.h
+  src/util/dictionary.h
+  src/util/djb2.h
+  src/util/fasthash.h
+  src/util/hashtable.h
+  src/util/iterator.h
+  src/util/numeric.h
+  src/util/point2d.h
+  src/util/rect.h
+  src/util/stringutil.h
+  src/util/util.h
+  src/util/v2d.h
+  src/util/transform.h
+
+  src/scenes/mobile/subscenes/info.h
+  src/scenes/mobile/subscenes/credits.h
+  src/scenes/mobile/subscenes/screenshot.h
+  src/scenes/mobile/subscenes/subscene.h
+  src/scenes/mobile/util/touch.h
+  src/scenes/mobile/menu.h
+  src/scenes/mobile/popup.h
+  src/scenes/util/editorcmd.h
+  src/scenes/util/editorgrp.h
+  src/scenes/util/levparser.h
+  src/scenes/confirmbox.h
+  src/scenes/editorhelp.h
+  src/scenes/editorpal.h
+  src/scenes/credits.h
+  src/scenes/gameover.h
+  src/scenes/info.h
+  src/scenes/intro.h
+  src/scenes/langselect.h
+  src/scenes/level.h
+  src/scenes/modloader.h
+  src/scenes/pause.h
+  src/scenes/quest.h
+  src/scenes/settings.h
+  src/scenes/stageselect.h
+
+  src/scripting/util/iterators.h
+  src/scripting/loaderthread.h
+  src/scripting/scripting.h
+  src/physics/obstacle.h
+  src/physics/obstaclemap.h
+  src/physics/physicsactor.h
+  src/physics/sensor.h
+  src/physics/sensorstate.h
+  src/physics/collisionmask.h
+
+  src/entities/legacy/spatialhash.h
+  src/entities/legacy/entitymanager.h
+  src/entities/legacy/enemy.h
+  src/entities/legacy/item.h
+  src/entities/legacy/object_compiler.h
+  src/entities/legacy/object_decorators.h
+  src/entities/legacy/object_machine.h
+  src/entities/legacy/object_vm.h
+  src/entities/legacy/nanocalc/nanocalc.h
+  src/entities/legacy/nanocalc/nanocalc_addons.h
+  src/entities/legacy/nanocalc/nanocalcext.h
+
+  src/entities/actor.h
+  src/entities/background.h
+  src/entities/brick.h
+  src/entities/brickmanager.h
+  src/entities/camera.h
+  src/entities/character.h
+  src/entities/mobilegamepad.h
+  src/entities/player.h
+  src/entities/renderqueue.h
+  src/entities/sfx.h
+  src/entities/waterfx.h
+
+  src/third_party/ignorecase.h
+  src/third_party/utf8.h
+
+  src/misc/resource.h
+  ${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.rc
+)
+
+if(WANT_BETTER_GAMEPAD)
+  list(APPEND GAME_SRCS src/misc/gamecontrollerdb.c)
+endif()
+
+if(WANT_FASTDRAW)
+  list(APPEND GAME_SRCS src/third_party/fast_draw.c)
+  list(APPEND GAME_HEADERS src/third_party/fast_draw.h)
+endif()
