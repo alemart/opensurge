@@ -110,6 +110,8 @@ set(SURGESCRIPT_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look f
 set(PHYSFS_LIBRARY_PATH "${CMAKE_LIBRARY_PATH}" CACHE PATH "Where to look for PhysicsFS")
 set(PHYSFS_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" CACHE PATH "Where to look for the header files of PhysicsFS")
 
+set(GAME_DISTDIR "." CACHE PATH "Installation directory of the game, relative to the build folder, when running in place")
+
 if(UNIX)
   set(GAME_BINDIR "games" CACHE PATH "Installation directory of the executable. It will be appended to CMAKE_INSTALL_PREFIX if it's a relative path")
   set(GAME_DATADIR "share/games/${GAME_UNIXNAME}" CACHE PATH "Installation directory of the game data. It will be appended to CMAKE_INSTALL_PREFIX if it's a relative path")
@@ -123,7 +125,7 @@ if(UNIX AND NOT ANDROID)
 endif()
 
 # Data folder
-if(DEFINED GAME_DATADIR)
+if(UNIX)
   list(APPEND DEFS "GAME_USERDIRNAME=\"${GAME_USERDIRNAME}\"")
   if(IS_ABSOLUTE "${GAME_DATADIR}")
     list(APPEND DEFS "GAME_DATADIR=\"${GAME_DATADIR}\"")
@@ -327,5 +329,17 @@ if(UNIX AND NOT GAME_RUNINPLACE)
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.appdata.xml" DESTINATION "${DESKTOP_METAINFO_PATH}")
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/misc/opensurge.desktop" DESTINATION "${DESKTOP_ENTRY_PATH}")
   endif()
+
+elseif(GAME_RUNINPLACE)
+
+  # Portable executable & assets
+  install(TARGETS "${GAME_UNIXNAME}" RUNTIME DESTINATION "${GAME_DISTDIR}")
+  install(FILES ${ASSET_FILES} DESTINATION "${GAME_DISTDIR}")
+  install(
+    DIRECTORY ${ASSET_FOLDERS} screenshots
+    DESTINATION "${GAME_DISTDIR}"
+    PATTERN ".git" EXCLUDE
+    PATTERN "screenshots/*.png" EXCLUDE
+  )
 
 endif()
