@@ -1,0 +1,26 @@
+set(ASSET_FILES
+  LICENSE
+  README.md
+  CHANGELOG.md
+  CONTRIBUTING.md
+  logo.png
+  surge.png
+  surge.rocks
+  surge.cfg
+)
+
+set(ASSET_FOLDERS
+  characters
+  scripts
+  sprites
+  images
+  levels
+  musics
+  quests
+  samples
+  themes
+  languages
+  fonts
+  inputs
+  licenses
+)
