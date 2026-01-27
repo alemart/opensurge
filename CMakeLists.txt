@@ -307,6 +307,8 @@ endif()
 # Install the game
 # ------------------------------------------
 
+include(assets)
+
 if(UNIX AND NOT GAME_RUNINPLACE)
 
   # Executable
@@ -316,8 +318,8 @@ if(UNIX AND NOT GAME_RUNINPLACE)
   )
 
   # Assets
-  install(FILES LICENSE README.md CHANGELOG.md CONTRIBUTING.md logo.png surge.png surge.rocks surge.cfg DESTINATION "${GAME_DATADIR}")
-  install(DIRECTORY characters scripts sprites images levels musics quests samples themes languages fonts inputs licenses DESTINATION "${GAME_DATADIR}" PATTERN ".git" EXCLUDE)
+  install(FILES ${ASSET_FILES} DESTINATION "${GAME_DATADIR}")
+  install(DIRECTORY ${ASSET_FOLDERS} DESTINATION "${GAME_DATADIR}" PATTERN ".git" EXCLUDE)
 
   # AppStream / freedesktop.org
   if(DEFINED DESKTOP_ENTRY_PATH)
