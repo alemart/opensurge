@@ -2,7 +2,7 @@
 
 ## 0.6.1.3 - January 27th, 2026
 
-* Autodetect gamepad layouts for consistent cross-platform behavior
+* Auto-detect gamepad layouts for consistent cross-platform behavior
 * Introduced a more sophisticated architecture for the Audio System
 * Prevent the underwater muffler from altering the drowning music
 * Changed the formula of the underwater muffler
@@ -11,7 +11,7 @@
 * Improved the Title Card script
 * Prevent collected Life Powerups from respawning when restarting the level
 * Surge the Rabbit: introduced Game State and Consumable Entities
-* New translations: Ukranian, Lithuanian
+* New translations: Ukrainian, Lithuanian
 * Options Screen: added compatibility with specific versions of the engine
 * Level Editor: redesigned the Grid System
 * Windows: made the window display the icon of the executable
