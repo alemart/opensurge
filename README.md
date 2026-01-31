@@ -48,7 +48,7 @@ By purchasing your copy, you can show your appreciation and support future devel
 
 ### Where do I find MODs?
 
-[Here](https://www.youtube.com/playlist?list=PLbPToEpHpU2dkXfNGn6aFc5RzM103DC5l).
+[Here](https://opensurge2d.org/#games).
 
 ### How do I play a MOD?
 
