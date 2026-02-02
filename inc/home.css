@@ -163,6 +163,30 @@ a:any-link:not(.pure-button,.card) {
   }
 }
 
+/* logo */
+#logo {
+  background-image: url("/img/header.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 100%;
+  height: 0;
+  padding-bottom: 33.34%; /* 1/3 of the width; or equivalently, aspect-ratio: 3 */
+}
+
+@media screen and (min-width: 1024px) {
+  #logo {
+    padding-bottom: 27.5%;
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  #logo {
+    padding-bottom: 0;
+    height: 353px;
+  }
+}
+
 /* download area */
 #download img.platform {
   width: auto;
