@@ -129,7 +129,7 @@ image;images/watersplash.png;CC0-1.0;Mateus Reis (KZR);;
 image;images/animalprison.png;CC-BY-3.0;Mateus Reis (KZR) & Colin Beard (SilverstepP);;
 image;images/teleporter.png;CC-BY-3.0;d1337r;;
 image;images/goal_sign.png;CC-BY-3.0;MTK358;;
-image;images/tux.png;CC-BY-3.0;Constantin Pelikan;;
+image;images/tux.png;CC-BY-4.0;Carlos Quinones (MoonDeLaAxel);github.com/MoonDeLaAxel;Based on previous sprite by Constantin Pelikan
 image;images/spikes.png;CC0-1.0;Carl Olsson (surt);opengameart.org;Edited by Alexandre Martins (alemart)
 image;images/explosion.png;CC-BY-3.0;Daniel Cook;lostgarden.com, opengameart.org;
 image;images/cursor.png;CC0-1.0;qubodup;opengameart.org;
@@ -145,11 +145,13 @@ image;images/speed_smoke.png;CC-BY-3.0;klausdell;opengameart.org;Edited by Alexa
 image;images/smoke.png;CC-BY-3.0;KnoblePersona;opengameart.org;Edited by Alexandre Martins (alemart)
 image;images/mini_smoke.png;CC-BY-3.0;Master484;opengameart.org/users/master484;
 image;images/hydra.png;CC-BY-SA-3.0;Antifarea;opengameart.org;Expanded by Alexandre Martins (alemart)
-image;images/life_icon.png;CC-BY-3.0;João Victor (Race the Hedgehog), Colin Beard (SilverstepP), Constantin Pelikan, Alexandre Martins (alemart);;
+image;images/life_icon.png;CC-BY-3.0;João Victor (Race the Hedgehog), Colin Beard (SilverstepP), Constantin Pelikan, Alexandre Martins (alemart), Carlos Quinones (MoonDeLaAxel);;
 image;images/new_shields.png;CC-BY-SA-4.0;SecularSteve;github.com/SecularSteve;
 image;images/salamander_boss.png;CC-BY-4.0;Cody Licorish (svgmovement);;Special thanks to Mateus Reis (KZR)
 image;images/salamander_bridge.png;CC-BY-4.0;Cody Licorish (svgmovement);;
 image;images/salamander_wall.png;CC-BY-4.0;Cody Licorish (svgmovement);;
+image;images/SurgeAttempt.png;CC-BY-4.0;Carlos Quinones (MoonDeLaAxel);github.com/MoonDeLaAxel;
+image;images/tux_concept_art.png;CC-BY-4.0;Carlos Quinones (MoonDeLaAxel);github.com/MoonDeLaAxel;
 image;images/debug_mode/item_picker.png;CC-BY-4.0;Alexandre Martins (alemart);;
 image;images/debug_mode/trash.png;CC-BY-4.0;Alexandre Martins (alemart);;
 image;images/debug_mode/selection.png;CC0-1.0;Alexandre Martins (alemart);;
