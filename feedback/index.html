@@ -4,10 +4,26 @@
         <meta charset="utf-8">
         <title>Surge the Rabbit - Feedback</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
-        <meta http-equiv="refresh" content="0; url=https://alemart.itch.io/opensurge/rate?source=game">
+        <meta http-equiv="refresh" content="2; url=https://alemart.itch.io/opensurge/rate?source=game">
         <link rel="shortcut icon" href="/favicon.ico">
         <link rel="stylesheet" href="style.css">
         <script async src="//gc.zgo.at/count.js" data-goatcounter="https://opensurge.goatcounter.com/count"></script>
+        <script>
+(function() {
+
+const params = new URLSearchParams(location.search);
+const version = params.get('v');
+const platform = params.get('platform');
+
+// if the player has likely downloaded opensurge from fdroid, flathub, etc.,
+// then we don't redirect to itch.io for feedback
+if(version && (/fdroid/i.test(version) || /(unix|linux)/i.test(platform || '')))
+    location.href = 'https://forms.gle/5Z1pifyDqUfxqpxx7';
+else
+    location.href = 'https://alemart.itch.io/opensurge/rate?source=game';
+
+})();
+        </script>
     </head>
     <body>
         <section class="center-of-screen">
