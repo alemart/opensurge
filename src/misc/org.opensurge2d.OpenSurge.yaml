@@ -14,7 +14,7 @@ finish-args:
   - --socket=pulseaudio
   - --filesystem=xdg-download:ro
   - --device=all
-  - --env=LD_LIBRARY_PATH=/app/lib
+  - --env=LD_LIBRARY_PATH=/app/lib:/app/lib64
 
 cleanup:
   - /include
@@ -24,32 +24,17 @@ cleanup:
 
 modules:
   - shared-modules/glu/glu-9.json
-
-  - name: libphysfs
-    buildsystem: cmake-ninja
-    builddir: true
-    sources:
-      - type: archive
-        url: https://github.com/icculus/physfs/archive/refs/tags/release-3.2.0.tar.gz
-        sha256: 1991500eaeb8d5325e3a8361847ff3bf8e03ec89252b7915e1f25b3f8ab5d560
-    config-opts:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_INSTALL_LIBDIR=/app/lib
-      - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-      - -DPHYSFS_BUILD_TEST=OFF
-      - -DPHYSFS_BUILD_DOCS=OFF
-      - -DPHYSFS_BUILD_STATIC=OFF
+  - shared-modules/physfs/physfs.json
 
   - name: liballegro5
     buildsystem: cmake-ninja
     builddir: true
     sources:
       - type: archive
-        url: https://github.com/liballeg/allegro5/releases/download/5.2.11.2/allegro-5.2.11.2.tar.gz
-        sha256: f035fe128dd5f2412c32add41ed4058ad8154f6e9571084574487d67dbdbaae0
+        url: https://github.com/liballeg/allegro5/releases/download/5.2.11.3/allegro-5.2.11.3.tar.gz
+        sha256: aba4679a5b1f2bf62482eba6e8814a94de7ffc86de5f8587ba199fcc61b4a04f
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_INSTALL_LIBDIR=/app/lib
       - -DWANT_DEMO=OFF
       - -DWANT_DOCS=OFF
       - -DWANT_EXAMPLES=OFF
@@ -69,7 +54,6 @@ modules:
         #commit: ""
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
-      - -DCMAKE_INSTALL_LIBDIR=/app/lib
       - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
       - -DWANT_EXECUTABLE=OFF
       - -DWANT_STATIC=OFF
@@ -89,9 +73,8 @@ modules:
       - -DCMAKE_LIBRARY_PATH=/app/lib
       - -DCMAKE_INCLUDE_PATH=/app/include
       - -DCMAKE_INSTALL_PREFIX=/app/bin
-      - -DGAME_DATADIR=/app/share/opensurge
       - -DGAME_BINDIR=/app/bin
+      - -DGAME_DATADIR=/app/share/opensurge
       - -DDESKTOP_ENTRY_PATH=/app/share/applications
       - -DDESKTOP_ICON_PATH=/app/share/icons/hicolor/256x256/apps
       - -DDESKTOP_METAINFO_PATH=/app/share/metainfo
-      - -DDESKTOP_INSTALL=ON
