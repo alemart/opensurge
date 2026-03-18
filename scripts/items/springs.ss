@@ -679,17 +679,18 @@ object "Spring Behavior" is "private", "entity"
 
             // vertical spring
             else if(direction.x == 0 && direction.y != 0) {
-                // change speed
                 if(!wallRun || player.midair || player.jumping) {
+                    // change speed
                     if((v.y > 0 && v.y > player.ysp) || (v.y < 0 && v.y < player.ysp)) {
-                        // regular spring
                         player.ysp = v.y;
-                        player.springify();
 
                         // velocity swap when running on a ceiling
                         if(ceilRun)
                             player.gsp = -player.gsp;
                     }
+
+                    // springify
+                    player.springify();
                 }
                 else {
                     // the player is running on a wall
