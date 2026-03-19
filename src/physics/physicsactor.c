@@ -774,7 +774,7 @@ bool physicsactor_bounce(physicsactor_t *pa, double direction)
         return false;
 
     /* do nothing if on the ground */
-    if(!pa->midair || pa->state == PAS_DEAD || pa->state == PAS_DROWNED)
+    if(!pa->midair)
         return false;
 
     /* bounce */
@@ -783,7 +783,10 @@ bool physicsactor_bounce(physicsactor_t *pa, double direction)
     else
         pa->ysp -= 60.0 * sign(pa->ysp);
 
+    /* set the state to jumping */
     pa->state = PAS_JUMPING;
+
+    /* done! */
     return true;
 }
 
