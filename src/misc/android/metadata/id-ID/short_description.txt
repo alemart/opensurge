@@ -1,1 +1,1 @@
-Sebuah game engine retro platformer yang menyenangkan terinspirasi dari game-game Sonic 16-bit.
+Game engine retro platformer seru yang terinspirasi dari game-game Sonic 16-bit.

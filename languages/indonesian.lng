@@ -144,16 +144,16 @@ CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versi $ENGINE_
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Anggota</color>"
 CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Anggota sebelumnya</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Terima kasih kepada</color>"
-CREDITS_ALEXANDRE           "Project Lead & Founder\nProject Developer\nArtist"
-CREDITS_JOAO                "Artist\nIllustrator"
-CREDITS_MATEUS              "Sound effects"
-CREDITS_CODY                "Concept artist\nEnemy designer"
-CREDITS_JOHAN               "Musician (rest in peace, friend)"
-CREDITS_DI                  "Musician"
-CREDITS_VICTOR              "Musician"
-CREDITS_M374LX              "Musician"
-CREDITS_COLIN               "Sprites, first story"
-CREDITS_BRIAN               "Sprite artist"
+CREDITS_ALEXANDRE           "Pemimpin Proyek & Pendiri\nPengembang Proyek\nSeniman"
+CREDITS_JOAO                "Seniman\nIlustrator"
+CREDITS_MATEUS              "Efek suara"
+CREDITS_CODY                "Seniman konsep\nPerancang karakter musuh"
+CREDITS_JOHAN               "Musisi (rest in peace, friend)"
+CREDITS_DI                  "Musisi"
+CREDITS_VICTOR              "Musisi"
+CREDITS_M374LX              "Musisi"
+CREDITS_COLIN               "Sprite, zona pertama"
+CREDITS_BRIAN               "Seniman sprite"
 CREDITS_TRANSLATOR          "Penerjemah"
 CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Penerjemah</color>"
 CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Penerjemah sebelumnya</color>"
@@ -231,7 +231,7 @@ CONGRATULATIONS_TITLE       "TERIMA KASIH SUDAH BERMAIN"
 CONGRATULATIONS_SHARE       "BAGIKAN"
 CONGRATULATIONS_DONATE      "DONASI"
 CONGRATULATIONS_BACK        "KEMBALI"
-CONGRATULATIONS_TEXT        "Terima kasih sudah main Open Surge versi $ENGINE_VERSION.\nKepengen main lebih banyak lagi? Pergi ke $ENGINE_WEBSITE untuk liat update!\n\nOpen Surge bisa digunakan untuk main dan bikin gamemu sendiri. Dikembangkan oleh orang-orang seperti kamu. Bagikan keseruanmu sekarang! Bilang ke keluarga, temen-temen, pak satpam dan anabul. Bawa pesan ini ke persekutuanmu!"
+CONGRATULATIONS_TEXT        "Terima kasih sudah bermain Open Surge versi $ENGINE_VERSION.\nAyo kunjungi $ENGINE_WEBSITE untuk liat update terbaru!\n\nOpen Surge bisa digunakan untuk main dan bikin gamemu sendiri. Dikembangkan oleh orang-orang seperti kamu. Kasih tahu ke keluarga, temen-temen, pak satpam dan anabulmu sekarang!"
 
 
 
@@ -371,14 +371,14 @@ EDITOR_HELP_CMD_BRICKLAYER  "Ganti layer brick"
 EDITOR_HELP_CMD_FLIPBRICK   "Balik brick yang ini"
 
 // Input keys
-EDITOR_INPUT_ARROWS         "Arrow keys"
+EDITOR_INPUT_ARROWS         "Tombol panah"
 EDITOR_INPUT_SHIFT          "Shift" // Shift key
 EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
 EDITOR_INPUT_ESC            "ESC"   // ESC key
-EDITOR_INPUT_LEFTCLICK      "Left mouse button"
-EDITOR_INPUT_RIGHTCLICK     "Right mouse button"
-EDITOR_INPUT_MIDDLECLICK    "Middle mouse button"
-EDITOR_INPUT_MOUSEWHEEL     "Mouse wheel"
+EDITOR_INPUT_LEFTCLICK      "Klik kiri"
+EDITOR_INPUT_RIGHTCLICK     "Klik kanan"
+EDITOR_INPUT_MIDDLECLICK    "Klik tengah"
+EDITOR_INPUT_MOUSEWHEEL     "Roda gulir"
 
 // Confirm boxes
 EDITOR_CONFIRM_RELOAD       "Muat ulang level?"
@@ -423,8 +423,8 @@ HUD_TIME                    "Waktu"
 HUD_POWER                   "Power"
 
 // Level Cleared animation
-CLEARED_LINE1               "KAMU BERHASIL"
-CLEARED_LINE2               "MENYELESAIKAN ZONA $LEVEL_ACT"
+CLEARED_LINE1               "ZONA $LEVEL_ACT"
+CLEARED_LINE2               "SELESAI"
 CLEARED_POWER               "Bonus Power"
 CLEARED_TIME                "Bonus Waktu"
 CLEARED_SCORE               "Skor"
