@@ -1,0 +1,492 @@
+// -----------------------------------------------------------------------------
+// File: languages/polish.lng
+// Description: polish translation (encoding: UTF-8)
+// Author: Hubert Grzywa "HolyPaladin" <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+
+//
+// Section: generic
+//
+
+// Translation metadata
+// (use the English alphabet)
+LANG_ID                     "pl_PL"                            // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Polski"                           // language name
+LANG_AUTHOR                 "Hubert Grzywa 'Holypaladin'"      // translation author
+LANG_COMPATIBILITY          "0.6.1"                            // required engine version
+
+
+
+//
+// Translators:
+//
+// Before starting your work, please check out the
+// Translation Guide at http://wiki.opensurge2d.org
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// Developer mode: when seeing the Open Surge Engine splash
+// screen, press RIGHT 3 times and enter. You'll see a list
+// of all level files.
+//
+
+//
+// Updating translations:
+//
+// New strings get added from time to time. They are marked
+// as FIXME. To find them, use the Find tool in your editor.
+// Found something? Please search for it now.
+//
+// If you find that mark anywhere in the file, it means that
+// the translation needs to be updated. Please submit a patch
+// to keep it up to date.
+//
+// After translating the new strings, make sure to remove
+// that mark.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
+OPTIONS_TITLE               "OPCJE"
+OPTIONS_GRAPHICS            "Grafika"
+OPTIONS_AUDIO               "Dźwięk"
+OPTIONS_CONTROLS            "Sterowanie"
+OPTIONS_GAME                "Gra"
+OPTIONS_ENGINE              "Silnik"
+OPTIONS_MODS                "Modyfikacje"
+OPTIONS_BACK                "Wróć"
+OPTIONS_YES                 "Tak"
+OPTIONS_NO                  "Nie"
+OPTIONS_ON                  "Włącz" // alternatively: Enabled
+OPTIONS_OFF                 "Wyłącz" // alternatively: Disabled
+OPTIONS_DEFAULT             "Standardowy"
+OPTIONS_FULLSCREEN          "Tryb pełnoekranowy"
+OPTIONS_RESOLUTION          "Wielkość ekranu"
+OPTIONS_QUALITY             "Jakość"
+OPTIONS_QUALITY_LOW         "Niska"
+OPTIONS_QUALITY_MEDIUM      "Średnia"
+OPTIONS_QUALITY_HIGH        "Wysoka"
+OPTIONS_FPS                 "Wyświetl częstotliwość"
+OPTIONS_VSYNC               "Synchronizacja obrazu" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Skalowanie pixeli"
+OPTIONS_COMINGSOON          "Już wkrótce!"
+OPTIONS_VOLUME              "Głośność"
+OPTIONS_MUTE                "Wycisz"
+OPTIONS_MIXER               "Mikser dźwięku"
+OPTIONS_MIXER_MIN           "Wyłącz muzykę"
+OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
+OPTIONS_MIXER_MAX           "Wyłącz dźwięki"
+OPTIONS_MUFFLER             "Efekt podwodny"
+OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
+OPTIONS_MUFFLER_LOW         "Światło" // also: lightweight
+OPTIONS_MUFFLER_MEDIUM      "Umiarkowane"
+OPTIONS_MUFFLER_HIGH        "Intensywne"
+OPTIONS_MUFFLER_HIGHER      "Bardzo intensywne"
+OPTIONS_GAMEPADOPACITY      "Nieprzeźroczystość"
+OPTIONS_GAMEPAD             "Użyj konsoli"
+OPTIONS_LANGUAGE            "Język"
+OPTIONS_STAGESELECT         "Wybór poziomu"
+OPTIONS_DEVELOPERMODE       "Opcja deweloperska"
+OPTIONS_CREDITS             "Otwórz podziękowania za Open Surge"
+OPTIONS_WEBSITE             "Odwiedź Open Surge w internecie"
+OPTIONS_DONATE              "Wpłać na Open Surge"
+OPTIONS_ABOUT               "O silniku"
+OPTIONS_SHARE               "Udostępnij silnik"
+OPTIONS_DOWNLOAD_DESKTOP    "Zdobądź aplikację na komputer"
+OPTIONS_DOWNLOAD_MOBILE     "Zdobądź aplikację mobilną"
+OPTIONS_PLAYMOD             "Zagraj w grę"
+OPTIONS_PLAYMOD_NOTAGAME    "Wybranego przedmiotu nie ma w grze Open Surge!"
+OPTIONS_PLAYMOD_LEGACYERROR "Przestarzałe gry Open Surge nie są wspierane."
+OPTIONS_PLAYMOD_COMPATWARN  "Tryb zgodności to funkcja mająca na celu poprawę wrażeń z gry. Czy na pewno chcesz go wyłączyć?"
+OPTIONS_MODSTORAGE          "Magazyn"
+OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
+OPTIONS_COMPATIBILITYMODE   "Tryb zgodności"
+OPTIONS_SUBMITFEEDBACK      "Wyślij opinię"
+OPTIONS_WRITEREVIEW         "Napisz recenzję"
+OPTIONS_RATEAPP             "Oceń aplikację"
+OPTIONS_REPORTISSUE         "Zgłoś błąd"
+OPTIONS_BACKTOBASEGAME      "Wróc do głównej gry"
+
+// Stage Select
+STAGESELECT_TITLE           "WYBÓR POZIOMU"
+STAGESELECT_DEBUG           "OPCJA DEWELOPERSKA"
+STAGESELECT_MSG             "Wciśnij <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> aby wrócić"
+STAGESELECT_PAGE            "strona $1/$2"
+STAGESELECT_ACT             "Strefa"
+
+// Credits
+CREDITS_TITLE               "CREDITS"
+CREDITS_BACK                "Naciścij <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> aby wrócić"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME wersja $ENGINE_VERSION</color>\ndziałająca dzięki $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Ludzie</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Byli członkowie</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Podziękowania dla</color>"
+CREDITS_ALEXANDRE           "Project Lead & Founder\nDeweloper projektu\nArtist"
+CREDITS_JOAO                "Artysta\nIlustrator"
+CREDITS_MATEUS              "Efekty dźwiękowe"
+CREDITS_CODY                "Artysta koncepcji\nProjektant przeciwników"
+CREDITS_JOHAN               "Kompozytor (spoczywaj w pokoju przyjacielu)"
+CREDITS_DI                  "Kompozytor"
+CREDITS_VICTOR              "Kompozytor"
+CREDITS_M374LX              "Kompozytor"
+CREDITS_COLIN               "Animacja postaci, pierwsza historia"
+CREDITS_BRIAN               "Artysta, animacja postaci"
+CREDITS_TRANSLATOR          "Tłumacz"
+CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Tłumacze</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>PByli tłumacze</color>"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Podziękowania za indywidualne zasoby</color>"
+CREDITS_RES_TEXT            "Wymienione poniżej pliki są objęte licencjami libre. Wymienieni ich odpowiedni autorzy:"
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Obrazy</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Muzyka</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Efekty dźwiękowe</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Czcionki</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Poziomy</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Tłumaczenia</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skrypty</color>"
+CREDITS_RES_SCRIPTS_TEXT    "Autorzy są zidentyfikowani w samych skryptach."
+
+// Title Screen
+TITLESCREEN_PLAY            "ROZPOCZNIJ GRĘ"
+TITLESCREEN_OPTIONS         "OPCJE"
+TITLESCREEN_CREATE          "TWÓRZ"
+TITLESCREEN_MOBILE          "WERSJA MOBILNA"
+TITLESCREEN_SHARE           "UDOSTĘPNIJ"
+TITLESCREEN_DONATE          "WPŁAĆ"
+TITLESCREEN_QUIT            "WYJDŹ"
+TITLESCREEN_SUBMITFEEDBACK  "WYŚLIJ OPINIĘ"
+TITLESCREEN_WRITEREVIEW     "NAPISZ RECENZJĘ"
+TITLESCREEN_RATEAPP         "OCEŃ APLIKACJĘ"
+TITLESCREEN_REPORTISSUE     "ZGŁOŚ BŁĄD"
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
+
+// End of Demo
+ENDOFDEMO_CONTINUE          "KONTYNUUJ"
+ENDOFDEMO_VERSION           "PRZYKŁAD $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Dzięki za grę! Surge the Rabbit jest w rozwoju.\n\nOdwiedź <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> po dostępne aktualizacje!\n\nTeraz zobaczmy jak tworzysz własne gry!"
+
+// Rate the Game
+// Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+RATEGAME_TITLE              "Ocenisz Surge the Rabbit?"
+RATEGAME_MESSAGE            "Chcemy od ciebie usłyszeć!\nTwoja opinia pomoże tej otwartoźródłowej grze i jej silnikowi!" // 2 lines max.
+RATEGAME_YES                "Oczywiście!"
+RATEGAME_NO                 "Jeszcze nie"
+
+// Play classic levels
+PLAYCLASSICLEVELS_TEXT      "Zagrać w klasyczne poziomy?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+
+// Thanks for playing
+THANKSFORPLAYING_TITLE      "Thanks for playing!"
+THANKSFORPLAYING_TEXT       "Ta gra jest utworzona przy użyciu Open Surge, bardzo elastycznego i otwartoźródłowego silnika gry 2D który teraz jest w twoich rękach!\n\nTeraz podziel się radością! Powiedz rodzinie i przyjaciołom o tym i rozpowszechniaj Open Surge!"
+THANKSFORPLAYING_YES        "Oczywiście!"
+THANKSFORPLAYING_NO         "Jeszcze nie"
+
+// (legacy) Main Menu
+MAINMENU_TITLE              "MENU"
+MAINMENU_PLAY               "ROZPOCZNIJ GRĘ"
+MAINMENU_CREATE             "TWÓRZ"
+MAINMENU_SHARE              "UDOSTĘPNIJ"
+MAINMENU_OPTIONS            "OPCJE"
+MAINMENU_QUIT               "WYJDŹ"
+MAINMENU_DEVBUILD           "Wersja deweloperska"
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
+
+// (legacy) Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "TWÓRZ"
+CREATEMENU_PLAY             "ZAGRAJ PRZYKŁADOWY POZIOM"
+CREATEMENU_LEARN            "NAUKA"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "WRÓĆ"
+CREATEMENU_TEXT             "Open Surge pozwala ci tworzyć własne wspaniałe gry! Uwolnij kreatywność! Rozwijaj swoje zdolności!\n\nRozpocznij własny projekt! Twórz nowe przedmioty, poziomy, modyfikacje, postacie i jeszcze więcej! Otwórz się na potęgę edytora poziomów, naucz silnika i zanurz w SurgeScript dla maksymalnej siły!"
+
+// (legacy) Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "DZIĘKI ZA GRĘ"
+CONGRATULATIONS_SHARE       "UDOSTĘPNIJ"
+CONGRATULATIONS_DONATE      "WPŁAĆ"
+CONGRATULATIONS_BACK        "WRÓĆ"
+CONGRATULATIONS_TEXT        "Dzięki za grę w Open Surge version $ENGINE_VERSION.\nChcesz zagrać więcej? Go to $ENGINE_WEBSITE for updates!\n\nOpen Surge pozwala ci grać i tworzyć własne gry. Jest rozwijane dla ludzi takich jak ty. Teraz podziel się radością! Powiedz rodzinie i przyjaciołom o tym i rozpowszechniaj Open Surge!"
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
+INPUT_KEYB_DIRECTIONAL      "KLAWISZE STRZAŁEK"
+INPUT_KEYB_LEFT             "LEWA STRZAŁKA"
+INPUT_KEYB_RIGHT            "PRAWA STRZAŁKA"
+INPUT_KEYB_UP               "STRZAŁKA DO GÓRY"
+INPUT_KEYB_DOWN             "STRZAŁKA W DÓŁ"
+INPUT_KEYB_FIRE1            "SPACJA"
+INPUT_KEYB_FIRE2            "LEWY CTRL"
+INPUT_KEYB_FIRE3            "ENTER"
+INPUT_KEYB_FIRE4            "ESC"
+INPUT_KEYB_FIRE5            "LEWY SHIFT"
+INPUT_KEYB_FIRE6            "PRAWy SHIFT"
+INPUT_KEYB_FIRE7            "<dostępny>"
+INPUT_KEYB_FIRE8            "<dostępny>"
+
+// joystick
+INPUT_JOY_DIRECTIONAL       "KIERUNKI"
+INPUT_JOY_LEFT              "LEWY PRZYCISK"
+INPUT_JOY_RIGHT             "PRAWY PRZYCISK"
+INPUT_JOY_UP                "PRZYCISK W GÓRĘ"
+INPUT_JOY_DOWN              "PRZYCISK W DÓŁ"
+INPUT_JOY_FIRE1             "PRZYCISK AKCJI"
+INPUT_JOY_FIRE2             "POMOCNICZY PRZYCISK AKCJI"
+INPUT_JOY_FIRE3             "PAUZA"
+INPUT_JOY_FIRE4             "WRÓĆ"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
+INPUT_JOY_FIRE7             "<dostępny>"
+INPUT_JOY_FIRE8             "<dostępny>"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
+QUIT_QUESTION               "Na pewno chcesz wyjść?"
+QUIT_OPTION1                "Tak"
+QUIT_OPTION2                "Nie"
+
+// Loading Screen
+LOADING_TEXT                "wczytywanie..."
+
+
+
+//
+// Section: levels
+//
+
+// Demo Level
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Twórz swoje wspaniałe gry!</color>\nTa gra jest utworzona przy użyciu <color=$COLOR_HIGHLIGHT>Open Surge</color>, bardzo elastycznego i otwartoźródłowego silnika gry 2D który teraz jest w twoich rękach!"
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Czy wiedziałeś...?</color>\nWszystko w Open Surge można dostosować. Możesz tworzyć nowe przedmioty, poziomy, modyfikacje, postacie i jeszcze więcej! To jest kompleksowy <color=$COLOR_HIGHLIGHT>system tworzenia gier</color>."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Uwolnij kreatywność!</color>\nJedną z kluczowych funkcji w Open Surge jest <color=$COLOR_HIGHLIGHT>SurgeScript</color>. To wysokiej jakości skryptowanie gier! Użyj tego aby budować co tylko sobie wyobrazisz!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Świetnie!</color>\nLubisz co widzisz? Twoje możliwości są ogromne! Odwiedź <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> aby tworzyć własne wspaniałe gry już dziś!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Zrób to sam!</color>\nTeraz Twoja kolej! <color=$COLOR_HIGHLIGHT>Naciśnij F12 aby otworzyć edytor.</color> Potem otwórz gamę przedmiotów i zacznij budować własny poziom! (użyj F1 do pomocy)"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Zrób to sam!</color>\nTeraz Twoja kolej! Zatrzymaj grę, przeciągnij uchwyt u dołu ekranu i otwórz <color=$COLOR_HIGHLIGHT>tryb debugowania</color> aby <color=$COLOR_HIGHLIGHT>edytować poziom</color>!"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>Świetnie!</color>\nOdwiedź <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> aby tworzyć własne wspaniałe gry już dziś!"
+
+
+
+//
+// Section: level editor
+//
+
+// Main UI
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: pomoc"
+EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
+EDITOR_UI_BRICK             "cegiełka"
+EDITOR_UI_GROUP             "grupa"
+EDITOR_UI_ENTITY            "podmiot"
+EDITOR_UI_LEGACYITEM        "archaiczny przedmiot"
+EDITOR_UI_LEGACYOBJECT      "archaiczny obiekt"
+EDITOR_UI_MISSING           "<brakuje>"
+
+// Bricks - scenery elements
+// Translators: please keep the names below succint. See the comments for their meaning.
+EDITOR_BRICK_TYPE_SOLID     "SOLIDNY"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "CHMURA"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "DEKORACYJNY"  // a cegiełka with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "NIEZNANY"
+
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "ZWYCZAJNY"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "OKRĄGŁY"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "WAHADŁOWY"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "ŁAMLIWY" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "ROZBIJALNY" // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "SPADAJĄCY"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "PŁYWAJĄCY"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "ZAZNACZ"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "NIEZNANY"
+
+EDITOR_BRICK_FLIP_NOFLIP    "nieodwrócony"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "Odwrócony horyzontalnie" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "Odwrócony wertykalnie"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "Obrócony o 180°"      // flip horizontally & vertically
+
+// Palette
+EDITOR_PALETTE_BRICK        "cegiełka"
+EDITOR_PALETTE_MISSING      "brakuje"
+EDITOR_PALETTE_EMPTY        "Nie znaleziono przedmiotów. Naciśnij <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> aby wrócić."
+
+// Help screen
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Kwestie główne</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Położenie przedmiotów</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>System warstowy</color>"
+EDITOR_HELP_BACK            "Naciśnij <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> aby wrócić"
+EDITOR_HELP_TINYWINDOW      "Brakuje miejsca, aby wyświetlić opis poleceń. Proszę powiększyć okno na ekranie opcji. \n\nNaciśnij <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> aby wrócić."
+EDITOR_HELP_LAYERSTUTORIAL  "Gracz będzie przełączał warstwy, dotykając obiektów L w kolorze zielonym/żółtym (patrz paleta) \nObiekt „Zielona L” włącza warstwę zieloną i wyłącza warstwę żółtą \nObiekt „Żółta L” włącza warstwę żółtą i wyłącza warstwę zieloną \nNaciśnij L, aby zmienić warstwę, na której umieścisz klocki \nZielona warstwa pojawi się przed żółtą warstwą"
+
+EDITOR_HELP_CMD_RETURN      "Wróć do gry"
+EDITOR_HELP_CMD_PALETTE     "Otwórz paletę przedmiotów"
+EDITOR_HELP_CMD_SAVE        "Zapisz poziom"
+EDITOR_HELP_CMD_RELOAD      "Odśwież poziom"
+EDITOR_HELP_CMD_MOVE        "Porusz kamerą"
+EDITOR_HELP_CMD_MOVEFASTER  "Porusz kamerą (szybciej)"
+EDITOR_HELP_CMD_UNDO        "Cofnij"
+EDITOR_HELP_CMD_REDO        "Ponów"
+EDITOR_HELP_CMD_HELP        "Pokaż pomoc"
+EDITOR_HELP_CMD_GRID        "Przyciągnij do siatki"
+EDITOR_HELP_CMD_MASKS       "Pokaż maski kolizyjne"
+EDITOR_HELP_CMD_PUTITEM     "Połóż przedmiot"
+EDITOR_HELP_CMD_PICKITEM    "Podnieś przedmiot"
+EDITOR_HELP_CMD_DELETEITEM  "Usuń przedmiot (trzymaj: gumkę)"
+EDITOR_HELP_CMD_CHANGEITEM  "Zamień przedmiot"
+EDITOR_HELP_CMD_CHANGETYPE  "Zamień typ przedmiotu"
+EDITOR_HELP_CMD_WATERLEVEL  "Zmień poziom wody"
+EDITOR_HELP_CMD_SPAWNPOINT  "Zmień punkt pojawienia"
+EDITOR_HELP_CMD_BRICKLAYER  "Zmień warstwę cegiełki"
+EDITOR_HELP_CMD_FLIPBRICK   "Obróć tą cegiełkę"
+
+// Input keys
+EDITOR_INPUT_ARROWS         "Klawisze strzałek"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Lewy przycisk myszy"
+EDITOR_INPUT_RIGHTCLICK     "Prawy przycisk myszy"
+EDITOR_INPUT_MIDDLECLICK    "Środkowy przycisk myszy"
+EDITOR_INPUT_MOUSEWHEEL     "Przewijanie myszą"
+
+// Confirm boxes
+EDITOR_CONFIRM_RELOAD       "Czy chcesz odświeżyć poziom?"
+EDITOR_CONFIRM_YES          "Tak"
+EDITOR_CONFIRM_NO           "Nie"
+
+// Messages
+EDITOR_MESSAGE_WELCOME      "Welcome to the Level Editor!"
+EDITOR_MESSAGE_SAVED        "Zapisane do <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Nie można zapisać poziomu. Sprawdź ponownie logi."
+EDITOR_MESSAGE_RELOADED     "Poziom został ponownie załadowany"
+EDITOR_MESSAGE_UNDOERROR    "Już przy najstarszej zmianie"
+EDITOR_MESSAGE_REDOERROR    "Już przy najnowszej zmianie"
+EDITOR_MESSAGE_SNAP2GRIDON  "Przyciągnij do siatki: używając $1 lub $2 siatki"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Przyciągnij do siatki: wyłączone"
+EDITOR_MESSAGE_DEFAULTLAYER "Przełączony na <color=$1>default</color> warstwę"
+EDITOR_MESSAGE_GREENLAYER   "Przełączony na <color=$1>green</color> warstwę"
+EDITOR_MESSAGE_YELLOWLAYER  "Przełączony na <color=$1>yellow</color> warstwę"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Translators:
+//
+// This section accepts SOME language-specific
+// special characters. Please test as necessary.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+// Heads-Up Display
+HUD_SCORE                   "Wynik"
+HUD_TIME                    "Czas"
+HUD_POWER                   "Moc"
+
+// Level Cleared animation
+CLEARED_LINE1               "PRZESZEDŁEŚ"
+CLEARED_LINE2               "PRZEZ POZIOM $LEVEL_ACT"
+CLEARED_POWER               "Bonus za moc"
+CLEARED_TIME                "Bonus za czas"
+CLEARED_SCORE               "Wynik"
+
+// Game Over
+GAMEOVER_PART1              "KONIEC"
+GAMEOVER_PART2              "GRY"
+
+// Time Over
+TIMEOVER_PART1              "KONIEC"
+TIMEOVER_PART2              "CZASU"
+
+// Pause Menu
+PAUSE_TITLE                 "PAUZA"
+PAUSE_CONTINUE              "KONTYNUUJ"
+PAUSE_RESTART               "ODŚWIEŻ"
+PAUSE_EXIT                  "WYJDŹ"
+
+
+
+//
+// Section: special codes
+//
+
+//
+// Translators:
+//
+// Erase this section from your translation.
+// Language files other than English should
+// NOT include the codes below.
+//
+
+// Colors
+COLOR_TITLE                 "ff8844"
+COLOR_SUBTITLE              "ffa16b"
+COLOR_HIGHLIGHT             "ffee11"
+COLOR_HUD                   "ffff00"
+COLOR_HUDDANGER             "ff0000"
+COLOR_EDITOR_HIGHLIGHT      "ffa060"
+PAUSE_HIGHLIGHT             "ffee11"
+PAUSE_UNHIGHLIGHT           "ffffff"
+
+// Input
+INPUT_DIRECTIONAL           "${INPUT_${INPUT_TYPE}_DIRECTIONAL}"
+INPUT_UP                    "${INPUT_${INPUT_TYPE}_UP}"
+INPUT_RIGHT                 "${INPUT_${INPUT_TYPE}_RIGHT}"
+INPUT_DOWN                  "${INPUT_${INPUT_TYPE}_DOWN}"
+INPUT_LEFT                  "${INPUT_${INPUT_TYPE}_LEFT}"
+INPUT_FIRE1                 "${INPUT_${INPUT_TYPE}_FIRE1}"
+INPUT_FIRE2                 "${INPUT_${INPUT_TYPE}_FIRE2}"
+INPUT_FIRE3                 "${INPUT_${INPUT_TYPE}_FIRE3}"
+INPUT_FIRE4                 "${INPUT_${INPUT_TYPE}_FIRE4}"
+INPUT_FIRE5                 "${INPUT_${INPUT_TYPE}_FIRE5}"
+INPUT_FIRE6                 "${INPUT_${INPUT_TYPE}_FIRE6}"
+INPUT_FIRE7                 "${INPUT_${INPUT_TYPE}_FIRE7}"
+INPUT_FIRE8                 "${INPUT_${INPUT_TYPE}_FIRE8}"
+
+// Colored titles
+STAGESELECT_COLORED_TITLE   "<color=$COLOR_TITLE>$STAGESELECT_TITLE</color>"
+STAGESELECT_COLORED_DEBUG   "<color=$COLOR_TITLE>$STAGESELECT_DEBUG</color>"
+CREDITS_COLORED_TITLE       "<color=$COLOR_TITLE>$CREDITS_TITLE</color>"
+OPTIONS_COLORED_TITLE       "<color=$COLOR_TITLE>$OPTIONS_TITLE</color>"
+OPTIONS_COLORED_GRAPHICS    "<color=$COLOR_SUBTITLE>$OPTIONS_GRAPHICS</color>"
+OPTIONS_COLORED_AUDIO       "<color=$COLOR_SUBTITLE>$OPTIONS_AUDIO</color>"
+OPTIONS_COLORED_CONTROLS    "<color=$COLOR_SUBTITLE>$OPTIONS_CONTROLS</color>"
+OPTIONS_COLORED_GAME        "<color=$COLOR_SUBTITLE>$OPTIONS_GAME</color>"
+OPTIONS_COLORED_MODS        "<color=$COLOR_SUBTITLE>$OPTIONS_MODS</color>"
+OPTIONS_COLORED_ENGINE      "<color=$COLOR_SUBTITLE>$OPTIONS_ENGINE</color>"
+
+// Backward compatibility
+HUD_COLLECTIBLES            "$HUD_POWER"
+
+// EOF
