@@ -30,6 +30,7 @@ sprite "Flag Icon"
         ru_RU       7
         uk_UA       8
         lt_LT       9
+        id_ID       10
         eo          31
     }
 
@@ -111,6 +112,14 @@ sprite "Flag Icon"
         repeat      TRUE
         fps         8
         data        137
+    }
+
+    // id_ID
+    animation 10
+    {
+        repeat      TRUE
+        fps         8
+        data        105
     }
 
     // eo
