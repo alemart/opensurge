@@ -1,0 +1,444 @@
+// -----------------------------------------------------------------------------
+// File: languages/indonesian.lng
+// Description: indonesian translation (encoding: UTF-8)
+// Author: Yugicchi
+// License: MIT
+// -----------------------------------------------------------------------------
+
+
+//
+// Section: generic
+//
+
+// Translation metadata
+// (use the English alphabet)
+LANG_ID                     "id_ID"                   // language code & country according to ISO 639-1 & ISO 3166-1, respectively
+LANG_NAME                   "Indonesia"                 // language name
+LANG_AUTHOR                 "Yugicchi"       // translation author
+LANG_COMPATIBILITY          "0.6.1"                   // required engine version
+
+
+
+//
+// Modders:
+//
+// Add your strings to languages/extends/english.lng,
+// not to this file. Read languages/extends/README.txt
+// for more information.
+//
+
+//
+// Translators:
+//
+// Before starting your work, please check out the
+// Translation Guide at http://wiki.opensurge2d.org
+//
+// You don't need to translate everything exactly "as is".
+// You may use some "cool" slang that kids use, provided
+// that it's innofensive and that the meaning of what
+// you're translating is preserved!
+//
+// After translating, please make sure you test everything.
+// All texts should fit within their graphical boundaries.
+// To help you with the testing, use the developer mode.
+//
+// Developer mode: when seeing the Open Surge Engine splash
+// screen, press RIGHT 3 times and enter. You'll see a list
+// of all level files.
+//
+
+//
+// Updating translations:
+//
+// New strings get added from time to time. They are marked
+// as FIXME. To find them, use the Find tool in your editor.
+// Found something? Please search for it now.
+//
+// If you find that mark anywhere in the file, it means that
+// the translation needs to be updated. Please submit a patch
+// to keep it up to date.
+//
+// After translating the new strings, make sure to remove
+// that mark.
+//
+
+
+
+//
+// Section: menus
+//
+
+// Options
+OPTIONS_TITLE               "PENGATURAN"
+OPTIONS_GRAPHICS            "Grafik"
+OPTIONS_AUDIO               "Audio"
+OPTIONS_CONTROLS            "Kontrol"
+OPTIONS_GAME                "Game"
+OPTIONS_ENGINE              "Engine"
+OPTIONS_MODS                "MOD"
+OPTIONS_BACK                "Kembali"
+OPTIONS_YES                 "Ya"
+OPTIONS_NO                  "Tidak"
+OPTIONS_ON                  "On" // alternatively: Enabled
+OPTIONS_OFF                 "Off" // alternatively: Disabled
+OPTIONS_DEFAULT             "Setelan bawaan"
+OPTIONS_FULLSCREEN          "Layar penuh"
+OPTIONS_RESOLUTION          "Ukuran layar"
+OPTIONS_QUALITY             "Kualitas"
+OPTIONS_QUALITY_LOW         "Rendah"
+OPTIONS_QUALITY_MEDIUM      "Menengah"
+OPTIONS_QUALITY_HIGH        "Tinggi"
+OPTIONS_FPS                 "Tampilkan FPS"
+OPTIONS_VSYNC               "V-Sync" // meaning: vertical synchronization
+OPTIONS_PIXELSCALER         "Penskala piksel"
+OPTIONS_COMINGSOON          "Ditunggu ya!"
+OPTIONS_VOLUME              "Volume"
+OPTIONS_MUTE                "Senyap"
+OPTIONS_MIXER               "Mixer"
+OPTIONS_MIXER_MIN           "Tanpa musik"
+OPTIONS_MIXER_MID           "$OPTIONS_DEFAULT"
+OPTIONS_MIXER_MAX           "Tanpa suara"
+OPTIONS_MUFFLER             "Efek bawah air"
+OPTIONS_MUFFLER_OFF         "$OPTIONS_OFF"
+OPTIONS_MUFFLER_LOW         "Ringan" // also: lightweight
+OPTIONS_MUFFLER_MEDIUM      "Sedang"
+OPTIONS_MUFFLER_HIGH        "Kuat"
+OPTIONS_MUFFLER_HIGHER      "Kuat banget"
+OPTIONS_GAMEPADOPACITY      "Transparansi"
+OPTIONS_GAMEPAD             "Gunakan gamepad"
+OPTIONS_LANGUAGE            "Bahasa"
+OPTIONS_STAGESELECT         "Pilih stage"
+OPTIONS_DEVELOPERMODE       "Mode developer"
+OPTIONS_CREDITS             "Kredit Open Surge"
+OPTIONS_WEBSITE             "Kunjungi web Open Surge"
+OPTIONS_DONATE              "Donasi ke Open Surge"
+OPTIONS_ABOUT               "Tentang engine"
+OPTIONS_SHARE               "Bagikan engine"
+OPTIONS_DOWNLOAD_DESKTOP    "Dapatkan engine untuk desktop"
+OPTIONS_DOWNLOAD_MOBILE     "Dapatkan engine untuk ponsel"
+OPTIONS_PLAYMOD             "Mainkan MOD"
+OPTIONS_PLAYMOD_NOTAGAME    "Item terpilih bukan file game Open Surge!"
+OPTIONS_PLAYMOD_LEGACYERROR "Game Open Surge versi ini tidak didukung."
+OPTIONS_PLAYMOD_COMPATWARN  "Mode kompatibilitas didesain untuk meningkatkan kelancaran mainmu. Yakin mau dimatikan?"
+OPTIONS_MODSTORAGE          "Penyimpanan"
+OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
+OPTIONS_MODSTORAGE_ARCHIVE  "File .zip"
+OPTIONS_COMPATIBILITYMODE   "Mode kompatibilitas"
+OPTIONS_SUBMITFEEDBACK      "Kirim masukan"
+OPTIONS_WRITEREVIEW         "Tulis review"
+OPTIONS_RATEAPP             "Beri rating aplikasinya"
+OPTIONS_REPORTISSUE         "Laporkan kendala"
+OPTIONS_BACKTOBASEGAME      "Kembali ke game dasar"
+
+// Stage Select
+STAGESELECT_TITLE           "PILIH STAGE"
+STAGESELECT_DEBUG           "MODE DEVELOPER"
+STAGESELECT_MSG             "Tekan <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> untuk kembali"
+STAGESELECT_PAGE            "halaman $1/$2"
+STAGESELECT_ACT             "Zona"
+
+// Credits
+CREDITS_TITLE               "KREDIT"
+CREDITS_BACK                "Tekan <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> untuk kembali"
+CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME versi $ENGINE_VERSION</color>\nditenagai oleh $ENGINE_NAME\n$ENGINE_WEBSITE"
+CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Anggota</color>"
+CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Anggota sebelumnya</color>"
+CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Terima kasih kepada</color>"
+CREDITS_ALEXANDRE           "Pemimpin Proyek & Pendiri\nPengembang Proyek\nSeniman"
+CREDITS_JOAO                "Seniman\nIlustrator"
+CREDITS_MATEUS              "Efek suara"
+CREDITS_CODY                "Seniman konsep\nPerancang karakter musuh"
+CREDITS_JOHAN               "Musisi (rest in peace, friend)"
+CREDITS_DI                  "Musisi"
+CREDITS_VICTOR              "Musisi"
+CREDITS_M374LX              "Musisi"
+CREDITS_COLIN               "Sprite, zona pertama"
+CREDITS_BRIAN               "Seniman sprite"
+CREDITS_TRANSLATOR          "Penerjemah"
+CREDITS_TRANSLATORS         "<color=$COLOR_HIGHLIGHT>Penerjemah</color>"
+CREDITS_PASTTRANSLATORS     "<color=$COLOR_HIGHLIGHT>Penerjemah sebelumnya</color>"
+CREDITS_RES_TITLE           "<color=$COLOR_HIGHLIGHT>Kredit sumber daya individu</color>"
+CREDITS_RES_TEXT            "Semua file-file ini di bawah lisensi libre. Masing-masing pemiliknya ialah sebagai berikut:"
+CREDITS_RES_IMAGES          "<color=$COLOR_HIGHLIGHT>Gambar</color>"
+CREDITS_RES_MUSICS          "<color=$COLOR_HIGHLIGHT>Musik</color>"
+CREDITS_RES_SAMPLES         "<color=$COLOR_HIGHLIGHT>Efek suara</color>"
+CREDITS_RES_FONTS           "<color=$COLOR_HIGHLIGHT>Font</color>"
+CREDITS_RES_LEVELS          "<color=$COLOR_HIGHLIGHT>Level</color>"
+CREDITS_RES_TRANSLATIONS    "<color=$COLOR_HIGHLIGHT>Terjemahan</color>"
+CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skrip</color>"
+CREDITS_RES_SCRIPTS_TEXT    "Informasi pengenai pembuat skrip silahkan melihat di masing-masing skrip."
+
+// Title Screen
+TITLESCREEN_PLAY            "MULAI GAME"
+TITLESCREEN_OPTIONS         "PENGATURAN"
+TITLESCREEN_CREATE          "BUAT GAME"
+TITLESCREEN_MOBILE          "MAINKAN DI HP"
+TITLESCREEN_SHARE           "BAGIKAN"
+TITLESCREEN_DONATE          "DONASI"
+TITLESCREEN_QUIT            "KELUAR"
+TITLESCREEN_SUBMITFEEDBACK  "KIRIM MASUKAN"
+TITLESCREEN_WRITEREVIEW     "TULIS REVIEW"
+TITLESCREEN_RATEAPP         "RATING APLIKASINYA"
+TITLESCREEN_REPORTISSUE     "LAPORKAN KENDALA"
+TITLESCREEN_VERSION         "SurgeEngine\n$ENGINE_VERSION" // bitmap font: no special characters are allowed
+TITLESCREEN_WEBSITE         "$ENGINE_WEBSITE" // bitmap font: no special characters are allowed
+
+// End of Demo
+ENDOFDEMO_CONTINUE          "LANJUTKAN"
+ENDOFDEMO_VERSION           "DEMO $GAME_VERSION\n"
+ENDOFDEMO_TEXT              "Terima kasih sudah bermain! Surge the Rabbit masih dalam pengembangan.\n\nKunjungi <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> buat ikutin kelanjutannya!\n\nSekarang saatnya tunjukkan kemampuanmu bikin game!"
+
+// Rate the Game
+// Tip: the rating scene isn't displayed often, so delete file surge.prefs or uncomment ratingTime.forget() at scripts/setup/scenes/rate_game.ss to test it (levels/scenes/rate_game.lev)
+RATEGAME_TITLE              "Beri rating Surge the Rabbit?"
+RATEGAME_MESSAGE            "Kami pengen denger pendapatmu!\nMasukanmu sangat berarti dalam membantu pengembangan game & engine open source ini!" // 2 lines max.
+RATEGAME_YES                "Gas!"
+RATEGAME_NO                 "Nanti dulu"
+
+// Play classic levels
+PLAYCLASSICLEVELS_TEXT      "Mainkan level-level klasik?"
+PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
+PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
+
+// Thanks for playing
+THANKSFORPLAYING_TITLE      "Terima kasih sudah bermain!"
+THANKSFORPLAYING_TEXT       "Game ini dibuat menggunakan Open Surge, game engine 2D open-source yang sangat fleksible dan sekarang ada di tanganmu!\n\nBagikan keseruanmu! Bilang ke keluarga, temen-temen, pak satpam dan anabul. Bawa pesan ini ke persekutuanmu!"
+THANKSFORPLAYING_YES        "Gas!"
+THANKSFORPLAYING_NO         "Nanti dulu"
+
+// (legacy) Main Menu
+MAINMENU_TITLE              "MENU"
+MAINMENU_PLAY               "MAINKAN"
+MAINMENU_CREATE             "BUAT GAME"
+MAINMENU_SHARE              "BAGIKAN"
+MAINMENU_OPTIONS            "PENGATURAN"
+MAINMENU_QUIT               "KELUAR"
+MAINMENU_DEVBUILD           "Versi pengembangan"
+MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
+
+// (legacy) Create Menu
+// Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
+CREATEMENU_TITLE            "BUAT GAME"
+CREATEMENU_PLAY             "MAINKAN DEMO"
+CREATEMENU_LEARN            "PELAJARI"
+CREATEMENU_SCRIPTING        "SURGESCRIPT"
+CREATEMENU_BACK             "KEMBALI"
+CREATEMENU_TEXT             "Open Surge bisa digunakan untuk bikin gamemu sendiri! Tunjukkan kreativitasmu! Biarkan ide gila itu mengalir!\n\nMulai proyekmu! Buat level baru, item, kekuatan spesial, karakter dan masih banyak lagi! Cobain level editornya, pelajari engine dan SurgeScript untuk kontrol maksimal!"
+
+// (legacy) Congratulations Screen
+// Note: when translating CONGRATULATIONS_TEXT, make sure the text fits the screen! (6 lines max)
+CONGRATULATIONS_TITLE       "TERIMA KASIH SUDAH BERMAIN"
+CONGRATULATIONS_SHARE       "BAGIKAN"
+CONGRATULATIONS_DONATE      "DONASI"
+CONGRATULATIONS_BACK        "KEMBALI"
+CONGRATULATIONS_TEXT        "Terima kasih sudah bermain Open Surge versi $ENGINE_VERSION.\nAyo kunjungi $ENGINE_WEBSITE untuk liat update terbaru!\n\nOpen Surge bisa digunakan untuk main dan bikin gamemu sendiri. Dikembangkan oleh orang-orang seperti kamu. Kasih tahu ke keluarga, temen-temen, pak satpam dan anabulmu sekarang!"
+
+
+
+//
+// Section: input devices
+//
+
+// keyboard
+INPUT_KEYB_DIRECTIONAL      "TOMBOL ANAK PANAH"
+INPUT_KEYB_LEFT             "TOMBOL KIRI"
+INPUT_KEYB_RIGHT            "TOMBOL KANAN"
+INPUT_KEYB_UP               "TOMBOL ATAS"
+INPUT_KEYB_DOWN             "TOMBOL BAWAH"
+INPUT_KEYB_FIRE1            "SPASI"
+INPUT_KEYB_FIRE2            "CTRL KIRI"
+INPUT_KEYB_FIRE3            "ENTER"
+INPUT_KEYB_FIRE4            "ESC"
+INPUT_KEYB_FIRE5            "SHIFT KIRI"
+INPUT_KEYB_FIRE6            "SHIFT KANAN"
+INPUT_KEYB_FIRE7            "<available>"
+INPUT_KEYB_FIRE8            "<available>"
+
+// joystick
+INPUT_JOY_DIRECTIONAL       "TOMBOL ARAH"
+INPUT_JOY_LEFT              "TOMBOL KIRI"
+INPUT_JOY_RIGHT             "TOMBOL KANAN"
+INPUT_JOY_UP                "TOMBOL ATAS"
+INPUT_JOY_DOWN              "TOMBOL BAWAH"
+INPUT_JOY_FIRE1             "TOMBOL AKSI"
+INPUT_JOY_FIRE2             "TOMBOL AKSI SEKUNDER"
+INPUT_JOY_FIRE3             "JEDA"
+INPUT_JOY_FIRE4             "KEMBALI"
+INPUT_JOY_FIRE5             "L1"
+INPUT_JOY_FIRE6             "R1"
+INPUT_JOY_FIRE7             "<available>"
+INPUT_JOY_FIRE8             "<available>"
+
+
+
+//
+// Section: general gameplay
+//
+
+// Quit game? confirm box
+QUIT_QUESTION               "Yakin mau keluar?"
+QUIT_OPTION1                "Ya"
+QUIT_OPTION2                "Tidak"
+
+// Loading Screen
+LOADING_TEXT                "loading..."
+
+
+
+//
+// Section: levels
+//
+
+// Demo Level
+LEV_DEMO_1                  "<color=$COLOR_TITLE>Buat game kerenmu!</color>\nGame ini dibuat menggunakan <color=$COLOR_HIGHLIGHT>Open Surge</color>, game engine 2D open-source yang sangat fleksible dan sekarang ada di tanganmu!"
+LEV_DEMO_2                  "<color=$COLOR_TITLE>Apakah kamu tahu...?</color>\nSemua di Open Surge bisa di kustomisasi. Kamu bisa buat level, item, bos, karakter and masih banyak lagi! Open Surge itu <color=$COLOR_HIGHLIGHT>game creation system</color> lengkap."
+LEV_DEMO_3                  "<color=$COLOR_TITLE>Tunjukkan kreativitasmu!</color>\nSalah satu fitur utama di Open Surge adalah <color=$COLOR_HIGHLIGHT>SurgeScript</color>. Scripting nih, tapi untuk game! Gunakan untuk membuat apapun yang kamu imajinasikan!"
+LEV_DEMO_4                  "<color=$COLOR_TITLE>Keren banget!</color>\nPenasaran? Potensinya tak terhingga loh! Kunjungi <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> untuk buat gamemu sekarang!"
+LEV_DEMO_5                  "<color=$COLOR_TITLE>Cobain deh!</color>\nSekarang giliranmu! <color=$COLOR_HIGHLIGHT>Tekan F12 untuk membuka editor.</color> Selanjutnya, buka palet item untuk mulai buat levelmu! (tekan F1 untuk bantuan)"
+LEV_DEMO_5_MOBILE           "<color=$COLOR_TITLE>Cobain deh!</color>\nSekarang giliranmu! Jeda gamenya, seret handle di bawah layar dan masuk ke <color=$COLOR_HIGHLIGHT>Debug Mode</color> untuk <color=$COLOR_HIGHLIGHT>edit levelnya</color>!"
+LEV_DEMO_6                  "<color=$COLOR_TITLE>Keren banget!</color>\nKunjungi <color=$COLOR_HIGHLIGHT>$ENGINE_WEBSITE</color> untuk buat game keren kamu sekarang!"
+
+
+
+//
+// Section: level editor
+//
+
+// Main UI
+EDITOR_UI_HELP              "<color=$COLOR_EDITOR_HIGHLIGHT>F1</color>: bantuan"
+EDITOR_UI_TOOL              "<color=$COLOR_EDITOR_HIGHLIGHT>$1</color> $2"
+EDITOR_UI_BRICK             "brick"
+EDITOR_UI_GROUP             "group"
+EDITOR_UI_ENTITY            "entity"
+EDITOR_UI_LEGACYITEM        "legacy item"
+EDITOR_UI_LEGACYOBJECT      "legacy object"
+EDITOR_UI_MISSING           "<missing>"
+
+// Bricks - scenery elements
+// Translators: please keep the names below succint. See the comments for their meaning.
+EDITOR_BRICK_TYPE_SOLID     "SOLID"     // a solid brick (you can't get inside them)
+EDITOR_BRICK_TYPE_CLOUD     "PLATFORM"     // "jump-through" platforms (you can step on top of them)
+EDITOR_BRICK_TYPE_PASSABLE  "BISA TEMBUS"  // a brick with no effect on collisions (decorative elements)
+EDITOR_BRICK_TYPE_UNKNOWN   "UNKNOWN"
+
+EDITOR_BRICK_BEHAVIOR_DEFAULT    "DEFAULT"   // a brick that stands still
+EDITOR_BRICK_BEHAVIOR_CIRCULAR   "MENGORBIT"  // circular motion / elliptic orbit
+EDITOR_BRICK_BEHAVIOR_PENDULAR   "MENGAYUN"  // a brick with pendular motion
+EDITOR_BRICK_BEHAVIOR_BREAKABLE  "BISA HANCUR" // breakable when rolling and colliding with it
+EDITOR_BRICK_BEHAVIOR_SMASHABLE  "BISA PECAH" // will break when the player jumps on top of it
+EDITOR_BRICK_BEHAVIOR_FALL       "BISA JATUH"      // falls as soon as the player steps on it
+EDITOR_BRICK_BEHAVIOR_FLOAT      "MELAYANG"     // a floating platform
+EDITOR_BRICK_BEHAVIOR_MARKER     "MARKER"    // special brick only rendered in the editor
+EDITOR_BRICK_BEHAVIOR_UNKNOWN    "UNKNOWN"
+
+EDITOR_BRICK_FLIP_NOFLIP    "normal"            // the brick is not flipped (this is the default)
+EDITOR_BRICK_FLIP_HFLIP     "balik horisontal" // flip horizontally
+EDITOR_BRICK_FLIP_VFLIP     "balik vertikal"   // flip vertically
+EDITOR_BRICK_FLIP_VHFLIP    "rotasi 180°"      // flip horizontally & vertically
+
+// Palette
+EDITOR_PALETTE_BRICK        "brick"
+EDITOR_PALETTE_MISSING      "missing"
+EDITOR_PALETTE_EMPTY        "Item tidak ditemukan. Tekan <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> untuk kembali."
+
+// Help screen
+EDITOR_HELP_GENERAL         "<color=$COLOR_EDITOR_HIGHLIGHT>Umum</color>"
+EDITOR_HELP_ITEMS           "<color=$COLOR_EDITOR_HIGHLIGHT>Penempatan item</color>"
+EDITOR_HELP_LAYERS          "<color=$COLOR_EDITOR_HIGHLIGHT>Sistem layer</color>"
+EDITOR_HELP_BACK            "Tekan <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> untuk kembali"
+EDITOR_HELP_TINYWINDOW      "Referensi perintah tidak bisa dimunculkan karena ruang kurang luas. Silahkan perbesar ukuran window di pengaturan.\n\nTekan <color=$COLOR_EDITOR_HIGHLIGHT>$EDITOR_INPUT_ESC</color> untuk kembali."
+EDITOR_HELP_LAYERSTUTORIAL  "Pemain akan berganti layer ketika melewati objek layer berwarna Hijau/Kuning\n(lihat objek-objek di palet)\nObjek layer Hijau mengaktifkan layer hijau dan menonaktifkan layer kuning\nObjek layer Kuning mengaktifkan layer kuning dan menonaktifkan layer hijau\nTekan tombol L untuk mengganti layer tempat kamu menaruh bricks\nUrutan layernya adalah layer Hijau di depan dan Kuning di belakang"
+
+EDITOR_HELP_CMD_RETURN      "Kembali ke game"
+EDITOR_HELP_CMD_PALETTE     "Buka palet item"
+EDITOR_HELP_CMD_SAVE        "Simpan level"
+EDITOR_HELP_CMD_RELOAD      "Muat ulang level"
+EDITOR_HELP_CMD_MOVE        "Gerakkan kamera"
+EDITOR_HELP_CMD_MOVEFASTER  "Gerakkan kamera (cepat)"
+EDITOR_HELP_CMD_UNDO        "Undo"
+EDITOR_HELP_CMD_REDO        "Redo"
+EDITOR_HELP_CMD_HELP        "Tampilkan bantuan"
+EDITOR_HELP_CMD_GRID        "Tempelkan ke grid"
+EDITOR_HELP_CMD_MASKS       "Perlihatkan collision masks"
+EDITOR_HELP_CMD_PUTITEM     "Taruh item"
+EDITOR_HELP_CMD_PICKITEM    "Ambil item"
+EDITOR_HELP_CMD_DELETEITEM  "Hapus item (tahan: penghapus)"
+EDITOR_HELP_CMD_CHANGEITEM  "Ganti item"
+EDITOR_HELP_CMD_CHANGETYPE  "Ganti tipe item"
+EDITOR_HELP_CMD_WATERLEVEL  "Ganti ketinggian air"
+EDITOR_HELP_CMD_SPAWNPOINT  "Ganti poin spawn"
+EDITOR_HELP_CMD_BRICKLAYER  "Ganti layer brick"
+EDITOR_HELP_CMD_FLIPBRICK   "Balik brick yang ini"
+
+// Input keys
+EDITOR_INPUT_ARROWS         "Tombol panah"
+EDITOR_INPUT_SHIFT          "Shift" // Shift key
+EDITOR_INPUT_CTRL           "Ctrl"  // Ctrl key
+EDITOR_INPUT_ESC            "ESC"   // ESC key
+EDITOR_INPUT_LEFTCLICK      "Klik kiri"
+EDITOR_INPUT_RIGHTCLICK     "Klik kanan"
+EDITOR_INPUT_MIDDLECLICK    "Klik tengah"
+EDITOR_INPUT_MOUSEWHEEL     "Roda gulir"
+
+// Confirm boxes
+EDITOR_CONFIRM_RELOAD       "Muat ulang level?"
+EDITOR_CONFIRM_YES          "Ya"
+EDITOR_CONFIRM_NO           "Tidak"
+
+// Messages
+EDITOR_MESSAGE_WELCOME      "Selamat datang di Level Editor!"
+EDITOR_MESSAGE_SAVED        "Tersimpan ke <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
+EDITOR_MESSAGE_SAVEERROR    "Tidak bisa menyimpan level. Silahkan cek log"
+EDITOR_MESSAGE_RELOADED     "Level dimuat ulang"
+EDITOR_MESSAGE_UNDOERROR    "Sudah di perubahan terawal"
+EDITOR_MESSAGE_REDOERROR    "Sudah di perubahan terakhir"
+EDITOR_MESSAGE_SNAP2GRIDON  "Tempelkan ke grid: gunakan grid $1 × $2"
+EDITOR_MESSAGE_SNAP2GRIDOFF "Tempelkan ke grid: off"
+EDITOR_MESSAGE_DEFAULTLAYER "Pindah ke layer <color=$1>default</color>"
+EDITOR_MESSAGE_GREENLAYER   "Pindah ke layer <color=$1>hijau</color>"
+EDITOR_MESSAGE_YELLOWLAYER  "Pindah ke layer <color=$1>kuning</color>"
+
+
+
+//
+// Section: bitmap fonts
+//
+
+//
+// Translators:
+//
+// This section accepts SOME language-specific
+// special characters. Please test as necessary.
+//
+// If a translation is not possible, you may
+// leave the following sentences in English.
+//
+// If translating is possible, adapt the
+// sentences as necessary.
+//
+
+// Heads-Up Display
+HUD_SCORE                   "Skor"
+HUD_TIME                    "Waktu"
+HUD_POWER                   "Power"
+
+// Level Cleared animation
+CLEARED_LINE1               "ZONA $LEVEL_ACT"
+CLEARED_LINE2               "SELESAI"
+CLEARED_POWER               "Bonus Power"
+CLEARED_TIME                "Bonus Waktu"
+CLEARED_SCORE               "Skor"
+
+// Game Over
+GAMEOVER_PART1              "GAME"
+GAMEOVER_PART2              "OVER"
+
+// Time Over
+TIMEOVER_PART1              "WAKTU"
+TIMEOVER_PART2              "HABIS"
+
+// Pause Menu
+PAUSE_TITLE                 "JEDA"
+PAUSE_CONTINUE              "LANJUTKAN"
+PAUSE_RESTART               "MULAI ULANG"
+PAUSE_EXIT                  "KELUAR"

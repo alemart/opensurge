@@ -1,0 +1,13 @@
+<b>Buat mimpimu jadi nyata!</b> Open Surge Engine is adalah sebuah retro game engine 2D open-source yang didesain untuk membuat mimpimu jadi nyata!
+
+<b>Pasti asik banget!</b> Surge the Rabbit adalah game jump 'n' run pilihan yang dibuat menggunakan Open Surge Engine. Engine ini adalah penerus semangat platformer 16-bit klasik Sonic tahun 1990an. Main sebagai Surge dalam level-level yang seru dan menyenangkan penuh dengan tantangan!
+
+<b>Tunjukkan kreativitasmu!</b> Buat game menakjubkanmu sendiri dan mainkan di PC dan ponsel! Bagikan game buatanmu dengan teman-temanmu! Pasti serunya gak habis-habis!
+
+<b>Engine yang powerful untuk game-game retro!</b> Salah satu daya tariknya adalah SurgeScript, sebuah bahasa scripting untuk game. Gunakan ini untuk membuat mekanika permainan baru, karakter dengan kemampuan spesial, bos, dan banyak lagi! Potensinya banyak banget!
+
+Open Surge Engine adalah alat yang luar biasa untuk belajar pengembangan game, pemrograman, seni digital, dan lingkungan software gratis dan open-soure dengan cara yang menyenangkan.
+
+Catatan: direkomendasikan untuk menggunakan PC jika kamu membuat gamemu sendiri. Tapi jangan khawatir, kamu bisa memainkannya di PC dan ponsel. Dibutuhkan gamepad untuk memainkan game di Android TV dan mouse untuk menggunakan level editor.
+
+Laman resmi: http://opensurge2d.org
