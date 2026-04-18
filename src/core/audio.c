@@ -245,7 +245,7 @@ void music_stop()
 {
     if(current_music != NULL) {
         al_set_audio_stream_playing(current_music->stream, false);
-        al_rewind_audio_stream(current_music->stream);
+        al_seek_audio_stream_secs(current_music->stream, 0.0);
         current_music->is_paused = false; /* it's stopped, not paused */
     }
 
