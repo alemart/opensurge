@@ -14,7 +14,7 @@ act 3
 theme "themes/waterworks-zone.brk"
 bgtheme "themes/waterworks-zone-outdoors.bg"
 spawn_point 192 9072
-music "musics/waterworks.ogg"
+music "musics/waterworks.ogg" 0.025 57.3384328358209
 setup "Surge Gameplay" "Default Camera" "Default Pause and Quit" "Default HUD" "Default Title Card" "Default Cleared Animation" "Waterworks Zone"
 players "Surge"
 
