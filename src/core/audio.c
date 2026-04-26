@@ -209,18 +209,16 @@ void music_play(music_t *music, bool loop)
 }
 
 /*
- * music_set_repeat_points()
+ * music_set_repeat_point()
  * Set the loop endpoints for a music.
- * Set start and stop to zero for default loop (i.e. end to end).
+ * Set start to zero for default loop (i.e. end to end).
  */
-void music_set_repeat_points(music_t *music, double start, double stop)
+void music_set_repeat_point(music_t *music, double start)
 {
-    if (start > stop)
-        return;
     if (music != NULL) {
-        if (start <= 0.0 && stop <= 0.0) {
+        const double stop = al_get_audio_stream_length_secs(music->stream);
+        if (start < 0.0) {
             start = 0.0;
-            stop = al_get_audio_stream_length_secs(music->stream);
         }
         al_set_audio_stream_loop_secs(music->stream, start, stop);
     }

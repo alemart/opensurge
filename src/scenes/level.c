@@ -139,7 +139,6 @@ static char version[128];
 static char license[128];
 static int act_number;
 static double music_repeat_start = 0.0;
-static double music_repeat_end = 0.0;
 static int requires[3]; /* this level requires engine version x.y.z */
 static bool readonly; /* we can't activate the level editor */
 static v2d_t spawn_point;
@@ -525,7 +524,6 @@ void level_load(const char *filepath)
     readonly = false;
     dialogregion_size = 0;
     music_repeat_start = 0.0;
-    music_repeat_end = 0.0;
 
     /* clear pointers */
     backgroundtheme = NULL;
@@ -551,7 +549,7 @@ void level_load(const char *filepath)
     music_stop(); /* stop any music that's playing */
     music = *musicfile ? music_load(musicfile) : NULL;
     if (music != NULL)
-        music_set_repeat_points(music, music_repeat_start, music_repeat_end);
+        music_set_repeat_point(music, music_repeat_start);
 
     /* load the brickset */
     brickset_load(theme);
@@ -917,9 +915,8 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     case LEVCOMMAND_MUSIC: {
         if(param_count >= 1) {
             str_cpy(musicfile, param[0], sizeof(musicfile));
-            if (param_count >= 3) {
+            if (param_count >= 2) {
                 music_repeat_start = atof(param[1]);
-                music_repeat_end = atof(param[2]);
             }
         } else
             logfile_message("Level loader - command '%s' expects one parameter: music filepath. Did you forget to double quote the music filepath?", command_name);

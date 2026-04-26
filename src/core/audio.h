@@ -48,7 +48,7 @@ music_t *music_load(const char *path); /* will be unloaded automatically */
 void music_destroy(music_t *music); /* you don't usually need to bother with this. */
 int music_unref(music_t *music); /* returns the number of active references */
 void music_play(music_t *music, bool loop); /* plays a music. Set loop to TRUE to make it loop continuously. */
-void music_set_repeat_points(music_t *music, double start, double stop); /* Set the loop points for a music from `start` to `stop` seconds. */
+void music_set_repeat_point(music_t *music, double start); /* Set the loop points for a music from `start` seconds to end of music. */
 void music_stop();
 void music_pause();
 void music_resume();
