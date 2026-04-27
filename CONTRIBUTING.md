@@ -49,6 +49,6 @@ Other ways to contribute as a user include:
 
 ## Contributing to the engine
 
-No contributions to the game engine are accepted at this time. While [suggestions and bug reports](http://opensurge2d.org/appdata/bugtracker.html) are welcome, any pull requests attempting to modify the game engine will be rejected.
+Contributions to the game engine are unlikely to be accepted at this time, though pull requests are occasionally merged. [Suggestions and bug reports](http://opensurge2d.org/appdata/bugtracker.html) are welcome.
 
 The Open Surge game engine is written in C language and is licensed under the [GPLv3](licenses/GPL3-license.txt). It provides the ability to display graphics and animations, play musics and sound effects, accept user input, load levels, run physics simulations, parse and run user-made scripts, and much more. It uses the [Allegro game programming library](http://liballeg.org) in its core.
