@@ -915,13 +915,14 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
     case LEVCOMMAND_MUSIC: {
         if(param_count == 1) {
             str_cpy(musicfile, param[0], sizeof(musicfile));
+            music_repeat_start = 0.0;
         }
         else if(param_count >= 2) {
             str_cpy(musicfile, param[0], sizeof(musicfile));
             music_repeat_start = atof(param[1]);
         }
         else
-            logfile_message("Level loader - command '%s' expects one parameter: music filepath. Did you forget to double quote the music filepath?", command_name);
+            logfile_message("Level loader - command '%s' expects parameters: filepath [, loop_point]", command_name);
 
         break;
     }
