@@ -215,11 +215,9 @@ void music_play(music_t *music, bool loop)
  */
 void music_set_repeat_point(music_t *music, double start)
 {
-    if (music != NULL) {
-        const double stop = al_get_audio_stream_length_secs(music->stream);
-        if (start < 0.0) {
-            start = 0.0;
-        }
+    if(music != NULL) {
+        double stop = al_get_audio_stream_length_secs(music->stream);
+        start = clip(start, 0.0, stop);
         al_set_audio_stream_loop_secs(music->stream, start, stop);
     }
 }
