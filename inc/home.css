@@ -194,6 +194,24 @@ a:any-link:not(.pure-button,.card) {
   padding: 8px;
 }
 
+#download .widget {
+  display: none;
+}
+
+#download .alt-widget {
+  display: block;
+}
+
+@media screen and (min-width: 640px) {
+  #download .widget {
+    display: block;
+  }
+
+  #download .alt-widget {
+    display: none;
+  }
+}
+
 /* learning area */
 .card {
   display: block;
