@@ -1980,7 +1980,7 @@ font "GoodNeighborsLarge"
             offset              0 -6
         }
         char "Ę" {
-            source_rect         1560 166 18 38
+            source_rect         1560 166 16 38
             offset              0 -6
         }
         char "ę" {
