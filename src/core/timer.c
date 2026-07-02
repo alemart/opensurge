@@ -161,7 +161,7 @@ int64_t timer_get_frames()
  */
 double timer_get_now()
 {
-    return (al_get_time() - start_time) - pause_duration;
+    return al_get_time() - (start_time + pause_duration);
 }
 
 
