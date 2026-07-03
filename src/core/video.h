@@ -84,7 +84,6 @@ bool video_is_immersive();
 /* frames per second */
 void video_set_fps_visible(bool visible);
 bool video_is_fps_visible();
-int video_fps(); /* the FPS rate */
 
 /* built-in console */
 void video_showmessage(const char *fmt, ...);

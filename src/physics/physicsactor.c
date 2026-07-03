@@ -32,6 +32,7 @@
 #include "../core/global.h"
 #include "../util/numeric.h"
 #include "../util/util.h"
+#include "../util/fps.h"
 
 typedef struct physicsactorobserverlist_t physicsactorobserverlist_t;
 
@@ -175,8 +176,8 @@ static const grounddir_t _MM_TO_GD[4] = {
 #define WANT_JUMP_ATTENUATION   0
 #define AB_SENSOR_OFFSET        1 /* test with 0 and 1; with 0 it misbehaves a bit (unstable pa->midair) */
 #define CLOUD_HEIGHT            16
-#define TARGET_FPS              60.0 /* target framerate of the simulation */
-#define HARD_CAPSPEED           (24.0 * TARGET_FPS)
+#define TARGET_FRAMERATE        ((double)TARGET_FPS) /* target framerate of the simulation */
+#define HARD_CAPSPEED           (24.0 * TARGET_FRAMERATE)
 
 static void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double dt);
 static void update_movmode(physicsactor_t* pa);
@@ -516,7 +517,7 @@ void physicsactor_reset_model_parameters(physicsactor_t* pa)
 void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
 {
     /* we run the simulation with a fixed timestep for better accuracy and consistency */
-    const double FIXED_TIMESTEP = 1.0 / TARGET_FPS;
+    const double FIXED_TIMESTEP = 1.0 / TARGET_FRAMERATE;
 #if 1
     /* advance the reference time */
     double dt = timer_get_delta();
@@ -562,7 +563,7 @@ void physicsactor_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap)
     while(pa->fixed_time <= pa->reference_time) {
         if(0 == counter++) {
             /* run at most once per framestep in order to avoid jittering when
-               the engine framerate drops below TARGET_FPS. The simulation will
+               the engine framerate drops below TARGET_FRAMERATE. The simulation will
                seem slower in this case. */
             fixed_update(pa, obstaclemap, FIXED_TIMESTEP);
         }
@@ -1214,7 +1215,7 @@ void fixed_update(physicsactor_t *pa, const obstaclemap_t *obstaclemap, double d
 
             pa->gsp = multiplier * (2.0 + pa->charge_intensity);
             pa->charge_intensity = 0.0;
-            pa->jump_lock_timer = 2.0 / TARGET_FPS;
+            pa->jump_lock_timer = 2.0 / TARGET_FRAMERATE;
             pa->state = PAS_ROLLING;
 
             notify_observers(pa, PAE_RELEASE);
@@ -2461,8 +2462,8 @@ void update_angle(physicsactor_t* pa, const obstaclemap_t* obstaclemap, obstacle
     int dx = 0, dy = 0;
 
     double abs_gsp = fabs(pa->gsp);
-    bool within_default_capspeed = (abs_gsp <= 16.0 * TARGET_FPS);
-    bool within_increased_capspeed = (abs_gsp <= 20.0 * TARGET_FPS);
+    bool within_default_capspeed = (abs_gsp <= 16.0 * TARGET_FRAMERATE);
+    bool within_increased_capspeed = (abs_gsp <= 20.0 * TARGET_FRAMERATE);
 
     v2d_t position = physicsactor_get_position(pa);
     v2d_t velocity = v2d_new(pa->xsp, pa->ysp);
@@ -2848,7 +2849,7 @@ void render_ball(v2d_t sensor_position, int radius, color_t color, v2d_t camera_
 /* distance between the angle sensors */
 int distance_between_angle_sensors(const physicsactor_t* pa)
 {
-    const double DEFAULT_CAPSPEED = 16.0 * TARGET_FPS;
+    const double DEFAULT_CAPSPEED = 16.0 * TARGET_FRAMERATE;
 
     if(fabs(pa->gsp) <= DEFAULT_CAPSPEED)
         return 13;
