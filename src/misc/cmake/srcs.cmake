@@ -38,6 +38,7 @@ set(GAME_SRCS
   src/util/util.c
   src/util/v2d.c
   src/util/transform.c
+  src/util/fps.c
 
   src/scenes/mobile/subscenes/info.c
   src/scenes/mobile/subscenes/credits.c
@@ -189,6 +190,7 @@ set(GAME_HEADERS
   src/util/util.h
   src/util/v2d.h
   src/util/transform.h
+  src/util/fps.h
 
   src/scenes/mobile/subscenes/info.h
   src/scenes/mobile/subscenes/credits.h
