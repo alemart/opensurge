@@ -41,5 +41,8 @@
 float lerp(float a, float b, float t); /* linear interpolation */
 float lerp_angle(float alpha, float beta, float t); /* alpha, beta in radians */
 int normalized_gaussian(float* g, float sigma, size_t n); /* normalized gaussian kernel */
+double find_median(const double* arr, int n); /* find the median of a dataset */
+double find_median_ex(const double* arr, int n, double* out_min, double* out_max); /* find the median, the min and the max of a dataset */
+int find_outliers(const double* arr, int n, bool* out_is_inlier, double* out_median, double* out_mad, double* out_min, double* out_max); /* find outliers in a normally distributed dataset */
 
 #endif

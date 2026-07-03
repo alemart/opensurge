@@ -22,6 +22,7 @@
 #include "numeric.h"
 #include "v2d.h"
 
+static int compare_doubles(const void *a, const void *b);
 
 
 /*
@@ -99,4 +100,124 @@ int normalized_gaussian(float* g, float sigma, size_t n)
         g[x] /= int_g; /* normalize */
 
     return w;
+}
+
+/**
+ * find_median()
+ * Find the median of a dataset arr of size n
+ */
+double find_median(const double* arr, int n)
+{
+    return find_median_ex(arr, n, NULL, NULL);
+}
+
+/**
+ * find_median_ex()
+ * Find the median, the minimum, and the maximum value of a dataset arr of size n
+ * All output parameters are optional and may be set to NULL
+ */
+double find_median_ex(const double* arr, int n, double* out_min, double* out_max)
+{
+    double median, *sorted_arr;
+
+    if(n <= 0) {
+        if(out_min) *out_min = 0.0;
+        if(out_max) *out_max = 0.0;
+        return 0.0;
+    }
+
+    sorted_arr = mallocx(n * sizeof(double));
+    memcpy(sorted_arr, arr, n * sizeof(double));
+    qsort(sorted_arr, n, sizeof(double), compare_doubles);
+
+    if(n % 2 == 1)
+        median = sorted_arr[n / 2];
+    else
+        median = (sorted_arr[(n / 2) - 1] + sorted_arr[n / 2]) * 0.5;
+
+    if(out_min)
+        *out_min = sorted_arr[0];
+
+    if(out_max)
+        *out_max = sorted_arr[n-1];
+
+    free(sorted_arr);
+    return median;
+}
+
+/**
+ * find_outliers()
+ * Find outliers in a normally distributed dataset arr of size n
+ * All output parameters are optional and may be set to NULL. out_is_inlier is an output array of size n
+ * Returns the number of outliers
+ */
+int find_outliers(const double* arr, int n, bool* out_is_inlier, double* out_median, double* out_mad, double* out_min, double* out_max)
+{
+    /* this implementation is based on the method described in
+       "How to detect and handle outliers" by Iglewicz and Hoaglin (1993) */
+    const double SENSITIVITY_THRESHOLD = 3.5; /* mimics a Z-score threshold for outlier detection */
+    const double MAD_SCALE_FACTOR = 0.6745; /* suitable for normally distributed data */
+    const double MAGIC_SCALE_FACTOR = SENSITIVITY_THRESHOLD / MAD_SCALE_FACTOR;
+
+    /* validity check */
+    if(n <= 0) {
+        if(out_median) *out_median = 0.0;
+        if(out_mad) *out_mad = 0.0;
+        if(out_min) *out_min = 0.0;
+        if(out_max) *out_max = 0.0;
+        return false;
+    }
+
+    /* initialize the mask */
+    if(out_is_inlier)
+        memset(out_is_inlier, 1, n * sizeof(bool));
+
+    /* find the median of the dataset */
+    double median = find_median_ex(arr, n, out_min, out_max);
+    if(out_median)
+        *out_median = median;
+
+    /* calculate absolute deviations */
+    double* abs_deviations = mallocx(n * sizeof(double));
+    for(int i = 0; i < n; i++)
+        abs_deviations[i] = fabs(arr[i] - median);
+
+    /* find the Median Absolute Deviation (MAD) */
+    double mad = find_median_ex(abs_deviations, n, NULL, NULL); /* possibly zero */
+    if(out_mad)
+        *out_mad = mad;
+
+    /* find outliers according to the Modified Z-Score method */
+    int outlier_count = 0;
+    double magic_threshold = mad * MAGIC_SCALE_FACTOR;
+    for(int i = 0; i < n; i++) {
+        if(abs_deviations[i] > magic_threshold) {
+            ++outlier_count;
+            if(out_is_inlier)
+                out_is_inlier[i] = false;
+        }
+    }
+
+    /* cleanup */
+    free(abs_deviations);
+    return outlier_count;
+}
+
+
+
+
+
+/* private stuff */
+
+
+/**
+ * compare_doubles()
+ * Comparison function for qsort
+ * Sort by increasing values
+ */
+int compare_doubles(const void* a, const void* b)
+{
+    double da = *(const double*)a;
+    double db = *(const double*)b;
+    return (da > db) - (da < db);
 }
