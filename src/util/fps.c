@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "fps.h"
+#include "numeric.h"
 
 #define UPDATE_FREQUENCY 1 /* updates per second (ideally) */
 static int counter = 0;
@@ -32,7 +33,6 @@ static double last_update = 0.0;
 static double sample[NUMBER_OF_SAMPLES];
 static int index_of_next_sample = 0;
 static double sampled_estimate = 0.0;
-static int sort_samples(const void* a, const void* b);
 
 /*
  * fps_init()
@@ -76,10 +76,7 @@ void fps_update(double elapsed_time, double delta_time)
     /* method 2: invert the median of n samples of estimates of the inverse framerate
        method 2 typically gives 60 */
     if(index_of_next_sample >= NUMBER_OF_SAMPLES) {
-        qsort(sample, NUMBER_OF_SAMPLES, sizeof(*sample), sort_samples);
-        double mid_a = sample[NUMBER_OF_SAMPLES / 2];
-        double mid_b = sample[(NUMBER_OF_SAMPLES - 1 + NUMBER_OF_SAMPLES % 2) / 2];
-        sampled_estimate = 2.0 / (mid_a + mid_b);
+        sampled_estimate = 1.0 / find_median(sample, NUMBER_OF_SAMPLES);
         index_of_next_sample = 0;
     }
 
@@ -95,21 +92,3 @@ double fps_current()
 {
     return sampled_estimate;
 }
-
-
-
-
-/* private stuff */
-
-
-
-
-/* sorting function for the framerate samples */
-int sort_samples(const void* a, const void* b)
-{
-    double x = *((const double*)a);
-    double y = *((const double*)b);
-
-    return (x > y) - (x < y);
-}
-
