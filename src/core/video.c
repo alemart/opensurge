@@ -1463,8 +1463,11 @@ void render_fps()
     al_translate_transform(&transform, xpos, 0.0f);
 
     al_use_transform(&transform);
-        double fps = fps_current();
+        double fps = fps_current(), stability = fps_stability(), noise = fps_noise();
+        int height = al_get_font_line_height(console.font);
         DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%.1lf", fps);
+        DRAW_TEXT(0.0f, height, ALLEGRO_ALIGN_RIGHT, "%.0lf%%", stability * 100.0);
+        DRAW_TEXT(0.0f, 2 * height, ALLEGRO_ALIGN_RIGHT, "%.2lf", noise);
     al_restore_state(&state);
 }
 
