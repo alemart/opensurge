@@ -26,6 +26,7 @@
 
 #define WANTED_METHOD 2
 static double framerate = 0.0;
+static double previous_time = 0.0;
 
 /* method 1: count the number of frames */
 #define UPDATES_PER_SECOND 1
@@ -46,6 +47,7 @@ static double min_framerate = 0.0;
 void fps_init()
 {
     framerate = TARGET_FPS;
+    previous_time = 0.0;
 
     last_update = 0.0;
     counter = 0;
@@ -67,9 +69,10 @@ void fps_release()
 
 /*
  * fps_update()
- * Update the FPS counter. Call every frame with unscaled time
+ * Update the FPS counter
+ * Give as input the elapsed time, in seconds, at the beginning of the current framestep
  */
-void fps_update(double elapsed_time, double delta_time)
+void fps_update(double elapsed_time)
 {
 #if WANTED_METHOD == 1
 
@@ -83,8 +86,6 @@ void fps_update(double elapsed_time, double delta_time)
         counter = 0;
     }
 
-    (void)delta_time;
-
 #else
 
     /* method 2: invert the median of n samples of estimates of the inverse framerate
@@ -97,11 +98,16 @@ void fps_update(double elapsed_time, double delta_time)
         index_of_next_sample = 0;
     }
 
+    /* find the unscaled delta_time, in seconds */
+    double delta_time = elapsed_time > previous_time ? elapsed_time - previous_time : 0.0;
+
     /* collect a sample of an estimate of the inverse framerate */
     samples[index_of_next_sample++] = delta_time;
-    (void)elapsed_time;
 
 #endif
+
+    /* save the current time for the next frame */
+    previous_time = elapsed_time;
 }
 
 /*

@@ -29,6 +29,6 @@ double fps_noise(); /* another measure of smoothness */
 
 void fps_init();
 void fps_release();
-void fps_update(double elapsed_time, double delta_time);
+void fps_update(double elapsed_time);
 
 #endif

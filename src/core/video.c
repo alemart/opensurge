@@ -371,7 +371,7 @@ void video_render(void (*render_overlay)())
     al_flip_display();
 
     /* update the FPS counter */
-    fps_update(timer_get_elapsed(), timer_get_delta());
+    fps_update(timer_get_elapsed());
 
     /* OpenGL: clear values */
     if(_glClearColor != NULL)
