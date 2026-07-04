@@ -102,6 +102,52 @@ int normalized_gaussian(float* g, float sigma, size_t n)
     return w;
 }
 
+/*
+ * find_mean()
+ * Find the arithmetic mean of a dataset arr of size n
+ */
+double find_mean(const double* arr, int n)
+{
+    return find_mean_ex(arr, n, NULL, NULL);
+}
+
+/*
+ * find_mean_ex()
+ * Find the arithmetic mean, the standard deviation and the variance of a dataset arr of size n
+ * All output parameters are optional and may be set to NULL
+ */
+double find_mean_ex(const double* arr, int n, double* out_stddev, double* out_variance)
+{
+    if(n <= 0) {
+        if(out_stddev) *out_stddev = 0.0;
+        if(out_variance) *out_variance = 0.0;
+        return 0.0;
+    }
+
+    double mean = 0.0;
+    for(int i = 0; i < n; i++)
+        mean += arr[i];
+    mean /= (double)n;
+
+    if(!out_variance && !out_stddev)
+        return mean;
+
+    double variance = 0.0;
+    for(int i = 0; i < n; i++) {
+        double deviation = arr[i] - mean;
+        variance += deviation * deviation;
+    }
+    variance /= (double)n;
+
+    if(out_variance)
+        *out_variance = variance;
+
+    if(out_stddev)
+        *out_stddev = sqrt(variance);
+
+    return mean;
+}
+
 /**
  * find_median()
  * Find the median of a dataset arr of size n
