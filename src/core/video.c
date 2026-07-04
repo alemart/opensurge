@@ -193,10 +193,12 @@ static const char* VIDEOQUALITY_NAME[] = {
     [VIDEOQUALITY_HIGH] = "high"
 };
 
-#define DRAW_TEXT(x, y, flags, fmt, ...) do { \
+#define DRAW_TEXT(x, y, flags, fmt, ...) DRAW_COLORED_TEXT((x), (y), (flags), al_map_rgb(255, 255, 255), (fmt), __VA_ARGS__)
+
+#define DRAW_COLORED_TEXT(x, y, flags, color, fmt, ...) do { \
     al_draw_textf(console.font, al_map_rgb(0, 0, 0), (x) + 1.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
     al_draw_textf(console.font, al_map_rgb(0, 0, 0), (x) + 0.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
-    al_draw_textf(console.font, al_map_rgb(255, 255, 255), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
+    al_draw_textf(console.font, (color), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
 } while(0)
 
 #define FONT_SCALE() (( \
@@ -1462,12 +1464,21 @@ void render_fps()
     al_scale_transform(&transform, font_scale, font_scale);
     al_translate_transform(&transform, xpos, 0.0f);
 
+    ALLEGRO_COLOR optimal, suboptimal, neutral;
+    optimal = al_map_rgb(176, 255, 176);
+    suboptimal = al_map_rgb(255, 255, 176);
+    neutral = al_map_rgb(255, 255, 255);
+
     al_use_transform(&transform);
+    {
+        const double min_stability = 0.9, max_noise = 1.0; /* these thresholds were arbitrarily picked */
         double fps = fps_current(), stability = fps_stability(), noise = fps_noise();
         int height = al_get_font_line_height(console.font);
-        DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%.1lf", fps);
-        DRAW_TEXT(0.0f, height, ALLEGRO_ALIGN_RIGHT, "%.0lf%%", stability * 100.0);
-        DRAW_TEXT(0.0f, 2 * height, ALLEGRO_ALIGN_RIGHT, "%.2lf", noise);
+
+        DRAW_COLORED_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, neutral, "%.1lf", fps);
+        DRAW_COLORED_TEXT(0.0f, height, ALLEGRO_ALIGN_RIGHT, stability >= min_stability ? optimal : suboptimal, "%.0lf%%", stability * 100.0);
+        DRAW_COLORED_TEXT(0.0f, 2 * height, ALLEGRO_ALIGN_RIGHT, noise < max_noise ? optimal : suboptimal, "%.2lf", noise);
+    }
     al_restore_state(&state);
 }
 
