@@ -23,9 +23,12 @@
 
 #define TARGET_FPS 60 /* target framerate */
 
+double fps_current(); /* the current framerate */
+double fps_stability(); /* a percentage of overall smoothness */
+double fps_noise(); /* another measure of smoothness */
+
 void fps_init();
 void fps_release();
 void fps_update(double elapsed_time, double delta_time);
-double fps_current();
 
 #endif
