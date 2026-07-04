@@ -22,6 +22,17 @@
 #include "numeric.h"
 #include "v2d.h"
 
+/* require alloca */
+#if !(defined(__APPLE__) || defined(MACOSX) || defined(macintosh) || defined(Macintosh))
+#include <malloc.h>
+#if defined(__linux__) || defined(__linux) || defined(__EMSCRIPTEN__)
+#include <alloca.h>
+#endif
+#endif
+
+#define ALLOCA_THRESHOLD 1024
+
+/* private utilities */
 static int compare_doubles(const void *a, const void *b);
 
 
@@ -164,7 +175,7 @@ double find_median(const double* arr, int n)
  */
 double find_median_ex(const double* arr, int n, double* out_min, double* out_max)
 {
-    double median, *sorted_arr;
+    double median;
 
     if(n <= 0) {
         if(out_min) *out_min = 0.0;
@@ -172,8 +183,11 @@ double find_median_ex(const double* arr, int n, double* out_min, double* out_max
         return 0.0;
     }
 
-    sorted_arr = mallocx(n * sizeof(double));
-    memcpy(sorted_arr, arr, n * sizeof(double));
+    size_t allocated_size = n * sizeof(double);
+    bool use_stack = allocated_size <= ALLOCA_THRESHOLD;
+    double* sorted_arr = use_stack ? alloca(allocated_size) : mallocx(allocated_size);
+
+    memcpy(sorted_arr, arr, allocated_size);
     qsort(sorted_arr, n, sizeof(double), compare_doubles);
 
     if(n % 2 == 1)
@@ -187,7 +201,9 @@ double find_median_ex(const double* arr, int n, double* out_min, double* out_max
     if(out_max)
         *out_max = sorted_arr[n-1];
 
-    free(sorted_arr);
+    if(!use_stack)
+        free(sorted_arr);
+
     return median;
 }
 
@@ -224,7 +240,9 @@ int find_outliers(const double* arr, int n, bool* out_is_inlier, double* out_med
         *out_median = median;
 
     /* calculate absolute deviations */
-    double* abs_deviations = mallocx(n * sizeof(double));
+    size_t allocated_size = n * sizeof(double);
+    bool use_stack = allocated_size <= ALLOCA_THRESHOLD;
+    double* abs_deviations = use_stack ? alloca(allocated_size) : mallocx(allocated_size);
     for(int i = 0; i < n; i++)
         abs_deviations[i] = fabs(arr[i] - median);
 
@@ -245,7 +263,10 @@ int find_outliers(const double* arr, int n, bool* out_is_inlier, double* out_med
     }
 
     /* cleanup */
-    free(abs_deviations);
+    if(!use_stack)
+        free(abs_deviations);
+
+    /* done! */
     return outlier_count;
 }
 
