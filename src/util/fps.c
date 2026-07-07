@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include "fps.h"
 #include "numeric.h"
+#include "../core/timer.h"
 
 #define WANTED_METHOD 2
 static double framerate = 0.0;
@@ -70,10 +71,15 @@ void fps_release()
 /*
  * fps_update()
  * Update the FPS counter
- * Give as input the elapsed time, in seconds, at the beginning of the current framestep
  */
-void fps_update(double elapsed_time)
+void fps_update()
 {
+    double elapsed_time = timer_get_elapsed();
+
+    /* find the unscaled delta_time, in seconds
+       note: timer_get_delta() is clamped, unsuitable for framerate measurement */
+    double delta_time = elapsed_time > previous_time ? elapsed_time - previous_time : 0.0;
+
 #if WANTED_METHOD == 1
 
     /* method 1: count the number of frames
@@ -85,6 +91,7 @@ void fps_update(double elapsed_time)
         min_framerate = framerate;
         counter = 0;
     }
+    (void)delta_time;
 
 #else
 
@@ -97,9 +104,6 @@ void fps_update(double elapsed_time)
         min_framerate = 1.0 / max_delta; /* how reliable is this estimate? */
         index_of_next_sample = 0;
     }
-
-    /* find the unscaled delta_time, in seconds */
-    double delta_time = elapsed_time > previous_time ? elapsed_time - previous_time : 0.0;
 
     /* collect a sample of an estimate of the inverse framerate */
     samples[index_of_next_sample++] = delta_time;
@@ -128,6 +132,13 @@ double fps_stability()
     /* This percentage tells us "how many" micro-stutters we're not experiencing per window of time
        The closer to 100%, the better. Running at TARGET_FPS with 100% or near stability is the intended experience
        A low percentage, particularly when the game is paused, may indicate unrelated work of the operating system (or of other programs) */
+
+#if 0
+    /* An outlier with fps_noise ~ 0 is not a problem */
+    const double THRESHOLD = 1.0 / (TARGET_FPS - 1) - 1.0 / TARGET_FPS;
+    if(fabs(1.0 / framerate - 1.0 / min_framerate) < THRESHOLD)
+        return 1.0;
+#endif
 
     double stutter_rate = (double)outlier_count / NUMBER_OF_SAMPLES;
     return 1.0 - stutter_rate;
