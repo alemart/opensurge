@@ -134,7 +134,7 @@ double fps_stability()
        A low percentage, particularly when the game is paused, may indicate unrelated work of the operating system (or of other programs) */
 
 #if 0
-    /* An outlier with fps_noise ~ 0 is not a problem */
+    /* An outlier with fps_maxdelta ~ 0 is not a problem */
     const double THRESHOLD = 1.0 / (TARGET_FPS - 1) - 1.0 / TARGET_FPS;
     if(fabs(1.0 / framerate - 1.0 / min_framerate) < THRESHOLD)
         return 1.0;
@@ -145,16 +145,16 @@ double fps_stability()
 }
 
 /*
- * fps_noise()
+ * fps_maxdelta()
  * Another measure of smoothness intended to capture micro-stutters
  */
-double fps_noise()
+double fps_maxdelta()
 {
     /* This value measures "how bad" was the worst micro-stutter we've just experienced (if any)
-       The closer to zero, the better. If fps_stability ~ 100%, then generally fps_noise ~ 0 (meaning: no stuttering)
+       The closer to zero, the better. If fps_stability ~ 100%, then generally fps_maxdelta ~ 0 (meaning: no stuttering)
        This value MAY reveal tasks like loading resources or heavy garbage collection, particularly if fps_stability is near 100%
-       and fps_noise >> 0, but it can't be reliably separated from unrelated work of the operating system (or of other programs).
-       This said, if fps_stability << 100% or fps_noise >> 0, then we're likely to be experiencing micro-stuttering */
+       and fps_maxdelta >> 0, but it can't be reliably separated from unrelated work of the operating system (or of other programs).
+       This said, if fps_stability << 100% or fps_maxdelta >> 0, then we're likely to be experiencing micro-stuttering */
 
     /* if we consider only the worst micro-stutter, this is the deviation from the framerate */
     return framerate - min_framerate; /* how accurate is this? */

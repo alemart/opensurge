@@ -25,7 +25,7 @@
 
 double fps_current(); /* the current framerate */
 double fps_stability(); /* a percentage of overall smoothness */
-double fps_noise(); /* another measure of smoothness */
+double fps_maxdelta(); /* another measure of smoothness */
 
 void fps_init();
 void fps_release();
