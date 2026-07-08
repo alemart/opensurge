@@ -1464,20 +1464,14 @@ void render_fps()
     al_scale_transform(&transform, font_scale, font_scale);
     al_translate_transform(&transform, xpos, 0.0f);
 
-    ALLEGRO_COLOR optimal, suboptimal, neutral;
-    optimal = al_map_rgb(176, 255, 176);
-    suboptimal = al_map_rgb(255, 255, 176);
-    neutral = al_map_rgb(255, 255, 255);
-
     al_use_transform(&transform);
     {
-        const double min_stability = 0.9, max_maxdelta = 1.0; /* these thresholds were arbitrarily picked */
         double fps = fps_current(), stability = fps_stability(), maxdelta = fps_maxdelta();
-        int height = al_get_font_line_height(console.font);
+        int width = al_get_text_width(console.font, " 60.0"), height = al_get_font_line_height(console.font);
 
-        DRAW_COLORED_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, neutral, "%.1lf", fps);
-        DRAW_COLORED_TEXT(0.0f, height, ALLEGRO_ALIGN_RIGHT, stability >= min_stability ? optimal : suboptimal, "%.0lf%%", stability * 100.0);
-        DRAW_COLORED_TEXT(0.0f, 2 * height, ALLEGRO_ALIGN_RIGHT, maxdelta < max_maxdelta ? optimal : suboptimal, "%.2lf", maxdelta);
+        DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%.1lf", fps);
+        DRAW_TEXT(-width, 0.0f, ALLEGRO_ALIGN_RIGHT, "%.2lf", -maxdelta);
+        DRAW_TEXT(0.0f, height, ALLEGRO_ALIGN_RIGHT, "%.0lf%%", stability * 100.0);
     }
     al_restore_state(&state);
 }
