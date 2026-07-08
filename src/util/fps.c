@@ -36,14 +36,14 @@ static int counter = 0;
 
 /* method 2: estimate the fps based on instantaneous framerates */
 #define NUMBER_OF_SAMPLES TARGET_FPS
-static double samples[NUMBER_OF_SAMPLES];
+static double samples[NUMBER_OF_SAMPLES] = { 0.0 };
 static int index_of_next_sample = 0;
 static int outlier_count = 0;
 static double min_framerate = 0.0;
 
 /*
  * fps_init()
- * Initialize the FPS counter
+ * Initialize the framerate utility
  */
 void fps_init()
 {
@@ -61,7 +61,7 @@ void fps_init()
 
 /*
  * fps_release()
- * Release the FPS counter
+ * Release the framerate utility
  */
 void fps_release()
 {
@@ -70,13 +70,13 @@ void fps_release()
 
 /*
  * fps_update()
- * Update the FPS counter
+ * Update the framerate utility
  */
 void fps_update()
 {
     double elapsed_time = timer_get_elapsed();
 
-    /* find the unscaled delta_time, in seconds
+    /* find the unscaled delta time, in seconds
        note: timer_get_delta() is clamped, unsuitable for framerate measurement */
     double delta_time = elapsed_time > previous_time ? elapsed_time - previous_time : 0.0;
 
@@ -106,7 +106,8 @@ void fps_update()
     }
 
     /* collect a sample of an estimate of the inverse framerate */
-    samples[index_of_next_sample++] = delta_time;
+    if(previous_time > 0.0)
+        samples[index_of_next_sample++] = delta_time;
 
 #endif
 

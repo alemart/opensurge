@@ -1467,7 +1467,8 @@ void render_fps()
     al_use_transform(&transform);
     {
         double fps = fps_current(), stability = fps_stability(), maxdelta = fps_maxdelta();
-        int width = al_get_text_width(console.font, " 60.0"), height = al_get_font_line_height(console.font);
+        int width = al_get_text_width(console.font, " " STRINGIFY(TARGET_FPS) ".0");
+        int height = al_get_font_line_height(console.font);
 
         DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%.1lf", fps);
         DRAW_TEXT(-width, 0.0f, ALLEGRO_ALIGN_RIGHT, "%.2lf", -maxdelta);
