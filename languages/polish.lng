@@ -161,7 +161,7 @@ CREDITS_RES_SCRIPTS         "<color=$COLOR_HIGHLIGHT>Skrypty</color>"
 CREDITS_RES_SCRIPTS_TEXT    "Autorzy są zidentyfikowani w samych skryptach."
 
 // Title Screen
-TITLESCREEN_PLAY            "ROZPOCZNIJ GRĘ"
+TITLESCREEN_PLAY            "URUCHOM GRĘ"
 TITLESCREEN_OPTIONS         "OPCJE"
 TITLESCREEN_CREATE          "TWÓRZ"
 TITLESCREEN_MOBILE          "WERSJA MOBILNA"
@@ -211,7 +211,7 @@ MAINMENU_VERSION            "v. $ENGINE_VERSION" // abbreviated
 // (legacy) Create Menu
 // Note: when translating CREATEMENU_TEXT, make sure the text fits the screen! (6 lines max)
 CREATEMENU_TITLE            "TWÓRZ"
-CREATEMENU_PLAY             "ZAGRAJ PRZYKŁADOWY POZIOM"
+CREATEMENU_PLAY             "PIASKOWNICA"
 CREATEMENU_LEARN            "NAUKA"
 CREATEMENU_SCRIPTING        "SURGESCRIPT"
 CREATEMENU_BACK             "WRÓĆ"
@@ -415,8 +415,8 @@ HUD_TIME                    "Czas"
 HUD_POWER                   "Moc"
 
 // Level Cleared animation
-CLEARED_LINE1               "PRZESZEDŁEŚ"
-CLEARED_LINE2               "PRZEZ POZIOM $LEVEL_ACT"
+CLEARED_LINE1               "ZROBIONY"
+CLEARED_LINE2               "POZIOM $LEVEL_ACT"
 CLEARED_POWER               "Bonus za moc"
 CLEARED_TIME                "Bonus za czas"
 CLEARED_SCORE               "Wynik"
