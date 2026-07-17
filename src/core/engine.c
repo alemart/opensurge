@@ -45,6 +45,7 @@
 #include "config.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../util/fps.h"
 #include "../entities/legacy/enemy.h"
 #include "../entities/legacy/nanocalc/nanocalc.h"
 #include "../entities/legacy/nanocalc/nanocalc_addons.h"
@@ -126,7 +127,6 @@ static void calc_error(const char *msg);
 static void perform_extra_validation(const commandline_t* cmd);
 static const char* INTRO_QUEST = "quests/intro.qst";
 static const char* SSAPP_LEVEL = "levels/surgescript.lev";
-static const double TARGET_FPS = 60.0; /* frames per second */
 static const double GC_INTERVAL = 10.0; /* in seconds (garbage collector) */
 static ALLEGRO_TIMER* a5_timer = NULL;
 static bool wants_to_quit = false;

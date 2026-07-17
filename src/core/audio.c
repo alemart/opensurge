@@ -209,6 +209,31 @@ void music_play(music_t *music, bool loop)
 }
 
 /*
+ * music_set_repeat_point()
+ * Set the loop endpoints for a music.
+ * Set start to zero for default loop (i.e. end to end).
+ */
+void music_set_repeat_point(music_t *music, double start)
+{
+    if(music != NULL) {
+        double stop = al_get_audio_stream_length_secs(music->stream);
+        start = clip(start, 0.0, stop);
+        al_set_audio_stream_loop_secs(music->stream, start, stop);
+    }
+}
+
+/*
+ * music_is_repeating()
+ * Checks if a music is repeating.
+ */
+bool music_is_repeating(music_t *music)
+{
+    return (music != NULL) && al_get_audio_stream_playmode(music->stream) == ALLEGRO_PLAYMODE_LOOP;
+}
+
+
+
+/*
  * music_stop()
  * Stops the current music (if any)
  */
@@ -216,7 +241,7 @@ void music_stop()
 {
     if(current_music != NULL) {
         al_set_audio_stream_playing(current_music->stream, false);
-        al_rewind_audio_stream(current_music->stream);
+        al_seek_audio_stream_secs(current_music->stream, 0.0);
         current_music->is_paused = false; /* it's stopped, not paused */
     }
 

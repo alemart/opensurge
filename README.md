@@ -26,13 +26,9 @@
 
 Open Surge Engine is an amazing tool for learning game development, programming, digital art, and the nature of free and open-source software in a playful way.
 
-Official website: <https://opensurge2d.org>
-
 ## Download
 
-By purchasing your copy, you can show your appreciation and support future development, user assistance and teaching with our game engine. As a supporter, you will receive exclusive items!
-
-[<img src="https://opensurge2d.org/img/badge_itchio.png" height="120" alt="Get it on itch.io">](https://alemart.itch.io/opensurge)
+<https://opensurge2d.org>
 
 ## Packaging
 

@@ -51,6 +51,7 @@
 #include "config.h"
 #include "../util/util.h"
 #include "../util/stringutil.h"
+#include "../util/fps.h"
 #include "../entities/mobilegamepad.h"
 
 #ifndef WANT_GLES
@@ -105,23 +106,6 @@ static fun_glgetstring_t _glGetString = NULL;
 static fun_glgeterror_t _glGetError = NULL;
 static void import_opengl_symbols();
 static const char* get_opengl_error();
-
-
-/* FPS counter */
-#define TARGET_FPS 60
-#define FPS_UPDATE_FREQUENCY 1 /* updates per second (ideally) */
-#define NUMBER_OF_FPS_SAMPLES (TARGET_FPS / FPS_UPDATE_FREQUENCY)
-static double fps = 0.0;
-static double fps_median = 0.0;
-static double fps_sample[NUMBER_OF_FPS_SAMPLES];
-static int index_of_next_fps_sample = 0;
-static int fps_frames = 0;
-static double fps_counted = 0.0;
-static double fps_last_update = 0.0;
-static void init_fps();
-static void update_fps();
-static void render_fps();
-static int sort_fps_samples(const void* a, const void* b);
 
 
 /* Video settings */
@@ -209,10 +193,12 @@ static const char* VIDEOQUALITY_NAME[] = {
     [VIDEOQUALITY_HIGH] = "high"
 };
 
-#define DRAW_TEXT(x, y, flags, fmt, ...) do { \
+#define DRAW_TEXT(x, y, flags, fmt, ...) DRAW_COLORED_TEXT((x), (y), (flags), al_map_rgb(255, 255, 255), (fmt), __VA_ARGS__)
+
+#define DRAW_COLORED_TEXT(x, y, flags, color, fmt, ...) do { \
     al_draw_textf(console.font, al_map_rgb(0, 0, 0), (x) + 1.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
     al_draw_textf(console.font, al_map_rgb(0, 0, 0), (x) + 0.0f, (y) + 1.0f, (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
-    al_draw_textf(console.font, al_map_rgb(255, 255, 255), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
+    al_draw_textf(console.font, (color), (x), (y), (flags) | ALLEGRO_ALIGN_INTEGER, (fmt), __VA_ARGS__); \
 } while(0)
 
 #define FONT_SCALE() (( \
@@ -223,6 +209,7 @@ static const char* VIDEOQUALITY_NAME[] = {
 #define LOG(...)    logfile_message("Video - " __VA_ARGS__)
 #define FATAL(...)  fatal_error("Video - " __VA_ARGS__)
 
+static void render_fps();
 static void render_texts();
 static bool use_default_shader();
 
@@ -269,9 +256,6 @@ void video_init()
     game_screen_height = config_video_screen_height(DEFAULT_SCREEN_HEIGHT);
     str_cpy(window_title, config_game_title(DEFAULT_WINDOW_TITLE), sizeof(window_title));
 
-    /* initialize the FPS counter */
-    init_fps();
-
     /* create the display */
     if(!create_display(game_screen_width, game_screen_height))
         FATAL("Failed to create a %dx%d display. %s", game_screen_width, game_screen_height, get_opengl_error());
@@ -303,13 +287,16 @@ void video_init()
             FATAL("OpenGL 2.1 or later is required to run the game");
     }
 
+    /* initialize the FPS counter */
+    fps_init();
+
+    /* initialize the console */
+    init_console();
+
     /* initialize the shader system */
     shader_init();
     if(!use_default_shader())
         FATAL("Failed to use the default shader. %s", get_opengl_error());
-
-    /* initialize the console */
-    init_console();
 }
 
 /*
@@ -320,11 +307,14 @@ void video_release()
 {
     LOG("Releasing the video manager...");
 
+    /* release the shader system */
+    shader_release();
+
     /* release the console */
     release_console();
 
-    /* release the shader system */
-    shader_release();
+    /* release the FPS counter */
+    fps_release();
 
     /* destroy the backbuffer */
     destroy_backbuffer();
@@ -380,8 +370,8 @@ void video_render(void (*render_overlay)())
     /* flip display */
     al_flip_display();
 
-    /* compute the framerate */
-    update_fps();
+    /* update the FPS counter */
+    fps_update(timer_get_elapsed());
 
     /* OpenGL: clear values */
     if(_glClearColor != NULL)
@@ -631,15 +621,6 @@ void video_set_fps_visible(bool visible)
 bool video_is_fps_visible()
 {
     return settings.is_fps_visible;
-}
-
-/*
- * video_fps()
- * Get the FPS rate
- */
-int video_fps()
-{
-    return fps;
 }
 
 /*
@@ -1434,69 +1415,25 @@ void render_console()
 }
 
 
+
+
 /*
  *
- * FRAMERATE
+ * MISC
  *
  */
 
-/* initialize the FPS counter */
-void init_fps()
+/* render texts with Allegro's built-in font */
+void render_texts()
 {
-    fps = 0.0;
+    al_hold_bitmap_drawing(true);
 
-    fps_frames = 0;
-    fps_counted = 0.0;
-    fps_last_update = 0.0;
+    if(settings.is_fps_visible)
+        render_fps();
 
-    fps_median = 0.0;
-    index_of_next_fps_sample = 0;
-    for(int i = 0; i < NUMBER_OF_FPS_SAMPLES; i++)
-        fps_sample[i] = 0.0;
-}
+    render_console();
 
-/* sorting function for the framerate samples */
-int sort_fps_samples(const void* a, const void* b)
-{
-    double x = *((double*)a);
-    double y = *((double*)b);
-
-    return (x > y) - (x < y);
-}
-
-/* compute the framerate */
-void update_fps()
-{
-    double delta_time = timer_get_delta();
-    double elapsed_time = timer_get_elapsed();
-
-    /* method 1: count the number of frames */
-    ++fps_frames;
-    if(elapsed_time >= fps_last_update + 1.0 / FPS_UPDATE_FREQUENCY) {
-        fps_last_update = elapsed_time;
-        fps_counted = fps_frames * FPS_UPDATE_FREQUENCY;
-        fps_frames = 0;
-    }
-
-    /* method 2: take the median of the samples of the framerate */
-    if(index_of_next_fps_sample >= NUMBER_OF_FPS_SAMPLES) {
-        qsort(fps_sample, NUMBER_OF_FPS_SAMPLES, sizeof(*fps_sample), sort_fps_samples);
-        double mid_a = fps_sample[NUMBER_OF_FPS_SAMPLES / 2];
-        double mid_b = fps_sample[(NUMBER_OF_FPS_SAMPLES - 1 + NUMBER_OF_FPS_SAMPLES % 2) / 2];
-        fps_median = (mid_a + mid_b) / 2.0;
-        index_of_next_fps_sample = 0;
-    }
-
-    /* collect a sample of the framerate */
-    fps_sample[index_of_next_fps_sample++] = 1.0 / delta_time;
-
-    /* Compare the two methods of determining the framerate. If their results
-       are very similar, take the median of the samples. If they are not, the
-       dataset has outliers. Let's take the counted method in this case. */
-    if(fabs(fps_median - fps_counted) < 2)
-        fps = fps_median; /* usually ~60 */
-    else
-        fps = fps_counted; /* usually 59, 60, 61 */
+    al_hold_bitmap_drawing(false);
 }
 
 /* render the FPS counter */
@@ -1527,31 +1464,24 @@ void render_fps()
     al_scale_transform(&transform, font_scale, font_scale);
     al_translate_transform(&transform, xpos, 0.0f);
 
+    ALLEGRO_COLOR optimal, suboptimal, neutral;
+    optimal = al_map_rgb(176, 255, 176);
+    suboptimal = al_map_rgb(255, 255, 176);
+    neutral = al_map_rgb(255, 255, 255);
+
     al_use_transform(&transform);
-        DRAW_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, "%.1lf", fps);
+    {
+        const double min_stability = 0.9, max_noise = 1.0; /* these thresholds were arbitrarily picked */
+        double fps = fps_current(), stability = fps_stability(), noise = fps_noise();
+        int height = al_get_font_line_height(console.font);
+
+        DRAW_COLORED_TEXT(0.0f, 0.0f, ALLEGRO_ALIGN_RIGHT, neutral, "%.1lf", fps);
+        DRAW_COLORED_TEXT(0.0f, height, ALLEGRO_ALIGN_RIGHT, stability >= min_stability ? optimal : suboptimal, "%.0lf%%", stability * 100.0);
+        DRAW_COLORED_TEXT(0.0f, 2 * height, ALLEGRO_ALIGN_RIGHT, noise < max_noise ? optimal : suboptimal, "%.2lf", noise);
+    }
     al_restore_state(&state);
 }
 
-
-
-/*
- *
- * MISC
- *
- */
-
-/* render texts with Allegro's built-in font */
-void render_texts()
-{
-    al_hold_bitmap_drawing(true);
-
-    if(settings.is_fps_visible)
-        render_fps();
-
-    render_console();
-
-    al_hold_bitmap_drawing(false);
-}
 
 /* import OpenGL symbols */
 void import_opengl_symbols()

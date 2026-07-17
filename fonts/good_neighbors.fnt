@@ -1931,6 +1931,14 @@ font "GoodNeighborsLarge"
             source_rect         1086 166 12 38
             offset              0 -6
         }
+        char "Ć" {
+            source_rect         1120 166 16 38
+            offset              0 -6
+        }
+        char "ć" {
+            source_rect         1138 166 16 38
+            offset              0 -6
+        }
         char "Č" {
             source_rect         1156 166 16 38
             offset              0 -6
@@ -1972,11 +1980,19 @@ font "GoodNeighborsLarge"
             offset              0 -6
         }
         char "Ę" {
-            source_rect         1560 166 18 38
+            source_rect         1560 166 16 38
             offset              0 -6
         }
         char "ę" {
             source_rect         1578 166 16 38
+            offset              0 -6
+        }
+        char "Ł" {
+            source_rect         1596 166 18 38
+            offset              0 -6
+        }
+        char "ł" {
+            source_rect         1616 166 12 38
             offset              0 -6
         }
         char "Ń" {
@@ -1985,6 +2001,30 @@ font "GoodNeighborsLarge"
         }
         char "ń" {
             source_rect         1650 166 18 38
+            offset              0 -6
+        }
+        char "Ś" {
+            source_rect         1668 166 16 38
+            offset              0 -6
+        }
+        char "ś" {
+            source_rect         1686 166 16 38
+            offset              0 -6
+        }
+        char "Ź" {
+            source_rect         1704 166 16 38
+            offset              0 -6
+        }
+        char "ź" {
+            source_rect         1722 166 16 38
+            offset              0 -6
+        }
+        char "Ż" {
+            source_rect         1740 166 16 38
+            offset              0 -6
+        }
+        char "ż" {
+            source_rect         1758 166 16 38
             offset              0 -6
         }
         char "×" {

@@ -368,8 +368,10 @@ object "Event Trigger Base" is "private", "entity", "special"
     {
         if(otherCollider.entity.hasTag("player") && !manager.triggered(group)) {
             player = otherCollider.entity;
-            manager.trigger(group, player);
-            parent.trigger();
+            if(!player.secondary) {
+                manager.trigger(group, player);
+                parent.trigger();
+            }
         }
     }
 }
