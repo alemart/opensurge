@@ -200,7 +200,7 @@ THANKSFORPLAYING_NO         "Jeszcze nie"
 
 // (legacy) Main Menu
 MAINMENU_TITLE              "MENU"
-MAINMENU_PLAY               "ROZPOCZNIJ"
+MAINMENU_PLAY               "GRAJ"
 MAINMENU_CREATE             "TWÓRZ"
 MAINMENU_SHARE              "UDOSTĘPNIJ"
 MAINMENU_OPTIONS            "OPCJE"
