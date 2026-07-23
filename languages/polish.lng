@@ -14,7 +14,7 @@
 // (use the English alphabet)
 LANG_ID                     "pl_PL"                            // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Polski"                           // language name
-LANG_AUTHOR                 "Hubert Grzywa 'Holypaladin'"      // translation author
+LANG_AUTHOR                 "Hubert Grzywa 'HolyPaladin'"      // translation author
 LANG_COMPATIBILITY          "0.6.1"                            // required engine version
 
 
