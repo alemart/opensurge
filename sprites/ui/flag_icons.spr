@@ -31,6 +31,7 @@ sprite "Flag Icon"
         uk_UA       8
         lt_LT       9
         id_ID       10
+        pl_PL       11
         eo          31
     }
 
@@ -120,6 +121,14 @@ sprite "Flag Icon"
         repeat      TRUE
         fps         8
         data        105
+    }
+
+    // pl_PL
+    animation 11
+    {
+        repeat      TRUE
+        fps         8
+        data        188
     }
 
     // eo
