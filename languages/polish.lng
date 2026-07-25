@@ -14,7 +14,7 @@
 // (use the English alphabet)
 LANG_ID                     "pl_PL"                            // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Polski"                           // language name
-LANG_AUTHOR                 "Hubert Grzywa 'HolyPaladin'"      // translation author
+LANG_AUTHOR                 "Hubert Grzywa 'Holypaladin'"      // translation author
 LANG_COMPATIBILITY          "0.6.1"                            // required engine version
 
 
@@ -114,7 +114,7 @@ OPTIONS_PLAYMOD_LEGACYERROR "Przestarzałe gry Open Surge nie są wspierane."
 OPTIONS_PLAYMOD_COMPATWARN  "Tryb zgodności to funkcja mająca na celu poprawę wrażeń z gry. Czy na pewno chcesz go wyłączyć?"
 OPTIONS_MODSTORAGE          "Magazyn"
 OPTIONS_MODSTORAGE_FOLDER   "Folder" // alternatively: Directory
-OPTIONS_MODSTORAGE_ARCHIVE  ".zip archive"
+OPTIONS_MODSTORAGE_ARCHIVE  "Archiwum .zip"
 OPTIONS_COMPATIBILITYMODE   "Tryb zgodności"
 OPTIONS_SUBMITFEEDBACK      "Wyślij opinię"
 OPTIONS_WRITEREVIEW         "Napisz recenzję"
@@ -130,13 +130,13 @@ STAGESELECT_PAGE            "strona $1/$2"
 STAGESELECT_ACT             "Strefa"
 
 // Credits
-CREDITS_TITLE               "CREDITS"
+CREDITS_TITLE               "PODZIĘKOWANIA"
 CREDITS_BACK                "Naciścij <color=$COLOR_HIGHLIGHT>$INPUT_FIRE4</color> aby wrócić"
 CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME wersja $ENGINE_VERSION</color>\ndziałająca dzięki $ENGINE_NAME\n$ENGINE_WEBSITE"
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Ludzie</color>"
 CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Byli członkowie</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Podziękowania dla</color>"
-CREDITS_ALEXANDRE           "Project Lead & Founder\nDeweloper projektu\nArtist"
+CREDITS_ALEXANDRE           "Koordynator Projektu i pomysłodawca\Deweloper projektu\Artysta"
 CREDITS_JOAO                "Artysta\nIlustrator"
 CREDITS_MATEUS              "Efekty dźwiękowe"
 CREDITS_CODY                "Artysta koncepcji\nProjektant przeciwników"
@@ -193,7 +193,7 @@ PLAYCLASSICLEVELS_YES       "$OPTIONS_YES"
 PLAYCLASSICLEVELS_NO        "$OPTIONS_NO"
 
 // Thanks for playing
-THANKSFORPLAYING_TITLE      "Thanks for playing!"
+THANKSFORPLAYING_TITLE      "Dzięki za grę!"
 THANKSFORPLAYING_TEXT       "Ta gra jest utworzona przy użyciu Open Surge, bardzo elastycznego i otwartoźródłowego silnika gry 2D który teraz jest w twoich rękach!\n\nTeraz podziel się radością! Powiedz rodzinie i przyjaciołom o tym i rozpowszechniaj Open Surge!"
 THANKSFORPLAYING_YES        "Oczywiście!"
 THANKSFORPLAYING_NO         "Jeszcze nie"
@@ -378,7 +378,7 @@ EDITOR_CONFIRM_YES          "Tak"
 EDITOR_CONFIRM_NO           "Nie"
 
 // Messages
-EDITOR_MESSAGE_WELCOME      "Welcome to the Level Editor!"
+EDITOR_MESSAGE_WELCOME      "Witaj w edytorze poziomów!"
 EDITOR_MESSAGE_SAVED        "Zapisane do <color=$COLOR_EDITOR_HIGHLIGHT>$1</color>"
 EDITOR_MESSAGE_SAVEERROR    "Nie można zapisać poziomu. Sprawdź ponownie logi."
 EDITOR_MESSAGE_RELOADED     "Poziom został ponownie załadowany"
@@ -434,59 +434,3 @@ PAUSE_TITLE                 "PAUZA"
 PAUSE_CONTINUE              "KONTYNUUJ"
 PAUSE_RESTART               "ODŚWIEŻ"
 PAUSE_EXIT                  "WYJDŹ"
-
-
-
-//
-// Section: special codes
-//
-
-//
-// Translators:
-//
-// Erase this section from your translation.
-// Language files other than English should
-// NOT include the codes below.
-//
-
-// Colors
-COLOR_TITLE                 "ff8844"
-COLOR_SUBTITLE              "ffa16b"
-COLOR_HIGHLIGHT             "ffee11"
-COLOR_HUD                   "ffff00"
-COLOR_HUDDANGER             "ff0000"
-COLOR_EDITOR_HIGHLIGHT      "ffa060"
-PAUSE_HIGHLIGHT             "ffee11"
-PAUSE_UNHIGHLIGHT           "ffffff"
-
-// Input
-INPUT_DIRECTIONAL           "${INPUT_${INPUT_TYPE}_DIRECTIONAL}"
-INPUT_UP                    "${INPUT_${INPUT_TYPE}_UP}"
-INPUT_RIGHT                 "${INPUT_${INPUT_TYPE}_RIGHT}"
-INPUT_DOWN                  "${INPUT_${INPUT_TYPE}_DOWN}"
-INPUT_LEFT                  "${INPUT_${INPUT_TYPE}_LEFT}"
-INPUT_FIRE1                 "${INPUT_${INPUT_TYPE}_FIRE1}"
-INPUT_FIRE2                 "${INPUT_${INPUT_TYPE}_FIRE2}"
-INPUT_FIRE3                 "${INPUT_${INPUT_TYPE}_FIRE3}"
-INPUT_FIRE4                 "${INPUT_${INPUT_TYPE}_FIRE4}"
-INPUT_FIRE5                 "${INPUT_${INPUT_TYPE}_FIRE5}"
-INPUT_FIRE6                 "${INPUT_${INPUT_TYPE}_FIRE6}"
-INPUT_FIRE7                 "${INPUT_${INPUT_TYPE}_FIRE7}"
-INPUT_FIRE8                 "${INPUT_${INPUT_TYPE}_FIRE8}"
-
-// Colored titles
-STAGESELECT_COLORED_TITLE   "<color=$COLOR_TITLE>$STAGESELECT_TITLE</color>"
-STAGESELECT_COLORED_DEBUG   "<color=$COLOR_TITLE>$STAGESELECT_DEBUG</color>"
-CREDITS_COLORED_TITLE       "<color=$COLOR_TITLE>$CREDITS_TITLE</color>"
-OPTIONS_COLORED_TITLE       "<color=$COLOR_TITLE>$OPTIONS_TITLE</color>"
-OPTIONS_COLORED_GRAPHICS    "<color=$COLOR_SUBTITLE>$OPTIONS_GRAPHICS</color>"
-OPTIONS_COLORED_AUDIO       "<color=$COLOR_SUBTITLE>$OPTIONS_AUDIO</color>"
-OPTIONS_COLORED_CONTROLS    "<color=$COLOR_SUBTITLE>$OPTIONS_CONTROLS</color>"
-OPTIONS_COLORED_GAME        "<color=$COLOR_SUBTITLE>$OPTIONS_GAME</color>"
-OPTIONS_COLORED_MODS        "<color=$COLOR_SUBTITLE>$OPTIONS_MODS</color>"
-OPTIONS_COLORED_ENGINE      "<color=$COLOR_SUBTITLE>$OPTIONS_ENGINE</color>"
-
-// Backward compatibility
-HUD_COLLECTIBLES            "$HUD_POWER"
-
-// EOF
