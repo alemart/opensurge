@@ -133,6 +133,36 @@ object "Water Bubble" is "entity", "private", "disposable"
     }
 }
 
+object "Water Bar" is "entity", "detached", "awake", "private"
+{
+    FACTOR = 0.4;
+    N_MAX_BUBBLE = 5;
+    bubbles = [];
+
+    state "main"
+    {
+        player = Player.active;
+        gauge = 0.0;
+        if(player.underwater)
+           gauge = (player.secondsToDrown / player.breathTime);
+        max = Math.min(gauge*N_MAX_BUBBLE - 0.02, N_MAX_BUBBLE);
+        for(i = 0; i < N_MAX_BUBBLE; i++) {
+            bubbles[i].visible = i < max;
+        }
+    }
+
+    fun constructor() {
+        for(i = 0; i < N_MAX_BUBBLE; i++){
+           bubble = Actor("Water Bubble");
+           bubble.anim = 3;
+           bubble.visible = false;
+           bubble.offset = Vector2(Screen.width - N_MAX_BUBBLE*(bubble.width * FACTOR) + i*(bubble.width * FACTOR), Screen.height - 16);
+           bubbles.push(bubble);
+        }
+    }
+
+}
+
 object "Water Splash" is "entity", "private", "disposable"
 {
     actor = Actor("Water Splash");
