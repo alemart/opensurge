@@ -14,7 +14,7 @@
 // (use the English alphabet)
 LANG_ID                     "pl_PL"                            // language code & country according to ISO 639-1 & ISO 3166-1, respectively
 LANG_NAME                   "Polski"                           // language name
-LANG_AUTHOR                 "Hubert Grzywa 'Holypaladin'"      // translation author
+LANG_AUTHOR                 "Hubert Grzywa 'HolyPaladin'"      // translation author
 LANG_COMPATIBILITY          "0.6.1"                            // required engine version
 
 
@@ -136,7 +136,7 @@ CREDITS_HEADER              "<color=$COLOR_HIGHLIGHT>$ENGINE_NAME wersja $ENGINE
 CREDITS_ACTIVE              "<color=$COLOR_HIGHLIGHT>Ludzie</color>"
 CREDITS_RETIRED             "<color=$COLOR_HIGHLIGHT>Byli członkowie</color>"
 CREDITS_THANKS              "<color=$COLOR_HIGHLIGHT>Podziękowania dla</color>"
-CREDITS_ALEXANDRE           "Koordynator Projektu i pomysłodawca\Deweloper projektu\Artysta"
+CREDITS_ALEXANDRE           "Koordynator Projektu i pomysłodawca\nDeweloper projektu\nArtysta"
 CREDITS_JOAO                "Artysta\nIlustrator"
 CREDITS_MATEUS              "Efekty dźwiękowe"
 CREDITS_CODY                "Artysta koncepcji\nProjektant przeciwników"
@@ -242,7 +242,7 @@ INPUT_KEYB_FIRE2            "LEWY CTRL"
 INPUT_KEYB_FIRE3            "ENTER"
 INPUT_KEYB_FIRE4            "ESC"
 INPUT_KEYB_FIRE5            "LEWY SHIFT"
-INPUT_KEYB_FIRE6            "PRAWy SHIFT"
+INPUT_KEYB_FIRE6            "PRAWY SHIFT"
 INPUT_KEYB_FIRE7            "<dostępny>"
 INPUT_KEYB_FIRE8            "<dostępny>"
 
