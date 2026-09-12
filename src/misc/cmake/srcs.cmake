@@ -139,6 +139,7 @@ set(GAME_SRCS
 
   src/misc/icon.c
   src/misc/license.c
+  src/misc/powersettings.c
   ${CMAKE_CURRENT_BINARY_DIR}/src/misc/credits.c
 
   src/main.c

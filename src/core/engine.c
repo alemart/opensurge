@@ -470,6 +470,10 @@ void init_basic_stuff(const commandline_t* cmd)
     );
     logfile_init(LOGFILE_TXT);
 
+    /* power settings */
+    extern void optimize_power_settings();
+    optimize_power_settings();
+
     /* initialize prefs and nanocalc */
     prefs = prefs_create(NULL);
     init_nanocalc();
