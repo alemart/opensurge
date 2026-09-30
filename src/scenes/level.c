@@ -130,6 +130,7 @@ static bool is_setup_object(const char* object_name);
 /* level attributes */
 static char file[PATH_MAXLEN];
 static char musicfile[PATH_MAXLEN];
+static double music_repeat_start = 0.0;
 static char theme[PATH_MAXLEN];
 static char bgtheme[PATH_MAXLEN];
 static char grouptheme[PATH_MAXLEN];
@@ -139,7 +140,6 @@ static char version[128];
 static char license[128];
 static int act_number;
 static int requires[3]; /* this level requires engine version x.y.z */
-static double music_repeat_start = 0.0;
 static bool readonly; /* we can't activate the level editor */
 static v2d_t spawn_point;
 
@@ -694,8 +694,12 @@ int level_save(const char *filepath)
     (int)spawn_point.x, (int)spawn_point.y);
 
     /* music? */
-    if(strcmp(musicfile, "") != 0)
-        al_fprintf(fp, "music \"%s\"\n", musicfile);
+    if(strcmp(musicfile, "") != 0) {
+        if(music_repeat_start == 0.0)
+            al_fprintf(fp, "music \"%s\"\n", musicfile);
+        else
+            al_fprintf(fp, "music \"%s\" %.2lf\n", musicfile, music_repeat_start);
+    }
 
     /* grouptheme? */
     if(strcmp(grouptheme, "") != 0)
