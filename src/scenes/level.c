@@ -923,7 +923,7 @@ bool level_interpret_header_line(const char* filepath, int fileline, levparser_c
         }
         else if(param_count >= 2) {
             str_cpy(musicfile, param[0], sizeof(musicfile));
-            music_repeat_start = atof(param[1]);
+            music_repeat_start = max(atof(param[1]), 0.0);
         }
         else
             logfile_message("Level loader - command '%s' expects parameters: filepath [, loop_point]", command_name);
