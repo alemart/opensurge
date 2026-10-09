@@ -43,3 +43,25 @@ endfunction()
 function(generate_from_template TEMPLATE)
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/misc/${TEMPLATE}.in" "src/misc/${TEMPLATE}" @ONLY)
 endfunction()
+
+# Make a build deterministic
+function(make_deterministic TARGET)
+  if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # Use relative paths in __FILE__
+    target_compile_options(${TARGET} PUBLIC "-ffile-prefix-map=${CMAKE_SOURCE_DIR}=.")
+    target_compile_options(${TARGET} PUBLIC "-ffile-prefix-map=${CMAKE_BINARY_DIR}=.") # useful for auto-generated sources
+
+    # Pick a random seed
+    target_compile_options(${TARGET} PUBLIC "-frandom-seed=${CMAKE_PROJECT_NAME}")
+
+    # Remove the build-id
+    target_link_options(${TARGET} PUBLIC "-Wl,--build-id=none")
+  else()
+    message(FATAL_ERROR "Deterministic builds: unsupported compiler")
+  endif()
+
+  # Check if SOURCE_DATE_EPOCH is set
+  if(NOT DEFINED ENV{SOURCE_DATE_EPOCH})
+    message(FATAL_ERROR "Deterministic builds: environment variable SOURCE_DATE_EPOCH is not set!")
+  endif()
+endfunction()

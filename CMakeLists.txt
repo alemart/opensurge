@@ -73,7 +73,7 @@ if(NOT GAME_BUILD_VERSION STREQUAL "")
 endif()
 
 # Set the build date
-option(WANT_BUILD_DATE "Include the build date in the binary (disable for reproducible builds)" ON)
+option(WANT_BUILD_DATE "Include the build date in the binary" ON)
 if(WANT_BUILD_DATE)
   list(APPEND DEFS "GAME_BUILD_DATE=__DATE__")
 endif()
@@ -100,6 +100,12 @@ endif()
 option(WANT_BETTER_GAMEPAD "Autodetect gamepad layouts for consistent cross-platform behavior" ON)
 if(WANT_BETTER_GAMEPAD)
   list(APPEND DEFS "WANT_BETTER_GAMEPAD=1")
+endif()
+
+# Deterministic builds
+option(WANT_DETERMINISTIC_BUILD "Enable deterministic builds. This option cannot affect any dependencies" OFF)
+if(WANT_DETERMINISTIC_BUILD AND WANT_BUILD_DATE)
+  message(WARNING "Deterministic builds: option WANT_BUILD_DATE is on")
 endif()
 
 # User-specified paths
@@ -297,9 +303,9 @@ if(GAME_RUNINPLACE)
   set_target_properties(${GAME_UNIXNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
 endif()
 
-# Use relative paths in __FILE__ (reproducible builds)
-if(NOT MSVC)
-  target_compile_options(${GAME_UNIXNAME} PUBLIC "-ffile-prefix-map=${CMAKE_SOURCE_DIR}=.")
+# Deterministic builds
+if(WANT_DETERMINISTIC_BUILD)
+  make_deterministic(${GAME_UNIXNAME})
 endif()
 
 
